@@ -1,4 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
+
+Widget wrapSystemUiOverlayStyle({@required Widget child}) {
+  return AnnotatedRegion<SystemUiOverlayStyle>(
+    value: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ),
+    child: child,
+  );
+}
+
+double getPlatformSize(double size) {
+  return Platform.isAndroid ? 0.9 * size : size;
+}
 
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
