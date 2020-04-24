@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/home.dart';
+import '../../constants.dart' as Constants;
 
 class Login extends StatelessWidget {
   @override
@@ -25,13 +26,16 @@ class _LoginMainState extends State<LoginMain> {
         decoration: BoxDecoration(
           //color: Colors.red,
           image: DecorationImage(
-              image: AssetImage('assets/images/login/bg_login.jpg'),
-              fit: BoxFit.cover),
+            image: AssetImage('assets/images/login/bg_login.jpg'),
+            fit: BoxFit.cover,
+          ),
         ),
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.only(
-                left: getPlatformSize(40.0), right: getPlatformSize(40.0)),
+              left: Constants.LoginScreen.HORIZONTAL_MARGIN,
+              right: Constants.LoginScreen.HORIZONTAL_MARGIN,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -40,42 +44,41 @@ class _LoginMainState extends State<LoginMain> {
                   flex: 1,
                   child: Center(
                     child: Container(
-                      margin: EdgeInsets.only(top: getPlatformSize(20.0)),
+                      margin: EdgeInsets.only(
+                        top: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
+                      ),
                       child: Image(
                         image: AssetImage('assets/images/login/exat_logo.png'),
-                        width: getPlatformSize(210.0),
-                        height: getPlatformSize(210.0),
+                        width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+                        height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                       ),
                     ),
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                      left: 0.0,
-                      right: 0.0,
-                      top: getPlatformSize(20.0),
-                      bottom: getPlatformSize(20.0)),
+                    top: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
+                    bottom: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
+                  ),
                   decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xaaffffff),
-                          blurRadius: getPlatformSize(15.0),
-                          // has the effect of softening the shadow
-                          spreadRadius: getPlatformSize(3.0),
-                          // has the effect of extending the shadow
-                          offset: Offset(
-                            getPlatformSize(3.0), // horizontal, move right 10
-                            getPlatformSize(3.0), // vertical, move down 10
-                          ),
-                        )
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(getPlatformSize(12.0)),
-                        topRight: Radius.circular(getPlatformSize(12.0)),
-                        bottomLeft: Radius.circular(getPlatformSize(12.0)),
-                        bottomRight: Radius.circular(getPlatformSize(12.0)),
-                      )),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xaaffffff),
+                        blurRadius: getPlatformSize(15.0),
+                        spreadRadius: getPlatformSize(3.0),
+                        offset: Offset(
+                          getPlatformSize(3.0), // move right
+                          getPlatformSize(3.0), // move down
+                        ),
+                      ),
+                    ],
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(
+                        getPlatformSize(Constants.App.BOX_BORDER_RADIUS),
+                      ),
+                    ),
+                  ),
                   child: Column(
                     children: <Widget>[
                       LoginField(
@@ -86,12 +89,17 @@ class _LoginMainState extends State<LoginMain> {
                         hint: 'Enter username or email',
                       ),
                       Container(
-                        height: 0.5,
-                        color: const Color(0xffe0e0e0),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 0.0, // hairline border
+                            color: Color(0xFFDDDDDD),
+                          ),
+                        ),
+                        height: 0.0,
                       ),
                       LoginField(
                         icon: AssetImage('assets/images/login/ic_password.png'),
-                        iconWidth: getPlatformSize(19.25),
+                        iconWidth: getPlatformSize(20.0),
                         iconHeight: getPlatformSize(22.0),
                         label: 'PASSWORD',
                         hint: 'Enter password',
