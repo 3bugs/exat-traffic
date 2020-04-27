@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+
 import '../../constants.dart' as Constants;
 import 'components/drawer.dart';
 import 'components/nav_bar.dart';
+
+//https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 
 class Home extends StatelessWidget {
   @override
@@ -30,8 +36,27 @@ class _HomeMainState extends State<HomeMain> {
     //todo:
   ];
 
+  Completer<GoogleMapController> _googleMapController = Completer();
+
+  //Bangkok position
+  static const CameraPosition INITIAL_POSITION = CameraPosition(
+    target: LatLng(13.7563, 100.5018),
+    zoom: 8,
+  );
+
   void _handleClickTab(int index) {
     //print(index.toString());
+  }
+
+  Future<void> _moveToCurrentPosition(BuildContext context) async {
+    final Position position =
+        await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    final CameraPosition currentPosition = CameraPosition(
+      target: LatLng(position.latitude, position.longitude),
+      zoom: 15,
+    );
+    final GoogleMapController controller = await _googleMapController.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
   }
 
   @override
@@ -123,9 +148,18 @@ class _HomeMainState extends State<HomeMain> {
                       margin: EdgeInsets.only(top: Constants.HomeScreen.MAPS_VERTICAL_POSITION),
                       decoration: BoxDecoration(
                         //color: Color(0xFFF6F6F4),
-                        color: Colors.yellow.shade100,
+                        color: Colors.black,
                       ),
-                      child: Center(
+                      child: GoogleMap(
+                        mapType: MapType.normal,
+                        initialCameraPosition: INITIAL_POSITION,
+                        myLocationEnabled: true,
+                        onMapCreated: (GoogleMapController controller) {
+                          _googleMapController.complete(controller);
+                          _moveToCurrentPosition(context);
+                        },
+                      ),
+                      /*Center(
                         child: Text(
                           'ʕ•́ᴥ•̀ʔ\nGoogle Maps\ncoming soon.\n♡♡♡',
                           textAlign: TextAlign.center,
@@ -134,7 +168,7 @@ class _HomeMainState extends State<HomeMain> {
                             color: Color(0xFF666666),
                           ),
                         ),
-                      ),
+                      ),*/
                     ),
                     Positioned(
                       width: MediaQuery.of(context).size.width,
@@ -214,25 +248,29 @@ class _HomeMainState extends State<HomeMain> {
                               child: Column(
                                 children: <Widget>[
                                   MapToolItem(
-                                    icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                                    icon: AssetImage(
+                                        'assets/images/map_tools/ic_map_tool_location.png'),
                                     iconWidth: getPlatformSize(21.0),
                                     iconHeight: getPlatformSize(21.0),
                                     marginTop: getPlatformSize(16.0),
                                   ),
                                   MapToolItem(
-                                    icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
+                                    icon: AssetImage(
+                                        'assets/images/map_tools/ic_map_tool_nearby.png'),
                                     iconWidth: getPlatformSize(26.6),
                                     iconHeight: getPlatformSize(21.6),
                                     marginTop: getPlatformSize(10.0),
                                   ),
                                   MapToolItem(
-                                    icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                                    icon: AssetImage(
+                                        'assets/images/map_tools/ic_map_tool_schematic.png'),
                                     iconWidth: getPlatformSize(16.4),
                                     iconHeight: getPlatformSize(18.3),
                                     marginTop: getPlatformSize(10.0),
                                   ),
                                   MapToolItem(
-                                    icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
+                                    icon:
+                                        AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
                                     iconWidth: getPlatformSize(15.5),
                                     iconHeight: getPlatformSize(16.5),
                                     marginTop: getPlatformSize(10.0),
