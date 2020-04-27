@@ -173,12 +173,13 @@ class _LoginMainState extends State<LoginMain> {
 }
 
 class LoginField extends StatefulWidget {
-  LoginField(
-      {@required this.icon,
-      @required this.iconWidth,
-      @required this.iconHeight,
-      @required this.label,
-      @required this.hint});
+  LoginField({
+    @required this.icon,
+    @required this.iconWidth,
+    @required this.iconHeight,
+    @required this.label,
+    @required this.hint,
+  });
 
   final AssetImage icon;
   final double iconWidth;
