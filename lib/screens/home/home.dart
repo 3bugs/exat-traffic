@@ -138,6 +138,11 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData queryData = MediaQuery.of(context);
+    print('Device width: ${queryData.size.width}, ' +
+        'height: ${queryData.size.height}, ' +
+        'pixel ratio: ${queryData.devicePixelRatio}');
+
     return Scaffold(
       appBar: null,
       /*AppBar(
