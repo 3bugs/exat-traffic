@@ -17,9 +17,13 @@ class NavBar {
   static final double CENTER_ITEM_INNER_SIZE = getPlatformSize(66.0);
 }
 
+class BottomSheet {
+  static final double HEIGHT_INITIAL = getPlatformSize(175.0);
+}
+
 class HomeScreen {
-  static final double MAPS_VERTICAL_POSITION = getPlatformSize(42.0);
-  static final double SEARCH_BOX_VERTICAL_POSITION = getPlatformSize(16.0);
+  static final double MAPS_VERTICAL_POSITION = getPlatformSize(38.0);
+  static final double SEARCH_BOX_VERTICAL_POSITION = getPlatformSize(13.0);
 }
 
 class LoginScreen {
