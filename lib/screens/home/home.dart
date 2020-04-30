@@ -138,6 +138,10 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    /*
+      Galaxy J7 Prime (5.5" @ 1920x1080) = 414 x 736 logical pixel @ 3.0 pixel ratio
+      iPhone 7 Plus (5.5" @ 1920x1080) = 360 x 640 logical pixel @ 3.0 pixel ratio
+    */
     final MediaQueryData queryData = MediaQuery.of(context);
     print('Device width: ${queryData.size.width}, ' +
         'height: ${queryData.size.height}, ' +
@@ -179,7 +183,7 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(
-                            left: getPlatformSize(3.0),
+                            left: getPlatformSize(0.0),
                             right: getPlatformSize(3.0),
                             top: getPlatformSize(16.0),
                             bottom: 0.0),
@@ -187,15 +191,41 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Image(
-                              image: AssetImage('assets/images/home/ic_menu.png'),
-                              width: getPlatformSize(22.0),
-                              height: getPlatformSize(20.0),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(getPlatformSize(0.0)),
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.only(
+                                    left: getPlatformSize(3.0),
+                                    right: getPlatformSize(3.0),
+                                    top: getPlatformSize(2.0),
+                                    bottom: getPlatformSize(3.0),
+                                  ),
+                                  child: Image(
+                                    image: AssetImage('assets/images/home/ic_menu.png'),
+                                    width: getPlatformSize(22.0),
+                                    height: getPlatformSize(20.0),
+                                  ),
+                                ),
+                              ),
                             ),
-                            Image(
-                              image: AssetImage('assets/images/home/ic_phone_circle.png'),
-                              width: getPlatformSize(36.0),
-                              height: getPlatformSize(36.0),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(getPlatformSize(18.0)),
+                                ),
+                                child: Image(
+                                  image: AssetImage('assets/images/home/ic_phone_circle.png'),
+                                  width: getPlatformSize(36.0),
+                                  height: getPlatformSize(36.0),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -250,16 +280,6 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                           _moveToCurrentPosition(context);
                         },
                       ),
-                      /*Center(
-                        child: Text(
-                          'ʕ•́ᴥ•̀ʔ\nGoogle Maps\ncoming soon.\n♡♡♡',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: getPlatformSize(40.0),
-                            color: Color(0xFF666666),
-                          ),
-                        ),
-                      ),*/
                     ),
                     // search box
                     Positioned(
@@ -299,7 +319,7 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                                   top: getPlatformSize(6.0),
                                   bottom: getPlatformSize(6.0),
                                   left: getPlatformSize(20.0),
-                                  right: getPlatformSize(16.0),
+                                  right: getPlatformSize(12.0),
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -328,10 +348,25 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                                         ),
                                       ),
                                     ),
-                                    Image(
-                                      image: AssetImage('assets/images/home/ic_close_search.png'),
-                                      width: getPlatformSize(24.0),
-                                      height: getPlatformSize(24.0),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {},
+                                        borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                                        child: Container(
+                                          width: getPlatformSize(36.0),
+                                          height: getPlatformSize(36.0),
+                                          //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                          child: Center(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/images/home/ic_close_search.png'),
+                                              width: getPlatformSize(24.0),
+                                              height: getPlatformSize(24.0),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -475,7 +510,9 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                                             onTap: () {
                                               _handleClickUpDownSheet(context);
                                             },
-                                            borderRadius: BorderRadius.all(Radius.circular(21.0)),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(getPlatformSize(21.0)),
+                                            ),
                                             child: Container(
                                               width: getPlatformSize(42.0),
                                               height: getPlatformSize(42.0),
@@ -568,11 +605,13 @@ class MapToolItem extends StatelessWidget {
   final double iconHeight;
   final double marginTop;
 
+  static const double SIZE = 45.0;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: getPlatformSize(45.0),
-      height: getPlatformSize(45.0),
+      width: getPlatformSize(SIZE),
+      height: getPlatformSize(SIZE),
       margin: EdgeInsets.only(
         top: marginTop,
       ),
@@ -592,11 +631,19 @@ class MapToolItem extends StatelessWidget {
           borderRadius: BorderRadius.all(
             Radius.circular(Constants.App.BOX_BORDER_RADIUS),
           )),
-      child: Center(
-        child: Image(
-          image: icon,
-          width: iconWidth,
-          height: iconHeight,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          //highlightColor: Constants.App.PRIMARY_COLOR,
+          borderRadius: BorderRadius.all(Radius.circular(Constants.App.BOX_BORDER_RADIUS)),
+          child: Center(
+            child: Image(
+              image: icon,
+              width: iconWidth,
+              height: iconHeight,
+            ),
+          ),
         ),
       ),
     );

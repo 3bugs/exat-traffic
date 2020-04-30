@@ -152,11 +152,20 @@ class _MyNavBarState extends State<MyNavBar> {
                       Radius.circular(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2),
                     ),
                   ),
-                  child: Center(
-                    child: Image(
-                      image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),
-                      width: getPlatformSize(26.0),
-                      height: getPlatformSize(26.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {},
+                      //highlightColor: Constants.App.PRIMARY_COLOR,
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2)),
+                      child: Center(
+                        child: Image(
+                          image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),
+                          width: getPlatformSize(26.0),
+                          height: getPlatformSize(26.0),
+                        ),
+                      ),
                     ),
                   ),
                 ),
