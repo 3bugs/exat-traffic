@@ -1,17 +1,20 @@
 import 'dart:async';
+import 'package:exattraffic/models/toll_plaza.dart';
 import 'package:flutter/material.dart';
-import 'package:exattraffic/etc/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../constants.dart' as Constants;
-import 'components/drawer.dart';
-import 'components/nav_bar.dart';
+import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/express_way.dart';
+import 'package:exattraffic/screens/home/components/drawer.dart';
+import 'package:exattraffic/screens/home/components/nav_bar.dart';
+import 'package:exattraffic/constants.dart' as Constants;
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
 //https://codewithandrea.com/articles/2018-09-13-bottom-bar-navigation-with-fab/
+//https://medium.com/flutter/executing-dart-in-the-background-with-flutter-plugins-and-geofencing-2b3e40a1a124
 
 class Home extends StatelessWidget {
   @override
@@ -52,7 +55,7 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
   bool _showDate = true;
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
-  final List<ExpressWay> _expressWays = <ExpressWay>[
+  final List<ExpressWay> _expressWayList = <ExpressWay>[
     ExpressWay(
       name: 'ทางพิเศษศรีรัช',
       image: AssetImage('assets/images/home/express_way_srirach.jpg'),
@@ -80,6 +83,33 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
     ExpressWay(
       name: 'ทางพิเศษกาญจนาภิเษก',
       image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
+    ),
+  ];
+
+  final List<TollPlaza> _tollPlazaList = <TollPlaza>[
+    TollPlaza(
+      name: 'ทางลงลาดพร้าว',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      isEntrance: false,
+      isExit: true,
+    ),
+    TollPlaza(
+      name: 'รามอินทรา',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      isEntrance: true,
+      isExit: true,
+    ),
+    TollPlaza(
+      name: 'สุขาภิบาล 5',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      isEntrance: true,
+      isExit: false,
+    ),
+    TollPlaza(
+      name: 'โยธิน',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      isEntrance: true,
+      isExit: true,
     ),
   ];
 
@@ -412,7 +442,7 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                       ),
                     ),
                     // bottom sheet
-                    PositionedTransition(
+                    /*PositionedTransition(
                       rect: RelativeRectTween(
                         begin: RelativeRect.fromLTRB(
                           0,
@@ -480,10 +510,11 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                                 padding: EdgeInsets.only(
                                   left: getPlatformSize(0.0),
                                   right: getPlatformSize(0.0),
-                                  top: getPlatformSize(2.0),
+                                  top: getPlatformSize(6.0),
                                   bottom: getPlatformSize(0.0),
                                 ),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.max,
                                   //crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: <Widget>[
                                     Row(
@@ -536,21 +567,54 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                                         ),
                                       ],
                                     ),
-                                    Container(
-                                      height: getPlatformSize(110.0),
-                                      child: ListView.separated(
-                                        itemCount: _expressWays.length,
-                                        scrollDirection: Axis.horizontal,
-                                        physics: BouncingScrollPhysics(),
-                                        itemBuilder: (BuildContext context, int index) {
-                                          return ExpressWayView(
-                                              expressWayModel: _expressWays[index]);
-                                        },
-                                        separatorBuilder: (BuildContext context, int index) {
-                                          return SizedBox(
-                                            width: getPlatformSize(0.0),
-                                          );
-                                        },
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          // list ทางพิเศษ (text)
+                                          Container(
+                                            height: getPlatformSize(44.0),
+                                            child: ListView.separated(
+                                              itemCount: _expressWayList.length,
+                                              scrollDirection: Axis.horizontal,
+                                              physics: BouncingScrollPhysics(),
+                                              itemBuilder: (BuildContext context, int index) {
+                                                return ExpressWayTextView(
+                                                  expressWay: _expressWayList[index],
+                                                  isFirstItem: index == 0,
+                                                  isLastItem: index == _expressWayList.length - 1,
+                                                );
+                                              },
+                                              separatorBuilder: (BuildContext context, int index) {
+                                                return SizedBox(
+                                                  width: getPlatformSize(0.0),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          // list ด่านทางขึ้น-ลง
+                                          Expanded(
+                                            child: Container(
+                                              child: ListView.separated(
+                                                itemCount: _tollPlazaList.length,
+                                                scrollDirection: Axis.vertical,
+                                                physics: BouncingScrollPhysics(),
+                                                itemBuilder: (BuildContext context, int index) {
+                                                  return TollPlazaView(
+                                                    tollPlaza: _tollPlazaList[index],
+                                                    isFirstItem: index == 0,
+                                                    isLastItem: index == _tollPlazaList.length - 1,
+                                                  );
+                                                },
+                                                separatorBuilder:
+                                                    (BuildContext context, int index) {
+                                                  return SizedBox(
+                                                    width: getPlatformSize(0.0),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -560,7 +624,7 @@ class _HomeMainState extends State<HomeMain> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                    ),
+                    ),*/
                     // เงาบนแถบ bottom nav
                     Align(
                       alignment: Alignment.bottomLeft,
@@ -650,20 +714,16 @@ class MapToolItem extends StatelessWidget {
   }
 }
 
-class ExpressWay {
-  ExpressWay({
-    @required this.name,
-    @required this.image,
+class ExpressWayImageView extends StatelessWidget {
+  ExpressWayImageView({
+    @required this.expressWay,
+    @required this.isFirstItem,
+    @required this.isLastItem,
   });
 
-  final String name;
-  final AssetImage image;
-}
-
-class ExpressWayView extends StatelessWidget {
-  ExpressWayView({@required this.expressWayModel});
-
-  final ExpressWay expressWayModel;
+  final ExpressWay expressWay;
+  final bool isFirstItem;
+  final bool isLastItem;
 
   @override
   Widget build(BuildContext context) {
@@ -671,20 +731,25 @@ class ExpressWayView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {},
+        borderRadius: BorderRadius.all(
+          Radius.circular(getPlatformSize(5.0)),
+        ),
         child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: getPlatformSize(10.0),
-            vertical: getPlatformSize(2.0),
+          padding: EdgeInsets.only(
+            left: getPlatformSize(isFirstItem ? 20.0 : 10.0),
+            right: getPlatformSize(isLastItem ? 20.0 : 10.0),
+            top: getPlatformSize(2.0),
+            bottom: getPlatformSize(2.0),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(getPlatformSize(12.0)),
+                  Radius.circular(Constants.App.BOX_BORDER_RADIUS),
                 ),
                 child: Image(
-                  image: expressWayModel.image,
+                  image: expressWay.image,
                   width: getPlatformSize(122.0),
                   height: getPlatformSize(78.0),
                   fit: BoxFit.cover,
@@ -695,7 +760,7 @@ class ExpressWayView extends StatelessWidget {
                   top: getPlatformSize(6.0),
                 ),
                 child: Text(
-                  expressWayModel.name,
+                  expressWay.name,
                   style: TextStyle(
                     fontSize: getPlatformSize(14.0),
                     color: Color(0xFF585858),
@@ -706,6 +771,201 @@ class ExpressWayView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ExpressWayTextView extends StatelessWidget {
+  ExpressWayTextView({
+    @required this.expressWay,
+    @required this.isFirstItem,
+    @required this.isLastItem,
+  });
+
+  final ExpressWay expressWay;
+  final bool isFirstItem;
+  final bool isLastItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(
+            left: getPlatformSize(isFirstItem ? 14.0 : 7.0),
+            right: getPlatformSize(isLastItem ? 14.0 : 7.0),
+            top: getPlatformSize(2.0),
+            bottom: getPlatformSize(2.0),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.all(
+                Radius.circular(getPlatformSize(6.0)),
+              ),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: getPlatformSize(8.0),
+                  vertical: getPlatformSize(5.0),
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: getPlatformSize(1.0),
+                    color: Color(0xFF707070),
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                ),
+                child: Center(
+                  child: Text(
+                    expressWay.name,
+                    style: TextStyle(
+                      fontSize: getPlatformSize(14.0),
+                      color: Color(0xFF585858),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class TollPlazaView extends StatelessWidget {
+  TollPlazaView({
+    @required this.tollPlaza,
+    @required this.isFirstItem,
+    @required this.isLastItem,
+  });
+
+  final TollPlaza tollPlaza;
+  final bool isFirstItem;
+  final bool isLastItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(
+            left: getPlatformSize(14.0),
+            right: getPlatformSize(14.0),
+            top: getPlatformSize(isFirstItem ? 7.0 : 7.0),
+            bottom: getPlatformSize(isLastItem ? 21.0 : 7.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x11808080),
+                  blurRadius: getPlatformSize(6.0),
+                  spreadRadius: getPlatformSize(2.0),
+                  offset: Offset(
+                    getPlatformSize(2.0), // move right
+                    getPlatformSize(2.0), // move down
+                  ),
+                ),
+              ],
+              color: Color(0xFFF4F4F4),
+              border: Border.all(
+                width: getPlatformSize(1.0),
+                color: Color(0xFFE8E8E8),
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.all(
+                  Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+                ),
+                child: Container(
+                  padding: EdgeInsets.only(
+                    left: getPlatformSize(10.0),
+                    right: getPlatformSize(10.0),
+                    top: getPlatformSize(10.0),
+                    bottom: getPlatformSize(10.0),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(
+                        width: getPlatformSize(4.0),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: getPlatformSize(4.0),
+                          right: getPlatformSize(2.0),
+                          top: getPlatformSize(0.0),
+                          bottom: getPlatformSize(4.0),
+                        ),
+                        child: Image(
+                          image: tollPlaza.isEntrance
+                              ? AssetImage('assets/images/home/ic_arrow_green_up.png')
+                              : AssetImage('assets/images/home/ic_arrow_red_up.png'),
+                          width: getPlatformSize(15.6),
+                          height: getPlatformSize(26.7),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: getPlatformSize(2.0),
+                          right: getPlatformSize(4.0),
+                          top: getPlatformSize(4.0),
+                          bottom: getPlatformSize(0.0),
+                        ),
+                        child: Image(
+                          image: tollPlaza.isExit
+                              ? AssetImage('assets/images/home/ic_arrow_green_down.png')
+                              : AssetImage('assets/images/home/ic_arrow_red_down.png'),
+                          width: getPlatformSize(15.6),
+                          height: getPlatformSize(26.7),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.only(
+                            left: getPlatformSize(30.0),
+                          ),
+                          child: Text(
+                            tollPlaza.name,
+                            style: TextStyle(
+                              fontSize: getPlatformSize(16.0),
+                              color: Color(0xFF717171),
+                            ),
+                          ),
+                        ),
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(getPlatformSize(9.0)),
+                        ),
+                        child: Image(
+                          image: tollPlaza.image,
+                          width: getPlatformSize(100.0),
+                          height: getPlatformSize(65.0),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

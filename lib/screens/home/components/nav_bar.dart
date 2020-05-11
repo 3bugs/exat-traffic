@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:exattraffic/etc/utils.dart';
-import '../../../constants.dart' as Constants;
+import 'package:exattraffic/constants.dart' as Constants;
 
 class MyNavBar extends StatefulWidget {
   MyNavBar({

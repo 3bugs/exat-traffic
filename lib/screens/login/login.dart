@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/home.dart';
-import '../../constants.dart' as Constants;
+import 'package:exattraffic/constants.dart' as Constants;
 
 class Login extends StatelessWidget {
   @override

@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.black.withOpacity(0.0),
         ),
       ),
-      home: Home(),
+      home: Login(),
     );
   }
 }

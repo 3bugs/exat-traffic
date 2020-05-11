@@ -1,7 +1,7 @@
 library constants;
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class App {
   static const Color PRIMARY_COLOR = Color(0xFF47A1FD);
