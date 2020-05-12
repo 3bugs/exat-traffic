@@ -2,28 +2,144 @@ import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/screens/home/components/express_way.dart';
+import 'package:exattraffic/screens/home/components/toll_plaza.dart';
+import 'package:exattraffic/models/toll_plaza.dart';
+import 'package:exattraffic/models/express_way.dart';
 
 class MyBottomSheet extends StatefulWidget {
+  MyBottomSheet({
+    @required this.expandPosition,
+    @required this.collapsePosition,
+  });
+
+  final double expandPosition;
+  final double collapsePosition;
+
   @override
   _MyBottomSheetState createState() => _MyBottomSheetState();
 }
 
-class _MyBottomSheetState extends State<MyBottomSheet> {
+class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateMixin {
+  AnimationController _controller;
+  bool _bottomSheetExpanded = false;
+
+  int _expressWayIndex = -1;
+
+  final List<ExpressWay> _expressWayList = <ExpressWay>[
+    ExpressWay(
+      name: 'ทางพิเศษศรีรัช',
+      image: AssetImage('assets/images/home/express_way_srirach.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษฉลองรัช',
+      image: AssetImage('assets/images/home/express_way_chalong.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษบูรพาวิถี',
+      image: AssetImage('assets/images/home/express_way_burapa.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษเฉลิมมหานคร',
+      image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษอุดรรัถยา',
+      image: AssetImage('assets/images/home/express_way_udorn.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษสายบางนา',
+      image: AssetImage('assets/images/home/express_way_bangna.jpg'),
+    ),
+    ExpressWay(
+      name: 'ทางพิเศษกาญจนาภิเษก',
+      image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
+    ),
+  ];
+
+  final List<TollPlaza> _tollPlazaList = <TollPlaza>[
+    TollPlaza(
+      name: 'ทางลงลาดพร้าว',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      isEntrance: false,
+      isExit: true,
+    ),
+    TollPlaza(
+      name: 'รามอินทรา',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      isEntrance: true,
+      isExit: true,
+    ),
+    TollPlaza(
+      name: 'สุขาภิบาล 5',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      isEntrance: true,
+      isExit: false,
+    ),
+    TollPlaza(
+      name: 'โยธิน',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      isEntrance: true,
+      isExit: true,
+    ),
+  ];
+
+  initState() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _bottomSheetExpanded = true;
+        });
+      } else if (status == AnimationStatus.dismissed) {
+        setState(() {
+          _bottomSheetExpanded = false;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  void _handleClickUpDownSheet(BuildContext context) {
+    if (_bottomSheetExpanded) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+    // toggle _bottomSheetExpanded ใน AnimationController's AnimationStatusListener
+  }
+
+  void _handleClickBack(BuildContext context) {
+    setState(() {
+      _expressWayIndex = -1;
+    });
+  }
+
+  void _handleClickExpressWay(int index) {
+    setState(() {
+      _expressWayIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return PositionedTransition(
       rect: RelativeRectTween(
         begin: RelativeRect.fromLTRB(
           0,
-          Constants.HomeScreen.MAPS_VERTICAL_POSITION +
+          widget.collapsePosition,
+          /*Constants.HomeScreen.MAPS_VERTICAL_POSITION +
               _googleMapsHeight -
-              Constants.BottomSheet.HEIGHT_INITIAL,
+              Constants.BottomSheet.HEIGHT_INITIAL,*/
           0,
           0,
         ),
         end: RelativeRect.fromLTRB(
           0,
-          Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION - 1,
+          widget.expandPosition, //Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION - 1,
           0,
           0,
         ),
@@ -90,12 +206,41 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         SizedBox(
-                          width: getPlatformSize(56.0), // 42 + 14
+                          width: getPlatformSize(8.0),
                         ),
+                        _expressWayIndex == -1
+                            ? SizedBox(
+                                width: getPlatformSize(42.0),
+                              )
+                            : Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    _handleClickBack(context);
+                                  },
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(getPlatformSize(21.0)),
+                                  ),
+                                  child: Container(
+                                    width: getPlatformSize(42.0),
+                                    height: getPlatformSize(42.0),
+                                    //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                    child: Center(
+                                      child: Image(
+                                        image: AssetImage('assets/images/home/ic_back.png'),
+                                        width: getPlatformSize(12.0),
+                                        height: getPlatformSize(12.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                         Expanded(
                           child: Center(
                             child: Text(
-                              'ทางพิเศษ',
+                              _expressWayIndex == -1
+                                  ? 'ทางพิเศษ'
+                                  : _expressWayList[_expressWayIndex].name,
                               style: TextStyle(
                                 fontSize: getPlatformSize(16.0),
                                 fontWeight: FontWeight.bold,
@@ -120,10 +265,8 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                               child: Center(
                                 child: Image(
                                   image: _bottomSheetExpanded
-                                      ? AssetImage(
-                                      'assets/images/home/ic_sheet_down.png')
-                                      : AssetImage(
-                                      'assets/images/home/ic_sheet_up.png'),
+                                      ? AssetImage('assets/images/home/ic_sheet_down.png')
+                                      : AssetImage('assets/images/home/ic_sheet_up.png'),
                                   width: getPlatformSize(12.0),
                                   height: getPlatformSize(6.7),
                                 ),
@@ -137,54 +280,85 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
                       ],
                     ),
                     Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          // list ทางพิเศษ (text)
-                          Container(
-                            height: getPlatformSize(44.0),
-                            child: ListView.separated(
-                              itemCount: _expressWayList.length,
-                              scrollDirection: Axis.horizontal,
-                              physics: BouncingScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                return ExpressWayTextView(
-                                  expressWay: _expressWayList[index],
-                                  isFirstItem: index == 0,
-                                  isLastItem: index == _expressWayList.length - 1,
-                                );
-                              },
-                              separatorBuilder: (BuildContext context, int index) {
-                                return SizedBox(
-                                  width: getPlatformSize(0.0),
-                                );
-                              },
-                            ),
-                          ),
-                          // list ด่านทางขึ้น-ลง
-                          Expanded(
-                            child: Container(
-                              child: ListView.separated(
-                                itemCount: _tollPlazaList.length,
-                                scrollDirection: Axis.vertical,
-                                physics: BouncingScrollPhysics(),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return TollPlazaView(
-                                    tollPlaza: _tollPlazaList[index],
-                                    isFirstItem: index == 0,
-                                    isLastItem: index == _tollPlazaList.length - 1,
-                                  );
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                  return SizedBox(
-                                    width: getPlatformSize(0.0),
-                                  );
-                                },
+                      child: _expressWayIndex == -1
+                          ? AnimatedOpacity(
+                              opacity: _expressWayIndex == -1 ? 1.0 : 0.0,
+                              duration: Duration(milliseconds: 500),
+                              child: Container(
+                                height: getPlatformSize(110.0),
+                                child: ListView.separated(
+                                  itemCount: _expressWayList.length,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: BouncingScrollPhysics(),
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return ExpressWayImageView(
+                                      expressWay: _expressWayList[index],
+                                      isFirstItem: index == 0,
+                                      isLastItem: index == _expressWayList.length - 1,
+                                      onClick: () {
+                                        _handleClickExpressWay(index);
+                                      },
+                                    );
+                                  },
+                                  separatorBuilder: (BuildContext context, int index) {
+                                    return SizedBox(
+                                      width: getPlatformSize(0.0),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          : AnimatedOpacity(
+                              opacity: _expressWayIndex == -1 ? 0.0 : 1.0,
+                              duration: Duration(milliseconds: 500),
+                              child: Column(
+                                children: <Widget>[
+                                  // list ทางพิเศษ (text)
+                                  Container(
+                                    height: getPlatformSize(44.0),
+                                    child: ListView.separated(
+                                      itemCount: _expressWayList.length,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: BouncingScrollPhysics(),
+                                      itemBuilder: (BuildContext context, int index) {
+                                        return ExpressWayTextView(
+                                          expressWay: _expressWayList[index],
+                                          isFirstItem: index == 0,
+                                          isLastItem: index == _expressWayList.length - 1,
+                                        );
+                                      },
+                                      separatorBuilder: (BuildContext context, int index) {
+                                        return SizedBox(
+                                          width: getPlatformSize(0.0),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  // list ด่านทางขึ้น-ลง
+                                  Expanded(
+                                    child: Container(
+                                      child: ListView.separated(
+                                        itemCount: _tollPlazaList.length,
+                                        scrollDirection: Axis.vertical,
+                                        physics: BouncingScrollPhysics(),
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return TollPlazaView(
+                                            tollPlaza: _tollPlazaList[index],
+                                            isFirstItem: index == 0,
+                                            isLastItem: index == _tollPlazaList.length - 1,
+                                          );
+                                        },
+                                        separatorBuilder: (BuildContext context, int index) {
+                                          return SizedBox(
+                                            width: getPlatformSize(0.0),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),
