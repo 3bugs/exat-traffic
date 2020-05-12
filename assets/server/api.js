@@ -12,13 +12,14 @@ app.get('/',
             database : 'itsexat2020'
         });
         connection.connect();
-        connection.query('SELECT name FROM gate_in', function (error, results, fields) {
+        connection.query('SELECT * FROM gate_in', function (error, results, fields) {
             if (error) throw error;
 
             const tableRows = results.reduce((total, row) => {
                 return total += `<tr><td>${row.name}</td></tr>`;
             }, '');
-            res.send(`<table>${tableRows}</table>`);
+            //res.send(`<table>${tableRows}</table>`);
+            res.json(results);
         });
         connection.end();
     }
