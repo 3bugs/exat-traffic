@@ -1,6 +1,10 @@
 h3.title {
     margin-top: 10px;
 }
+span.smaller-text {
+    font-size: smaller;
+    color: #999;
+}
 /* The side navigation menu */
 .sidebar {
     margin: 0;

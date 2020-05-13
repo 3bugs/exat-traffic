@@ -279,52 +279,66 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                         ),
                       ],
                     ),
-                    Expanded(
-                      child: _expressWayIndex == -1
-                          ? AnimatedOpacity(
-                              opacity: _expressWayIndex == -1 ? 1.0 : 0.0,
-                              duration: Duration(milliseconds: 500),
-                              child: Container(
-                                height: getPlatformSize(110.0),
-                                child: ListView.separated(
-                                  itemCount: _expressWayList.length,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: BouncingScrollPhysics(),
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return ExpressWayImageView(
-                                      expressWay: _expressWayList[index],
-                                      isFirstItem: index == 0,
-                                      isLastItem: index == _expressWayList.length - 1,
-                                      onClick: () {
-                                        _handleClickExpressWay(index);
-                                      },
-                                    );
+                    _expressWayIndex == -1
+                        ? Container(
+                            height: getPlatformSize(110.0),
+                            child: ListView.separated(
+                              itemCount: _expressWayList.length,
+                              scrollDirection: Axis.horizontal,
+                              physics: BouncingScrollPhysics(),
+                              itemBuilder: (BuildContext context, int index) {
+                                return ExpressWayImageView(
+                                  expressWay: _expressWayList[index],
+                                  isFirstItem: index == 0,
+                                  isLastItem: index == _expressWayList.length - 1,
+                                  onClick: () {
+                                    _handleClickExpressWay(index);
                                   },
-                                  separatorBuilder: (BuildContext context, int index) {
-                                    return SizedBox(
-                                      width: getPlatformSize(0.0),
-                                    );
-                                  },
+                                );
+                              },
+                              separatorBuilder: (BuildContext context, int index) {
+                                return SizedBox(
+                                  width: getPlatformSize(0.0),
+                                );
+                              },
+                            ),
+                          )
+                        : Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                // list ทางพิเศษ (text)
+                                Container(
+                                  height: getPlatformSize(44.0),
+                                  child: ListView.separated(
+                                    itemCount: _expressWayList.length,
+                                    scrollDirection: Axis.horizontal,
+                                    physics: BouncingScrollPhysics(),
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return ExpressWayTextView(
+                                        expressWay: _expressWayList[index],
+                                        isFirstItem: index == 0,
+                                        isLastItem: index == _expressWayList.length - 1,
+                                      );
+                                    },
+                                    separatorBuilder: (BuildContext context, int index) {
+                                      return SizedBox(
+                                        width: getPlatformSize(0.0),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            )
-                          : AnimatedOpacity(
-                              opacity: _expressWayIndex == -1 ? 0.0 : 1.0,
-                              duration: Duration(milliseconds: 500),
-                              child: Column(
-                                children: <Widget>[
-                                  // list ทางพิเศษ (text)
-                                  Container(
-                                    height: getPlatformSize(44.0),
+                                // list ด่านทางขึ้น-ลง
+                                Expanded(
+                                  child: Container(
                                     child: ListView.separated(
-                                      itemCount: _expressWayList.length,
-                                      scrollDirection: Axis.horizontal,
+                                      itemCount: _tollPlazaList.length,
+                                      scrollDirection: Axis.vertical,
                                       physics: BouncingScrollPhysics(),
                                       itemBuilder: (BuildContext context, int index) {
-                                        return ExpressWayTextView(
-                                          expressWay: _expressWayList[index],
+                                        return TollPlazaView(
+                                          tollPlaza: _tollPlazaList[index],
                                           isFirstItem: index == 0,
-                                          isLastItem: index == _expressWayList.length - 1,
+                                          isLastItem: index == _tollPlazaList.length - 1,
                                         );
                                       },
                                       separatorBuilder: (BuildContext context, int index) {
@@ -334,32 +348,10 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                                       },
                                     ),
                                   ),
-                                  // list ด่านทางขึ้น-ลง
-                                  Expanded(
-                                    child: Container(
-                                      child: ListView.separated(
-                                        itemCount: _tollPlazaList.length,
-                                        scrollDirection: Axis.vertical,
-                                        physics: BouncingScrollPhysics(),
-                                        itemBuilder: (BuildContext context, int index) {
-                                          return TollPlazaView(
-                                            tollPlaza: _tollPlazaList[index],
-                                            isFirstItem: index == 0,
-                                            isLastItem: index == _tollPlazaList.length - 1,
-                                          );
-                                        },
-                                        separatorBuilder: (BuildContext context, int index) {
-                                          return SizedBox(
-                                            width: getPlatformSize(0.0),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                    ),
+                          ),
                   ],
                 ),
               ),

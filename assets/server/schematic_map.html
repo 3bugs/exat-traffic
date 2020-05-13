@@ -13,6 +13,7 @@
             integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
             crossorigin="anonymous"></script>
     <script src="node_modules/dragscroll/dragscroll.js"></script>
+    <script src="cctv.js"></script>
     <script>
         const colors = ['green', 'orange', 'red'];
         $(document).ready(() => {
@@ -56,8 +57,9 @@
             $('#zoomButtonGroup button').click(function () {
                 const CONTAINER_WIDTH = 540;
                 const CONTAINER_HEIGHT = 600;
-                const rootSvg = $('#rootSvg');
-                const svgContainer = rootSvg.parent();
+                const svgWrapper = $('#svgWrapper');
+                const svgContainer = svgWrapper.parent();
+                const canvas = $('#myCanvas');
 
                 if ($(this).hasClass('active')) {
                     //alert(`Left: ${svgContainer.scrollLeft()}, Top: ${svgContainer.scrollTop()}`);
@@ -68,7 +70,17 @@
 
                 const scale = parseFloat($(this).val());
                 //svgContainer.css('overflow', 'auto');
-                rootSvg.css('width', Math.floor(100 * scale) + '%');
+                svgWrapper.css('width', Math.floor(100 * scale) + '%');
+                svgWrapper.css('height', Math.floor(100 * scale) + '%');
+
+                //canvas.css('width', '200px');
+                //canvas.css('height', '200px');
+                ctx.canvas.width = scale * CONTAINER_WIDTH;
+                ctx.canvas.height = scale * CONTAINER_HEIGHT;
+                if (scale >= 10) {
+                    drawMapMarker(scale);
+                }
+
                 if (scale > 1) {
                     svgContainer.scrollLeft(((scale * CONTAINER_WIDTH) - CONTAINER_WIDTH) / 2.55);
                     svgContainer.scrollTop(((scale * CONTAINER_HEIGHT) - CONTAINER_HEIGHT) / 1.7);
@@ -97,6 +109,50 @@
                     });
                 }
             });
+
+            const c = document.getElementById("myCanvas");
+            const ctx = c.getContext("2d");
+
+            const imgMapMarker = new Image();
+            //imgMapMarker.onload = () => drawMapMarker(1);
+            imgMapMarker.src = 'images/ic_marker_blank.png';
+            const MARKER_WIDTH = 112;
+            const MARKER_HEIGHT = 146;
+
+            //top-left: 14.337003, 100.171288
+            //bottom-right: 13.362089, 101.087897
+            const LATITUDE_BOTTOM = 13.362089;
+            const LATITUDE_TOP = 14.337003;
+            const LONGITUDE_LEFT = 100.171288;
+            const LONGITUDE_RIGHT = 101.087897
+
+            function drawMapMarker(scale) {
+                const markerDrawWidth = MARKER_WIDTH / 5;
+                const markerDrawHeight = MARKER_HEIGHT / 5;
+                const canvasWidth = ctx.canvas.width;
+                const canvasHeight = ctx.canvas.height;
+                ctx.clearRect( 0, 0, canvasWidth, canvasHeight)
+
+                cctvList.forEach(cctv => {
+                    if (cctv.status === 1) {
+                        ctx.drawImage(
+                            imgMapMarker,
+                            (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2),
+                            canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM) - markerDrawHeight,
+                            markerDrawWidth,
+                            markerDrawHeight
+                        );
+                    }
+                })
+
+                /*const imgMapMarker = document.getElementById('marker');
+                ctx.drawImage(imgMapMarker, 10, 10);*/
+
+                /*ctx.beginPath();
+                ctx.arc(100, 75, 50, 0, 2 * Math.PI);
+                ctx.fillStyle = 'red';
+                ctx.fill();*/
+            }
         });
     </script>
 </head>
@@ -109,7 +165,7 @@
 
 <!-- Page content -->
 <div class="content">
-    <h3 class="title">Schematic Map (ข้อมูลสภาพการจราจรสมมติ)</h3>
+    <h3 class="title">Schematic Map <span class="smaller-text">(ข้อมูลสภาพการจราจรสมมติ)</span></h3>
     <!--How to Scale SVG - https://css-tricks.com/scale-svg/-->
     <div style="display: flex; flex-direction: column; align-items: flex-start; padding: 0px; border: 0px solid red">
         <div id="zoomButtonGroup" class="btn-group mb-0" role="group" aria-label="Basic example">
@@ -120,13 +176,15 @@
             <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="10"><h4>10x</h4></button>
             <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="15"><h4>15x</h4></button>
         </div>
-        <div id="svgContainer" class="dragscroll" style="overflow: auto; width: 540px; height: 600px; border: 1px solid grey">
-            <svg version="1.1" id="rootSvg"
-                 xmlns="http://www.w3.org/2000/svg"
-                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                 x="0px" y="0px"
-                 width="100%" viewBox="0 0 4621.4 5134" enable-background="new 0 0 4621.4 5134"
-                 xml:space="preserve">
+        <!--<img id="marker" src="images/ic_marker_blank.png" width="112" height="146">-->
+        <div id="svgContainer" class="dragscroll" style="overflow: auto; width: 540px; height: 600px; border: 1px solid grey; cursor: pointer">
+            <div id="svgWrapper" style="position: relative; display: flex; width: 100%; height: 100%; border: solid 0px blue">
+                <svg version="1.1" id="rootSvg"
+                     xmlns="http://www.w3.org/2000/svg"
+                     xmlns:xlink="http://www.w3.org/1999/xlink"
+                     x="0px" y="0px"
+                     width="100%" viewBox="0 0 4621.4 5134" enable-background="new 0 0 4621.4 5134"
+                     xml:space="preserve">
 <g>
 	<defs>
 		<rect id="SVGID_1_" width="4621.4" height="5134"/>
@@ -14641,6 +14699,10 @@ g3xJMcKbE52XPNob2BFNic7AUczFfn9Yt//Z" transform="matrix(0.48 0 0 0.48 1859.223 1
 	</g>
 </g>
 </svg>
+                <canvas id="myCanvas" width="540px" height="600px" style="position: absolute; width: 100%; height: 100%; border: 0px solid pink;">
+                    Your browser does not support the HTML5 canvas tag.
+                </canvas>
+            </div>
         </div>
     </div>
 </div>

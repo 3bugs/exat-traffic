@@ -6,21 +6,23 @@ const port = 3000;
 app.get('/',
     (req, res) => {
         const connection = mysql.createConnection({
-            host     : 'localhost',
-            user     : 'root',
-            password : 'Exf@2020ch5U$m#2kh&Mc[XY',
-            database : 'itsexat2020'
+            host: 'localhost',
+            user: 'root',
+            password: 'Exf@2020ch5U$m#2kh&Mc[XY',
+            database: 'itsexat2020'
         });
         connection.connect();
-        connection.query('SELECT * FROM gate_in', function (error, results, fields) {
-            if (error) throw error;
+        connection.query(
+            'SELECT * FROM gate_in',
+            (error, results, fields) => {
+                if (error) throw error;
 
-            const tableRows = results.reduce((total, row) => {
-                return total += `<tr><td>${row.name}</td></tr>`;
-            }, '');
-            //res.send(`<table>${tableRows}</table>`);
-            res.json(results);
-        });
+                const tableRows = results.reduce((total, row) => {
+                    return total += `<tr><td>${row.name}</td></tr>`;
+                }, '');
+                //res.send(`<table>${tableRows}</table>`);
+                res.json(results);
+            });
         connection.end();
     }
 );
