@@ -70,8 +70,9 @@
 
                 const scale = parseFloat($(this).val());
                 //svgContainer.css('overflow', 'auto');
-                svgWrapper.css('width', Math.floor(100 * scale) + '%');
-                svgWrapper.css('height', Math.floor(100 * scale) + '%');
+                //alert(scale * CONTAINER_WIDTH);
+                svgWrapper.css('width', scale * CONTAINER_WIDTH /*Math.floor(100 * scale) + '%'*/);
+                svgWrapper.css('height', scale * CONTAINER_HEIGHT /*Math.floor(100 * scale) + '%'*/);
 
                 //canvas.css('width', '200px');
                 //canvas.css('height', '200px');
@@ -110,8 +111,8 @@
                 }
             });
 
-            const c = document.getElementById("myCanvas");
-            const ctx = c.getContext("2d");
+            const myCanvas = document.getElementById("myCanvas");
+            const ctx = myCanvas.getContext("2d");
 
             const imgMapMarker = new Image();
             //imgMapMarker.onload = () => drawMapMarker(1);
@@ -131,19 +132,19 @@
                 const markerDrawHeight = MARKER_HEIGHT / 5;
                 const canvasWidth = ctx.canvas.width;
                 const canvasHeight = ctx.canvas.height;
-                ctx.clearRect( 0, 0, canvasWidth, canvasHeight)
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
                 cctvList.forEach(cctv => {
                     if (cctv.status === 1) {
                         ctx.drawImage(
                             imgMapMarker,
                             (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2),
-                            canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM) - markerDrawHeight,
+                            (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight,
                             markerDrawWidth,
                             markerDrawHeight
                         );
                     }
-                })
+                });
 
                 /*const imgMapMarker = document.getElementById('marker');
                 ctx.drawImage(imgMapMarker, 10, 10);*/
@@ -153,7 +154,36 @@
                 ctx.fillStyle = 'red';
                 ctx.fill();*/
             }
-        });
+
+            function getCursorPosition(canvas, event) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                console.log(`x: ${x}, y: ${y}`);
+                //alert(`x: ${x}, y: ${y}`);
+
+                const markerDrawWidth = MARKER_WIDTH / 5;
+                const markerDrawHeight = MARKER_HEIGHT / 5;
+                const canvasWidth = ctx.canvas.width;
+                const canvasHeight = ctx.canvas.height;
+
+                cctvList.forEach(cctv => {
+                    if (cctv.status === 1) {
+                        const left = (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
+                        const right = left + markerDrawWidth;
+                        const top = (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
+                        const bottom = top + markerDrawHeight;
+                        if (x > left && x < right && y > top && y < bottom) {
+                            alert(cctv.name);
+                        }
+                    }
+                });
+            }
+
+            myCanvas.addEventListener('click', function (e) {
+                getCursorPosition(myCanvas, e);
+            });
+        }); // document.ready
     </script>
 </head>
 <body>
