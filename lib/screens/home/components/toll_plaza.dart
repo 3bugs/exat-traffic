@@ -47,7 +47,7 @@ class TollPlazaView extends StatelessWidget {
                 color: Color(0xFFE8E8E8),
               ),
               borderRadius: BorderRadius.all(
-                Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+                Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
               ),
             ),
             child: Material(
@@ -55,7 +55,7 @@ class TollPlazaView extends StatelessWidget {
               child: InkWell(
                 onTap: () {},
                 borderRadius: BorderRadius.all(
-                  Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+                  Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                 ),
                 child: Container(
                   padding: EdgeInsets.only(
@@ -110,8 +110,8 @@ class TollPlazaView extends StatelessWidget {
                           child: Text(
                             tollPlaza.name,
                             style: TextStyle(
-                              fontSize: getPlatformSize(16.0),
-                              color: Color(0xFF717171),
+                              fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
+                              color: Constants.Font.DEFAULT_COLOR,
                             ),
                           ),
                         ),

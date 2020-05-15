@@ -34,8 +34,8 @@ class _LoginMainState extends State<LoginMain> {
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.only(
-              left: Constants.LoginScreen.HORIZONTAL_MARGIN,
-              right: Constants.LoginScreen.HORIZONTAL_MARGIN,
+              left: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
+              right: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,7 +46,7 @@ class _LoginMainState extends State<LoginMain> {
                   child: Center(
                     child: Container(
                       margin: EdgeInsets.only(
-                        top: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
+                        top: getPlatformSize(Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN),
                       ),
                       child: Image(
                         image: AssetImage('assets/images/login/exat_logo.png'),
@@ -58,8 +58,8 @@ class _LoginMainState extends State<LoginMain> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
-                    bottom: Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN,
+                    top: getPlatformSize(Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN),
+                    bottom: getPlatformSize(Constants.LoginScreen.CENTER_BOX_VERTICAL_MARGIN),
                   ),
                   decoration: BoxDecoration(
                     boxShadow: [

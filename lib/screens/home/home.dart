@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+//import 'package:google_fonts/google_fonts.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/models/toll_plaza.dart';
-import 'package:exattraffic/models/express_way.dart';
 import 'package:exattraffic/screens/home/components/drawer.dart';
 import 'package:exattraffic/screens/home/components/nav_bar.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -119,14 +118,16 @@ class _HomeMainState extends State<HomeMain> {
         child: SafeArea(
           child: Column(
             children: <Widget>[
+              // หัวด้านบน (พื้นหลังไล่เฉดสีฟ้า)
               Padding(
                   padding: EdgeInsets.only(
-                    left: Constants.App.HORIZONTAL_MARGIN,
-                    right: Constants.App.HORIZONTAL_MARGIN,
+                    left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                    right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      // ปุ่มเมนูแฮมเบอร์เกอร์, ปุ่มโทร
                       Padding(
                         padding: EdgeInsets.only(
                             left: getPlatformSize(0.0),
@@ -176,19 +177,33 @@ class _HomeMainState extends State<HomeMain> {
                           ],
                         ),
                       ),
+                      // headline
                       Padding(
                         padding: EdgeInsets.only(
                           left: getPlatformSize(3.0),
                         ),
-                        child: Text(
-                          'Home',
-                          style: TextStyle(
-                            fontSize: getPlatformSize(42.0),
-                            color: Colors.white,
-                            height: 0.95,
+                        child: Flexible(
+                          child: Text(
+                            'Home',
+                            //'ทางพิเศษกาญจนาภิเษก',
+                            //'ทางพิเศษเฉลิมมหานคร',
+                            //'你好', // chinese
+                            //'여보세요', // korean
+                            //'こんにちは', // japanese
+                            /*style: GoogleFonts.kanit(
+                            textStyle: TextStyle(
+                              fontSize: getPlatformSize(38.0),
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white,
+                              height: 0.95,
+                            ),
+                          ),*/
+                            style: getHeadlineTextStyle(context),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
+                      // วันที่
                       Visibility(
                         visible: _showDate,
                         child: Padding(
@@ -196,11 +211,9 @@ class _HomeMainState extends State<HomeMain> {
                             left: getPlatformSize(5.0),
                           ),
                           child: Text(
-                            formattedDate, //'APRIL 23, 2020',
-                            style: TextStyle(
-                              fontSize: getPlatformSize(16.0),
-                              color: Colors.white,
-                            ),
+                            formattedDate,
+                            //'你好 23, 2020', //'APRIL 23, 2020',
+                            style: getDateTextStyle(),
                           ),
                         ),
                       ),
@@ -211,7 +224,7 @@ class _HomeMainState extends State<HomeMain> {
                   children: <Widget>[
                     // maps
                     Container(
-                      margin: EdgeInsets.only(top: Constants.HomeScreen.MAPS_VERTICAL_POSITION),
+                      margin: EdgeInsets.only(top: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION)),
                       decoration: BoxDecoration(
                         //color: Color(0xFFF6F6F4),
                         color: Colors.white70,
@@ -227,21 +240,21 @@ class _HomeMainState extends State<HomeMain> {
                         },
                       ),
                     ),
-                    // search box
+                    // ช่อง search
                     Positioned(
                       width: MediaQuery.of(context).size.width,
                       top: 0.0,
                       left: 0.0,
                       child: Padding(
                         padding: EdgeInsets.only(
-                          left: Constants.App.HORIZONTAL_MARGIN,
-                          right: Constants.App.HORIZONTAL_MARGIN,
+                          left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                          right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                         ),
                         child: Column(
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(
-                                top: Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION,
+                                top: getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION),
                               ),
                               decoration: BoxDecoration(
                                 boxShadow: [
@@ -257,7 +270,7 @@ class _HomeMainState extends State<HomeMain> {
                                 ],
                                 color: Colors.white,
                                 borderRadius: BorderRadius.all(
-                                  Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+                                  Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                                 ),
                               ),
                               child: Padding(
@@ -286,11 +299,12 @@ class _HomeMainState extends State<HomeMain> {
                                             isDense: true,
                                             contentPadding: EdgeInsets.only(
                                               top: getPlatformSize(4.0),
-                                              bottom: getPlatformSize(8.0),
+                                              bottom: getPlatformSize(4.0),
                                             ),
                                             border: InputBorder.none,
                                             hintText: 'ค้นหา',
                                           ),
+                                          style: getSearchTextStyle(),
                                         ),
                                       ),
                                     ),
@@ -359,10 +373,10 @@ class _HomeMainState extends State<HomeMain> {
                     ),
                     // bottom sheet
                     MyBottomSheet(
-                      collapsePosition: Constants.HomeScreen.MAPS_VERTICAL_POSITION +
+                      collapsePosition: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
                           _googleMapsHeight -
-                          Constants.BottomSheet.HEIGHT_INITIAL,
-                      expandPosition: Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION - 1,
+                          getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                      expandPosition: getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
                     ),
                     // เงาบนแถบ bottom nav
                     Align(
@@ -432,14 +446,14 @@ class MapToolItem extends StatelessWidget {
           ],
           color: Colors.white,
           borderRadius: BorderRadius.all(
-            Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+            Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
           )),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {},
           //highlightColor: Constants.App.PRIMARY_COLOR,
-          borderRadius: BorderRadius.all(Radius.circular(Constants.App.BOX_BORDER_RADIUS)),
+          borderRadius: BorderRadius.all(Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))),
           child: Center(
             child: Image(
               image: icon,

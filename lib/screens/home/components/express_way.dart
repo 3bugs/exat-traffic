@@ -38,7 +38,7 @@ class ExpressWayImageView extends StatelessWidget {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(Constants.App.BOX_BORDER_RADIUS),
+                  Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                 ),
                 child: Image(
                   image: expressWay.image,
@@ -54,8 +54,8 @@ class ExpressWayImageView extends StatelessWidget {
                 child: Text(
                   expressWay.name,
                   style: TextStyle(
-                    fontSize: getPlatformSize(14.0),
-                    color: Color(0xFF585858),
+                    fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE),
+                    color: Constants.Font.DEFAULT_COLOR,
                   ),
                 ),
               ),
@@ -113,8 +113,8 @@ class ExpressWayTextView extends StatelessWidget {
                   child: Text(
                     expressWay.name,
                     style: TextStyle(
-                      fontSize: getPlatformSize(14.0),
-                      color: Color(0xFF585858),
+                      fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE),
+                      color: Constants.Font.DEFAULT_COLOR,
                     ),
                   ),
                 ),

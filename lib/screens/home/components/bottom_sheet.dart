@@ -242,9 +242,9 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                                   ? 'ทางพิเศษ'
                                   : _expressWayList[_expressWayIndex].name,
                               style: TextStyle(
-                                fontSize: getPlatformSize(16.0),
+                                fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF585858),
+                                color: Constants.Font.DEFAULT_COLOR,
                               ),
                             ),
                           ),

@@ -58,12 +58,12 @@ class _MyNavBarState extends State<MyNavBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: Constants.NavBar.HEIGHT,
+      height: getPlatformSize(Constants.NavBar.HEIGHT),
       child: Stack(
         overflow: Overflow.visible,
         children: <Widget>[
           SizedBox(
-            height: Constants.NavBar.HEIGHT,
+            height: getPlatformSize(Constants.NavBar.HEIGHT),
             child: BottomNavigationBar(
               currentIndex: _currentTabIndex,
               onTap: handlePressTab,
@@ -114,11 +114,11 @@ class _MyNavBarState extends State<MyNavBar> {
             ),
           ),
           Positioned(
-            top: Constants.NavBar.HEIGHT - Constants.NavBar.CENTER_ITEM_OUTER_SIZE,
-            left: (MediaQuery.of(context).size.width - Constants.NavBar.CENTER_ITEM_OUTER_SIZE) / 2,
+            top: getPlatformSize(Constants.NavBar.HEIGHT) - getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+            left: (MediaQuery.of(context).size.width - getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE)) / 2,
             child: Container(
-              width: Constants.NavBar.CENTER_ITEM_OUTER_SIZE,
-              height: Constants.NavBar.CENTER_ITEM_OUTER_SIZE,
+              width: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+              height: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: FractionalOffset.topCenter,
@@ -129,13 +129,13 @@ class _MyNavBarState extends State<MyNavBar> {
                 //color: Colors.pinkAccent.shade100,
                 color: Colors.white,
                 borderRadius: BorderRadius.all(
-                  Radius.circular(Constants.NavBar.CENTER_ITEM_OUTER_SIZE / 2),
+                  Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE / 2)),
                 ),
               ),
               child: Center(
                 child: Container(
-                  width: Constants.NavBar.CENTER_ITEM_INNER_SIZE,
-                  height: Constants.NavBar.CENTER_ITEM_INNER_SIZE,
+                  width: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
+                  height: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -150,7 +150,7 @@ class _MyNavBarState extends State<MyNavBar> {
                     ],
                     color: Constants.App.PRIMARY_COLOR,
                     borderRadius: BorderRadius.all(
-                      Radius.circular(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2),
+                      Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2)),
                     ),
                   ),
                   child: Material(
@@ -159,7 +159,7 @@ class _MyNavBarState extends State<MyNavBar> {
                       onTap: () {},
                       //highlightColor: Constants.App.PRIMARY_COLOR,
                       borderRadius: BorderRadius.all(
-                          Radius.circular(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2)),
+                          Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),
                       child: Center(
                         child: Image(
                           image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),

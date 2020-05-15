@@ -13,6 +13,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EXAT Traffic',
       theme: ThemeData(
+        //fontFamily: 'DBHeavent',
+        /*textTheme: TextTheme(
+          bodyText1: TextStyle(
+
+          ),
+        ),*/
         primaryColor: Constants.App.PRIMARY_COLOR,
         accentColor: Constants.App.PRIMARY_COLOR,
         bottomSheetTheme: BottomSheetThemeData(

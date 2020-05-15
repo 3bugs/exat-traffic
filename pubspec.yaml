@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_fonts: ^1.1.0
   intl: ^0.16.1
   google_maps_flutter: ^0.5.26+4
   geolocator: ^5.3.1
@@ -80,3 +81,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+    - family: DBHeavent
+      fonts:
+        - asset: assets/fonts/DBHeavent.ttf
+    - family: DBHeavent-Bold
+      fonts:
+        - asset: assets/fonts/DBHeavent-Bold.ttf
+    - family: DBHeavent-Med
+      fonts:
+        - asset: assets/fonts/DBHeavent-Med.ttf
+    - family: DBHeavent-Light
+      fonts:
+        - asset: assets/fonts/DBHeaventt-Light.ttf
