@@ -1,8 +1,10 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/toll_plaza.dart';
+import 'package:provider/provider.dart';
 
 class TollPlazaView extends StatelessWidget {
   TollPlazaView({
@@ -107,12 +109,26 @@ class TollPlazaView extends StatelessWidget {
                           padding: EdgeInsets.only(
                             left: getPlatformSize(30.0),
                           ),
-                          child: Text(
-                            tollPlaza.name,
-                            style: TextStyle(
-                              fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
-                              color: Constants.Font.DEFAULT_COLOR,
-                            ),
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              String name;
+                              switch (language.lang) {
+                                case 0:
+                                  name = tollPlaza.name;
+                                  break;
+                                case 1:
+                                  name = 'Expressway';
+                                  break;
+                                case 2:
+                                  name = '高速公路';
+                                  break;
+                              }
+
+                              return Text(
+                                name,
+                                style: getTextStyle(language.lang),
+                              );
+                            },
                           ),
                         ),
                       ),

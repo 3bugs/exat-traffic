@@ -21,29 +21,36 @@ double getPlatformSize(double size) {
   return Platform.isAndroid ? 0.9 * size : size;
 }
 
-TextStyle getHeadlineTextStyle(BuildContext context) {
-  double size = 32.0;
-  if (screenWidth(context) > getPlatformSize(400) && screenHeight(context) > getPlatformSize(700)) {
-    size = 40.0;
-  }
-  return TextStyle(
-    fontSize: getPlatformSize(size),
-    color: Colors.white,
-    height: 1,
-  );
-}
+const double DEFAULT_LINE_HEIGHT = -1;
 
-TextStyle getDateTextStyle() {
-  return TextStyle(
-    fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
-    color: Colors.white,
-  );
-}
+TextStyle getTextStyle(
+  int lang, {
+  double sizeTh = Constants.Font.DEFAULT_SIZE_TH,
+  double sizeEn = Constants.Font.DEFAULT_SIZE_EN,
+  Color color = Constants.Font.DEFAULT_COLOR,
+  bool isBold = false,
+  double heightTh = DEFAULT_LINE_HEIGHT,
+  double heightEn = DEFAULT_LINE_HEIGHT,
+}) {
+  String fontFamily = lang == 0 ? (isBold ? 'DBHeavent-Med' : 'DBHeavent') : null;
+  FontWeight fontWeight = lang == 0 ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
+  double fontSize = lang == 0 ? getPlatformSize(sizeTh) : getPlatformSize(sizeEn);
+  double height = lang == 0 ? heightTh : heightEn;
 
-TextStyle getSearchTextStyle() {
-  return TextStyle(
-    fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
-  );
+  return height == DEFAULT_LINE_HEIGHT
+      ? TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          color: color,
+        )
+      : TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          color: color,
+          height: height,
+        );
 }
 
 Size screenSize(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -6,6 +7,13 @@ import 'package:exattraffic/screens/home/components/express_way.dart';
 import 'package:exattraffic/screens/home/components/toll_plaza.dart';
 import 'package:exattraffic/models/toll_plaza.dart';
 import 'package:exattraffic/models/express_way.dart';
+import 'package:provider/provider.dart';
+
+List<String> expressWayHeaderList = [
+  'ทางพิเศษ',
+  'Expressway',
+  '高速公路',
+];
 
 class MyBottomSheet extends StatefulWidget {
   MyBottomSheet({
@@ -25,6 +33,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
   bool _bottomSheetExpanded = false;
 
   int _expressWayIndex = -1;
+  //int _lang = 0;
 
   final List<ExpressWay> _expressWayList = <ExpressWay>[
     ExpressWay(
@@ -237,15 +246,29 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                               ),
                         Expanded(
                           child: Center(
-                            child: Text(
-                              _expressWayIndex == -1
-                                  ? 'ทางพิเศษ'
-                                  : _expressWayList[_expressWayIndex].name,
-                              style: TextStyle(
-                                fontSize: getPlatformSize(Constants.Font.DEFAULT_SIZE),
-                                fontWeight: FontWeight.bold,
-                                color: Constants.Font.DEFAULT_COLOR,
-                              ),
+                            child: Consumer<LanguageModel>(
+                              builder: (context, language, child) {
+                                String name;
+                                if (_expressWayIndex != -1) {
+                                  switch (language.lang) {
+                                    case 0:
+                                      name = _expressWayList[_expressWayIndex].name;
+                                      break;
+                                    case 1:
+                                      name = 'Expressway';
+                                      break;
+                                    case 2:
+                                      name = '高速公路';
+                                      break;
+                                  }
+                                }
+                                return Text(
+                                  _expressWayIndex == -1
+                                      ? expressWayHeaderList[language.lang]
+                                      : name,
+                                  style: getTextStyle(language.lang, isBold: true),
+                                );
+                              },
                             ),
                           ),
                         ),

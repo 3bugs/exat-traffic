@@ -1,10 +1,17 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/screens/login/login.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'constants.dart' as Constants;
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  ChangeNotifierProvider(
+    create: (context) => LanguageModel(),
+    child: MyApp(),
+  ),
+);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

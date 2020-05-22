@@ -1,8 +1,10 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way.dart';
+import 'package:provider/provider.dart';
 
 class ExpressWayImageView extends StatelessWidget {
   ExpressWayImageView({
@@ -51,12 +53,31 @@ class ExpressWayImageView extends StatelessWidget {
                 padding: EdgeInsets.only(
                   top: getPlatformSize(6.0),
                 ),
-                child: Text(
-                  expressWay.name,
-                  style: TextStyle(
-                    fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE),
-                    color: Constants.Font.DEFAULT_COLOR,
-                  ),
+                child: Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    String name;
+                    switch (language.lang) {
+                      case 0:
+                        name = expressWay.name;
+                        break;
+                      case 1:
+                        name = 'Expressway';
+                        break;
+                      case 2:
+                        name = '高速公路';
+                        break;
+                    }
+
+                    return Text(
+                      name,
+                      style: getTextStyle(
+                        language.lang,
+                        sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                        sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                        heightTh: 1.0,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -110,12 +131,31 @@ class ExpressWayTextView extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(6.0)),
                 ),
                 child: Center(
-                  child: Text(
-                    expressWay.name,
-                    style: TextStyle(
-                      fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE),
-                      color: Constants.Font.DEFAULT_COLOR,
-                    ),
+                  child: Consumer<LanguageModel>(
+                    builder: (context, language, child) {
+                      String name;
+                      switch (language.lang) {
+                        case 0:
+                          name = expressWay.name;
+                          break;
+                        case 1:
+                          name = 'Expressway';
+                          break;
+                        case 2:
+                          name = '高速公路';
+                          break;
+                      }
+
+                      return Text(
+                        name,
+                        style: getTextStyle(
+                          language.lang,
+                          sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                          sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                          heightTh: 1.0,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

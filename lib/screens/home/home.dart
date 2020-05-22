@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/home/components/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,11 +11,28 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/components/drawer.dart';
 import 'package:exattraffic/screens/home/components/nav_bar.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:provider/provider.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
 //https://codewithandrea.com/articles/2018-09-13-bottom-bar-navigation-with-fab/
 //https://medium.com/flutter/executing-dart-in-the-background-with-flutter-plugins-and-geofencing-2b3e40a1a124
+
+List<String> headlineList = [
+  'หน้าหลัก',
+  'Home',
+  '家园',
+];
+List<String> dateList = [
+  '15 พฤษภาคม 2563',
+  'MAY 15, 2020',
+  '2020年5月15日',
+];
+List<String> searchList = [
+  'ค้นหา',
+  'Search',
+  '搜索',
+];
 
 class Home extends StatelessWidget {
   @override
@@ -50,6 +68,7 @@ class _HomeMainState extends State<HomeMain> {
     zoom: 8,
   );
 
+  //int _lang = 0;
   bool _showDate = true;
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
@@ -67,7 +86,7 @@ class _HomeMainState extends State<HomeMain> {
   }
 
   void _handleClickTab(int index) {
-    //print(index.toString());
+    print(index.toString());
   }
 
   Future<void> _moveToCurrentPosition(BuildContext context) async {
@@ -163,7 +182,15 @@ class _HomeMainState extends State<HomeMain> {
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  Provider.of<LanguageModel>(context, listen: false).nextLang();
+                                  /*setState(() {
+                                    _lang++;
+                                    if (_lang > headlineList.length - 1) {
+                                      _lang = 0;
+                                    }
+                                  });*/
+                                },
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(getPlatformSize(18.0)),
                                 ),
@@ -183,23 +210,14 @@ class _HomeMainState extends State<HomeMain> {
                           left: getPlatformSize(3.0),
                         ),
                         child: Flexible(
-                          child: Text(
-                            'Home',
-                            //'ทางพิเศษกาญจนาภิเษก',
-                            //'ทางพิเศษเฉลิมมหานคร',
-                            //'你好', // chinese
-                            //'여보세요', // korean
-                            //'こんにちは', // japanese
-                            /*style: GoogleFonts.kanit(
-                            textStyle: TextStyle(
-                              fontSize: getPlatformSize(38.0),
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white,
-                              height: 0.95,
-                            ),
-                          ),*/
-                            style: getHeadlineTextStyle(context),
-                            overflow: TextOverflow.ellipsis,
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return Text(
+                                headlineList[language.lang],
+                                style: _getHeadlineTextStyle(context, lang: language.lang),
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -210,10 +228,21 @@ class _HomeMainState extends State<HomeMain> {
                           padding: EdgeInsets.only(
                             left: getPlatformSize(5.0),
                           ),
-                          child: Text(
-                            formattedDate,
-                            //'你好 23, 2020', //'APRIL 23, 2020',
-                            style: getDateTextStyle(),
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return Text(
+                                dateList[language.lang],
+                                //formattedDate,
+                                //'15 พฤษภาคม 2563',
+                                //'MAY 15, 2020',
+                                style: getTextStyle(
+                                  language.lang,
+                                  color: Colors.white,
+                                  heightTh: 0.8,
+                                  heightEn: 1.15,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -224,7 +253,8 @@ class _HomeMainState extends State<HomeMain> {
                   children: <Widget>[
                     // maps
                     Container(
-                      margin: EdgeInsets.only(top: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION)),
+                      margin: EdgeInsets.only(
+                          top: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION)),
                       decoration: BoxDecoration(
                         //color: Color(0xFFF6F6F4),
                         color: Colors.white70,
@@ -254,7 +284,8 @@ class _HomeMainState extends State<HomeMain> {
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(
-                                top: getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION),
+                                top: getPlatformSize(
+                                    Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION),
                               ),
                               decoration: BoxDecoration(
                                 boxShadow: [
@@ -294,17 +325,21 @@ class _HomeMainState extends State<HomeMain> {
                                           left: getPlatformSize(16.0),
                                           right: getPlatformSize(16.0),
                                         ),
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            isDense: true,
-                                            contentPadding: EdgeInsets.only(
-                                              top: getPlatformSize(4.0),
-                                              bottom: getPlatformSize(4.0),
-                                            ),
-                                            border: InputBorder.none,
-                                            hintText: 'ค้นหา',
-                                          ),
-                                          style: getSearchTextStyle(),
+                                        child: Consumer<LanguageModel>(
+                                          builder: (context, language, child) {
+                                            return TextField(
+                                              decoration: InputDecoration(
+                                                isDense: true,
+                                                contentPadding: EdgeInsets.only(
+                                                  top: getPlatformSize(4.0),
+                                                  bottom: getPlatformSize(4.0),
+                                                ),
+                                                border: InputBorder.none,
+                                                hintText: searchList[language.lang],
+                                              ),
+                                              style: getTextStyle(language.lang),
+                                            );
+                                          },
                                         ),
                                       ),
                                     ),
@@ -373,10 +408,12 @@ class _HomeMainState extends State<HomeMain> {
                     ),
                     // bottom sheet
                     MyBottomSheet(
-                      collapsePosition: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                          _googleMapsHeight -
-                          getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
-                      expandPosition: getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
+                      collapsePosition:
+                          getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                              _googleMapsHeight -
+                              getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                      expandPosition:
+                          getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
                     ),
                     // เงาบนแถบ bottom nav
                     Align(
@@ -405,6 +442,19 @@ class _HomeMainState extends State<HomeMain> {
           ),
         ),
       ),
+    );
+  }
+
+  TextStyle _getHeadlineTextStyle(BuildContext context, {int lang = 0}) {
+    final bool isBigScreen =
+        screenWidth(context) > getPlatformSize(400) && screenHeight(context) > getPlatformSize(700);
+    return getTextStyle(
+      lang,
+      sizeTh: isBigScreen ? 55.0 : 44.0,
+      sizeEn: isBigScreen ? 40.0 : 32.0,
+      color: Colors.white,
+      heightTh: 0.8,
+      heightEn: 1.0,
     );
   }
 }
@@ -453,7 +503,8 @@ class MapToolItem extends StatelessWidget {
         child: InkWell(
           onTap: () {},
           //highlightColor: Constants.App.PRIMARY_COLOR,
-          borderRadius: BorderRadius.all(Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))),
+          borderRadius:
+              BorderRadius.all(Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))),
           child: Center(
             child: Image(
               image: icon,

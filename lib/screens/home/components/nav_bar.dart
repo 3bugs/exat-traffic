@@ -1,7 +1,30 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:provider/provider.dart';
+
+List<String> homeLabelList = [
+  'หน้าหลัก',
+  'Home',
+  '家园',
+];
+List<String> favoriteLabelList = [
+  'รายการโปรด',
+  'Favorite',
+  '喜爱',
+];
+List<String> incidentLabelList = [
+  'เหตุการณ์',
+  'Incident',
+  '事件',
+];
+List<String> notificationLabelList = [
+  'แจ้งเตือน',
+  'Notification',
+  '通知',
+];
 
 class MyNavBar extends StatefulWidget {
   MyNavBar({
@@ -20,7 +43,7 @@ class _MyNavBarState extends State<MyNavBar> {
 
   int _currentTabIndex = 0;
 
-  void handlePressTab(int index) {
+  void _handlePressTab(int index) {
     setState(() {
       _currentTabIndex = index;
     });
@@ -31,7 +54,7 @@ class _MyNavBarState extends State<MyNavBar> {
     @required AssetImage icon,
     @required double iconWidth,
     @required double iconHeight,
-    @required String label,
+    @required List<String> labelList,
   }) {
     return BottomNavigationBarItem(
       icon: Image(
@@ -41,12 +64,20 @@ class _MyNavBarState extends State<MyNavBar> {
       ),
       title: Padding(
         padding: EdgeInsets.only(top: getPlatformSize(5.0)),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: getPlatformSize(14.0),
-          ),
-        ),
+        child: Consumer<LanguageModel>(builder: (context, language, child) {
+          return Text(
+            labelList[language.lang],
+            style: language.lang == 0
+                ? TextStyle(
+                    fontFamily: 'DBHeavent',
+                    fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
+                    height: 1.0,
+                  )
+                : TextStyle(
+                    fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
+                  ),
+          );
+        }),
       ),
     );
   }
@@ -66,7 +97,7 @@ class _MyNavBarState extends State<MyNavBar> {
             height: getPlatformSize(Constants.NavBar.HEIGHT),
             child: BottomNavigationBar(
               currentIndex: _currentTabIndex,
-              onTap: handlePressTab,
+              onTap: _handlePressTab,
               type: BottomNavigationBarType.fixed,
               elevation: getPlatformSize(50.0),
               backgroundColor: Colors.white,
@@ -77,7 +108,7 @@ class _MyNavBarState extends State<MyNavBar> {
                       : AssetImage('assets/images/nav_bar/ic_nav_home_off.png'),
                   iconWidth: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(25.5)),
                   iconHeight: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(21.0)),
-                  label: 'Home',
+                  labelList: homeLabelList,
                 ),
                 _getNavBarItem(
                   icon: _currentTabIndex == 1
@@ -85,7 +116,7 @@ class _MyNavBarState extends State<MyNavBar> {
                       : AssetImage('assets/images/nav_bar/ic_nav_favorite_off.png'),
                   iconWidth: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(22.0)),
                   iconHeight: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(21.0)),
-                  label: 'Favorite',
+                  labelList: favoriteLabelList,
                 ),
                 BottomNavigationBarItem(
                   icon: Opacity(
@@ -100,7 +131,7 @@ class _MyNavBarState extends State<MyNavBar> {
                       : AssetImage('assets/images/nav_bar/ic_nav_incident_off.png'),
                   iconWidth: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(17.0)),
                   iconHeight: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(21.0)),
-                  label: 'Incident',
+                  labelList: incidentLabelList,
                 ),
                 _getNavBarItem(
                   icon: _currentTabIndex == 4
@@ -108,14 +139,17 @@ class _MyNavBarState extends State<MyNavBar> {
                       : AssetImage('assets/images/nav_bar/ic_nav_notification_off.png'),
                   iconWidth: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
                   iconHeight: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
-                  label: 'Notification',
+                  labelList: notificationLabelList,
                 ),
               ],
             ),
           ),
           Positioned(
-            top: getPlatformSize(Constants.NavBar.HEIGHT) - getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
-            left: (MediaQuery.of(context).size.width - getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE)) / 2,
+            top: getPlatformSize(Constants.NavBar.HEIGHT) -
+                getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+            left: (MediaQuery.of(context).size.width -
+                    getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE)) /
+                2,
             child: Container(
               width: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
               height: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
@@ -158,8 +192,8 @@ class _MyNavBarState extends State<MyNavBar> {
                     child: InkWell(
                       onTap: () {},
                       //highlightColor: Constants.App.PRIMARY_COLOR,
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),
+                      borderRadius: BorderRadius.all(Radius.circular(
+                          getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),
                       child: Center(
                         child: Image(
                           image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),

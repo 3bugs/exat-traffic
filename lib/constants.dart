@@ -32,7 +32,10 @@ class LoginScreen {
 }
 
 class Font {
-  static const double DEFAULT_SIZE = 16.0;
-  static const double SMALLER_SIZE = 14.0;
+  static const double DEFAULT_SIZE_TH = 24.0;
+  static const double DEFAULT_SIZE_EN = 16.0;
+
+  static const double SMALLER_SIZE_TH = 21.0;
+  static const double SMALLER_SIZE_EN = 14.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
 }
