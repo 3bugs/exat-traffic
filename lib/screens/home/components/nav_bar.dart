@@ -1,4 +1,4 @@
-import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/language.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -21,7 +21,7 @@ List<String> incidentLabelList = [
   '事件',
 ];
 List<String> notificationLabelList = [
-  'แจ้งเตือน',
+  'การแจ้งเตือน',
   'Notification',
   '通知',
 ];

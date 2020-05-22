@@ -1,10 +1,10 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/toll_plaza.dart';
 import 'package:provider/provider.dart';
+import 'package:exattraffic/models/language.dart';
 
 class TollPlazaView extends StatelessWidget {
   TollPlazaView({
@@ -13,7 +13,7 @@ class TollPlazaView extends StatelessWidget {
     @required this.isLastItem,
   });
 
-  final TollPlaza tollPlaza;
+  final TollPlazaModel tollPlaza;
   final bool isFirstItem;
   final bool isLastItem;
 

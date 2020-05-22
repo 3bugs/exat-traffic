@@ -1,4 +1,4 @@
-import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/language.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -14,7 +14,7 @@ class ExpressWayImageView extends StatelessWidget {
     @required this.onClick,
   });
 
-  final ExpressWay expressWay;
+  final ExpressWayModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
   final Function onClick;
@@ -95,7 +95,7 @@ class ExpressWayTextView extends StatelessWidget {
     @required this.isLastItem,
   });
 
-  final ExpressWay expressWay;
+  final ExpressWayModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
 
@@ -152,7 +152,7 @@ class ExpressWayTextView extends StatelessWidget {
                           language.lang,
                           sizeTh: Constants.Font.SMALLER_SIZE_TH,
                           sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                          heightTh: 1.0,
+                          heightTh: 1.05,
                         ),
                       );
                     },

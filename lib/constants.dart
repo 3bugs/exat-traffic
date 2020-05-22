@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class App {
   static const Color PRIMARY_COLOR = Color(0xFF47A1FD);
+  static const Color ACCENT_COLOR = Color(0xFF446E9D);
   static const Color HEADER_GRADIENT_COLOR_START = Color(0xFF5574F7);
   static const Color HEADER_GRADIENT_COLOR_END = Color(0xFF60C3FF);
   static const double HORIZONTAL_MARGIN = 24.0;
@@ -32,10 +33,10 @@ class LoginScreen {
 }
 
 class Font {
-  static const double DEFAULT_SIZE_TH = 24.0;
+  static const double DEFAULT_SIZE_TH = 23.0;
   static const double DEFAULT_SIZE_EN = 16.0;
-
-  static const double SMALLER_SIZE_TH = 21.0;
+  static const double SMALLER_SIZE_TH = 20.0;
   static const double SMALLER_SIZE_EN = 14.0;
+  static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
 }

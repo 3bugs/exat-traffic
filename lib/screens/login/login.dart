@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:exattraffic/screens/scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -133,7 +134,7 @@ class _LoginMainState extends State<LoginMain> {
                           //alert(context, 'Login', 'Test login');
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Home()),
+                            MaterialPageRoute(builder: (context) => MyScaffold()),
                           );
                         },
                       ),

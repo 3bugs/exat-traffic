@@ -54,6 +54,8 @@ flutter:
     - assets/images/
     - assets/images/login/
     - assets/images/home/
+    - assets/images/favorite/
+    - assets/images/incident/
     - assets/images/nav_bar/
     - assets/images/map_tools/
 

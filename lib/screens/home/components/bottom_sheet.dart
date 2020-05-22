@@ -1,4 +1,4 @@
-import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/language.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -33,59 +33,58 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
   bool _bottomSheetExpanded = false;
 
   int _expressWayIndex = -1;
-  //int _lang = 0;
 
-  final List<ExpressWay> _expressWayList = <ExpressWay>[
-    ExpressWay(
+  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
+    ExpressWayModel(
       name: 'ทางพิเศษศรีรัช',
       image: AssetImage('assets/images/home/express_way_srirach.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษฉลองรัช',
       image: AssetImage('assets/images/home/express_way_chalong.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษบูรพาวิถี',
       image: AssetImage('assets/images/home/express_way_burapa.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษเฉลิมมหานคร',
       image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษอุดรรัถยา',
       image: AssetImage('assets/images/home/express_way_udorn.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษสายบางนา',
       image: AssetImage('assets/images/home/express_way_bangna.jpg'),
     ),
-    ExpressWay(
+    ExpressWayModel(
       name: 'ทางพิเศษกาญจนาภิเษก',
       image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
     ),
   ];
 
-  final List<TollPlaza> _tollPlazaList = <TollPlaza>[
-    TollPlaza(
+  final List<TollPlazaModel> _tollPlazaList = <TollPlazaModel>[
+    TollPlazaModel(
       name: 'ทางลงลาดพร้าว',
       image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
       isEntrance: false,
       isExit: true,
     ),
-    TollPlaza(
+    TollPlazaModel(
       name: 'รามอินทรา',
       image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
       isEntrance: true,
       isExit: true,
     ),
-    TollPlaza(
+    TollPlazaModel(
       name: 'สุขาภิบาล 5',
       image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
       isEntrance: true,
       isExit: false,
     ),
-    TollPlaza(
+    TollPlazaModel(
       name: 'โยธิน',
       image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
       isEntrance: true,
@@ -344,9 +343,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                                       );
                                     },
                                     separatorBuilder: (BuildContext context, int index) {
-                                      return SizedBox(
-                                        width: getPlatformSize(0.0),
-                                      );
+                                      return SizedBox.shrink();
                                     },
                                   ),
                                 ),
@@ -365,9 +362,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                                         );
                                       },
                                       separatorBuilder: (BuildContext context, int index) {
-                                        return SizedBox(
-                                          width: getPlatformSize(0.0),
-                                        );
+                                        return SizedBox.shrink();
                                       },
                                     ),
                                   ),

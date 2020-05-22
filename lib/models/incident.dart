@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ExpressWayModel {
-  ExpressWayModel({
+class IncidentModel {
+  IncidentModel({
     @required this.name,
+    @required this.description,
+    @required this.date,
     @required this.image,
   });
 
   final String name;
+  final String description;
+  final String date;
   final AssetImage image;
 }
