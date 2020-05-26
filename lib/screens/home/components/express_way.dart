@@ -1,9 +1,9 @@
-import 'package:exattraffic/models/language.dart';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/express_way.dart';
+import 'package:exattraffic/models/express_way_model.dart';
 import 'package:provider/provider.dart';
 
 class ExpressWayImageView extends StatelessWidget {

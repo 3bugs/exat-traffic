@@ -4,8 +4,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:exattraffic/models/language.dart';
-import 'package:exattraffic/models/incident.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/incident_model.dart';
 import 'package:exattraffic/components/list_item.dart';
 
 class IncidentView extends StatelessWidget {
@@ -92,7 +92,7 @@ class IncidentView extends StatelessWidget {
                       description,
                       style: getTextStyle(
                         language.lang,
-                        color: Color(0xFFB2B2B2),
+                        color: Constants.Font.DIM_COLOR,
                         heightEn: 1.6,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,

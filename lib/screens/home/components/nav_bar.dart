@@ -1,4 +1,4 @@
-import 'package:exattraffic/models/language.dart';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';

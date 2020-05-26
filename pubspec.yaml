@@ -57,6 +57,7 @@ flutter:
     - assets/images/favorite/
     - assets/images/incident/
     - assets/images/nav_bar/
+    - assets/images/drawer/
     - assets/images/map_tools/
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/toll_plaza.dart';
+import 'package:exattraffic/models/toll_plaza_model.dart';
 import 'package:provider/provider.dart';
-import 'package:exattraffic/models/language.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class TollPlazaView extends StatelessWidget {
   TollPlazaView({

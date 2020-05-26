@@ -5,14 +5,17 @@ import 'package:intl/intl.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:provider/provider.dart';
-import 'package:exattraffic/models/language.dart';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/screens/home/components/drawer.dart';
 import 'package:exattraffic/screens/home/components/nav_bar.dart';
 import 'package:exattraffic/screens/home/components/bottom_sheet.dart';
 import 'package:exattraffic/screens/favorite/favorite.dart';
 import 'package:exattraffic/screens/incident/incident.dart';
+import 'package:exattraffic/screens/notification/notification.dart';
 import 'package:exattraffic/models/screen_props.dart';
+//import 'package:exattraffic/components/fade_indexed_stack.dart';
+import 'package:exattraffic/components/animated_indexed_stack.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -105,9 +108,9 @@ List<ScreenProps> screenPropsList = [
 ];
 
 List<String> dateList = [
-  '22 พฤษภาคม 2563',
-  'MAY 22, 2020',
-  '2020年5月22日',
+  '25 พฤษภาคม 2563',
+  'MAY 25, 2020',
+  '2020年5月25日',
 ];
 
 class MyScaffoldMain extends StatefulWidget {
@@ -117,6 +120,7 @@ class MyScaffoldMain extends StatefulWidget {
 
 class _MyScaffoldMainState extends State<MyScaffoldMain> {
   final GlobalKey _keyMainContainer = GlobalKey();
+  final GlobalKey<ScaffoldState> _keyDrawer = GlobalKey();
 
   final String formattedDate = new DateFormat.yMMMMd().format(new DateTime.now()).toUpperCase();
 
@@ -132,14 +136,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     Container(
     ),
     Incident(),
-    Center(
-      child: Text(
-          'Notification'
-      ),
-    ),
+    MyNotification(),
   ];
 
   bool _showDate = true;
+  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   int _currentTabIndex = 0;
   ScreenProps _currentScreenProps = screenPropsList[0];
@@ -153,6 +154,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     final RenderBox mainContainerRenderBox =
         _keyMainContainer.currentContext.findRenderObject();
     setState(() {
+      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
   }
@@ -176,12 +178,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         'pixel ratio: ${queryData.devicePixelRatio}');
 
     return Scaffold(
+      key: _keyDrawer,
       appBar: null,
       /*AppBar(
         title: Text('Home'),
       )*/
       drawer: Drawer(
-        child: MyDrawer(),
+        child: MyDrawer(_mainContainerTop),
       ),
       bottomNavigationBar: MyNavBar(
         onClickTab: _handleClickTab,
@@ -224,7 +227,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {_keyDrawer.currentState.openDrawer();},
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(getPlatformSize(0.0)),
                                 ),
@@ -325,7 +328,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                       // main container
                       child: Container(
                         key: _keyMainContainer,
-                        child: IndexedStack(
+                        child: AnimatedIndexedStack(
                           children: _fragmentList,
                           index: _currentTabIndex,
                         ),
@@ -493,7 +496,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 }
 
-class MapToolItem extends StatelessWidget {
+/*class MapToolItem extends StatelessWidget {
   MapToolItem({
     @required this.icon,
     @required this.iconWidth,
@@ -550,4 +553,4 @@ class MapToolItem extends StatelessWidget {
       ),
     );
   }
-}
+}*/

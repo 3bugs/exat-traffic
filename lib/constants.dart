@@ -39,4 +39,5 @@ class Font {
   static const double SMALLER_SIZE_EN = 14.0;
   static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
+  static const Color DIM_COLOR = Color(0xFFB2B2B2);
 }

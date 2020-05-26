@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'package:exattraffic/screens/favorite/components/favorite.dart';
-import 'package:exattraffic/screens/incident/components/incident.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/incident.dart';
+import 'package:exattraffic/models/incident_model.dart';
+import 'package:exattraffic/screens/incident/components/incident_view.dart';
 
 class Incident extends StatelessWidget {
   @override
@@ -97,7 +96,7 @@ class _IncidentMainState extends State<IncidentMain> {
 
   @override
   void initState() {
-    print('FAVORITE SCREEN');
+    print('INCIDENT SCREEN');
     super.initState();
   }
 
