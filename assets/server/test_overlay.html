@@ -25,7 +25,7 @@
       float: left;
     }
 
-    #content {
+    #description {
       margin-left: 50%;
       padding: 15px;
     }
@@ -369,7 +369,7 @@
      * onAdd is called when the map's panes are ready and the overlay has been
      * added to the map.
      */
-    MyCanvasOverlay.prototype.onAdd = function() {
+    MyCanvasOverlay.prototype.onAdd = function () {
       console.log('-- MyCanvasOverlay.onAdd()');
 
       const canvas = document.createElement('canvas');
@@ -393,7 +393,7 @@
 
     let center;
 
-    MyCanvasOverlay.prototype.draw = function() {
+    MyCanvasOverlay.prototype.draw = function () {
       console.log('-- MyCanvasOverlay.draw()');
 
       // We use the south-west and north-east
@@ -506,17 +506,17 @@
             }
           });
         }, DRAWING_LOOP_INTERVAL_MS);
-
-        getPoints();
-        const pointTimer = setInterval(() => {
-          getPoints();
-        }, 400);
       }
     };
 
+    getPoints();
+    const pointTimer = setInterval(() => {
+      getPoints();
+    }, 1500);
+
     // The onRemove() method will be called automatically from the API if
     // we ever set the overlay's map property to 'null'.
-    MyCanvasOverlay.prototype.onRemove = function() {
+    MyCanvasOverlay.prototype.onRemove = function () {
       this.div_.parentNode.removeChild(this.div_);
       this.div_ = null;
     };
@@ -543,23 +543,32 @@
   </script>
 </head>
 <body>
-<section id="container">
-  <div id="map"></div>
-  <div id="content">
-    <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
-    <div id="main-container" style="display: flex">
-      <div style="margin-top: 16px">
-        <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
-        <ul>
-          <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
-          <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
-          <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
-          <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
-        </ul>
+<!-- The sidebar -->
+<!--<div class="sidebar">
+  <a href="schematic_map.html">Schematic Map</a>
+  <a href="connection_visualization.html">App Connection Visualization</a>
+  <a class="active" href="test_overlay.html">App Connection Visualization (Google Maps จริง - ยังคงมี bug!)</a>
+</div>-->
+
+<!--<div class="content">-->
+  <section id="container">
+    <div id="map"></div>
+    <div id="description">
+      <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
+      <div id="main-container" style="display: flex">
+        <div style="margin-top: 16px">
+          <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
+          <ul>
+            <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
+            <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
+            <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
+            <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+<!--</div>-->
 <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&callback=initMap"
         async defer></script>-->
 </body>
