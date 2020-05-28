@@ -32,11 +32,17 @@ class LoginScreen {
   static const double LOGO_SIZE = 210.0;
 }
 
+class CctvPlayerScreen {
+  static const double HORIZONTAL_MARGIN = 22.0;
+}
+
 class Font {
   static const double DEFAULT_SIZE_TH = 23.0;
   static const double DEFAULT_SIZE_EN = 16.0;
   static const double SMALLER_SIZE_TH = 20.0;
   static const double SMALLER_SIZE_EN = 14.0;
+  static const double BIGGER_SIZE_TH = 26.0;
+  static const double BIGGER_SIZE_EN = 18.0;
   static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
   static const Color DIM_COLOR = Color(0xFFB2B2B2);

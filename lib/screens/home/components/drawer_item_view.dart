@@ -74,8 +74,8 @@ class DrawerItemView extends StatelessWidget {
                         name,
                         style: getTextStyle(
                           language.lang,
-                          sizeTh: 26.0,
-                          sizeEn: 18.0,
+                          sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                          sizeEn: Constants.Font.BIGGER_SIZE_EN,
                           color: Colors.white,
                           isBold: true,
                           //heightEn: 1.5,

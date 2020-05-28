@@ -130,33 +130,73 @@ class ExpressWayTextView extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(6.0)),
                 ),
-                child: Center(
-                  child: Consumer<LanguageModel>(
-                    builder: (context, language, child) {
-                      String name;
-                      switch (language.lang) {
-                        case 0:
-                          name = expressWay.name;
-                          break;
-                        case 1:
-                          name = 'Expressway';
-                          break;
-                        case 2:
-                          name = '高速公路';
-                          break;
-                      }
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Consumer<LanguageModel>(
+                      builder: (context, language, child) {
+                        String name;
+                        switch (language.lang) {
+                          case 0:
+                            name = 'ดินแดง';
+                            break;
+                          case 1:
+                            name = 'Din dang';
+                            break;
+                          case 2:
+                            name = '中文';
+                            break;
+                        }
 
-                      return Text(
-                        name,
-                        style: getTextStyle(
-                          language.lang,
-                          sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                          sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                          heightTh: 1.05,
-                        ),
-                      );
-                    },
-                  ),
+                        return Text(
+                          name,
+                          style: getTextStyle(
+                            language.lang,
+                            sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                            sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                            heightTh: 1.05,
+                          ),
+                        );
+                      },
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: getPlatformSize(8.0),
+                        right: getPlatformSize(8.0),
+                      ),
+                      child: Image(
+                        image: AssetImage('assets/images/home/ic_double_arrow.png'),
+                        width: getPlatformSize(8.44),
+                        height: getPlatformSize(9.84),
+                      ),
+                    ),
+                    Consumer<LanguageModel>(
+                      builder: (context, language, child) {
+                        String name;
+                        switch (language.lang) {
+                          case 0:
+                            name = 'บางนา';
+                            break;
+                          case 1:
+                            name = 'Bangna';
+                            break;
+                          case 2:
+                            name = '中文';
+                            break;
+                        }
+
+                        return Text(
+                          name,
+                          style: getTextStyle(
+                            language.lang,
+                            sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                            sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                            heightTh: 1.05,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),

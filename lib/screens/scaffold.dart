@@ -14,6 +14,7 @@ import 'package:exattraffic/screens/favorite/favorite.dart';
 import 'package:exattraffic/screens/incident/incident.dart';
 import 'package:exattraffic/screens/notification/notification.dart';
 import 'package:exattraffic/models/screen_props.dart';
+
 //import 'package:exattraffic/components/fade_indexed_stack.dart';
 import 'package:exattraffic/components/animated_indexed_stack.dart';
 
@@ -30,7 +31,8 @@ class MyScaffold extends StatelessWidget {
 }
 
 List<ScreenProps> screenPropsList = [
-  ScreenProps( // home
+  ScreenProps(
+    // home
     id: 0,
     showSearchBox: true,
     showBottomSheet: true,
@@ -45,7 +47,8 @@ List<ScreenProps> screenPropsList = [
       '搜索',
     ],
   ),
-  ScreenProps( // favorite
+  ScreenProps(
+    // favorite
     id: 1,
     showSearchBox: true,
     showBottomSheet: false,
@@ -75,7 +78,8 @@ List<ScreenProps> screenPropsList = [
       '搜索事件',
     ],
   ),
-  ScreenProps( // incident
+  ScreenProps(
+    // incident
     id: 3,
     showSearchBox: true,
     showBottomSheet: false,
@@ -90,7 +94,8 @@ List<ScreenProps> screenPropsList = [
       '搜索事件',
     ],
   ),
-  ScreenProps( // notification
+  ScreenProps(
+    // notification
     id: 4,
     showSearchBox: true,
     showBottomSheet: false,
@@ -130,11 +135,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   ];
   static const List<double> BG_GRADIENT_STOPS = [0.0, 1.0];
 
-  List<Widget> _fragmentList = [
+  final List<Widget> _fragmentList = [
     Home(),
     Favorite(),
-    Container(
-    ),
+    Container(),
     Incident(),
     MyNotification(),
   ];
@@ -151,8 +155,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 
   _afterLayout(_) {
-    final RenderBox mainContainerRenderBox =
-        _keyMainContainer.currentContext.findRenderObject();
+    final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
     setState(() {
       _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
@@ -227,7 +230,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {_keyDrawer.currentState.openDrawer();},
+                                onTap: () {
+                                  _keyDrawer.currentState.openDrawer();
+                                },
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(getPlatformSize(0.0)),
                                 ),
@@ -367,7 +372,8 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                   ],
                                   color: Colors.white,
                                   borderRadius: BorderRadius.all(
-                                    Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                    Radius.circular(
+                                        getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                                   ),
                                 ),
                                 child: Padding(
@@ -401,7 +407,8 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                                     bottom: getPlatformSize(4.0),
                                                   ),
                                                   border: InputBorder.none,
-                                                  hintText: _currentScreenProps.getSearchHint(language.lang),
+                                                  hintText: _currentScreenProps
+                                                      .getSearchHint(language.lang),
                                                 ),
                                                 style: getTextStyle(language.lang),
                                               );
@@ -433,7 +440,6 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                   ),
                                 ),
                               ),
-
                             ],
                           ),
                         ),
@@ -444,11 +450,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                       visible: _currentScreenProps.showBottomSheet,
                       child: MyBottomSheet(
                         collapsePosition:
-                        getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                            _mainContainerHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
                         expandPosition:
-                        getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
+                            getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
                       ),
                     ),
                     // เงาบนแถบ bottom nav

@@ -5,6 +5,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 
+//use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
+
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

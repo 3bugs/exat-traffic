@@ -59,6 +59,8 @@ flutter:
     - assets/images/nav_bar/
     - assets/images/drawer/
     - assets/images/map_tools/
+    - assets/images/cctv_details/
+    - assets/images/rest_area_details/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

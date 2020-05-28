@@ -1,13 +1,16 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/components/express_way.dart';
-import 'package:exattraffic/screens/home/components/toll_plaza.dart';
+import 'package:exattraffic/screens/home/components/cctv_item.dart';
 import 'package:exattraffic/models/toll_plaza_model.dart';
 import 'package:exattraffic/models/express_way_model.dart';
-import 'package:provider/provider.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
+import 'package:exattraffic/screens/rest_area_details/rest_area_details.dart';
 
 List<String> expressWayHeaderList = [
   'ทางพิเศษ',
@@ -31,66 +34,7 @@ class MyBottomSheet extends StatefulWidget {
 class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateMixin {
   AnimationController _controller;
   bool _bottomSheetExpanded = false;
-
-  int _expressWayIndex = -1;
-
-  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
-    ExpressWayModel(
-      name: 'ทางพิเศษศรีรัช',
-      image: AssetImage('assets/images/home/express_way_srirach.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษฉลองรัช',
-      image: AssetImage('assets/images/home/express_way_chalong.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษบูรพาวิถี',
-      image: AssetImage('assets/images/home/express_way_burapa.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษเฉลิมมหานคร',
-      image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษอุดรรัถยา',
-      image: AssetImage('assets/images/home/express_way_udorn.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษสายบางนา',
-      image: AssetImage('assets/images/home/express_way_bangna.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษกาญจนาภิเษก',
-      image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
-    ),
-  ];
-
-  final List<TollPlazaModel> _tollPlazaList = <TollPlazaModel>[
-    TollPlazaModel(
-      name: 'ทางลงลาดพร้าว',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
-      isEntrance: false,
-      isExit: true,
-    ),
-    TollPlazaModel(
-      name: 'รามอินทรา',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
-      isEntrance: true,
-      isExit: true,
-    ),
-    TollPlazaModel(
-      name: 'สุขาภิบาล 5',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
-      isEntrance: true,
-      isExit: false,
-    ),
-    TollPlazaModel(
-      name: 'โยธิน',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
-      isEntrance: true,
-      isExit: true,
-    ),
-  ];
+  ExpressWayModel _selectedExpressWay;
 
   initState() {
     _controller = AnimationController(
@@ -122,14 +66,23 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
 
   void _handleClickBack(BuildContext context) {
     setState(() {
-      _expressWayIndex = -1;
+      _selectedExpressWay = null;
     });
   }
 
-  void _handleClickExpressWay(int index) {
+  void _handleClickExpressWay(BuildContext context, ExpressWayModel expressWayModel) {
     setState(() {
-      _expressWayIndex = index;
+      _selectedExpressWay = expressWayModel;
     });
+  }
+
+  void _handleClickCctv(BuildContext context, CctvModel cctvModel) {
+    //alert(context, 'TEST', chunkModel.name);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CctvDetails(cctvModel)),
+      //MaterialPageRoute(builder: (context) => RestAreaDetails(cctvModel)),
+    );
   }
 
   @override
@@ -139,15 +92,12 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
         begin: RelativeRect.fromLTRB(
           0,
           widget.collapsePosition,
-          /*Constants.HomeScreen.MAPS_VERTICAL_POSITION +
-              _googleMapsHeight -
-              Constants.BottomSheet.HEIGHT_INITIAL,*/
           0,
           0,
         ),
         end: RelativeRect.fromLTRB(
           0,
-          widget.expandPosition, //Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION - 1,
+          widget.expandPosition,
           0,
           0,
         ),
@@ -216,42 +166,42 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                         SizedBox(
                           width: getPlatformSize(8.0),
                         ),
-                        _expressWayIndex == -1
+                        _selectedExpressWay == null
                             ? SizedBox(
-                                width: getPlatformSize(42.0),
-                              )
+                          width: getPlatformSize(42.0),
+                        )
                             : Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    _handleClickBack(context);
-                                  },
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(getPlatformSize(21.0)),
-                                  ),
-                                  child: Container(
-                                    width: getPlatformSize(42.0),
-                                    height: getPlatformSize(42.0),
-                                    //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                                    child: Center(
-                                      child: Image(
-                                        image: AssetImage('assets/images/home/ic_back.png'),
-                                        width: getPlatformSize(12.0),
-                                        height: getPlatformSize(12.0),
-                                      ),
-                                    ),
-                                  ),
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _handleClickBack(context);
+                            },
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(getPlatformSize(21.0)),
+                            ),
+                            child: Container(
+                              width: getPlatformSize(42.0),
+                              height: getPlatformSize(42.0),
+                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                              child: Center(
+                                child: Image(
+                                  image: AssetImage('assets/images/home/ic_back.png'),
+                                  width: getPlatformSize(12.0),
+                                  height: getPlatformSize(12.0),
                                 ),
                               ),
+                            ),
+                          ),
+                        ),
                         Expanded(
                           child: Center(
                             child: Consumer<LanguageModel>(
                               builder: (context, language, child) {
                                 String name;
-                                if (_expressWayIndex != -1) {
+                                if (_selectedExpressWay != null) {
                                   switch (language.lang) {
                                     case 0:
-                                      name = _expressWayList[_expressWayIndex].name;
+                                      name = _selectedExpressWay.name;
                                       break;
                                     case 1:
                                       name = 'Expressway';
@@ -262,7 +212,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                                   }
                                 }
                                 return Text(
-                                  _expressWayIndex == -1
+                                  _selectedExpressWay == null
                                       ? expressWayHeaderList[language.lang]
                                       : name,
                                   style: getTextStyle(language.lang, isBold: true),
@@ -301,75 +251,15 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
                         ),
                       ],
                     ),
-                    _expressWayIndex == -1
-                        ? Container(
-                            height: getPlatformSize(110.0),
-                            child: ListView.separated(
-                              itemCount: _expressWayList.length,
-                              scrollDirection: Axis.horizontal,
-                              physics: BouncingScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                return ExpressWayImageView(
-                                  expressWay: _expressWayList[index],
-                                  isFirstItem: index == 0,
-                                  isLastItem: index == _expressWayList.length - 1,
-                                  onClick: () {
-                                    _handleClickExpressWay(index);
-                                  },
-                                );
-                              },
-                              separatorBuilder: (BuildContext context, int index) {
-                                return SizedBox(
-                                  width: getPlatformSize(0.0),
-                                );
-                              },
-                            ),
-                          )
-                        : Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                // list ทางพิเศษ (text)
-                                Container(
-                                  height: getPlatformSize(44.0),
-                                  child: ListView.separated(
-                                    itemCount: _expressWayList.length,
-                                    scrollDirection: Axis.horizontal,
-                                    physics: BouncingScrollPhysics(),
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return ExpressWayTextView(
-                                        expressWay: _expressWayList[index],
-                                        isFirstItem: index == 0,
-                                        isLastItem: index == _expressWayList.length - 1,
-                                      );
-                                    },
-                                    separatorBuilder: (BuildContext context, int index) {
-                                      return SizedBox.shrink();
-                                    },
-                                  ),
-                                ),
-                                // list ด่านทางขึ้น-ลง
-                                Expanded(
-                                  child: Container(
-                                    child: ListView.separated(
-                                      itemCount: _tollPlazaList.length,
-                                      scrollDirection: Axis.vertical,
-                                      physics: BouncingScrollPhysics(),
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return TollPlazaView(
-                                          tollPlaza: _tollPlazaList[index],
-                                          isFirstItem: index == 0,
-                                          isLastItem: index == _tollPlazaList.length - 1,
-                                        );
-                                      },
-                                      separatorBuilder: (BuildContext context, int index) {
-                                        return SizedBox.shrink();
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    Expanded(
+                      child: IndexedStack(
+                        children: <Widget>[
+                          ExpressWayList(_handleClickExpressWay),
+                          CctvList(_handleClickCctv)
+                        ],
+                        index: _selectedExpressWay == null ? 0 : 1,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -377,6 +267,157 @@ class _MyBottomSheetState extends State<MyBottomSheet> with TickerProviderStateM
           ],
         ),
       ),
+    );
+  }
+}
+
+class ExpressWayList extends StatelessWidget {
+  ExpressWayList(this._onSelectExpressWay);
+
+  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
+    ExpressWayModel(
+      name: 'ทางพิเศษศรีรัช',
+      image: AssetImage('assets/images/home/express_way_srirach.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษฉลองรัช',
+      image: AssetImage('assets/images/home/express_way_chalong.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษบูรพาวิถี',
+      image: AssetImage('assets/images/home/express_way_burapa.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษเฉลิมมหานคร',
+      image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษอุดรรัถยา',
+      image: AssetImage('assets/images/home/express_way_udorn.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษสายบางนา',
+      image: AssetImage('assets/images/home/express_way_bangna.jpg'),
+    ),
+    ExpressWayModel(
+      name: 'ทางพิเศษกาญจนาภิเษก',
+      image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
+    ),
+  ];
+
+  final Function _onSelectExpressWay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: getPlatformSize(110.0),
+      child: ListView.separated(
+        itemCount: _expressWayList.length,
+        scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          ExpressWayModel selectedExpressWay = _expressWayList[index];
+
+          return ExpressWayImageView(
+            expressWay: selectedExpressWay,
+            isFirstItem: index == 0,
+            isLastItem: index == _expressWayList.length - 1,
+            onClick: () {
+              _onSelectExpressWay(context, selectedExpressWay);
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return SizedBox(
+            width: getPlatformSize(0.0),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CctvList extends StatefulWidget {
+  CctvList(this._onSelectCctv);
+
+  final List<CctvModel> _cctvList = <CctvModel>[
+    CctvModel(
+      name: 'ทางลงลาดพร้าว',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+    ),
+    CctvModel(
+      name: 'รามอินทรา',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+    ),
+    CctvModel(
+      name: 'สุขาภิบาล 5',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+    ),
+    CctvModel(
+      name: 'โยธิน',
+      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+    ),
+  ];
+
+  final Function _onSelectCctv;
+
+  @override
+  _CctvListState createState() => _CctvListState();
+}
+
+class _CctvListState extends State<CctvList> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
+        Container(
+          height: getPlatformSize(44.0),
+          child: ListView.separated(
+            itemCount: 5,
+            scrollDirection: Axis.horizontal,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return ExpressWayTextView(
+                expressWay: ExpressWayModel(
+                  name: 'ทางพิเศษศรีรัช',
+                  image: AssetImage('assets/images/home/express_way_srirach.jpg'),
+                ),
+                isFirstItem: index == 0,
+                isLastItem: index == 4,
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return SizedBox.shrink();
+            },
+          ),
+        ),
+        // list ด่านทางขึ้น-ลง
+        Expanded(
+          child: Container(
+            child: ListView.separated(
+              itemCount: widget._cctvList.length,
+              scrollDirection: Axis.vertical,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                CctvModel selectedCctv = widget._cctvList[index];
+
+                return CctvItemView(
+                  cctvModel: selectedCctv,
+                  isFirstItem: index == 0,
+                  isLastItem: index == widget._cctvList.length - 1,
+                  onClick: () {
+                    widget._onSelectCctv(context, selectedCctv);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
