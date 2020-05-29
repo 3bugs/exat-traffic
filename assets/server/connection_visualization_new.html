@@ -576,11 +576,11 @@
 </div>
 
 <!-- Page content -->
-<div class="content">
+<div class="content" style="display: flex; flex-direction: column; border: 0px solid red; height: 100vh">
   <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
-  <div id="main-container" style="display: flex">
-    <div id="map" style="width: 580px; height: 580px; border: 0px solid red;"></div>
-    <div style="margin-top: 16px">
+  <div id="main-container" style="flex: 1; border: 0px solid blue; align-items: stretch">
+    <div id="map" style="flex: 1; height: 100%; border: 0px solid red;"></div>
+    <div style="flex: 1; margin-top: 16px">
       <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
       <ul>
         <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
