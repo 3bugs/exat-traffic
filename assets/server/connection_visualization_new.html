@@ -20,7 +20,6 @@
     }
 
     #map {
-      height: 600px;
       width: 50%;
       float: left;
     }
@@ -40,6 +39,9 @@
       #main-container {
         display: flex;
         flex-direction: column;
+      }
+      #map {
+        width: 100%;
       }
     }
   </style>
@@ -62,10 +64,15 @@
     const LINE_OPACITY = 0.2;
     const OPACITY_STEP = Math.floor(PERSIST_TIME_MINUTES * 60 * 1000) / DRAWING_LOOP_INTERVAL_MS;
 
-    const MIN_LATITUDE = 13.409445; //5.406847;
-    const MAX_LATITUDE = 14.223382; //20.604112;
-    const MIN_LONGITUDE = 100.220543; //97.206511;
-    const MAX_LONGITUDE = 101.061671; //105.784084;
+    /*const MIN_LATITUDE = 0; //5.406847;
+    const MAX_LATITUDE = 60; //20.604112;
+    const MIN_LONGITUDE = 97.206511;
+    const MAX_LONGITUDE = 105.784084;*/
+
+    const MIN_LATITUDE = 13.409445;
+    const MAX_LATITUDE = 14.223382;
+    const MIN_LONGITUDE = 100.220543;
+    const MAX_LONGITUDE = 101.061671;
 
     MyCanvasOverlay.prototype = new google.maps.OverlayView();
 
@@ -548,13 +555,18 @@
     }
 
     function getPoints() {
+      /*const min_lat = 5.406847;
+      const max_lat = 20.604112;
+      const min_lng = 97.206511;
+      const max_lng = 105.784084;*/
+
       pointList = pointList.filter(point => !point.dead);
 
       const numPoint = Math.floor(Math.random() * 3);
       if (numPoint === 0) {
         pointList.push({
-          lat: (Math.random() * (MAX_LATITUDE - (MIN_LATITUDE + 0.1)) + (MIN_LATITUDE + 0.1)),
-          lng: (Math.random() * (MAX_LONGITUDE - MIN_LONGITUDE) + MIN_LONGITUDE),
+          lat: (Math.random() * ((MAX_LATITUDE - 0.1) - (MIN_LATITUDE + 0.1)) + (MIN_LATITUDE + 0.1)),
+          lng: (Math.random() * ((MAX_LONGITUDE - 0.1) - (MIN_LONGITUDE + 0.1)) + (MIN_LONGITUDE + 0.1)),
         });
       }
       /*for (let i = 0; i < numPoint; i++) {
