@@ -64,15 +64,15 @@
     const LINE_OPACITY = 0.2;
     const OPACITY_STEP = Math.floor(PERSIST_TIME_MINUTES * 60 * 1000) / DRAWING_LOOP_INTERVAL_MS;
 
-    /*const MIN_LATITUDE = 0; //5.406847;
-    const MAX_LATITUDE = 60; //20.604112;
-    const MIN_LONGITUDE = 97.206511;
-    const MAX_LONGITUDE = 105.784084;*/
+    const MIN_LATITUDE = -60; //5.406847;
+    const MAX_LATITUDE = 80; //60; //20.604112;
+    const MIN_LONGITUDE = -170; //97.206511;
+    const MAX_LONGITUDE = 180; //105.784084;
 
-    const MIN_LATITUDE = 13.409445;
+    /*const MIN_LATITUDE = 13.409445;
     const MAX_LATITUDE = 14.223382;
     const MIN_LONGITUDE = 100.220543;
-    const MAX_LONGITUDE = 101.061671;
+    const MAX_LONGITUDE = 101.061671;*/
 
     MyCanvasOverlay.prototype = new google.maps.OverlayView();
 
@@ -80,7 +80,7 @@
     function initMap() {
       const map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.8163, lng: 100.6518}, //13.7563, 100.5018
-        zoom: 10,
+        zoom: 4,
         styles: [
           {
             "elementType": "geometry",
@@ -354,9 +354,9 @@
         ],
       });
 
-      map.addListener('zoom_changed', function () {
+      /*map.addListener('zoom_changed', function () {
         if (parseInt(map.getZoom()) > 12) map.setZoom(12);
-      });
+      });*/
 
       const bounds = new google.maps.LatLngBounds(
         //new google.maps.LatLng(12.493143, 98.702379),
@@ -390,7 +390,7 @@
       console.log('-- MyCanvasOverlay.onAdd()');
 
       const canvas = document.createElement('canvas');
-      //canvas.style.border = "5px solid rgba(255, 0, 0, 0.2)";
+      canvas.style.border = "5px solid rgba(255, 0, 0, 0.2)";
       canvas.style.position = 'absolute';
 
       /*const img = document.createElement('img');
@@ -409,7 +409,6 @@
     };
 
     let center;
-
     MyCanvasOverlay.prototype.draw = function () {
       console.log('-- MyCanvasOverlay.draw()');
 
@@ -421,24 +420,40 @@
       // Retrieve the south-west and north-east coordinates of this overlay
       // in LatLngs and convert them to pixel coordinates.
       // We'll use these coordinates to resize the div.
-      const sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
-      const ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+      /*const sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+      const ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());*/
+
+      let southWest = this.map_.getBounds().getSouthWest();
+      if (southWest.lat() < -85) {
+        southWest = new google.maps.LatLng(-85, southWest.lng());
+      }
+      let northEast = this.map_.getBounds().getNorthEast();
+      if (northEast.lat() > 85) {
+        northEast = new google.maps.LatLng(85, northEast.lng());
+      }
+
+      const sw = overlayProjection.fromLatLngToDivPixel(southWest);
+      const ne = overlayProjection.fromLatLngToDivPixel(northEast);
+
+      console.log(`SOUTH WEST: ${southWest}, NORTH EAST: ${northEast}, `);
 
       // Resize the image's div to fit the indicated dimensions.
-      const canvas = this.canvas_;
-      canvas.style.left = sw.x + 'px';
-      canvas.style.top = ne.y + 'px';
+      const canvasElement = this.canvas_;
+      canvasElement.style.left = sw.x + 'px';
+      canvasElement.style.top = ne.y + 'px';
+      ctx.canvas.left = sw.x; // แค่เก็บไว้ใช้คำนวณหาตำแหน่ง x, y บน canvas
+      ctx.canvas.top = ne.y;
 
       const canvasWidth = ne.x - sw.x;
       const canvasHeight = sw.y - ne.y;
-      canvas.style.width = canvasWidth + 'px';
-      canvas.style.height = canvasHeight + 'px';
+      canvasElement.style.width = canvasWidth + 'px';
+      canvasElement.style.height = canvasHeight + 'px';
       ctx.canvas.width = canvasWidth;
       ctx.canvas.height = canvasHeight;
 
-      console.log(`left: ${canvas.style.left}, top: ${canvas.style.top}, width: ${canvasWidth}, height: ${canvasHeight}`);
+      console.log(`area: ${Math.floor(canvasWidth * canvasHeight)}, left: ${canvasElement.style.left}, top: ${canvasElement.style.top}, width: ${canvasWidth}, height: ${canvasHeight}`);
 
-      center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas);
+      center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas, overlayProjection);
       center.lat = EXAT_LAT_LNG.lat;
       center.lng = EXAT_LAT_LNG.lng;
 
@@ -474,10 +489,10 @@
               point.end = true;
             }
 
-            let coord = getCoordinateFromLatLng(point, ctx.canvas);
+            let coord = getCoordinateFromLatLng(point, ctx.canvas, overlayProjection);
             point.x = coord.x;
             point.y = coord.y;
-            let coordCurrent = getCoordinateFromLatLng({lat: point.currentLat, lng: point.currentLng}, ctx.canvas);
+            let coordCurrent = getCoordinateFromLatLng({lat: point.currentLat, lng: point.currentLng}, ctx.canvas, overlayProjection);
             point.currentX = coordCurrent.x;
             point.currentY = coordCurrent.y;
 
@@ -542,10 +557,19 @@
       this.div_ = null;
     };
 
-    function getCoordinateFromLatLng(pointLatLng, canvasSize) {
-      const x = canvasSize.width * (pointLatLng.lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
+    function getCoordinateFromLatLng(pointLatLng, canvasSize, overlayProjection) {
+      /*const x = canvasSize.width * (pointLatLng.lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
       const y = canvasSize.height * (MAX_LATITUDE - pointLatLng.lat) / (MAX_LATITUDE - MIN_LATITUDE);
-      return {x, y};
+      return {x, y};*/
+
+      const coord = overlayProjection.fromLatLngToDivPixel(new google.maps.LatLng(pointLatLng));
+      /*if (canvasSize.left + canvasSize.width < coord.x || canvasSize.lelf > coord.x) {
+        console.log('### OUT OF BOUNDARY - HORIZONTAL');
+      }
+      if (canvasSize.top + canvasSize.height < coord.y || canvasSize.top > coord.y) {
+        console.log('### OUT OF BOUNDARY - VERTICAL');
+      }*/
+      return {x: coord.x - canvasSize.left, y: coord.y - canvasSize.top};
     }
 
     function getLatLngSizeFromCoordSize(coordSize, canvasSize) {
@@ -555,18 +579,18 @@
     }
 
     function getPoints() {
-      /*const min_lat = 5.406847;
+      const min_lat = 5.406847;
       const max_lat = 20.604112;
       const min_lng = 97.206511;
-      const max_lng = 105.784084;*/
+      const max_lng = 105.784084;
 
       pointList = pointList.filter(point => !point.dead);
 
       const numPoint = Math.floor(Math.random() * 3);
       if (numPoint === 0) {
         pointList.push({
-          lat: (Math.random() * ((MAX_LATITUDE - 0.1) - (MIN_LATITUDE + 0.1)) + (MIN_LATITUDE + 0.1)),
-          lng: (Math.random() * ((MAX_LONGITUDE - 0.1) - (MIN_LONGITUDE + 0.1)) + (MIN_LONGITUDE + 0.1)),
+          lat: (Math.random() * ((max_lat - 0.1) - (min_lat + 0.1)) + (min_lat + 0.1)),
+          lng: (Math.random() * ((max_lng - 0.1) - (min_lng + 0.1)) + (min_lng + 0.1)),
         });
       }
       /*for (let i = 0; i < numPoint; i++) {
