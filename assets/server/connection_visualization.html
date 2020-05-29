@@ -1,64 +1,59 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>EXAT Traffic - Backend Widget Prototype</title>
-    <meta name="viewport" content="width=device-width, initial-scale=0.62, maximum-scale=0.62, user-scalable=no">
-    <meta charset="UTF-8">
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
-    <link rel="stylesheet" href="css/main.css">
-    <style>
-        #main-container {
-            display: flex;
-            flex-direction: row;
-        }
+  <title>Simple Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=no">
+  <meta charset="utf-8">
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #container {
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      padding: 0;
+    }
 
-        /* On screens that are less than 700px wide */
-        @media screen and (max-width: 700px) {
-            #main-container {
-                display: flex;
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
+    #map {
+      height: 600px;
+      width: 50%;
+      float: left;
+    }
 
-<body>
-<!-- The sidebar -->
-<div class="sidebar">
-    <a href="schematic_map.html">Schematic Map</a>
-    <a class="active" href="connection_visualization.html">App Connection Visualization</a>
-</div>
+    #description {
+      margin-left: 50%;
+      padding: 15px;
+    }
 
-<!-- Page content -->
-<div class="content">
-    <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
-    <div id="main-container" style="display: flex">
-        <div style="background-image: url('images/base_map_dark2.png'); width: 540px; height: 540px; border: 0px solid red;">
-            <canvas id="myCanvas" width="540px" height="540px" style="border: 0px solid #ccc;">
-                Your browser does not support the HTML5 canvas tag.
-            </canvas>
-        </div>
-        <div style="margin-top: 16px">
-            <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
-            <ul>
-                <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
-                <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
-                <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
-                <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
-            </ul>
-        </div>
-    </div>
-</div>
+    #main-container {
+      display: flex;
+      flex-direction: row;
+    }
 
-<script>
-    const c = document.getElementById("myCanvas");
-    const ctx = c.getContext("2d");
-    const center = {x: 262, y: 369};
+    /* On screens that are less than 700px wide */
+    @media screen and (max-width: 700px) {
+      #main-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak"></script>
+  <script>
+    let overlay, ctx;
+    const EXAT_LAT_LNG = {lat: 13.8469852, lng: 100.5780775};
+
     let pointList = [];
+    let drawingLoopTimer = null;
+
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+
     const MOTION_STEP = 5;
     const PERSIST_TIME_MINUTES = 1;
     const DRAWING_LOOP_INTERVAL_MS = 50;
@@ -67,109 +62,537 @@
     const LINE_OPACITY = 0.2;
     const OPACITY_STEP = Math.floor(PERSIST_TIME_MINUTES * 60 * 1000) / DRAWING_LOOP_INTERVAL_MS;
 
-    /* var bgImage = new Image();
-    bgImage.src = "images/base_map.png";
-    bgImage.onload = function () {
-        //ctx.drawImage(bgImage, 0, 0, c.width, c.height);
-    } */
+    const MIN_LATITUDE = 13.409445; //5.406847;
+    const MAX_LATITUDE = 14.223382; //20.604112;
+    const MIN_LONGITUDE = 100.220543; //97.206511;
+    const MAX_LONGITUDE = 101.061671; //105.784084;
 
-    const timer = setInterval(() => {
-        //ctx.drawImage(bgImage, 0, 0, c.width, c.height);
-        ctx.clearRect(0, 0, c.width, c.height);
+    MyCanvasOverlay.prototype = new google.maps.OverlayView();
 
-        pointList.forEach(point => {
+    // Initialize the map and the custom overlay.
+    function initMap() {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 13.8163, lng: 100.6518}, //13.7563, 100.5018
+        zoom: 10,
+        styles: [
+          {
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#212121"
+              }
+            ]
+          },
+          {
+            "elementType": "labels.icon",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#757575"
+              }
+            ]
+          },
+          {
+            "elementType": "labels.text.stroke",
+            "stylers": [
+              {
+                "color": "#212121"
+              }
+            ]
+          },
+          {
+            "featureType": "administrative",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#757575"
+              }
+            ]
+          },
+          {
+            "featureType": "administrative.country",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#9e9e9e"
+              }
+            ]
+          },
+          {
+            "featureType": "administrative.land_parcel",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "administrative.locality",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#bdbdbd"
+              }
+            ]
+          },
+          {
+            "featureType": "administrative.neighborhood",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "poi",
+            "elementType": "labels.text",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "poi",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#757575"
+              }
+            ]
+          },
+          {
+            "featureType": "poi.business",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "poi.park",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#181818"
+              }
+            ]
+          },
+          {
+            "featureType": "poi.park",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#616161"
+              }
+            ]
+          },
+          {
+            "featureType": "poi.park",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+              {
+                "color": "#1b1b1b"
+              }
+            ]
+          },
+          {
+            "featureType": "road",
+            "elementType": "geometry.fill",
+            "stylers": [
+              {
+                "color": "#2c2c2c"
+              }
+            ]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels.icon",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#8a8a8a"
+              }
+            ]
+          },
+          {
+            "featureType": "road.arterial",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road.arterial",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#373737"
+              }
+            ]
+          },
+          {
+            "featureType": "road.highway",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#3c3c3c"
+              }
+            ]
+          },
+          {
+            "featureType": "road.highway",
+            "elementType": "labels",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road.highway.controlled_access",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#4e4e4e"
+              }
+            ]
+          },
+          {
+            "featureType": "road.local",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road.local",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#616161"
+              }
+            ]
+          },
+          {
+            "featureType": "transit",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "transit",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#757575"
+              }
+            ]
+          },
+          {
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "color": "#000000"
+              }
+            ]
+          },
+          {
+            "featureType": "water",
+            "elementType": "labels.text",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "water",
+            "elementType": "labels.text.fill",
+            "stylers": [
+              {
+                "color": "#3d3d3d"
+              }
+            ]
+          }
+        ],
+      });
+
+      map.addListener('zoom_changed', function () {
+        if (parseInt(map.getZoom()) > 12) map.setZoom(12);
+      });
+
+      const bounds = new google.maps.LatLngBounds(
+        //new google.maps.LatLng(12.493143, 98.702379),
+        //new google.maps.LatLng(15.789370, 102.425715),
+        new google.maps.LatLng(MIN_LATITUDE, MIN_LONGITUDE),
+        new google.maps.LatLng(MAX_LATITUDE, MAX_LONGITUDE),
+      );
+
+      overlay = new MyCanvasOverlay(bounds, map);
+    }
+
+    /** @constructor */
+    function MyCanvasOverlay(bounds, map) {
+      this.bounds_ = bounds;
+      this.map_ = map;
+
+      // Define a property to hold the image's div. We'll
+      // actually create this div upon receipt of the onAdd()
+      // method so we'll leave it null for now.
+      this.canvas_ = null;
+
+      // Explicitly call setMap on this overlay.
+      this.setMap(map);
+    }
+
+    /**
+     * onAdd is called when the map's panes are ready and the overlay has been
+     * added to the map.
+     */
+    MyCanvasOverlay.prototype.onAdd = function () {
+      console.log('-- MyCanvasOverlay.onAdd()');
+
+      const canvas = document.createElement('canvas');
+      //canvas.style.border = "5px solid rgba(255, 0, 0, 0.2)";
+      canvas.style.position = 'absolute';
+
+      /*const img = document.createElement('img');
+      img.src = this.image_;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.position = 'absolute';
+      div.appendChild(img);*/
+
+      this.canvas_ = canvas;
+
+      // Add the element to the "overlayLayer" pane.
+      const panes = this.getPanes();
+      panes.overlayLayer.appendChild(canvas);
+      ctx = canvas.getContext("2d");
+    };
+
+    let center;
+
+    MyCanvasOverlay.prototype.draw = function () {
+      console.log('-- MyCanvasOverlay.draw()');
+
+      // We use the south-west and north-east
+      // coordinates of the overlay to peg it to the correct position and size.
+      // To do this, we need to retrieve the projection from the overlay.
+      const overlayProjection = this.getProjection();
+
+      // Retrieve the south-west and north-east coordinates of this overlay
+      // in LatLngs and convert them to pixel coordinates.
+      // We'll use these coordinates to resize the div.
+      const sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+      const ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+
+      // Resize the image's div to fit the indicated dimensions.
+      const canvas = this.canvas_;
+      canvas.style.left = sw.x + 'px';
+      canvas.style.top = ne.y + 'px';
+
+      const canvasWidth = ne.x - sw.x;
+      const canvasHeight = sw.y - ne.y;
+      canvas.style.width = canvasWidth + 'px';
+      canvas.style.height = canvasHeight + 'px';
+      ctx.canvas.width = canvasWidth;
+      ctx.canvas.height = canvasHeight;
+
+      console.log(`left: ${canvas.style.left}, top: ${canvas.style.top}, width: ${canvasWidth}, height: ${canvasHeight}`);
+
+      center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas);
+      center.lat = EXAT_LAT_LNG.lat;
+      center.lng = EXAT_LAT_LNG.lng;
+
+      /*ตอนนี้ center จะมีทั้ง x, y, lat, lng*/
+
+      if (drawingLoopTimer == null) {
+        drawingLoopTimer = setInterval(() => {
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+          pointList.forEach(point => {
             if (point.timestamp == null) {
-                //point.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                point.timestamp = Date.now();
-                point.opacity = POINT_OPACITY;
-                point.lineOpacity = LINE_OPACITY;
-                point.currentX = point.x;
-                point.currentY = point.y;
+              //point.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+              point.timestamp = Date.now();
+              point.opacity = POINT_OPACITY;
+              point.lineOpacity = LINE_OPACITY;
 
-                const distanceX = Math.abs(point.x - center.x);
-                const distanceY = Math.abs(point.y - center.y);
-                const distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+              point.currentLat = point.lat;
+              point.currentLng = point.lng;
 
-                point.deltaX = (center.x > point.x ? 1 : -1) * (distanceX * MOTION_STEP) / distance;
-                point.deltaY = (center.y > point.y ? 1 : -1) * (distanceY * MOTION_STEP) / distance;
-            } else if ((point.deltaX > 0 && point.currentX > center.x)
-                || (point.deltaX < 0 && point.currentX < center.x)
-                || (point.deltaY > 0 && point.currentY > center.y)
-                || (point.deltaY < 0 && point.currentY < center.y)) {
-                point.end = true;
+              const distanceLng = Math.abs(point.lng - center.lng);
+              const distanceLat = Math.abs(point.lat - center.lat);
+              const distance = Math.sqrt(Math.pow(distanceLng, 2) + Math.pow(distanceLat, 2));
+
+              /*const stepSize = getLatLngSizeFromCoordSize({width: MOTION_STEP, height: MOTION_STEP}, ctx.canvas);
+              point.deltaLng = (center.lng > point.lng ? 1 : -1) * (distanceLng * stepSize.width) / distance;
+              point.deltaLat = (center.lat > point.lat ? 1 : -1) * (distanceLat * stepSize.width) / distance;*/
+              point.deltaLng = (center.lng > point.lng ? 1 : -1) * distanceLng / 20;
+              point.deltaLat = (center.lat > point.lat ? 1 : -1) * distanceLat / 20;
+            } else if ((point.deltaLng > 0 && point.currentLng > center.lng)
+              || (point.deltaLng < 0 && point.currentLng < center.lng)
+              || (point.deltaLat > 0 && point.currentLat > center.lat)
+              || (point.deltaLat < 0 && point.currentLat < center.lat)) {
+              point.end = true;
             }
+
+            let coord = getCoordinateFromLatLng(point, ctx.canvas);
+            point.x = coord.x;
+            point.y = coord.y;
+            let coordCurrent = getCoordinateFromLatLng({lat: point.currentLat, lng: point.currentLng}, ctx.canvas);
+            point.currentX = coordCurrent.x;
+            point.currentY = coordCurrent.y;
 
             if (!point.end) {
-                ctx.beginPath();
-                ctx.moveTo(point.x, point.y);
-                ctx.lineTo(center.x, center.y);
-                const lineStyle = ctx.createLinearGradient(point.x, point.y, center.x, center.y);
-                lineStyle.addColorStop(0, 'rgba(0, 200, 0, 0)');
-                lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
-                ctx.strokeStyle = lineStyle;
-                ctx.lineWidth = 3;
-                ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(point.x, point.y);
+              ctx.lineTo(center.x, center.y);
+              const lineStyle = ctx.createLinearGradient(point.x, point.y, center.x, center.y);
+              lineStyle.addColorStop(0, 'rgba(0, 200, 0, 0)');
+              lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+              ctx.strokeStyle = lineStyle;
+              ctx.lineWidth = 3;
+              ctx.stroke();
 
-                ctx.beginPath();
-                ctx.arc(point.currentX, point.currentY, 2, 0, 2 * Math.PI);
-                ctx.fillStyle = 'rgba(239, 253, 23, 1)';
-                ctx.fill();
+              ctx.beginPath();
+              ctx.arc(point.currentX, point.currentY, 2, 0, 2 * Math.PI);
+              ctx.fillStyle = 'rgba(239, 253, 23, 1)';
+              ctx.fill();
 
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 255, 1)`;
-                ctx.fill();
+              ctx.beginPath();
+              ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+              ctx.fill();
 
-                point.currentX += point.deltaX;
-                point.currentY += point.deltaY;
+              point.currentLng += point.deltaLng;
+              point.currentLat += point.deltaLat;
             } else if (Date.now() - point.timestamp < Math.floor(PERSIST_TIME_MINUTES * 60 * 1000)) {
-                ctx.beginPath();
-                ctx.moveTo(point.x, point.y);
-                ctx.lineTo(center.x, center.y);
-                ctx.strokeStyle = `rgba(0, 200, 0, ${point.lineOpacity})`;
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(point.x, point.y);
+              ctx.lineTo(center.x, center.y);
+              ctx.strokeStyle = `rgba(0, 200, 0, ${point.lineOpacity})`;
+              ctx.lineWidth = 1.5;
+              ctx.stroke();
 
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
-                ctx.fill();
+              ctx.beginPath();
+              ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
+              ctx.fill();
 
-                point.opacity -= (POINT_OPACITY / OPACITY_STEP);
-                if (point.opacity <= 0) point.opacity = 0;
+              point.opacity -= (POINT_OPACITY / OPACITY_STEP);
+              if (point.opacity <= 0) point.opacity = 0;
 
-                point.lineOpacity -= (LINE_OPACITY / OPACITY_STEP);
-                if (point.lineOpacity <= 0) point.lineOpacity = 0;
+              point.lineOpacity -= (LINE_OPACITY / OPACITY_STEP);
+              if (point.lineOpacity <= 0) point.lineOpacity = 0;
             } else {
-                point.dead = true;
+              point.dead = true;
             }
-        });
-    }, DRAWING_LOOP_INTERVAL_MS);
+          });
+        }, DRAWING_LOOP_INTERVAL_MS);
+      }
+    };
 
     getPoints();
     const pointTimer = setInterval(() => {
-        getPoints();
-    }, 400);
+      getPoints();
+    }, 200);
 
-    function getPoints() {
-        pointList = pointList.filter(point => !point.dead);
+    // The onRemove() method will be called automatically from the API if
+    // we ever set the overlay's map property to 'null'.
+    MyCanvasOverlay.prototype.onRemove = function () {
+      this.div_.parentNode.removeChild(this.div_);
+      this.div_ = null;
+    };
 
-        const numPoint = Math.floor(Math.random() * 5);
-        for (let i = 0; i < numPoint; i++) {
-            pointList.push({
-                x: Math.floor(Math.random() * (c.width - 250)) + 100,
-                y: Math.floor(Math.random() * (c.height - 150) + 75)
-            })
-        }
+    function getCoordinateFromLatLng(pointLatLng, canvasSize) {
+      const x = canvasSize.width * (pointLatLng.lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
+      const y = canvasSize.height * (MAX_LATITUDE - pointLatLng.lat) / (MAX_LATITUDE - MIN_LATITUDE);
+      return {x, y};
     }
 
-    c.addEventListener('click', e => {
-        const x = e.pageX - c.offsetLeft;
-        const y = e.pageY - c.offsetTop;
-        pointList = pointList.filter(point => !point.dead);
-        pointList.push({x, y});
-    });
-</script>
-</body>
+    function getLatLngSizeFromCoordSize(coordSize, canvasSize) {
+      const width = coordSize.width * (MAX_LONGITUDE - MIN_LONGITUDE) / canvasSize.width;
+      const height = coordSize.height * (MAX_LATITUDE - MIN_LATITUDE) / canvasSize.height;
+      return {width, height};
+    }
 
+    function getPoints() {
+      pointList = pointList.filter(point => !point.dead);
+
+      const numPoint = Math.floor(Math.random() * 3);
+      if (numPoint === 0) {
+        pointList.push({
+          lat: (Math.random() * (MAX_LATITUDE - (MIN_LATITUDE + 0.1)) + (MIN_LATITUDE + 0.1)),
+          lng: (Math.random() * (MAX_LONGITUDE - MIN_LONGITUDE) + MIN_LONGITUDE),
+        });
+      }
+      /*for (let i = 0; i < numPoint; i++) {
+        pointList.push({
+          lat: (Math.random() * (MAX_LATITUDE - (MIN_LATITUDE + 0.1)) + (MIN_LATITUDE + 0.1)),
+          lng: (Math.random() * (MAX_LONGITUDE - MIN_LONGITUDE) + MIN_LONGITUDE),
+        });
+      }*/
+    }
+
+    google.maps.event.addDomListener(window, 'load', initMap);
+  </script>
+</head>
+<body>
+<!-- The sidebar -->
+<div class="sidebar">
+  <a href="schematic_map.html">Schematic Map</a>
+  <a class="active" href="connection_visualization.html">App Connection Visualization</a>
+</div>
+
+<!-- Page content -->
+<div class="content">
+  <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
+  <div id="main-container" style="display: flex">
+    <div id="map" style="width: 580px; height: 580px; border: 0px solid red;"></div>
+    <div style="margin-top: 16px">
+      <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
+      <ul>
+        <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
+        <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
+        <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
+        <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&callback=initMap"
+        async defer></script>-->
+</body>
 </html>

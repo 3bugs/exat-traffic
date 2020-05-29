@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>EXAT Traffic - Backend Widget Prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=no">
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        #main-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* On screens that are less than 700px wide */
+        @media screen and (max-width: 700px) {
+            #main-container {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- The sidebar -->
+<div class="sidebar">
+    <a href="schematic_map.html">Schematic Map</a>
+    <a class="active" href="connection_visualization.html">App Connection Visualization</a>
+</div>
+
+<!-- Page content -->
+<div class="content">
+    <h3 class="title">ภาพ Visualization แสดงการเชื่อมต่อจากแอปพลิเคชัน EXAT Traffic เข้ามายังเครื่อง Server ที่การทางพิเศษแห่งประเทศไทย <span class="smaller-text">(ข้อมูลสมมติ)</span></h3>
+    <div id="main-container" style="display: flex">
+        <div style="background-image: url('images/base_map_dark2.png'); width: 540px; height: 540px; border: 0px solid red;">
+            <canvas id="myCanvas" width="540px" height="540px" style="border: 0px solid #ccc;">
+                Your browser does not support the HTML5 canvas tag.
+            </canvas>
+        </div>
+        <div style="margin-top: 16px">
+            <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
+            <ul>
+                <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
+                <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
+                <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
+                <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const c = document.getElementById("myCanvas");
+    const ctx = c.getContext("2d");
+    const center = {x: 262, y: 369};
+    let pointList = [];
+    const MOTION_STEP = 5;
+    const PERSIST_TIME_MINUTES = 1;
+    const DRAWING_LOOP_INTERVAL_MS = 50;
+
+    const POINT_OPACITY = 1.0;
+    const LINE_OPACITY = 0.2;
+    const OPACITY_STEP = Math.floor(PERSIST_TIME_MINUTES * 60 * 1000) / DRAWING_LOOP_INTERVAL_MS;
+
+    /* var bgImage = new Image();
+    bgImage.src = "images/base_map.png";
+    bgImage.onload = function () {
+        //ctx.drawImage(bgImage, 0, 0, c.width, c.height);
+    } */
+
+    const timer = setInterval(() => {
+        //ctx.drawImage(bgImage, 0, 0, c.width, c.height);
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        pointList.forEach(point => {
+            if (point.timestamp == null) {
+                //point.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                point.timestamp = Date.now();
+                point.opacity = POINT_OPACITY;
+                point.lineOpacity = LINE_OPACITY;
+                point.currentX = point.x;
+                point.currentY = point.y;
+
+                const distanceX = Math.abs(point.x - center.x);
+                const distanceY = Math.abs(point.y - center.y);
+                const distance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+
+                point.deltaX = (center.x > point.x ? 1 : -1) * (distanceX * MOTION_STEP) / distance;
+                point.deltaY = (center.y > point.y ? 1 : -1) * (distanceY * MOTION_STEP) / distance;
+            } else if ((point.deltaX > 0 && point.currentX > center.x)
+                || (point.deltaX < 0 && point.currentX < center.x)
+                || (point.deltaY > 0 && point.currentY > center.y)
+                || (point.deltaY < 0 && point.currentY < center.y)) {
+                point.end = true;
+            }
+
+            if (!point.end) {
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(center.x, center.y);
+                const lineStyle = ctx.createLinearGradient(point.x, point.y, center.x, center.y);
+                lineStyle.addColorStop(0, 'rgba(0, 200, 0, 0)');
+                lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                ctx.strokeStyle = lineStyle;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(point.currentX, point.currentY, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(239, 253, 23, 1)';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+                ctx.fill();
+
+                point.currentX += point.deltaX;
+                point.currentY += point.deltaY;
+            } else if (Date.now() - point.timestamp < Math.floor(PERSIST_TIME_MINUTES * 60 * 1000)) {
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(center.x, center.y);
+                ctx.strokeStyle = `rgba(0, 200, 0, ${point.lineOpacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
+                ctx.fill();
+
+                point.opacity -= (POINT_OPACITY / OPACITY_STEP);
+                if (point.opacity <= 0) point.opacity = 0;
+
+                point.lineOpacity -= (LINE_OPACITY / OPACITY_STEP);
+                if (point.lineOpacity <= 0) point.lineOpacity = 0;
+            } else {
+                point.dead = true;
+            }
+        });
+    }, DRAWING_LOOP_INTERVAL_MS);
+
+    getPoints();
+    const pointTimer = setInterval(() => {
+        getPoints();
+    }, 400);
+
+    function getPoints() {
+        pointList = pointList.filter(point => !point.dead);
+
+        const numPoint = Math.floor(Math.random() * 5);
+        for (let i = 0; i < numPoint; i++) {
+            pointList.push({
+                x: Math.floor(Math.random() * (c.width - 250)) + 100,
+                y: Math.floor(Math.random() * (c.height - 150) + 75)
+            })
+        }
+    }
+
+    c.addEventListener('click', e => {
+        const x = e.pageX - c.offsetLeft;
+        const y = e.pageY - c.offsetTop;
+        pointList = pointList.filter(point => !point.dead);
+        pointList.push({x, y});
+    });
+</script>
+</body>
+
+</html>

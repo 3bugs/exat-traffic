@@ -421,17 +421,10 @@
 
       console.log(`left: ${canvas.style.left}, top: ${canvas.style.top}, width: ${canvasWidth}, height: ${canvasHeight}`);
 
-      /*ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(ne.x - sw.x, sw.y - ne.y);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'red';
-      ctx.stroke();*/
-      center = getCoordinateFromLatLng(EXAT_LAT_LNG);
+      center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas);
 
       if (drawingLoopTimer == null) {
         drawingLoopTimer = setInterval(() => {
-          //ctx.drawImage(bgImage, 0, 0, c.width, c.height);
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
           pointList.forEach(point => {
@@ -441,7 +434,7 @@
               point.opacity = POINT_OPACITY;
               point.lineOpacity = LINE_OPACITY;
 
-              const {x, y} = getCoordinateFromLatLng(point);
+              const {x, y} = getCoordinateFromLatLng(point, ctx.canvas);
               point.x = x;
               point.y = y;
               point.currentX = x;
@@ -521,9 +514,9 @@
       this.div_ = null;
     };
 
-    function getCoordinateFromLatLng({lat, lng}) {
-      const x = ctx.canvas.width * (lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
-      const y = ctx.canvas.height * (MAX_LATITUDE - lat) / (MAX_LATITUDE - MIN_LATITUDE);
+    function getCoordinateFromLatLng(pointLatLng, canvasSize) {
+      const x = canvasSize.width * (pointLatLng.lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
+      const y = canvasSize.height * (MAX_LATITUDE - pointLatLng.lat) / (MAX_LATITUDE - MIN_LATITUDE);
       return {x, y};
     }
 
