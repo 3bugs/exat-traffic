@@ -579,7 +579,7 @@
     };
 
     getPoints();
-    const pointTimer = setInterval(() => {
+    let pointTimer = setInterval(() => {
       getPoints();
     }, 200);
 
@@ -649,7 +649,17 @@
     }
 
     function handleClickCheck(cb) {
-
+      if (cb.checked) {
+        if (pointTimer == null) {
+          pointTimer = setInterval(() => {
+            getPoints();
+          }, 200);
+        }
+      } else {
+        clearInterval(pointTimer);
+        pointTimer = null;
+        clearMaps();
+      }
     }
   </script>
 </head>
@@ -667,10 +677,11 @@
     <div id="map" style="flex: 1; height: 100%; border: 0px solid red;"></div>
     <div style="flex: 1; margin-top: 16px">
       <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
-      <div style="margin-left: 24px; margin-right: 16px">
+      <div style="margin-left: 24px; margin-right: 16px; margin-bottom: 16px">
         <button type="button" class="btn btn-outline-danger" onClick="clearMaps()">Clear Maps</button><br><br>
-        <!--<input id="cbVisualization" type="checkbox" onClick="handleClickCheck(this)"> Visualization-->
+        <input id="cbShowRandomData" type="checkbox" checked onClick="handleClickCheck(this)"> แสดงข้อมูลตำแหน่งผู้ใช้ app ที่ random ขึ้นมา (random พิกัดบริเวณประเทศไทย)
       </div>
+      <hr/>
       <ul>
         <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
         <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
