@@ -96,6 +96,7 @@
       const map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.8163, lng: 100.6518}, //13.7563, 100.5018
         zoom: 4,
+        mapTypeControl: false,
         streetViewControl: false,
         styles: [
           {
@@ -639,7 +640,7 @@
   <script>
     function clearImage() {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.drawImage(logoImg, ctx.canvas.width - 125, 0);
+      ctx.drawImage(logoImg, 10, 2);
     }
 
     function clearMaps() {
