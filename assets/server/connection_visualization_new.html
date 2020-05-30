@@ -81,6 +81,7 @@
       const map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 13.8163, lng: 100.6518}, //13.7563, 100.5018
         zoom: 4,
+        streetViewControl: false,
         styles: [
           {
             "elementType": "geometry",
@@ -390,7 +391,7 @@
       console.log('-- MyCanvasOverlay.onAdd()');
 
       const canvas = document.createElement('canvas');
-      canvas.style.border = "5px solid rgba(255, 0, 0, 0.2)";
+      canvas.style.border = "1px solid rgba(255, 255, 0, 0.5)";
       canvas.style.position = 'absolute';
 
       /*const img = document.createElement('img');
@@ -424,34 +425,38 @@
       const ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());*/
 
       let southWest = this.map_.getBounds().getSouthWest();
-      if (southWest.lat() < -85) {
-        southWest = new google.maps.LatLng(-85, southWest.lng());
+      if (southWest.lng() < -175) {
+        //southWest = new google.maps.LatLng(southWest.lat(), -175);
       }
       let northEast = this.map_.getBounds().getNorthEast();
-      if (northEast.lat() > 85) {
-        northEast = new google.maps.LatLng(85, northEast.lng());
+      if (northEast.lng() > 175) {
+        //northEast = new google.maps.LatLng(northEast.lat(), 175);
       }
 
+      const canvasElement = this.canvas_;
+      const worldWidthPixel = overlayProjection.getWorldWidth();
       const sw = overlayProjection.fromLatLngToDivPixel(southWest);
       const ne = overlayProjection.fromLatLngToDivPixel(northEast);
 
       console.log(`SOUTH WEST: ${southWest}, NORTH EAST: ${northEast}, `);
 
-      // Resize the image's div to fit the indicated dimensions.
-      const canvasElement = this.canvas_;
-      canvasElement.style.left = sw.x + 'px';
-      canvasElement.style.top = ne.y + 'px';
-      ctx.canvas.left = sw.x; // แค่เก็บไว้ใช้คำนวณหาตำแหน่ง x, y บน canvas
-      ctx.canvas.top = ne.y;
-
-      const canvasWidth = ne.x - sw.x;
+      const canvasWidth = (ne.x - sw.x === 0) ? worldWidthPixel : (ne.x - sw.x);
       const canvasHeight = sw.y - ne.y;
       canvasElement.style.width = canvasWidth + 'px';
       canvasElement.style.height = canvasHeight + 'px';
       ctx.canvas.width = canvasWidth;
       ctx.canvas.height = canvasHeight;
 
-      console.log(`area: ${Math.floor(canvasWidth * canvasHeight)}, left: ${canvasElement.style.left}, top: ${canvasElement.style.top}, width: ${canvasWidth}, height: ${canvasHeight}`);
+      const left = (((canvasWidth === worldWidthPixel) && sw.x > 0) ? sw.x - worldWidthPixel : sw.x);
+      canvasElement.style.left = left + 'px';
+      canvasElement.style.top = ne.y + 'px';
+      ctx.canvas.left = left; // แค่เก็บไว้ใช้คำนวณหาตำแหน่ง x, y บน canvas
+      ctx.canvas.top = ne.y;
+
+      console.log('----------');
+      console.log(`Left: ${canvasElement.style.left}, Top: ${canvasElement.style.top}`);
+      console.log(`Width: ${canvasWidth}, Height: ${canvasHeight}, Area: ${Math.floor(canvasWidth * canvasHeight)}`);
+      console.log(`World width: ${overlayProjection.getWorldWidth()}`);
 
       center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas, overlayProjection);
       center.lat = EXAT_LAT_LNG.lat;
