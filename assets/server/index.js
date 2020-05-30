@@ -18,6 +18,8 @@ app.get('/location', function (req, res) {
     const {lat, lng} = req.query;
     //io.emit('location', `Latitude: ${lat}, Longitude: ${lng}`);
     io.emit('location', {lat: parseFloat(lat), lng: parseFloat(lng)});
+    console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+
     res.send('ok');
 });
 
