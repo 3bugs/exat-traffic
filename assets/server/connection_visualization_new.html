@@ -40,14 +40,29 @@
         display: flex;
         flex-direction: column;
       }
+
       #map {
         width: 100%;
       }
     }
   </style>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    $(function () {
+      const socket = io();
+      socket.on('location', function (location) {
+        //alert(location);
+        pointList.push(location);
+      });
+    });
+  </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak"></script>
   <script>
     let overlay, ctx;
+    const logoImg = new window.Image();
+    logoImg.setAttribute('src', 'images/exat-w100-white.png');
+
     const EXAT_LAT_LNG = {lat: 13.8469852, lng: 100.5780775};
 
     let pointList = [];
@@ -359,6 +374,16 @@
         if (parseInt(map.getZoom()) > 12) map.setZoom(12);
       });*/
 
+      map.addListener('click', function (e) {
+        console.log(e.latLng);
+
+        pointList = pointList.filter(point => !point.dead);
+        pointList.push({
+          lat: e.latLng.lat(),
+          lng: e.latLng.lng(),
+        });
+      });
+
       const bounds = new google.maps.LatLngBounds(
         //new google.maps.LatLng(12.493143, 98.702379),
         //new google.maps.LatLng(15.789370, 102.425715),
@@ -390,9 +415,9 @@
     MyCanvasOverlay.prototype.onAdd = function () {
       console.log('-- MyCanvasOverlay.onAdd()');
 
-      const canvas = document.createElement('canvas');
-      canvas.style.border = "1px solid rgba(255, 255, 0, 0.5)";
-      canvas.style.position = 'absolute';
+      const canvasElement = document.createElement('canvas');
+      //canvasElement.style.border = "1px solid rgba(255, 255, 0, 0.3)";
+      canvasElement.style.position = 'absolute';
 
       /*const img = document.createElement('img');
       img.src = this.image_;
@@ -401,12 +426,12 @@
       img.style.position = 'absolute';
       div.appendChild(img);*/
 
-      this.canvas_ = canvas;
+      this.canvas_ = canvasElement;
 
       // Add the element to the "overlayLayer" pane.
       const panes = this.getPanes();
-      panes.overlayLayer.appendChild(canvas);
-      ctx = canvas.getContext("2d");
+      panes.overlayLayer.appendChild(canvasElement);
+      ctx = canvasElement.getContext("2d");
     };
 
     let center;
@@ -447,6 +472,8 @@
       ctx.canvas.width = canvasWidth;
       ctx.canvas.height = canvasHeight;
 
+      canvasElement.style.border = canvasWidth === worldWidthPixel ? "1px solid rgba(255, 255, 0, 0.5)" : null;
+
       const left = (((canvasWidth === worldWidthPixel) && sw.x > 0) ? sw.x - worldWidthPixel : sw.x);
       canvasElement.style.left = left + 'px';
       canvasElement.style.top = ne.y + 'px';
@@ -466,7 +493,7 @@
 
       if (drawingLoopTimer == null) {
         drawingLoopTimer = setInterval(() => {
-          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+          clearImage();
 
           pointList.forEach(point => {
             if (point.timestamp == null) {
@@ -507,7 +534,7 @@
               ctx.lineTo(center.x, center.y);
               const lineStyle = ctx.createLinearGradient(point.x, point.y, center.x, center.y);
               lineStyle.addColorStop(0, 'rgba(0, 200, 0, 0)');
-              lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+              lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
               ctx.strokeStyle = lineStyle;
               ctx.lineWidth = 3;
               ctx.stroke();
@@ -608,6 +635,22 @@
 
     google.maps.event.addDomListener(window, 'load', initMap);
   </script>
+
+  <script>
+    function clearImage() {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(logoImg, ctx.canvas.width - 125, 0);
+    }
+
+    function clearMaps() {
+      pointList = [];
+      clearImage();
+    }
+
+    function handleClickCheck(cb) {
+
+    }
+  </script>
 </head>
 <body>
 <!-- The sidebar -->
@@ -623,6 +666,10 @@
     <div id="map" style="flex: 1; height: 100%; border: 0px solid red;"></div>
     <div style="flex: 1; margin-top: 16px">
       <!--<img src="images/exat.png" style="align-self: center; width: 150px; height: 150px; margin: 20px 0 10px 10px;"/>-->
+      <div style="margin-left: 24px; margin-right: 16px">
+        <button type="button" class="btn btn-outline-danger" onClick="clearMaps()">Clear Maps</button><br><br>
+        <!--<input id="cbVisualization" type="checkbox" onClick="handleClickCheck(this)"> Visualization-->
+      </div>
       <ul>
         <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
         <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
