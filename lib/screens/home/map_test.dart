@@ -7,21 +7,20 @@ import 'package:http/http.dart' as http;
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/screens/home/map_test.dart';
 
-class Home extends StatelessWidget {
+class MapTest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return HomeMain();
+    return wrapSystemUiOverlayStyle(child: MapTestMain());
   }
 }
 
-class HomeMain extends StatefulWidget {
+class MapTestMain extends StatefulWidget {
   @override
-  _HomeMainState createState() => _HomeMainState();
+  _MapTestMainState createState() => _MapTestMainState();
 }
 
-class _HomeMainState extends State<HomeMain> {
+class _MapTestMainState extends State<MapTestMain> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
   final Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
@@ -37,7 +36,7 @@ class _HomeMainState extends State<HomeMain> {
         await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     final CameraPosition currentPosition = CameraPosition(
       target: LatLng(position.latitude, position.longitude),
-      zoom: 15,
+      zoom: 3,
     );
     final GoogleMapController controller = await _googleMapController.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
@@ -71,89 +70,92 @@ class _HomeMainState extends State<HomeMain> {
     var response = await http.get(uri);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-
-    /*var url = 'http://163.47.9.26/location?lat=20&lng=20';
-    var response = await http.post(url, body: {'name': 'doodle', 'color': 'blue'});
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');*/
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      /*decoration: BoxDecoration(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'สำหรับทดสอบ Visualization',
+          style: getTextStyle(
+            0,
+            sizeTh: 30.0,
+            color: Colors.white,
+          ),
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.pinkAccent,
+      ),
+      body: Container(
+        /*decoration: BoxDecoration(
         border: Border.all(
           color: Colors.redAccent,
           width: 2.0,
         ),
       ),*/
-      child: Stack(
-        children: <Widget>[
-          GoogleMap(
-            key: _keyGoogleMaps,
-            mapType: MapType.normal,
-            initialCameraPosition: INITIAL_POSITION,
-            myLocationEnabled: true,
-            onMapCreated: (GoogleMapController controller) {
-              _googleMapController.complete(controller);
-              _moveToCurrentPosition(context);
-            },
-            onTap: (LatLng latLng) {
-              _addMarker(latLng);
-              _sendToVisualization(latLng);
-            },
-            markers: Set<Marker>.of(markers.values),
-          ),
-          Container(
-            padding: EdgeInsets.only(
-              top: getPlatformSize(42.0),
-              left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-              right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+        child: Stack(
+          children: <Widget>[
+            GoogleMap(
+              key: _keyGoogleMaps,
+              mapType: MapType.normal,
+              initialCameraPosition: INITIAL_POSITION,
+              myLocationEnabled: true,
+              onMapCreated: (GoogleMapController controller) {
+                _googleMapController.complete(controller);
+                _moveToCurrentPosition(context);
+              },
+              onTap: (LatLng latLng) {
+                _addMarker(latLng);
+                _sendToVisualization(latLng);
+              },
+              markers: Set<Marker>.of(markers.values),
             ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Column(
-                children: <Widget>[
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                    iconWidth: getPlatformSize(21.0),
-                    iconHeight: getPlatformSize(21.0),
-                    marginTop: getPlatformSize(0.0),
-                    onClick: () {
-                      setState(() {
-                        markers.clear();
-                      });
-                    },
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
-                    iconWidth: getPlatformSize(26.6),
-                    iconHeight: getPlatformSize(21.6),
-                    marginTop: getPlatformSize(10.0),
-                    onClick: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MapTest()),
-                      );
-                    },
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
-                    iconWidth: getPlatformSize(16.4),
-                    iconHeight: getPlatformSize(18.3),
-                    marginTop: getPlatformSize(10.0),
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
-                    iconWidth: getPlatformSize(15.5),
-                    iconHeight: getPlatformSize(16.5),
-                    marginTop: getPlatformSize(10.0),
-                  ),
-                ],
+            Container(
+              padding: EdgeInsets.only(
+                top: getPlatformSize(42.0),
+                left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+              ),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Column(
+                  children: <Widget>[
+                    MapToolItem(
+                      icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                      iconWidth: getPlatformSize(21.0),
+                      iconHeight: getPlatformSize(21.0),
+                      marginTop: getPlatformSize(0.0),
+                      onClick: () {
+                        setState(() {
+                          markers.clear();
+                        });
+                      },
+                    ),
+                    MapToolItem(
+                      icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
+                      iconWidth: getPlatformSize(26.6),
+                      iconHeight: getPlatformSize(21.6),
+                      marginTop: getPlatformSize(10.0),
+                    ),
+                    MapToolItem(
+                      icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                      iconWidth: getPlatformSize(16.4),
+                      iconHeight: getPlatformSize(18.3),
+                      marginTop: getPlatformSize(10.0),
+                    ),
+                    MapToolItem(
+                      icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
+                      iconWidth: getPlatformSize(15.5),
+                      iconHeight: getPlatformSize(16.5),
+                      marginTop: getPlatformSize(10.0),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

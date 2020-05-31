@@ -435,7 +435,7 @@
       ctx = canvasElement.getContext("2d");
     };
 
-    let center;
+    let center, lineScale;
     MyCanvasOverlay.prototype.draw = function () {
       console.log('-- MyCanvasOverlay.draw()');
 
@@ -464,7 +464,10 @@
       const sw = overlayProjection.fromLatLngToDivPixel(southWest);
       const ne = overlayProjection.fromLatLngToDivPixel(northEast);
 
-      console.log(`SOUTH WEST: ${southWest}, NORTH EAST: ${northEast}, `);
+      console.log(`SOUTH WEST: ${southWest}, NORTH EAST: ${northEast}`);
+
+      lineScale = Math.log2(worldWidthPixel) / 10;
+      if (lineScale < 1) lineScale = 1;
 
       const canvasWidth = (ne.x - sw.x === 0) ? worldWidthPixel : (ne.x - sw.x);
       const canvasHeight = sw.y - ne.y;
@@ -484,7 +487,9 @@
       console.log('----------');
       console.log(`Left: ${canvasElement.style.left}, Top: ${canvasElement.style.top}`);
       console.log(`Width: ${canvasWidth}, Height: ${canvasHeight}, Area: ${Math.floor(canvasWidth * canvasHeight)}`);
-      console.log(`World width: ${overlayProjection.getWorldWidth()}`);
+      console.log(`World width: ${worldWidthPixel}`);
+      console.log(`Line scale: ${lineScale}`);
+      //console.log(`Log2(World width): ${Math.log2(worldWidthPixel)}`);
 
       center = getCoordinateFromLatLng(EXAT_LAT_LNG, ctx.canvas, overlayProjection);
       center.lat = EXAT_LAT_LNG.lat;
@@ -537,17 +542,18 @@
               lineStyle.addColorStop(0, 'rgba(0, 200, 0, 0)');
               lineStyle.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
               ctx.strokeStyle = lineStyle;
-              ctx.lineWidth = 3;
+              ctx.lineWidth = 2.5 * lineScale;
               ctx.stroke();
 
               ctx.beginPath();
-              ctx.arc(point.currentX, point.currentY, 2, 0, 2 * Math.PI);
-              ctx.fillStyle = 'rgba(239, 253, 23, 1)';
+              ctx.arc(point.currentX, point.currentY, 2 * lineScale, 0, 2 * Math.PI);
+              //ctx.fillStyle = 'rgba(239, 253, 23, 1)';
+              ctx.fillStyle = 'rgba(255, 255, 255, 1)';
               ctx.fill();
 
               ctx.beginPath();
-              ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-              ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+              ctx.arc(point.x, point.y, 2 * lineScale, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgba(0, 255, 0, 1)`;
               ctx.fill();
 
               point.currentLng += point.deltaLng;
@@ -557,12 +563,12 @@
               ctx.moveTo(point.x, point.y);
               ctx.lineTo(center.x, center.y);
               ctx.strokeStyle = `rgba(0, 200, 0, ${point.lineOpacity})`;
-              ctx.lineWidth = 1.5;
+              ctx.lineWidth = 1.5 * lineScale;
               ctx.stroke();
 
               ctx.beginPath();
-              ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-              ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
+              ctx.arc(point.x, point.y, 2 * lineScale, 0, 2 * Math.PI);
+              ctx.fillStyle = `rgba(0, 255, 0, ${point.opacity})`;
               ctx.fill();
 
               point.opacity -= (POINT_OPACITY / OPACITY_STEP);
@@ -683,9 +689,9 @@
       </div>
       <hr/>
       <ul>
-        <li>จุดสีขาว คือตำแหน่งของผู้ใช้ app</li>
-        <li>เส้นที่มีจุดสีเหลืองเคลื่อนที่ หมายถึง มีการเชื่อมต่อจาก app มายัง server</li>
-        <li>เส้นและจุดสีขาวจะแสดงค้างไว้ประมาณ 1 นาที โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
+        <li>จุดสีเขียว คือตำแหน่งของผู้ใช้ app</li>
+        <li>เส้นที่มีจุดสีขาวเคลื่อนที่ หมายถึง ขณะนั้นมีการเชื่อมต่อจาก app มายัง server</li>
+        <li>เส้นและจุดสีเขียวจะแสดงค้างไว้ประมาณ 1 นาที (ปรับได้ในโค้ด) โดยสีจะค่อยๆจางลงเมื่อเวลาผ่านไป</li>
         <li>แสดงผลแบบ realtime โดยเชื่อมกับ API ด้วย Socket.IO</li>
       </ul>
     </div>
