@@ -23,8 +23,9 @@ class MapTestMain extends StatefulWidget {
 class _MapTestMainState extends State<MapTestMain> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
-  final Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-  final Uuid uuid = Uuid();
+  final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
+  //final Uuid _uuid = Uuid();
+  Timer _timer;
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
@@ -43,8 +44,8 @@ class _MapTestMainState extends State<MapTestMain> {
   }
 
   void _addMarker(LatLng latLng) {
-    String markerIdVal = uuid.v1();
-    final MarkerId markerId = MarkerId(markerIdVal);
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId((new DateTime.now().millisecondsSinceEpoch).toString());
 
     // creating a new marker
     final Marker marker = Marker(
@@ -56,7 +57,7 @@ class _MapTestMainState extends State<MapTestMain> {
 
     setState(() {
       // adding a new marker to map
-      markers[markerId] = marker;
+      _markers[markerId] = marker;
     });
   }
 
@@ -70,6 +71,23 @@ class _MapTestMainState extends State<MapTestMain> {
     var response = await http.get(uri);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
+  }
+
+  @override
+  void initState() {
+    _timer = Timer.periodic(new Duration(seconds: 1), (timer) {
+      setState(() {
+        _markers.removeWhere((key, value) => new DateTime.now().millisecondsSinceEpoch - int.parse(key.value) > 60000);
+      });
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -109,7 +127,7 @@ class _MapTestMainState extends State<MapTestMain> {
                 _addMarker(latLng);
                 _sendToVisualization(latLng);
               },
-              markers: Set<Marker>.of(markers.values),
+              markers: Set<Marker>.of(_markers.values),
             ),
             Container(
               padding: EdgeInsets.only(
@@ -128,7 +146,7 @@ class _MapTestMainState extends State<MapTestMain> {
                       marginTop: getPlatformSize(0.0),
                       onClick: () {
                         setState(() {
-                          markers.clear();
+                          _markers.clear();
                         });
                       },
                     ),
