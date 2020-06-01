@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EXAT Traffic - Backend Widget Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=no">
+  <meta charset="utf-8">
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #container {
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      padding: 0;
+    }
+
+    #map {
+      width: 50%;
+      float: left;
+    }
+
+    #description {
+      margin-left: 50%;
+      padding: 15px;
+    }
+
+    #main-container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* On screens that are less than 700px wide */
+    @media screen and (max-width: 700px) {
+      #main-container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      #map {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- The sidebar -->
+<div class="sidebar">
+  <a href="schematic_map.html">Schematic Map</a>
+  <a href="connection_visualization_new.html">App Connection Visualization</a>
+  <a class="active" href="test_visualization.html">Test Visualization</a>
+</div>
+
+<!-- Page content -->
+<div class="content" style="display: flex; flex-direction: column; border: 0px solid red; height: 100vh">
+  <h3 class="title">หน้าทดสอบยิงข้อมูลพิกัด Latitude, Longitude เข้าสู่ Visualization</h3>
+  <div id="main-container" style="flex: 1; border: 0px solid blue; align-items: stretch">
+    <div id="map" style="flex: 1; height: 100%; border: 0px solid red;"></div>
+    <div style="flex: 1; margin-top: 16px">
+      <ul>
+        <li>ให้คลิกเมาส์บนแผนที่ โดยสมมติว่าจุดที่คลิก คือตำแหน่งของผู้ใช้งานแอปพลิเคชัน EXAT Traffic</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  let map;
+  const markerList = [];
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 13.8163, lng: 100.6518}, //13.7563, 100.5018
+      zoom: 4,
+      mapTypeControl: true,
+      streetViewControl: false,
+    });
+
+    map.addListener('click', function (e) {
+      console.log(e.latLng);
+
+      const marker = new google.maps.Marker({
+        position: e.latLng,
+        map: map,
+      });
+      marker.timestamp = new Date().getTime();
+
+      markerList.push(marker);
+
+      sendToVisualization(e.latLng);
+    });
+
+    setInterval(() => {
+      markerList.forEach(marker => {
+        if (new Date().getTime() - marker.timestamp > 60000) {
+          marker.setMap(null);
+        }
+      });
+    }, 1000);
+  }
+
+  function sendToVisualization(latLng) {
+    $.get(`/location?lat=${latLng.lat()}&lng=${latLng.lng()}&type=inuse`, () => {
+
+    });
+  }
+</script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&callback=initMap"
+        async defer></script>
+</body>
+</html>
