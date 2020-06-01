@@ -466,7 +466,7 @@
 
       console.log(`SOUTH WEST: ${southWest}, NORTH EAST: ${northEast}`);
 
-      lineScale = Math.log2(worldWidthPixel) / 10;
+      lineScale = (Math.log2(worldWidthPixel) / 10) - 0.5;
       if (lineScale < 1) lineScale = 1;
 
       const canvasWidth = (ne.x - sw.x === 0) ? worldWidthPixel : (ne.x - sw.x);
