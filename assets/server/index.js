@@ -12,7 +12,7 @@ app.use(express.static('./'));
     res.send('<h1>Socket.IO Server is Running.</h1>');
 });*/
 
-app.get('/', function (req, res) {
+app.get('/demo', function (req, res) {
     res.sendFile(__dirname + '/connection_visualization_new.html');
 });
 
