@@ -12,9 +12,9 @@ app.use(express.static('./'));
     res.send('<h1>Socket.IO Server is Running.</h1>');
 });*/
 
-/*app.get('/connection_visualization_new.html', function (req, res) {
+app.get('/', function (req, res) {
     res.sendFile(__dirname + '/connection_visualization_new.html');
-});*/
+});
 
 app.get('/location', function (req, res) {
     const {lat, lng, type} = req.query;
