@@ -53,6 +53,7 @@
       const socket = io();
       socket.on('location', function (location) {
         //alert(location);
+        pointList = pointList.filter(point => !point.dead);
         pointList.push(location);
       });
     });
