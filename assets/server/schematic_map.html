@@ -73,13 +73,14 @@
         //alert(scale * CONTAINER_WIDTH);
         svgWrapper.css('width', scale * CONTAINER_WIDTH /*Math.floor(100 * scale) + '%'*/);
         svgWrapper.css('height', scale * CONTAINER_HEIGHT /*Math.floor(100 * scale) + '%'*/);
+        globalScale = scale;
 
         //canvas.css('width', '200px');
         //canvas.css('height', '200px');
         ctx.canvas.width = scale * CONTAINER_WIDTH;
         ctx.canvas.height = scale * CONTAINER_HEIGHT;
         //if (scale >= 10) {
-          drawMapMarker(scale);
+        drawMapMarker(scale);
         //}
 
         if (scale > 1) {
@@ -167,6 +168,8 @@
                 ctx.fill();*/
       }
 
+      let globalScale = 1;
+
       function getCursorPosition(canvas, event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
@@ -174,8 +177,18 @@
         console.log(`x: ${x}, y: ${y}`);
         //alert(`x: ${x}, y: ${y}`);
 
-        const markerDrawWidth = CCTV_MARKER_WIDTH / 3;
-        const markerDrawHeight = CCTV_MARKER_HEIGHT / 3;
+        let markerDrawWidth = CCTV_MARKER_WIDTH / 13; //CCTV_CAMERA_WIDTH / 12;
+        let markerDrawHeight = CCTV_MARKER_HEIGHT / 13; //CCTV_CAMERA_HEIGHT / 12;
+        if (globalScale === 10) {
+          markerDrawWidth = CCTV_MARKER_WIDTH / 4;
+          markerDrawHeight = CCTV_MARKER_HEIGHT / 4;
+        } else if (globalScale === 15) {
+          markerDrawWidth = CCTV_MARKER_WIDTH / 3;
+          markerDrawHeight = CCTV_MARKER_HEIGHT / 3;
+        }
+
+        //const markerDrawWidth = CCTV_MARKER_WIDTH / 3;
+        //const markerDrawHeight = CCTV_MARKER_HEIGHT / 3;
         const canvasWidth = ctx.canvas.width;
         const canvasHeight = ctx.canvas.height;
 
