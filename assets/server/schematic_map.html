@@ -78,9 +78,9 @@
         //canvas.css('height', '200px');
         ctx.canvas.width = scale * CONTAINER_WIDTH;
         ctx.canvas.height = scale * CONTAINER_HEIGHT;
-        if (scale >= 10) {
+        //if (scale >= 10) {
           drawMapMarker(scale);
-        }
+        //}
 
         if (scale > 1) {
           svgContainer.scrollLeft(((scale * CONTAINER_WIDTH) - CONTAINER_WIDTH) / 2.55);
@@ -115,10 +115,15 @@
       const ctx = myCanvas.getContext("2d");
 
       const imgMapMarker = new Image();
-      //imgMapMarker.onload = () => drawMapMarker(1);
-      imgMapMarker.src = 'images/ic_marker_blank.png';
-      const MARKER_WIDTH = 112;
-      const MARKER_HEIGHT = 146;
+      imgMapMarker.onload = () => drawMapMarker(1);
+      imgMapMarker.src = 'images/ic_cctv.png';
+      const imgMapCctv = new Image();
+      imgMapCctv.src = 'images/ic_cctv_camera.png';
+
+      const CCTV_MARKER_WIDTH = 134;
+      const CCTV_MARKER_HEIGHT = 174;
+      const CCTV_CAMERA_WIDTH = 115;
+      const CCTV_CAMERA_HEIGHT = 95;
 
       //top-left: 14.337003, 100.171288
       //bottom-right: 13.362089, 101.087897
@@ -128,8 +133,15 @@
       const LONGITUDE_RIGHT = 101.087897
 
       function drawMapMarker(scale) {
-        const markerDrawWidth = MARKER_WIDTH / 3;
-        const markerDrawHeight = MARKER_HEIGHT / 3;
+        let markerDrawWidth = CCTV_MARKER_WIDTH / 13; //CCTV_CAMERA_WIDTH / 12;
+        let markerDrawHeight = CCTV_MARKER_HEIGHT / 13; //CCTV_CAMERA_HEIGHT / 12;
+        if (scale === 10) {
+          markerDrawWidth = CCTV_MARKER_WIDTH / 4;
+          markerDrawHeight = CCTV_MARKER_HEIGHT / 4;
+        } else if (scale === 15) {
+          markerDrawWidth = CCTV_MARKER_WIDTH / 3;
+          markerDrawHeight = CCTV_MARKER_HEIGHT / 3;
+        }
         const canvasWidth = ctx.canvas.width;
         const canvasHeight = ctx.canvas.height;
         ctx.clearRect(0, 0, canvasWidth, canvasHeight)
@@ -137,7 +149,7 @@
         cctvList.forEach(cctv => {
           if (cctv.status === 1) {
             ctx.drawImage(
-              imgMapMarker,
+              scale === 1 ? imgMapMarker : imgMapMarker,
               (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2),
               (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight,
               markerDrawWidth,
@@ -162,8 +174,8 @@
         console.log(`x: ${x}, y: ${y}`);
         //alert(`x: ${x}, y: ${y}`);
 
-        const markerDrawWidth = MARKER_WIDTH / 3;
-        const markerDrawHeight = MARKER_HEIGHT / 3;
+        const markerDrawWidth = CCTV_MARKER_WIDTH / 3;
+        const markerDrawHeight = CCTV_MARKER_HEIGHT / 3;
         const canvasWidth = ctx.canvas.width;
         const canvasHeight = ctx.canvas.height;
 
@@ -201,9 +213,9 @@
   <div style="display: flex; flex-direction: column; align-items: flex-start; padding: 0px; border: 0px solid red">
     <div id="zoomButtonGroup" class="btn-group mb-0" role="group" aria-label="Basic example">
       <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3 active" value="1"><h4>1x</h4></button>
-      <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="2.5"><h4>2.5x</h4></button>
+      <!--<button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="2.5"><h4>2.5x</h4></button>
       <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="5"><h4>5x</h4></button>
-      <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="7.5"><h4>7.5x</h4></button>
+      <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="7.5"><h4>7.5x</h4></button>-->
       <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="10"><h4>10x</h4></button>
       <button type="button" class="btn btn-secondary text-monospace mb-0 pb-0 pl-3 pr-3" value="15"><h4>15x</h4></button>
     </div>
