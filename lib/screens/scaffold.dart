@@ -9,7 +9,7 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/screens/home/components/drawer.dart';
 import 'package:exattraffic/screens/home/components/nav_bar.dart';
-import 'package:exattraffic/screens/home/components/bottom_sheet.dart';
+import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 import 'package:exattraffic/screens/favorite/favorite.dart';
 import 'package:exattraffic/screens/incident/incident.dart';
 import 'package:exattraffic/screens/notification/notification.dart';
@@ -448,7 +448,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                     // bottom sheet
                     Visibility(
                       visible: _currentScreenProps.showBottomSheet,
-                      child: MyBottomSheet(
+                      child: HomeBottomSheet(
                         collapsePosition:
                             getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
                                 _mainContainerHeight -
