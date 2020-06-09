@@ -18,7 +18,10 @@ class NavBar {
 }
 
 class BottomSheet {
-  static const double HEIGHT_INITIAL = 175.0;
+  static const double HEIGHT_INITIAL = 180.0;
+  static const double HEIGHT_LAYER = 145.0;
+  static const Color LAYER_ITEM_BORDER_COLOR_OFF = Color(0xFF898989);
+  static const Color LAYER_ITEM_BORDER_COLOR_ON = App.PRIMARY_COLOR;
 }
 
 class HomeScreen {

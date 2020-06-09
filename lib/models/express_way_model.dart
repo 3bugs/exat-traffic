@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ExpressWayModel {
-  ExpressWayModel({
+class LayerItemModel {
+  LayerItemModel({
     @required this.name,
     @required this.image,
   });

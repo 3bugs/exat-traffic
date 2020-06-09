@@ -3,17 +3,14 @@ import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/toll_plaza_model.dart';
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/cctv_model.dart';
 import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
-import 'package:exattraffic/screens/rest_area_details/rest_area_details.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
 import 'components/cctv_item.dart';
-import 'components/tab_strip.dart';
 
 List<String> expressWayHeaderList = [
   'ทางพิเศษ',
@@ -37,7 +34,7 @@ class HomeBottomSheet extends StatefulWidget {
 class _HomeBottomSheetState extends State<HomeBottomSheet>  {
   final GlobalKey<BottomSheetScaffoldState> _keyBottomSheetScaffold = GlobalKey();
 
-  ExpressWayModel _selectedExpressWay;
+  LayerItemModel _selectedExpressWay;
   bool _bottomSheetExpanded = false;
 
   @override
@@ -61,7 +58,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet>  {
     });
   }
 
-  void _handleClickExpressWay(BuildContext context, ExpressWayModel expressWayModel) {
+  void _handleClickExpressWay(BuildContext context, LayerItemModel expressWayModel) {
     setState(() {
       _selectedExpressWay = expressWayModel;
     });
@@ -208,32 +205,32 @@ class _HomeBottomSheetState extends State<HomeBottomSheet>  {
 class ExpressWayList extends StatelessWidget {
   ExpressWayList(this._onSelectExpressWay);
 
-  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
-    ExpressWayModel(
+  final List<LayerItemModel> _expressWayList = <LayerItemModel>[
+    LayerItemModel(
       name: 'ทางพิเศษศรีรัช',
       image: AssetImage('assets/images/home/express_way_srirach.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษฉลองรัช',
       image: AssetImage('assets/images/home/express_way_chalong.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษบูรพาวิถี',
       image: AssetImage('assets/images/home/express_way_burapa.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษเฉลิมมหานคร',
       image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษอุดรรัถยา',
       image: AssetImage('assets/images/home/express_way_udorn.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษสายบางนา',
       image: AssetImage('assets/images/home/express_way_bangna.jpg'),
     ),
-    ExpressWayModel(
+    LayerItemModel(
       name: 'ทางพิเศษกาญจนาภิเษก',
       image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
     ),
@@ -244,13 +241,13 @@ class ExpressWayList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: getPlatformSize(110.0),
+      height: getPlatformSize(120.0),
       child: ListView.separated(
         itemCount: _expressWayList.length,
         scrollDirection: Axis.horizontal,
         physics: BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          ExpressWayModel selectedExpressWay = _expressWayList[index];
+          LayerItemModel selectedExpressWay = _expressWayList[index];
 
           return ExpressWayImageView(
             expressWay: selectedExpressWay,
@@ -313,7 +310,7 @@ class _CctvListState extends State<CctvList> {
             physics: BouncingScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
               return ExpressWayTextView(
-                expressWay: ExpressWayModel(
+                expressWay: LayerItemModel(
                   name: 'ทางพิเศษศรีรัช',
                   image: AssetImage('assets/images/home/express_way_srirach.jpg'),
                 ),

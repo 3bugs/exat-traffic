@@ -10,6 +10,7 @@ import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/screens/home/components/drawer.dart';
 import 'package:exattraffic/screens/home/components/nav_bar.dart';
 import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
+import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 import 'package:exattraffic/screens/favorite/favorite.dart';
 import 'package:exattraffic/screens/incident/incident.dart';
 import 'package:exattraffic/screens/notification/notification.dart';
@@ -135,22 +136,28 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   ];
   static const List<double> BG_GRADIENT_STOPS = [0.0, 1.0];
 
-  final List<Widget> _fragmentList = [
-    Home(),
-    Favorite(),
-    Container(),
-    Incident(),
-    MyNotification(),
-  ];
+  List<Widget> _fragmentList;
 
   bool _showDate = true;
   double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   int _currentTabIndex = 0;
   ScreenProps _currentScreenProps = screenPropsList[0];
+  int _bottomSheetIndex = 0;
 
   initState() {
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+
+    _fragmentList = [
+      Home(
+        onClickMapTool: _handleClickMapTool,
+      ),
+      Favorite(),
+      Container(),
+      Incident(),
+      MyNotification(),
+    ];
+
     super.initState();
   }
 
@@ -167,6 +174,14 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       _currentTabIndex = index;
       _currentScreenProps = screenPropsList[index];
     });
+  }
+
+  void _handleClickMapTool(int toolIndex, bool checked) {
+    if (toolIndex == 3) {
+      setState(() {
+        _bottomSheetIndex = 1;
+      });
+    }
   }
 
   @override
@@ -448,13 +463,28 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                     // bottom sheet
                     Visibility(
                       visible: _currentScreenProps.showBottomSheet,
-                      child: HomeBottomSheet(
-                        collapsePosition:
-                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                                _mainContainerHeight -
-                                getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
-                        expandPosition:
-                            getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) - 1,
+                      child: IndexedStack(
+                        index: _bottomSheetIndex,
+                        children: <Widget>[
+                          HomeBottomSheet(
+                            collapsePosition:
+                                getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                    _mainContainerHeight -
+                                    getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                            expandPosition:
+                                getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
+                                    1,
+                          ),
+                          LayerBottomSheet(
+                            collapsePosition:
+                                getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                    _mainContainerHeight -
+                                    getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                            expandPosition:
+                                getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
+                                    1,
+                          ),
+                        ],
                       ),
                     ),
                     // เงาบนแถบ bottom nav

@@ -60,6 +60,7 @@
   </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak"></script>
   <script>
+    // ถ้าใช้ server-side render ก็ให้พ่น initial points มาตรงนี้ (query ข้อมูล 1 นาทีล่าสุด)
     const INITIAL_POINT_LIST = [];
     let exatVisualization = null;
     let randomPointTimer = null;
@@ -484,7 +485,10 @@
         this.clearCanvas();
       };
 
-      this.getCoordinateFromLatLng = function (pointLatLng, canvasSize, projection) {
+      const getCoordinateFromLatLng = function (pointLatLng) {
+        const projection = this.overlay.getProjection();
+        const canvas = this.ctx.canvas;
+
         /*const x = canvasSize.width * (pointLatLng.lng - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
         const y = canvasSize.height * (MAX_LATITUDE - pointLatLng.lat) / (MAX_LATITUDE - MIN_LATITUDE);
         return {x, y};*/
@@ -496,10 +500,10 @@
         if (canvasSize.top + canvasSize.height < coord.y || canvasSize.top > coord.y) {
           console.log('### OUT OF BOUNDARY - VERTICAL');
         }*/
-        return {x: coord.x - canvasSize.left, y: coord.y - canvasSize.top};
+        return {x: coord.x - canvas.left, y: coord.y - canvas.top};
       };
 
-      this.getLatLngSizeFromCoordSize = function (coordSize, canvasSize) {
+      const getLatLngSizeFromCoordSize = function (coordSize, canvasSize) {
         const width = coordSize.width * (MAX_LONGITUDE - MIN_LONGITUDE) / canvasSize.width;
         const height = coordSize.height * (MAX_LATITUDE - MIN_LATITUDE) / canvasSize.height;
         return {width, height};
@@ -530,7 +534,7 @@
         this.ctx.canvas.left = left; // แค่เก็บไว้ใช้คำนวณหาตำแหน่ง x, y บน canvas
         this.ctx.canvas.top = nePixel.y;
 
-        this.centerPoint = this.getCoordinateFromLatLng(EXAT_LAT_LNG, this.ctx.canvas, projection);
+        this.centerPoint = getCoordinateFromLatLng(EXAT_LAT_LNG);
         this.centerPoint.lat = EXAT_LAT_LNG.lat;
         this.centerPoint.lng = EXAT_LAT_LNG.lng;
 
@@ -578,10 +582,10 @@
               point.end = true;
             }
 
-            let coord = this.getCoordinateFromLatLng(point, this.ctx.canvas, this.overlay.getProjection());
+            let coord = getCoordinateFromLatLng(point);
             point.x = coord.x;
             point.y = coord.y;
-            let coordCurrent = this.getCoordinateFromLatLng({lat: point.currentLat, lng: point.currentLng}, this.ctx.canvas, this.overlay.getProjection());
+            let coordCurrent = getCoordinateFromLatLng({lat: point.currentLat, lng: point.currentLng});
             point.currentX = coordCurrent.x;
             point.currentY = coordCurrent.y;
 

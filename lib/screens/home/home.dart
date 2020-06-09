@@ -10,13 +10,25 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/map_test.dart';
 
 class Home extends StatelessWidget {
+  Home({
+    @required this.onClickMapTool,
+  });
+
+  final Function onClickMapTool;
+
   @override
   Widget build(BuildContext context) {
-    return HomeMain();
+    return HomeMain(onClickMapTool: onClickMapTool);
   }
 }
 
 class HomeMain extends StatefulWidget {
+  HomeMain({
+    @required this.onClickMapTool,
+  });
+
+  final Function onClickMapTool;
+
   @override
   _HomeMainState createState() => _HomeMainState();
 }
@@ -25,6 +37,7 @@ class _HomeMainState extends State<HomeMain> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
   final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
+
   //final Uuid uuid = Uuid();
   Timer _timer;
 
@@ -83,7 +96,8 @@ class _HomeMainState extends State<HomeMain> {
   void initState() {
     _timer = Timer.periodic(new Duration(seconds: 1), (timer) {
       setState(() {
-        _markers.removeWhere((key, value) => new DateTime.now().millisecondsSinceEpoch - int.parse(key.value) > 60000);
+        _markers.removeWhere((key, value) =>
+            new DateTime.now().millisecondsSinceEpoch - int.parse(key.value) > 60000);
       });
     });
 
@@ -133,21 +147,19 @@ class _HomeMainState extends State<HomeMain> {
               child: Column(
                 children: <Widget>[
                   MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                    iconWidth: getPlatformSize(21.0),
-                    iconHeight: getPlatformSize(21.0),
+                    icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                    iconWidth: getPlatformSize(16.4),
+                    iconHeight: getPlatformSize(18.3),
                     marginTop: getPlatformSize(0.0),
-                    onClick: () {
-                      setState(() {
-                        _markers.clear();
-                      });
-                    },
+                    isChecked: false,
+                    onClick: () {},
                   ),
                   MapToolItem(
                     icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
                     iconWidth: getPlatformSize(26.6),
                     iconHeight: getPlatformSize(21.6),
                     marginTop: getPlatformSize(10.0),
+                    isChecked: false,
                     onClick: () {
                       Navigator.push(
                         context,
@@ -156,16 +168,26 @@ class _HomeMainState extends State<HomeMain> {
                     },
                   ),
                   MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
-                    iconWidth: getPlatformSize(16.4),
-                    iconHeight: getPlatformSize(18.3),
-                    marginTop: getPlatformSize(10.0),
-                  ),
-                  MapToolItem(
                     icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
                     iconWidth: getPlatformSize(15.5),
                     iconHeight: getPlatformSize(16.5),
                     marginTop: getPlatformSize(10.0),
+                    isChecked: false,
+                    onClick: () {
+                      widget.onClickMapTool(3, true);
+                    },
+                  ),
+                  MapToolItem(
+                    icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                    iconWidth: getPlatformSize(21.0),
+                    iconHeight: getPlatformSize(21.0),
+                    marginTop: getPlatformSize(10.0),
+                    isChecked: false,
+                    onClick: () {
+                      setState(() {
+                        _markers.clear();
+                      });
+                    },
                   ),
                 ],
               ),
@@ -183,6 +205,7 @@ class MapToolItem extends StatelessWidget {
     @required this.iconWidth,
     @required this.iconHeight,
     @required this.marginTop,
+    @required this.isChecked,
     @required this.onClick,
   });
 
@@ -190,6 +213,7 @@ class MapToolItem extends StatelessWidget {
   final double iconWidth;
   final double iconHeight;
   final double marginTop;
+  final bool isChecked;
   final Function onClick;
 
   static const double SIZE = 45.0;
@@ -203,21 +227,26 @@ class MapToolItem extends StatelessWidget {
         top: marginTop,
       ),
       decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x22777777),
-              blurRadius: getPlatformSize(10.0),
-              spreadRadius: getPlatformSize(5.0),
-              offset: Offset(
-                getPlatformSize(2.0), // move right
-                getPlatformSize(2.0), // move down
-              ),
-            )
-          ],
-          color: Colors.white,
-          borderRadius: BorderRadius.all(
-            Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-          )),
+        border: Border.all(
+          color: isChecked ? Constants.App.PRIMARY_COLOR : Colors.transparent,
+          width: isChecked ? 2 : 0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x22777777),
+            blurRadius: getPlatformSize(10.0),
+            spreadRadius: getPlatformSize(5.0),
+            offset: Offset(
+              getPlatformSize(2.0), // move right
+              getPlatformSize(2.0), // move down
+            ),
+          )
+        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+        ),
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -227,8 +256,9 @@ class MapToolItem extends StatelessWidget {
             }
           },
           //highlightColor: Constants.App.PRIMARY_COLOR,
-          borderRadius:
-              BorderRadius.all(Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))),
+          borderRadius: BorderRadius.all(
+            Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+          ),
           child: Center(
             child: Image(
               image: icon,

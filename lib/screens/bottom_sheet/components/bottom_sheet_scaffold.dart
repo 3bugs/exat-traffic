@@ -19,14 +19,14 @@ class BottomSheetScaffold extends StatefulWidget {
   final double expandPosition;
   final double collapsePosition;
   final Function onChangeSize;
-  final BottomSheetScaffoldState bsss = BottomSheetScaffoldState();
+  final BottomSheetScaffoldState bottomSheetScaffoldState = BottomSheetScaffoldState();
 
   void toggleSheet() {
-    bsss.toggleSheet();
+    bottomSheetScaffoldState.toggleSheet();
   }
 
   @override
-  BottomSheetScaffoldState createState() => bsss;
+  BottomSheetScaffoldState createState() => bottomSheetScaffoldState;
 }
 
 class BottomSheetScaffoldState extends State<BottomSheetScaffold> with TickerProviderStateMixin {

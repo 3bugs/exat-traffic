@@ -1,10 +1,10 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
-import 'package:provider/provider.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class ExpressWayImageView extends StatelessWidget {
   ExpressWayImageView({
@@ -14,7 +14,7 @@ class ExpressWayImageView extends StatelessWidget {
     @required this.onClick,
   });
 
-  final ExpressWayModel expressWay;
+  final LayerItemModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
   final Function onClick;
@@ -26,7 +26,7 @@ class ExpressWayImageView extends StatelessWidget {
       child: InkWell(
         onTap: onClick,
         borderRadius: BorderRadius.all(
-          Radius.circular(getPlatformSize(5.0)),
+          Radius.circular(getPlatformSize(12.0)),
         ),
         child: Container(
           padding: EdgeInsets.only(
@@ -51,7 +51,7 @@ class ExpressWayImageView extends StatelessWidget {
               ),
               Container(
                 padding: EdgeInsets.only(
-                  top: getPlatformSize(6.0),
+                  top: getPlatformSize(10.0),
                 ),
                 child: Consumer<LanguageModel>(
                   builder: (context, language, child) {
@@ -95,7 +95,7 @@ class ExpressWayTextView extends StatelessWidget {
     @required this.isLastItem,
   });
 
-  final ExpressWayModel expressWay;
+  final LayerItemModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
 
