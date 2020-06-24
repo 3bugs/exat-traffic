@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
   });
 });
 
-app.get('/api',
+app.get('/api/:action',
   (req, res) => {
     const connection = mysql.createConnection({
       host: 'localhost',
@@ -62,18 +62,29 @@ app.get('/api',
       database: 'itsexat2020'
     });
     connection.connect();
-    connection.query(
-      'SELECT * FROM gate_in',
-      (error, results, fields) => {
-        if (error) throw error;
 
-        const tableRows = results.reduce((total, row) => {
-          return total += `<tr><td>${row.name}</td></tr>`;
-        }, '');
-        //res.send(`<table>${tableRows}</table>`);
-        res.json(results);
-      });
-    connection.end();
+    switch (req.params.action) {
+      case 'gate_in':
+        connection.query(
+          'select m.route_id, temp.gate_in_id, temp.name as gate_in_name, temp.marker_id, m.name as marker_name, m.cate_id, m.lat, m.lng, m.enable, temp.cost_tolls_count from\n' +
+          '(select ct.gate_in_id, gi.name, gi.marker_id, count(ct.gate_in_id) as cost_tolls_count\n' +
+          'from (cost_tolls ct inner join gate_in gi on ct.gate_in_id = gi.id) \n' +
+          'group by ct.gate_in_id) as temp\n' +
+          'inner join markers m on temp.marker_id = m.id\n' +
+          'order by m.route_id, temp.gate_in_id',
+          (error, results, fields) => {
+            if (error) throw error;
+            res.json({
+              error: {
+                code : 0,
+                message: 'ok',
+              },
+              data_list: results,
+            });
+          });
+        connection.end();
+        break;
+    }
   }
 );
 
