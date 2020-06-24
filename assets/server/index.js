@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
   });
 });
 
-app.get('/api/:action',
+app.get('/api/:item/:id',
   (req, res) => {
     const connection = mysql.createConnection({
       host: 'localhost',
@@ -63,20 +63,33 @@ app.get('/api/:action',
     });
     connection.connect();
 
-    switch (req.params.action) {
+    switch (req.params.item) {
       case 'gate_in':
+        const whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
-          'select m.route_id, temp.gate_in_id, temp.name as gate_in_name, temp.marker_id, m.name as marker_name, m.cate_id, m.lat, m.lng, m.enable, temp.cost_tolls_count from\n' +
-          '(select ct.gate_in_id, gi.name, gi.marker_id, count(ct.gate_in_id) as cost_tolls_count\n' +
-          'from (cost_tolls ct inner join gate_in gi on ct.gate_in_id = gi.id) \n' +
-          'group by ct.gate_in_id) as temp\n' +
-          'inner join markers m on temp.marker_id = m.id\n' +
-          'order by m.route_id, temp.gate_in_id',
+          `SELECT m.route_id,
+                    temp.gate_in_id,
+                    temp.name AS gate_in_name,
+                    temp.marker_id,
+                    m.name AS marker_name,
+                    m.cate_id,
+                    m.lat,
+                    m.lng,
+                    m.enable,
+                    temp.cost_tolls_count
+             FROM (
+                 SELECT ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
+                   FROM cost_tolls ct
+                            INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
+                   WHERE ${whereClause} 
+                   GROUP BY ct.gate_in_id) AS temp
+                      INNER JOIN markers m ON temp.marker_id = m.id
+             ORDER BY m.route_id, temp.gate_in_id`,
           (error, results, fields) => {
             if (error) throw error;
             res.json({
               error: {
-                code : 0,
+                code: 0,
                 message: 'ok',
               },
               data_list: results,
