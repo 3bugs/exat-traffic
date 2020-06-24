@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
   });
 });
 
-app.get('/api/:item/:id',
+app.get('/api/:item/:id?',
   (req, res) => {
     const connection = mysql.createConnection({
       host: 'localhost',
