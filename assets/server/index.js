@@ -67,10 +67,11 @@ app.get('/api/:item/:id',
       case 'gate_in':
         const whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
-          `SELECT m.route_id,
+          `SELECT temp.route_id AS gate_in_route_id, 
                     temp.gate_in_id,
                     temp.name AS gate_in_name,
                     temp.marker_id,
+                    m.route_id as marker_route_id,
                     m.name AS marker_name,
                     m.cate_id,
                     m.lat,
@@ -78,7 +79,7 @@ app.get('/api/:item/:id',
                     m.enable,
                     temp.cost_tolls_count
              FROM (
-                 SELECT ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
+                 SELECT gi.route_id, ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
                    FROM cost_tolls ct
                             INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
                    WHERE ${whereClause} 
