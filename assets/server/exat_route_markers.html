@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EXAT Traffic - Backend Widget Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=no">
+  <meta charset="utf-8">
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous">
+  <!--<link rel="stylesheet" href="css/main.css">-->
+  <style>
+    /* Optional: Makes the sample page fill the window. */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+    #map {
+      width: 100%;
+      height: 100%;
+      border: 0px solid red;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+  let map;
+  const markerList = [];
+
+  const icon = {
+    path: "M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0",
+    fillColor: '#FF0000',
+    fillOpacity: .6,
+    anchor: new google.maps.Point(0,0),
+    strokeWeight: 0,
+    scale: 1
+  }
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 13.8963, lng: 100.6018}, //13.7563, 100.5018
+      zoom: 12,
+      mapTypeControl: true,
+      streetViewControl: false,
+    });
+
+    $.getJSON('exat_route_markers.json', markerDataList => {
+      //alert(markerList.length);
+
+      markerDataList.forEach(markerData => {
+        if (markerData[1] === 1) {
+          const marker = new google.maps.Marker({
+            position: {lat: markerData[2], lng: markerData[3]},
+            map,
+            opacity: 0.2,
+          });
+          marker.id = markerData[0];
+
+          marker.addListener('click', () => {
+            let count = 0;
+            markerList.forEach(m => {
+              if (m === marker) {
+                m.setOptions({'opacity': 1});
+                count = 0;
+                alert(m.id);
+              } else if (count < 10) {
+                m.setOptions({'opacity': 1});
+                count++;
+              } else {
+                m.setOptions({'opacity': 0.2});
+              }
+            });
+          });
+
+          markerList.push(marker);
+        }
+      })
+    });
+
+    /*
+    map.addListener('click', function (e) {
+      console.log(e.latLng);
+
+      const marker = new google.maps.Marker({
+        position: e.latLng,
+        map: map,
+      });
+      marker.timestamp = new Date().getTime();
+
+      markerList.push(marker);
+
+      //sendToVisualization(e.latLng);
+    });
+
+    setInterval(() => {
+      markerList.forEach(marker => {
+        if (new Date().getTime() - marker.timestamp > 60000) {
+          marker.setMap(null);
+        }
+      });
+    }, 1000);
+    */
+  }
+
+  function sendToVisualization(latLng) {
+    $.get(`/location?lat=${latLng.lat()}&lng=${latLng.lng()}&type=inuse`, () => {
+
+    });
+  }
+</script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&callback=initMap"
+        async defer></script>
+</body>
+</html>

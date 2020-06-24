@@ -40,6 +40,7 @@ class _HomeMainState extends State<HomeMain> {
 
   //final Uuid uuid = Uuid();
   Timer _timer;
+  bool _mapToolLayerChecked = false;
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
@@ -172,9 +173,10 @@ class _HomeMainState extends State<HomeMain> {
                     iconWidth: getPlatformSize(15.5),
                     iconHeight: getPlatformSize(16.5),
                     marginTop: getPlatformSize(10.0),
-                    isChecked: false,
+                    isChecked: _mapToolLayerChecked,
                     onClick: () {
-                      widget.onClickMapTool(3, true);
+                      _mapToolLayerChecked = !_mapToolLayerChecked;
+                      widget.onClickMapTool(2, _mapToolLayerChecked);
                     },
                   ),
                   MapToolItem(

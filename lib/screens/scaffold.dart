@@ -177,9 +177,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 
   void _handleClickMapTool(int toolIndex, bool checked) {
-    if (toolIndex == 3) {
+    if (toolIndex == 2) {
       setState(() {
-        _bottomSheetIndex = 1;
+        _bottomSheetIndex = checked ? 1 : 0;
       });
     }
   }
