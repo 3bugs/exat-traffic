@@ -105,7 +105,33 @@ app.get('/api/:item/:id?',
                    WHERE ${whereClause} 
                    GROUP BY ct.gate_in_id) AS temp
                       INNER JOIN markers m ON temp.marker_id = m.id
-             ORDER BY m.route_id, temp.gate_in_id`,
+             ORDER BY temp.gate_in_id`,
+          (error, results, fields) => {
+            if (error) throw error;
+            res.json({
+              error: {
+                code: 0,
+                message: 'ok',
+              },
+              data_list: results,
+            });
+          });
+        connection.end();
+        break;
+      case 'cost_toll_by_gate_in':
+        connection.query(
+            `SELECT ct.id,
+                    m.name,
+                    m.lat,
+                    m.lng,
+                    m.cate_id,
+                    ct.part_toll,
+                    ct.cost_less4,
+                    ct.cost_4to10,
+                    ct.cost_over10
+             FROM cost_tolls ct
+                      INNER JOIN markers m ON ct.marker_id = m.id
+             WHERE ct.gate_in_id = ${req.params.id}`,
           (error, results, fields) => {
             if (error) throw error;
             res.json({
