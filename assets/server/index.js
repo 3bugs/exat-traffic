@@ -87,7 +87,8 @@ app.get('/api/:item/:id?',
       case 'gate_in':
         const whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
-          `SELECT temp.route_id AS gate_in_route_id, 
+          `SELECT temp.route_name, 
+                    temp.route_id AS gate_in_route_id, 
                     temp.gate_in_id,
                     temp.name AS gate_in_name,
                     temp.marker_id,
