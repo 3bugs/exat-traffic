@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:exattraffic/models/error_model.dart';
-import 'package:exattraffic/models/gate_in_model.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,6 +13,9 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/error_model.dart';
+import 'package:exattraffic/models/gate_in_model.dart';
+import 'package:exattraffic/models/cost_toll_model.dart';
 
 class MyRoute extends StatelessWidget {
   MyRoute({
@@ -42,18 +44,22 @@ class MyRouteMain extends StatefulWidget {
 class _MyRouteMainState extends State<MyRouteMain> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
+  final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
 
-  final Map<MarkerId, Marker> _markerMap = <MarkerId, Marker>{};
+  final Map<MarkerId, Marker> _gateInMarkerMap = <MarkerId, Marker>{};
+  final Map<MarkerId, Marker> _costTollMarkerMap = <MarkerId, Marker>{};
+  final Set<Polyline> _polyLines = <Polyline>{};
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
-    zoom: 8,
+    zoom: 10,
   );
 
   //Future<List<GateInModel>> _futureGateInList;
-  List<GateInModel> _gateInList;
+  List<GateInModel> _gateInList = List();
+  List<CostTollModel> _costTollList = List();
   GateInModel _selectedGateIn;
-  String _routeDestinationValue = 'ทดสอบ4';
+  CostTollModel _selectedCostToll;
   BitmapDescriptor _originMarkerIcon, _originMarkerIconLarge;
   BitmapDescriptor _destinationMarkerIcon, _destinationMarkerIconLarge;
 
@@ -73,9 +79,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
     controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
-  void _addMarker(GateInModel gateIn) {
+  void _addGateInMarker(GateInModel gateIn) {
     //String markerIdVal = uuid.v1();
-    final MarkerId markerId = MarkerId(gateIn.id.toString());
+    final MarkerId markerId = MarkerId('gate-in-${gateIn.id.toString()}');
 
     final Marker marker = Marker(
       markerId: markerId,
@@ -84,19 +90,39 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       //infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
       onTap: () {
-        _selectMarker(gateIn);
+        _selectGateInMarker(gateIn);
       },
     );
 
     setState(() {
-      _markerMap[markerId] = marker;
+      _gateInMarkerMap[markerId] = marker;
+    });
+  }
+
+  void _addCostTollMarker(CostTollModel costToll) {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('cost-toll-${costToll.id.toString()}');
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position: LatLng(costToll.latitude, costToll.longitude),
+      icon: costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon,
+      alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      //infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      onTap: () {
+        _selectCostTollMarker(costToll);
+      },
+    );
+
+    setState(() {
+      _costTollMarkerMap[markerId] = marker;
     });
   }
 
   // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
   // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
   void _fetchGateIn() async {
-    final response = await http.get(Constants.Api.GET_GATE_IN_URL);
+    final response = await http.get(Constants.Api.FETCH_GATE_IN_URL);
 
     if (response.statusCode == 200) {
       Map<String, dynamic> responseBodyJson = json.decode(response.body);
@@ -130,41 +156,188 @@ class _MyRouteMainState extends State<MyRouteMain> {
     }
   }
 
+  void _fetchCostTollByGateIn(GateInModel gateIn) async {
+    final response = await http.get('${Constants.Api.FETCH_COST_TOLL_BY_GATE_IN_URL}/${gateIn.id}');
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseBodyJson = json.decode(response.body);
+      ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
+
+      if (error.code == 0) {
+        List dataList = responseBodyJson['data_list'];
+        List<CostTollModel> costTollList =
+            dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson)).toList();
+        print('Number of Gate In : ${costTollList.length}');
+
+        setState(() {
+          _costTollList = costTollList;
+        });
+        _createMarkersFromModel();
+
+        //return gateInList;
+      } else {
+        print(error.message);
+        //throw Exception(error.message);
+        /*new Future.delayed(Duration.zero, () {
+          alert(context, 'ผิดพลาด', error.message);
+        });*/
+      }
+    } else {
+      print('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
+      //throw Exception('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
+      /*new Future.delayed(Duration.zero, () {
+        alert(context, 'ผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
+      });*/
+    }
+  }
+
   void _setupCustomMarker() async {
     _originMarkerIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_origin.png',
+      'assets/images/route/ic_marker_origin-xhdpi.png',
     );
     _originMarkerIconLarge = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_origin-xxxhdpi.png',
+      'assets/images/route/ic_marker_origin-xxhdpi.png',
     );
     _destinationMarkerIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_destination.png',
+      'assets/images/route/ic_marker_destination-xhdpi.png',
     );
     _destinationMarkerIconLarge = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_destination-xxxhdpi.png',
+      'assets/images/route/ic_marker_destination-xxhdpi.png',
     );
   }
 
   void _createMarkersFromModel() {
-    _markerMap.clear();
+    bool isGateInSelected = _gateInList.fold(
+      false,
+      (previousValue, gateIn) => previousValue || gateIn.selected,
+    );
+    _gateInMarkerMap.clear();
     for (GateInModel gateIn in _gateInList) {
-      _addMarker(gateIn);
+      if (gateIn.selected || (!gateIn.selected && !isGateInSelected)) {
+        _addGateInMarker(gateIn);
+      }
+    }
+
+    bool isCostTollSelected = _costTollList.fold(
+      false,
+      (previousValue, costToll) => previousValue || costToll.selected,
+    );
+    if (_costTollList != null) {
+      _costTollMarkerMap.clear();
+      for (CostTollModel costToll in _costTollList) {
+        if (costToll.selected || (!costToll.selected && !isCostTollSelected)) {
+          _addCostTollMarker(costToll);
+        }
+      }
     }
   }
 
-  void _selectMarker(GateInModel selectedGateIn) {
+  void _selectGateInMarker(GateInModel selectedGateIn) {
     setState(() {
       _selectedGateIn = selectedGateIn;
+      _selectedCostToll = null;
+      _polyLines.clear();
     });
 
     _gateInList.forEach((gateIn) {
       gateIn.selected = selectedGateIn == gateIn;
     });
     _createMarkersFromModel();
+
+    _fetchCostTollByGateIn(selectedGateIn);
+  }
+
+  void _selectCostTollMarker(CostTollModel selectedCostToll) async {
+    setState(() {
+      _selectedCostToll = selectedCostToll;
+    });
+
+    _costTollList.forEach((costToll) {
+      costToll.selected = selectedCostToll == costToll;
+    });
+    _createMarkersFromModel();
+
+    String route = await _googleMapsServices.getRouteCoordinates(
+      LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude),
+      LatLng(_selectedCostToll.latitude, _selectedCostToll.longitude),
+    );
+    createRoute(route);
+  }
+
+  void createRoute(String encodedPoly) async {
+    final List<LatLng> latLngList = _convertToLatLngList(_decodePoly(encodedPoly));
+
+    setState(() {
+      _polyLines.clear();
+      _polyLines.add(
+        Polyline(
+          polylineId: PolylineId('1'),
+          width: 6,
+          points: latLngList,
+          color: Color(0xFF747474).withOpacity(0.9),
+        ),
+      );
+    });
+
+    LatLngBounds latLngBounds = _boundsFromLatLngList(latLngList);
+    final GoogleMapController controller = await _googleMapController.future;
+    controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+  }
+
+  List<LatLng> _convertToLatLngList(List points) {
+    List<LatLng> result = <LatLng>[];
+    for (int i = 0; i < points.length; i++) {
+      if (i % 2 != 0) {
+        result.add(LatLng(points[i - 1], points[i]));
+      }
+    }
+    return result;
+  }
+
+  List _decodePoly(String poly) {
+    var list = poly.codeUnits;
+    var lList = new List();
+    int index = 0;
+    int len = poly.length;
+    int c = 0;
+    do {
+      var shift = 0;
+      int result = 0;
+      do {
+        c = list[index] - 63;
+        result |= (c & 0x1F) << (shift * 5);
+        index++;
+        shift++;
+      } while (c >= 32);
+      if (result & 1 == 1) {
+        result = ~result;
+      }
+      var result1 = (result >> 1) * 0.00001;
+      lList.add(result1);
+    } while (index < len);
+    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    print(lList.toString());
+    return lList;
+  }
+
+  LatLngBounds _boundsFromLatLngList(List<LatLng> latLngList) {
+    double x0, x1, y0, y1;
+    for (LatLng latLng in latLngList) {
+      if (x0 == null) {
+        x0 = x1 = latLng.latitude;
+        y0 = y1 = latLng.longitude;
+      } else {
+        if (latLng.latitude > x1) x1 = latLng.latitude;
+        if (latLng.latitude < x0) x0 = latLng.latitude;
+        if (latLng.longitude > y1) y1 = latLng.longitude;
+        if (latLng.longitude < y0) y0 = latLng.longitude;
+      }
+    }
+    return LatLngBounds(northeast: LatLng(x1, y1), southwest: LatLng(x0, y0));
   }
 
   @override
@@ -208,7 +381,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
               _googleMapController.complete(controller);
               _moveMapToCurrentPosition(context);
             },
-            markers: Set<Marker>.of(_markerMap.values),
+            markers: Set<Marker>.of(_gateInMarkerMap.values)
+                .union(Set<Marker>.of(_costTollMarkerMap.values)),
+            polylines: _polyLines,
           ),
           Positioned(
             top: getPlatformSize(-32.0),
@@ -252,7 +427,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            Container(
+                            /*Container(
                               width: getPlatformSize(19.5),
                               height: getPlatformSize(19.5),
                               decoration: BoxDecoration(
@@ -273,6 +448,11 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                   ),
                                 ),
                               ),
+                            ),*/
+                            Image(
+                              image: AssetImage('assets/images/route/ic_marker_origin-xxxhdpi.png'),
+                              width: getPlatformSize(16.0),
+                              height: getPlatformSize(16.0 * 28.42 / 21.13),
                             ),
                             Container(
                               width: 0.0,
@@ -291,9 +471,10 @@ class _MyRouteMainState extends State<MyRouteMain> {
                               ),
                             ),
                             Image(
-                              image: AssetImage('assets/images/map_markers/ic_marker_small.png'),
-                              width: getPlatformSize(14.33),
-                              height: getPlatformSize(19.0),
+                              image: AssetImage(
+                                  'assets/images/route/ic_marker_destination-xxxhdpi.png'),
+                              width: getPlatformSize(16.0),
+                              height: getPlatformSize(16.0 * 28.42 / 21.13),
                             ),
                           ],
                         ),
@@ -380,6 +561,24 @@ class _MyRouteMainState extends State<MyRouteMain> {
                             // dropdown เลือกต้นทาง
                             DropdownButton<GateInModel>(
                               value: _selectedGateIn,
+                              hint: Consumer<LanguageModel>(
+                                builder: (context, language, child) {
+                                  return Container(
+                                    padding: EdgeInsets.only(
+                                      left: getPlatformSize(6.0),
+                                    ),
+                                    child: Text(
+                                      'เลือกต้นทาง',
+                                      style: getTextStyle(
+                                        language.lang,
+                                        color: Color(0xFFB2B2B2),
+                                        heightTh: 0.8,
+                                        heightEn: 1.15,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                               icon: Image(
                                 image: AssetImage('assets/images/route/ic_down_arrow.png'),
                                 width: getPlatformSize(12.0),
@@ -392,7 +591,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                               isDense: true,
                               isExpanded: true,
                               onChanged: (GateInModel gateIn) {
-                                _selectMarker(gateIn);
+                                _selectGateInMarker(gateIn);
 
                                 final CameraPosition position = CameraPosition(
                                   target: LatLng(gateIn.latitude, gateIn.longitude),
@@ -434,7 +633,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              gateIn.routeId.toString(),
+                                              gateIn.routeName.trim(),
                                               style: getTextStyle(
                                                 language.lang,
                                                 color: Color(0xFFB2B2B2),
@@ -493,8 +692,26 @@ class _MyRouteMainState extends State<MyRouteMain> {
                             ),
 
                             // dropdown เลือกปลายทาง
-                            DropdownButton<String>(
-                              value: _routeDestinationValue,
+                            DropdownButton<CostTollModel>(
+                              value: _selectedCostToll,
+                              hint: Consumer<LanguageModel>(
+                                builder: (context, language, child) {
+                                  return Container(
+                                    padding: EdgeInsets.only(
+                                      left: getPlatformSize(6.0),
+                                    ),
+                                    child: Text(
+                                      'เลือกปลายทาง',
+                                      style: getTextStyle(
+                                        language.lang,
+                                        color: Color(0xFFB2B2B2),
+                                        heightTh: 0.8,
+                                        heightEn: 1.15,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                               icon: Image(
                                 image: AssetImage('assets/images/route/ic_down_arrow.png'),
                                 width: getPlatformSize(12.0),
@@ -506,29 +723,66 @@ class _MyRouteMainState extends State<MyRouteMain> {
                               underline: SizedBox.shrink(),
                               isDense: true,
                               isExpanded: true,
-                              onChanged: (String newValue) {
-                                setState(() {
-                                  _routeDestinationValue = newValue;
-                                });
+                              onChanged: (CostTollModel costToll) {
+                                _selectCostTollMarker(costToll);
+
+                                final CameraPosition position = CameraPosition(
+                                  target: LatLng(costToll.latitude, costToll.longitude),
+                                  zoom: 12,
+                                );
+                                _moveMapToPosition(context, position);
                               },
-                              items: <String>['ทดสอบ1', 'ทดสอบ2', 'ทดสอบ3', 'ทดสอบ4']
-                                  .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Consumer<LanguageModel>(
+                              selectedItemBuilder: (BuildContext context) {
+                                return _costTollList.map<Widget>((CostTollModel costToll) {
+                                  return Consumer<LanguageModel>(
                                     builder: (context, language, child) {
-                                      return Padding(
+                                      return Container(
                                         padding: EdgeInsets.only(
                                           left: getPlatformSize(6.0),
                                         ),
                                         child: Text(
-                                          value,
+                                          costToll.toString(),
                                           style: getTextStyle(
                                             language.lang,
-                                            isBold: false,
                                             heightTh: 0.8,
                                             heightEn: 1.15,
                                           ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }).toList();
+                              },
+                              items: _costTollList.map((CostTollModel costToll) {
+                                return DropdownMenuItem<CostTollModel>(
+                                  value: costToll,
+                                  child: Consumer<LanguageModel>(
+                                    builder: (context, language, child) {
+                                      return Container(
+                                        padding: EdgeInsets.only(
+                                          left: getPlatformSize(6.0),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              'ทดสอบ',
+                                              style: getTextStyle(
+                                                language.lang,
+                                                color: Color(0xFFB2B2B2),
+                                                sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                                sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                              ),
+                                            ),
+                                            Text(
+                                              costToll.toString().trim(),
+                                              style: getTextStyle(
+                                                language.lang,
+                                                heightTh: 0.8,
+                                                heightEn: 1.15,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       );
                                     },

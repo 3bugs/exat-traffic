@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
 
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/error_model.dart';
 
 Widget wrapSystemUiOverlayStyle({@required Widget child}) {
   return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -33,7 +37,8 @@ TextStyle getTextStyle(
   double heightEn = DEFAULT_LINE_HEIGHT,
 }) {
   String fontFamily = lang == 0 ? (isBold ? 'DBHeavent-Med' : 'DBHeavent') : null;
-  FontWeight fontWeight = lang == 0 ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
+  FontWeight fontWeight =
+      lang == 0 ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
   double fontSize = lang == 0 ? getPlatformSize(sizeTh) : getPlatformSize(sizeEn);
   double height = lang == 0 ? heightTh : heightEn;
 
@@ -88,3 +93,26 @@ Future<void> alert(BuildContext context, String title, String content) {
     },
   );
 }
+
+/*Future<List<dynamic>> fetchDataList(url) async {
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> responseBodyJson = json.decode(response.body);
+    ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
+
+    if (error.code == 0) {
+      List dataListJson = responseBodyJson['data_list'];
+      List<dynamic> dataList =
+          dataListJson.map((json) => GateInModel.fromJson(json)).toList();
+
+      return dataList;
+    } else {
+      print(error.message);
+      //throw Exception(error.message);
+    }
+  } else {
+    print('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
+    //throw Exception('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
+  }
+}*/

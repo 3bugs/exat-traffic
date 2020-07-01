@@ -40,7 +40,7 @@ class CctvPlayerScreen {
 }
 
 class RouteScreen {
-  static const double INITIAL_MARKER_OPACITY = 0.6;
+  static const double INITIAL_MARKER_OPACITY = 0.5;
 }
 
 class Font {
@@ -57,5 +57,6 @@ class Font {
 
 class Api {
   static const String MY_API_BASED_URL = 'http://163.47.9.26/api';
-  static const String GET_GATE_IN_URL = MY_API_BASED_URL + '/gate_in';
+  static const String FETCH_GATE_IN_URL = MY_API_BASED_URL + '/gate_in';
+  static const String FETCH_COST_TOLL_BY_GATE_IN_URL = MY_API_BASED_URL + '/cost_toll_by_gate_in';
 }

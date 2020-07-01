@@ -6,6 +6,7 @@ class GateInModel {
   final int id;
   final String name;
   final int routeId;
+  final String routeName;
   final int markerId;
   final double latitude;
   final double longitude;
@@ -17,6 +18,7 @@ class GateInModel {
     @required this.id,
     @required this.name,
     @required this.routeId,
+    @required this.routeName,
     @required this.markerId,
     @required this.latitude,
     @required this.longitude,
@@ -30,6 +32,7 @@ class GateInModel {
       id: json['gate_in_id'],
       name: json['gate_in_name'],
       routeId: json['gate_in_route_id'],
+      routeName: json['route_name'],
       markerId: json['marker_id'],
       latitude: json['lat'],
       longitude: json['lng'],
@@ -47,6 +50,7 @@ class GateInModel {
 
 /*
 {
+  route_name: "ทางพิเศษกาญจนาภิเษก",
   gate_in_route_id: 27,
   gate_in_id: 1,
   gate_in_name: "ด่านบางขุนเทียน",
@@ -58,4 +62,5 @@ class GateInModel {
   lng: 100.41192817,
   enable: 0,
   cost_tolls_count: 50
-},*/
+},
+*/
