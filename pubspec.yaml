@@ -64,6 +64,8 @@ flutter:
     - assets/images/cctv_details/
     - assets/images/rest_area_details/
     - assets/images/layers/
+    - assets/images/map_markers/
+    - assets/images/route/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

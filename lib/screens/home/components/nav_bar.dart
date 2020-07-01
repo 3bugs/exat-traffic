@@ -190,7 +190,9 @@ class _MyNavBarState extends State<MyNavBar> {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        _handlePressTab(2);
+                      },
                       //highlightColor: Constants.App.PRIMARY_COLOR,
                       borderRadius: BorderRadius.all(Radius.circular(
                           getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),

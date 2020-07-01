@@ -39,6 +39,10 @@ class CctvPlayerScreen {
   static const double HORIZONTAL_MARGIN = 22.0;
 }
 
+class RouteScreen {
+  static const double INITIAL_MARKER_OPACITY = 0.6;
+}
+
 class Font {
   static const double DEFAULT_SIZE_TH = 23.0;
   static const double DEFAULT_SIZE_EN = 16.0;
@@ -49,4 +53,9 @@ class Font {
   static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
   static const Color DIM_COLOR = Color(0xFFB2B2B2);
+}
+
+class Api {
+  static const String MY_API_BASED_URL = 'http://163.47.9.26/api';
+  static const String GET_GATE_IN_URL = MY_API_BASED_URL + '/gate_in';
 }

@@ -99,13 +99,14 @@ app.get('/api/:item/:id?',
                     m.enable,
                     temp.cost_tolls_count
              FROM (
-                 SELECT gi.route_id, ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
+                 SELECT gi.route_id, r.name AS route_name, ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
                    FROM cost_tolls ct
                             INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
+                            INNER JOIN routes r ON gi.route_id = r.id
                    WHERE ${whereClause} 
                    GROUP BY ct.gate_in_id) AS temp
                       INNER JOIN markers m ON temp.marker_id = m.id
-             ORDER BY temp.gate_in_id`,
+             ORDER BY temp.route_id, temp.gate_in_id`,
           (error, results, fields) => {
             if (error) throw error;
             res.json({
@@ -118,6 +119,7 @@ app.get('/api/:item/:id?',
           });
         connection.end();
         break;
+
       case 'cost_toll_by_gate_in':
         connection.query(
             `SELECT ct.id,

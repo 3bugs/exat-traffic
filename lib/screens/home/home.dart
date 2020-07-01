@@ -175,7 +175,9 @@ class _HomeMainState extends State<HomeMain> {
                     marginTop: getPlatformSize(10.0),
                     isChecked: _mapToolLayerChecked,
                     onClick: () {
-                      _mapToolLayerChecked = !_mapToolLayerChecked;
+                      setState(() {
+                        _mapToolLayerChecked = !_mapToolLayerChecked;
+                      });
                       widget.onClickMapTool(2, _mapToolLayerChecked);
                     },
                   ),

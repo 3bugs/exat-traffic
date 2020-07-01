@@ -14,6 +14,7 @@ import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 import 'package:exattraffic/screens/favorite/favorite.dart';
 import 'package:exattraffic/screens/incident/incident.dart';
 import 'package:exattraffic/screens/notification/notification.dart';
+import 'package:exattraffic/screens/route/route.dart';
 import 'package:exattraffic/models/screen_props.dart';
 
 //import 'package:exattraffic/components/fade_indexed_stack.dart';
@@ -37,6 +38,7 @@ List<ScreenProps> screenPropsList = [
     id: 0,
     showSearchBox: true,
     showBottomSheet: true,
+    showDate: true,
     titleList: [
       'หน้าหลัก',
       'Home',
@@ -53,6 +55,7 @@ List<ScreenProps> screenPropsList = [
     id: 1,
     showSearchBox: true,
     showBottomSheet: false,
+    showDate: true,
     titleList: [
       'รายการโปรด',
       'Favorite',
@@ -65,18 +68,15 @@ List<ScreenProps> screenPropsList = [
     ],
   ),
   ScreenProps(
+    // route
     id: 2,
-    showSearchBox: true,
-    showBottomSheet: true,
+    showSearchBox: false,
+    showBottomSheet: false,
+    showDate: false,
     titleList: [
-      'เหตุการณ์',
-      'Incident',
-      '事件',
-    ],
-    searchHintList: [
-      'ค้นหาเหตุการณ์',
-      'Search incident',
-      '搜索事件',
+      'เส้นทาง',
+      'Route',
+      '路线',
     ],
   ),
   ScreenProps(
@@ -84,6 +84,7 @@ List<ScreenProps> screenPropsList = [
     id: 3,
     showSearchBox: true,
     showBottomSheet: false,
+    showDate: true,
     titleList: [
       'เหตุการณ์',
       'Incident',
@@ -100,6 +101,7 @@ List<ScreenProps> screenPropsList = [
     id: 4,
     showSearchBox: true,
     showBottomSheet: false,
+    showDate: true,
     titleList: [
       'การแจ้งเตือน',
       'Notification',
@@ -114,9 +116,9 @@ List<ScreenProps> screenPropsList = [
 ];
 
 List<String> dateList = [
-  '25 พฤษภาคม 2563',
-  'MAY 25, 2020',
-  '2020年5月25日',
+  '29 มิถุนายน 2563',
+  'JUNE 29, 2020',
+  '2020年6月29日',
 ];
 
 class MyScaffoldMain extends StatefulWidget {
@@ -138,12 +140,12 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
   List<Widget> _fragmentList;
 
-  bool _showDate = true;
   double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   int _currentTabIndex = 0;
   ScreenProps _currentScreenProps = screenPropsList[0];
   int _bottomSheetIndex = 0;
+  bool _showSearchOptions = false;
 
   initState() {
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
@@ -153,7 +155,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         onClickMapTool: _handleClickMapTool,
       ),
       Favorite(),
-      Container(),
+      MyRoute(
+        onUpdateBottomSheet: null,
+      ),
       Incident(),
       MyNotification(),
     ];
@@ -164,7 +168,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   _afterLayout(_) {
     final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
     setState(() {
-      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      _mainContainerTop = mainContainerRenderBox
+          .localToGlobal(Offset.zero)
+          .dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
   }
@@ -308,7 +314,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                       ),
                       // วันที่
                       Visibility(
-                        visible: _showDate,
+                        visible: _currentScreenProps.showDate,
                         child: Padding(
                           padding: EdgeInsets.only(
                             left: getPlatformSize(5.0),
@@ -354,11 +360,15 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                         ),
                       ),
                     ),
+
                     // ช่อง search
                     Visibility(
                       visible: _currentScreenProps.showSearchBox,
                       child: Positioned(
-                        width: MediaQuery.of(context).size.width,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
                         top: 0.0,
                         left: 0.0,
                         child: Padding(
@@ -415,6 +425,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                           child: Consumer<LanguageModel>(
                                             builder: (context, language, child) {
                                               return TextField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _showSearchOptions = true;
+                                                  });
+                                                },
                                                 decoration: InputDecoration(
                                                   isDense: true,
                                                   contentPadding: EdgeInsets.only(
@@ -434,7 +449,12 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                       Material(
                                         color: Colors.transparent,
                                         child: InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            print('close search');
+                                            setState(() {
+                                              _showSearchOptions = false;
+                                            });
+                                          },
                                           borderRadius: BorderRadius.all(Radius.circular(18.0)),
                                           child: Container(
                                             width: getPlatformSize(36.0),
@@ -460,6 +480,162 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                         ),
                       ),
                     ),
+
+                    // รูปแบบการค้นหา (บริการผู้ใช้ทาง/เส้นทาง)
+                    Visibility(
+                      visible: _showSearchOptions,
+                      child: Positioned(
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
+                        top: getPlatformSize(65.0),
+                        left: 0.0,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                            right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x22777777),
+                                  blurRadius: getPlatformSize(10.0),
+                                  spreadRadius: getPlatformSize(5.0),
+                                  offset: Offset(
+                                    getPlatformSize(2.0), // move right
+                                    getPlatformSize(2.0), // move down
+                                  ),
+                                ),
+                              ],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                              ),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                // ค้นหาบริการผู้ใช้ทาง
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {},
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(
+                                          getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                      topRight: Radius.circular(
+                                          getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: getPlatformSize(18.0),
+                                        horizontal: getPlatformSize(20.0),
+                                      ),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            width: getPlatformSize(10.0),
+                                            height: getPlatformSize(10.0),
+                                            margin: EdgeInsets.only(
+                                              right: getPlatformSize(16.0),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFF3497FD),
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(getPlatformSize(3.0)),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Consumer<LanguageModel>(
+                                              builder: (context, language, child) {
+                                                return Text(
+                                                  'ค้นหาบริการผู้ใช้ทาง',
+                                                  style: getTextStyle(
+                                                    language.lang,
+                                                    color: Color(0xFF454F63),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // เส้นคั่น
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    left: getPlatformSize(20.0),
+                                    right: getPlatformSize(20.0),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Color(0xFFF4F4F4),
+                                        width: getPlatformSize(1.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // ค้นหาเส้นทาง
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {},
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(
+                                          getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                      bottomRight: Radius.circular(
+                                          getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: getPlatformSize(18.0),
+                                        horizontal: getPlatformSize(20.0),
+                                      ),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            width: getPlatformSize(10.0),
+                                            height: getPlatformSize(10.0),
+                                            margin: EdgeInsets.only(
+                                              right: getPlatformSize(16.0),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFF3ACCE1),
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(getPlatformSize(3.0)),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Consumer<LanguageModel>(
+                                              builder: (context, language, child) {
+                                                return Text(
+                                                  'ค้นหาเส้นทาง',
+                                                  style: getTextStyle(
+                                                    language.lang,
+                                                    color: Color(0xFF454F63),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     // bottom sheet
                     Visibility(
                       visible: _currentScreenProps.showBottomSheet,
@@ -468,25 +644,26 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                         children: <Widget>[
                           HomeBottomSheet(
                             collapsePosition:
-                                getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                                    _mainContainerHeight -
-                                    getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
                             expandPosition:
-                                getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
-                                    1,
+                            getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
+                                1,
                           ),
                           LayerBottomSheet(
                             collapsePosition:
-                                getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                                    _mainContainerHeight -
-                                    getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
                             expandPosition:
-                                getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
-                                    1,
+                            getPlatformSize(Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION) -
+                                1,
                           ),
                         ],
                       ),
                     ),
+
                     // เงาบนแถบ bottom nav
                     Align(
                       alignment: Alignment.bottomLeft,
