@@ -56,6 +56,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   );
 
   //Future<List<GateInModel>> _futureGateInList;
+  double _zoomLevel;
   List<GateInModel> _gateInList = List();
   List<CostTollModel> _costTollList = List();
   GateInModel _selectedGateIn;
@@ -88,7 +89,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
       position: LatLng(gateIn.latitude, gateIn.longitude),
       icon: gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon,
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
-      //infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      infoWindow: (true /*_zoomLevel != null && _zoomLevel > 8*/)
+          ? InfoWindow(
+              title: gateIn.name,
+              snippet: gateIn.routeName,
+            )
+          : InfoWindow.noText,
       onTap: () {
         _selectGateInMarker(gateIn);
       },
@@ -108,7 +114,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
       position: LatLng(costToll.latitude, costToll.longitude),
       icon: costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon,
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
-      //infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      infoWindow: (true /*_zoomLevel != null && _zoomLevel > 8*/)
+          ? InfoWindow(
+        title: costToll.name,
+        snippet: 'ชื่อทางพิเศษ' /*costToll.routeName*/,
+      )
+          : InfoWindow.noText,
       onTap: () {
         _selectCostTollMarker(costToll);
       },
@@ -237,6 +248,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
   }
 
   void _selectGateInMarker(GateInModel selectedGateIn) {
+    // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
+    if (selectedGateIn.selected) return;
+
     setState(() {
       _selectedGateIn = selectedGateIn;
       _selectedCostToll = null;
@@ -252,6 +266,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
   }
 
   void _selectCostTollMarker(CostTollModel selectedCostToll) async {
+    // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
+    if (selectedCostToll.selected) return;
+
     setState(() {
       _selectedCostToll = selectedCostToll;
     });
@@ -278,7 +295,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
           polylineId: PolylineId('1'),
           width: 6,
           points: latLngList,
-          color: Color(0xFF747474).withOpacity(0.9),
+          color: Color(0xFF747474).withOpacity(1.0),
         ),
       );
     });
@@ -380,6 +397,11 @@ class _MyRouteMainState extends State<MyRouteMain> {
             onMapCreated: (GoogleMapController controller) {
               _googleMapController.complete(controller);
               _moveMapToCurrentPosition(context);
+            },
+            onCameraMove: (CameraPosition position) {
+              /*setState(() {
+                _zoomLevel = position.zoom;
+              });*/
             },
             markers: Set<Marker>.of(_gateInMarkerMap.values)
                 .union(Set<Marker>.of(_costTollMarkerMap.values)),

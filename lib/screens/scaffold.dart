@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/lazy_indexed_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 //import 'package:google_fonts/google_fonts.dart';
@@ -354,8 +355,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                       // main container
                       child: Container(
                         key: _keyMainContainer,
-                        child: AnimatedIndexedStack(
-                          children: _fragmentList,
+                        child: LazyIndexedStack(
+                          //children: _fragmentList,
+                          reuse: true,
+                          itemBuilder: (context, index) {
+                            return _fragmentList[index];
+                          },
+                          itemCount: 5,
                           index: _currentTabIndex,
                         ),
                       ),

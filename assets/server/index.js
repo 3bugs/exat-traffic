@@ -128,12 +128,15 @@ app.get('/api/:item/:id?',
                     m.lat,
                     m.lng,
                     m.cate_id,
+                    m.route_id,
+                    r.name AS route_name,
                     ct.part_toll,
                     ct.cost_less4,
                     ct.cost_4to10,
                     ct.cost_over10
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
+                      INNER JOIN routes r ON m.route_id = r.id 
              WHERE ct.gate_in_id = ${req.params.id}`,
           (error, results, fields) => {
             if (error) throw error;
