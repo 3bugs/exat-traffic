@@ -18,8 +18,11 @@ class NavBar {
 }
 
 class BottomSheet {
+  static const Color DARK_BACKGROUND_COLOR = Color(0xFF2A2E43);
   static const double HEIGHT_INITIAL = 180.0;
   static const double HEIGHT_LAYER = 145.0;
+  static const double HEIGHT_ROUTE_COLLAPSED = 110.0;
+  static const double HEIGHT_ROUTE_EXPANDED = 335.0;
   static const Color LAYER_ITEM_BORDER_COLOR_OFF = Color(0xFF898989);
   static const Color LAYER_ITEM_BORDER_COLOR_ON = App.PRIMARY_COLOR;
 }
@@ -50,6 +53,8 @@ class Font {
   static const double SMALLER_SIZE_EN = 14.0;
   static const double BIGGER_SIZE_TH = 26.0;
   static const double BIGGER_SIZE_EN = 18.0;
+  static const double BIGGEST_SIZE_TH = 36.0;
+  static const double BIGGEST_SIZE_EN = 24.0;
   static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
   static const Color DIM_COLOR = Color(0xFFB2B2B2);

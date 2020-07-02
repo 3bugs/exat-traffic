@@ -5,6 +5,8 @@ import 'package:exattraffic/constants.dart' as Constants;
 class CostTollModel {
   final int id;
   final String name;
+  final int routeId;
+  final String routeName;
   final double latitude;
   final double longitude;
   final int cost4Wheels;
@@ -15,6 +17,8 @@ class CostTollModel {
   CostTollModel({
     @required this.id,
     @required this.name,
+    @required this.routeId,
+    @required this.routeName,
     @required this.latitude,
     @required this.longitude,
     @required this.cost4Wheels,
@@ -27,6 +31,8 @@ class CostTollModel {
     return CostTollModel(
       id: json['id'],
       name: json['name'],
+      routeId: json['route_id'],
+      routeName: json['route_name'],
       latitude: json['lat'],
       longitude: json['lng'],
       cost4Wheels: json['cost_less4'],

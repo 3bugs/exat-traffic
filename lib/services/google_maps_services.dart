@@ -5,10 +5,11 @@ const apiKey = 'AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak';
 //const apiKey = 'AIzaSyCrBhuovlx9Wk2v7mQNvCg4JIL_affg0ks';
 
 class GoogleMapsServices{
-  Future<String> getRouteCoordinates(LatLng origin, LatLng destination)async{
+  Future<Map<String, dynamic>> getRoute(LatLng origin, LatLng destination)async{
     String url = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$apiKey";
     http.Response response = await http.get(url);
     Map values = jsonDecode(response.body);
-    return values["routes"][0]["overview_polyline"]["points"];
+    //return values["routes"][0]["overview_polyline"]["points"];
+    return values["routes"][0];
   }
 }

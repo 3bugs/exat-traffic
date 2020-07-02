@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -16,6 +15,8 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/error_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/route_bottom_sheet.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 
 class MyRoute extends StatelessWidget {
   MyRoute({
@@ -55,12 +56,16 @@ class _MyRouteMainState extends State<MyRouteMain> {
     zoom: 10,
   );
 
+  double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+
   //Future<List<GateInModel>> _futureGateInList;
   double _zoomLevel;
   List<GateInModel> _gateInList = List();
   List<CostTollModel> _costTollList = List();
   GateInModel _selectedGateIn;
   CostTollModel _selectedCostToll;
+  Map<String, dynamic> _googleRoute;
   BitmapDescriptor _originMarkerIcon, _originMarkerIconLarge;
   BitmapDescriptor _destinationMarkerIcon, _destinationMarkerIconLarge;
 
@@ -116,9 +121,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true /*_zoomLevel != null && _zoomLevel > 8*/)
           ? InfoWindow(
-        title: costToll.name,
-        snippet: 'ชื่อทางพิเศษ' /*costToll.routeName*/,
-      )
+              title: costToll.name,
+              snippet: costToll.routeName,
+            )
           : InfoWindow.noText,
       onTap: () {
         _selectCostTollMarker(costToll);
@@ -278,11 +283,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
     });
     _createMarkersFromModel();
 
-    String route = await _googleMapsServices.getRouteCoordinates(
+    Map<String, dynamic> route = await _googleMapsServices.getRoute(
       LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude),
       LatLng(_selectedCostToll.latitude, _selectedCostToll.longitude),
     );
-    createRoute(route);
+    createRoute(route['overview_polyline']['points']);
+    setState(() {
+      _googleRoute = route;
+    });
   }
 
   void createRoute(String encodedPoly) async {
@@ -361,6 +369,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+
     /*BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
       'assets/images/route/ic_marker_origin.png',
@@ -370,6 +380,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
     _setupCustomMarker();
     _fetchGateIn();
+  }
+
+  _afterLayout(_) {
+    final RenderBox mainContainerRenderBox = _keyGoogleMaps.currentContext.findRenderObject();
+    setState(() {
+      _googleMapsTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      _googleMapsHeight = mainContainerRenderBox.size.height;
+    });
   }
 
   @override
@@ -407,6 +425,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 .union(Set<Marker>.of(_costTollMarkerMap.values)),
             polylines: _polyLines,
           ),
+
+          // ช่องเลือกทางเข้า/ทางออก
           Positioned(
             top: getPlatformSize(-32.0),
             width: MediaQuery.of(context).size.width,
@@ -435,8 +455,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 ),
                 child: Padding(
                   padding: EdgeInsets.only(
-                    top: getPlatformSize(14.0),
-                    bottom: getPlatformSize(10.0),
+                    top: getPlatformSize(10.0),
+                    bottom: getPlatformSize(6.0),
                     left: getPlatformSize(19.0),
                     right: getPlatformSize(19.0),
                   ),
@@ -478,7 +498,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                             ),
                             Container(
                               width: 0.0,
-                              height: getPlatformSize(48.0),
+                              height: getPlatformSize(30.0),
                               margin: EdgeInsets.symmetric(
                                 horizontal: getPlatformSize(0.0),
                                 vertical: getPlatformSize(5.0),
@@ -683,14 +703,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
                             // เส้นคั่นแนวนอน
                             Container(
                               margin: EdgeInsets.only(
-                                top: getPlatformSize(6.0),
-                                bottom: getPlatformSize(10.0),
+                                top: getPlatformSize(2.0),
+                                bottom: getPlatformSize(6.0),
                               ),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
                                     color: Color(0xFF707070).withOpacity(0.33),
-                                    width: getPlatformSize(1.0),
+                                    width: getPlatformSize(0.0),
                                   ),
                                 ),
                               ),
@@ -788,7 +808,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              'ทดสอบ',
+                                              costToll.routeName,
                                               style: getTextStyle(
                                                 language.lang,
                                                 color: Color(0xFFB2B2B2),
@@ -821,6 +841,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
               ),
             ),
           ),
+
+          // map tools
           Container(
             padding: EdgeInsets.only(
               top: getPlatformSize(100.0),
@@ -841,6 +863,19 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   ),
                 ],
               ),
+            ),
+          ),
+
+          // bottom sheet
+          Visibility(
+            visible: _selectedCostToll != null,
+            child: RouteBottomSheet(
+              collapsePosition:
+              _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
+              expandPosition:
+              _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
+              selectedCostToll: _selectedCostToll,
+              googleRoute: _googleRoute,
             ),
           ),
         ],
