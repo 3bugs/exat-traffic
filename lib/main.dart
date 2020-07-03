@@ -1,5 +1,6 @@
 import 'package:exattraffic/models/language_model.dart';
-//import 'package:exattraffic/screens/login/login.dart';
+import 'package:exattraffic/screens/login/login.dart';
+import 'package:exattraffic/screens/splash/splash.dart';
 import 'package:exattraffic/screens/scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.black.withOpacity(0.0),
         ),
       ),
-      home: MyScaffold(),
+      home: Splash(),
     );
   }
 }

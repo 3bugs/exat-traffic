@@ -94,7 +94,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
       position: LatLng(gateIn.latitude, gateIn.longitude),
       icon: gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon,
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
-      infoWindow: (true /*_zoomLevel != null && _zoomLevel > 8*/)
+      infoWindow: (true)
           ? InfoWindow(
               title: gateIn.name,
               snippet: gateIn.routeName,
@@ -119,7 +119,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
       position: LatLng(costToll.latitude, costToll.longitude),
       icon: costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon,
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
-      infoWindow: (true /*_zoomLevel != null && _zoomLevel > 8*/)
+      infoWindow: (true)
           ? InfoWindow(
               title: costToll.name,
               snippet: costToll.routeName,
@@ -155,6 +155,15 @@ class _MyRouteMainState extends State<MyRouteMain> {
         });
         _createMarkersFromModel();
 
+        // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
+        new Future.delayed(Duration(milliseconds: 1000), () async {
+          List<LatLng> gateInLatLngList =
+              gateInList.map((gateIn) => LatLng(gateIn.latitude, gateIn.longitude)).toList();
+          LatLngBounds latLngBounds = _boundsFromLatLngList(gateInLatLngList);
+          final GoogleMapController controller = await _googleMapController.future;
+          controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+        });
+
         //return gateInList;
       } else {
         print(error.message);
@@ -189,6 +198,17 @@ class _MyRouteMainState extends State<MyRouteMain> {
           _costTollList = costTollList;
         });
         _createMarkersFromModel();
+
+        // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
+        new Future.delayed(Duration(milliseconds: 1000), () async {
+          List<LatLng> costTollLatLngList = costTollList
+              .map((costToll) => LatLng(costToll.latitude, costToll.longitude))
+              .toList();
+          costTollLatLngList.add(LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude));
+          LatLngBounds latLngBounds = _boundsFromLatLngList(costTollLatLngList);
+          final GoogleMapController controller = await _googleMapController.future;
+          controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+        });
 
         //return gateInList;
       } else {
@@ -308,9 +328,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
       );
     });
 
-    LatLngBounds latLngBounds = _boundsFromLatLngList(latLngList);
-    final GoogleMapController controller = await _googleMapController.future;
-    controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+    // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
+    new Future.delayed(Duration(milliseconds: 1000), () async {
+      LatLngBounds latLngBounds = _boundsFromLatLngList(latLngList);
+      final GoogleMapController controller = await _googleMapController.future;
+      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+    });
   }
 
   List<LatLng> _convertToLatLngList(List points) {
@@ -409,12 +432,15 @@ class _MyRouteMainState extends State<MyRouteMain> {
         children: <Widget>[
           GoogleMap(
             key: _keyGoogleMaps,
+            /*padding: EdgeInsets.only(
+              top: getPlatformSize(20.0),
+            ),*/
             mapType: MapType.normal,
             initialCameraPosition: INITIAL_POSITION,
             myLocationEnabled: true,
             onMapCreated: (GoogleMapController controller) {
               _googleMapController.complete(controller);
-              _moveMapToCurrentPosition(context);
+              //_moveMapToCurrentPosition(context);
             },
             onCameraMove: (CameraPosition position) {
               /*setState(() {
@@ -871,9 +897,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
             visible: _selectedCostToll != null,
             child: RouteBottomSheet(
               collapsePosition:
-              _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
+                  _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
               expandPosition:
-              _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
+                  _googleMapsHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
               selectedCostToll: _selectedCostToll,
               googleRoute: _googleRoute,
             ),

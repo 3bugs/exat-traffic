@@ -21,7 +21,7 @@ class BottomSheet {
   static const Color DARK_BACKGROUND_COLOR = Color(0xFF2A2E43);
   static const double HEIGHT_INITIAL = 180.0;
   static const double HEIGHT_LAYER = 145.0;
-  static const double HEIGHT_ROUTE_COLLAPSED = 110.0;
+  static const double HEIGHT_ROUTE_COLLAPSED = 102.0;
   static const double HEIGHT_ROUTE_EXPANDED = 335.0;
   static const Color LAYER_ITEM_BORDER_COLOR_OFF = Color(0xFF898989);
   static const Color LAYER_ITEM_BORDER_COLOR_ON = App.PRIMARY_COLOR;

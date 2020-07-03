@@ -46,8 +46,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     });
   }
 
-  Widget _getCarItem(
-      int language, int widthFlex, String label, String iconPath, double iconWidth, double iconHeight, double iconMarginTop) {
+  Widget _getCarItem(int language, int widthFlex, String label, String iconPath, double iconWidth,
+      double iconHeight, double iconMarginTop) {
     return Expanded(
       flex: widthFlex,
       child: Container(
@@ -146,6 +146,17 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     );
   }
 
+  String _getArrivalTimeText() {
+    int routeDurationSeconds = widget.googleRoute == null
+        ? 0
+        : widget.googleRoute['legs'][0]['duration']['value'];
+
+    DateTime arrivalDate = new DateTime.now().add(Duration(seconds: routeDurationSeconds));
+    String hourText = (arrivalDate.hour < 10 ? "0" : "") + arrivalDate.hour.toString();
+    String minuteText = (arrivalDate.minute < 10 ? "0" : "") + arrivalDate.minute.toString();
+    return '$hourText.$minuteText';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BottomSheetScaffold(
@@ -180,7 +191,11 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                widget.googleRoute == null ? '' : widget.googleRoute['legs'][0]['duration']['text'].replaceAll('hour', 'ชม.').replaceAll('mins', 'นาที'),
+                                widget.googleRoute == null
+                                    ? ''
+                                    : widget.googleRoute['legs'][0]['duration']['text']
+                                    .replaceAll('hour', 'ชม.')
+                                    .replaceAll('mins', 'นาที'),
                                 style: getTextStyle(
                                   language.lang,
                                   isBold: true,
@@ -193,7 +208,10 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 width: getPlatformSize(15.0),
                               ),
                               Text(
-                                widget.googleRoute == null ? '' : '(${widget.googleRoute['legs'][0]['distance']['text'].replaceAll('km', 'กม.')})',
+                                widget.googleRoute == null
+                                    ? ''
+                                    : '(${widget.googleRoute['legs'][0]['distance']['text']
+                                    .replaceAll('km', 'กม.')})',
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,
@@ -243,7 +261,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       children: <Widget>[
                         Expanded(
                           child: Text(
-                            'เดินทางตอนนี้ ถึง 19.18 น.',
+                            'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
                             style: getTextStyle(
                               language.lang,
                               color: Colors.white,
@@ -253,7 +271,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                           ),
                         ),
                         Text(
-                          '', /*'ผ่านทั้งหมด 3 ด่าน',*/
+                          '',
+                          /*'ผ่านทั้งหมด 3 ด่าน',*/
                           style: getTextStyle(
                             language.lang,
                             color: Colors.white,
@@ -292,7 +311,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       children: <Widget>[
                         _getCarItem(
                           language.lang,
-                          3,
+                          8,
                           '4 ล้อ',
                           'assets/images/route/ic_car_small.png',
                           46.0,
@@ -301,19 +320,19 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                         ),
                         _getCarItem(
                           language.lang,
-                          4,
+                          10,
                           '6-10 ล้อ',
-                          'assets/images/route/ic_car_medium.png',
-                          98.28,
+                          'assets/images/route/ic_car_medium-new.png',
+                          84.65,
                           38.66,
                           1,
                         ),
                         _getCarItem(
                           language.lang,
-                          5,
+                          11,
                           'เกิน 10 ล้อ',
-                          'assets/images/route/ic_car_large.png',
-                          131.71,
+                          'assets/images/route/ic_car_large-new.png',
+                          118.25,
                           42.01,
                           0,
                         ),
@@ -328,9 +347,24 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                     ),
                     child: Row(
                       children: <Widget>[
-                        _getFeeItem(language.lang, 5, widget.selectedCostToll == null ? 0 : widget.selectedCostToll.cost4Wheels),
-                        _getFeeItem(language.lang, 6, widget.selectedCostToll == null ? 0 : widget.selectedCostToll.cost6To10Wheels),
-                        _getFeeItem(language.lang, 6, widget.selectedCostToll == null ? 0 : widget.selectedCostToll.costOver10Wheels),
+                        _getFeeItem(
+                            language.lang,
+                            6,
+                            widget.selectedCostToll == null
+                                ? 0
+                                : widget.selectedCostToll.cost4Wheels),
+                        _getFeeItem(
+                            language.lang,
+                            6,
+                            widget.selectedCostToll == null
+                                ? 0
+                                : widget.selectedCostToll.cost6To10Wheels),
+                        _getFeeItem(
+                            language.lang,
+                            6,
+                            widget.selectedCostToll == null
+                                ? 0
+                                : widget.selectedCostToll.costOver10Wheels),
                       ],
                     ),
                   ),

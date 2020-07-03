@@ -134,6 +134,7 @@ class _LoginMainState extends State<LoginMain> {
                         text: 'Login',
                         onClickButton: () {
                           //alert(context, 'Login', 'Test login');
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => MyScaffold()),

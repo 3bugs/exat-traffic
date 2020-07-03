@@ -180,6 +180,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     setState(() {
       _currentTabIndex = index;
       _currentScreenProps = screenPropsList[index];
+
+      if (index != 0) {
+        _showSearchOptions = false;
+      }
     });
   }
 

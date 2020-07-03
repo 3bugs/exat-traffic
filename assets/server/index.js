@@ -1,10 +1,13 @@
 //https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04
 
-var express = require('express');
-var app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 const mysql = require('mysql');
+
+const CODE_FAILED = 1;
+const CODE_SUCCESS = 0;
 
 app.use(express.static('./'));
 
@@ -83,6 +86,20 @@ app.get('/api/:item/:id?',
     });
     connection.connect();
 
+    /*connection.connect(function(err) {
+      if (err) {
+        res.json({
+          error: {
+            code: 1,
+            message: 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล',
+          },
+          data_list: null,
+        });
+        return;
+      }
+      console.log('connected as id ' + connection.threadId);
+    });*/
+
     switch (req.params.item) {
       case 'gate_in':
         const whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
@@ -109,21 +126,30 @@ app.get('/api/:item/:id?',
                       INNER JOIN markers m ON temp.marker_id = m.id
              ORDER BY temp.route_id, temp.gate_in_id`,
           (error, results, fields) => {
-            if (error) throw error;
-            res.json({
-              error: {
-                code: 0,
-                message: 'ok',
-              },
-              data_list: results,
-            });
+            if (error) {
+              res.json({
+                error: {
+                  code: CODE_FAILED,
+                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                },
+                data_list: null,
+              });
+            } else {
+              res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'ok',
+                },
+                data_list: results,
+              });
+            }
           });
         connection.end();
         break;
 
       case 'cost_toll_by_gate_in':
         connection.query(
-            `SELECT ct.id,
+          `SELECT ct.id,
                     m.name,
                     m.lat,
                     m.lng,
@@ -137,18 +163,62 @@ app.get('/api/:item/:id?',
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ct.gate_in_id = ${req.params.id}`,
+             WHERE ct.gate_in_id = ${req.params.id} 
+             ORDER BY route_id`,
           (error, results, fields) => {
-            if (error) throw error;
-            res.json({
-              error: {
-                code: 0,
-                message: 'ok',
-              },
-              data_list: results,
-            });
+            if (error) {
+              res.json({
+                error: {
+                  code: CODE_FAILED,
+                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                },
+                data_list: null,
+              });
+              connection.end();
+            } else {
+              results['part_toll_list'] = [];
+
+              if (results['part_toll'] != null) {
+                const partTollList = results['part_toll'].split('-');
+                const partTollListCsv = partTollList.reduce(
+                  (total, partToll) => total == null ? partToll : `${total}, ${partToll}`,
+                  null
+                );
+
+                const sql = `SELECT *
+                             FROM markers
+                             WHERE id IN (${partTollListCsv})`;
+                connection.query(
+                  sql,
+                  (error, partTollResults, fields) => {
+                    if (error) {
+                      res.json({
+                        error: {
+                          code: CODE_FAILED,
+                          message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                        },
+                        data_list: null,
+                      });
+                      connection.end();
+                      return;
+                    } else {
+                      results['part_toll_list'] = partTollResults;
+                    }
+                  }
+                );
+              }
+
+              res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'ok',
+                },
+                data_list: results,
+              });
+              connection.end();
+            }
           });
-        connection.end();
+        //connection.end();
         break;
     }
   }
