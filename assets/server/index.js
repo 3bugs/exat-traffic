@@ -176,9 +176,34 @@ app.get('/api/:item/:id?',
               });
               connection.end();
             } else {
-              results['part_toll_list'] = [];
+              //results['part_toll_list'] = [];
+              const allPartTollIdList = [];
 
-              if (results['part_toll'] != null) {
+              results.forEach(costToll => {
+                costToll['part_toll_id'] = [];
+
+                if (costToll['part_toll'] != null) {
+                  const partTollList = costToll['part_toll'].split('-');
+
+                  partTollList.forEach(partToll => {
+                    const partTollId = parseInt(partToll);
+                    costToll['part_toll_id'].push(partTollId);
+
+                    if (!allPartTollIdList.includes(partTollId)) {
+                      allPartTollIdList.push(partTollId);
+                    }
+                  });
+
+                  /*const partTollListCsv = partTollList.reduce(
+                    (total, partToll) => total == null ? partToll : `${total}, ${partToll}`,
+                    null
+                  );*/
+                }
+              });
+
+              results['all_part_toll_id'] = allPartTollIdList;
+
+              /*if (results['part_toll'] != null) {
                 const partTollList = results['part_toll'].split('-');
                 const partTollListCsv = partTollList.reduce(
                   (total, partToll) => total == null ? partToll : `${total}, ${partToll}`,
@@ -202,11 +227,11 @@ app.get('/api/:item/:id?',
                       connection.end();
                       return;
                     } else {
-                      results['part_toll_list'] = partTollResults;
+                      //results['part_toll_list'] = partTollResults;
                     }
                   }
                 );
-              }
+              }*/
 
               res.json({
                 error: {
