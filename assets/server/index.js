@@ -201,8 +201,6 @@ app.get('/api/:item/:id?',
                 }
               });
 
-              results['all_part_toll_id'] = allPartTollIdList;
-
               /*if (results['part_toll'] != null) {
                 const partTollList = results['part_toll'].split('-');
                 const partTollListCsv = partTollList.reduce(
@@ -238,6 +236,7 @@ app.get('/api/:item/:id?',
                   code: CODE_SUCCESS,
                   message: 'ok',
                 },
+                all_part_toll_id: allPartTollIdList,
                 data_list: results,
               });
               connection.end();
