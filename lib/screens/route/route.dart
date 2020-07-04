@@ -437,7 +437,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
             ),*/
             mapType: MapType.normal,
             initialCameraPosition: INITIAL_POSITION,
-            myLocationEnabled: true,
+            myLocationEnabled: false,
             onMapCreated: (GoogleMapController controller) {
               _googleMapController.complete(controller);
               //_moveMapToCurrentPosition(context);

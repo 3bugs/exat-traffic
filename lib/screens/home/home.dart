@@ -126,7 +126,7 @@ class _HomeMainState extends State<HomeMain> {
             key: _keyGoogleMaps,
             mapType: MapType.normal,
             initialCameraPosition: INITIAL_POSITION,
-            myLocationEnabled: true,
+            myLocationEnabled: false,
             onMapCreated: (GoogleMapController controller) {
               _googleMapController.complete(controller);
               _moveToCurrentPosition(context);

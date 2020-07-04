@@ -193,13 +193,56 @@ app.get('/api/:item/:id?',
                       allPartTollIdList.push(partTollId);
                     }
                   });
-
-                  /*const partTollListCsv = partTollList.reduce(
-                    (total, partToll) => total == null ? partToll : `${total}, ${partToll}`,
-                    null
-                  );*/
                 }
               });
+
+              if (allPartTollIdList.length > 0) {
+                const partTollIdListCsv = allPartTollIdList.reduce(
+                  (total, partTollId) => total == null ? partTollId : `${total}, ${partTollId}`,
+                  null
+                );
+
+                const sql = `SELECT *
+                             FROM markers
+                             WHERE id IN (${partTollIdListCsv})`;
+                connection.query(
+                  sql,
+                  (error, partTollResults, fields) => {
+                    if (error) {
+                      res.json({
+                        error: {
+                          code: CODE_FAILED,
+                          message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                        },
+                        all_part_toll_id: allPartTollIdList,
+                        data_list: null,
+                      });
+                      connection.end();
+                    } else {
+                      res.json({
+                        error: {
+                          code: CODE_SUCCESS,
+                          message: 'ok',
+                        },
+                        all_part_toll_id: allPartTollIdList,
+                        all_part_toll_markers: partTollResults,
+                        data_list: results,
+                      });
+                      connection.end();
+                    }
+                  }
+                );
+              } else {
+                res.json({
+                  error: {
+                    code: CODE_SUCCESS,
+                    message: 'ok',
+                  },
+                  all_part_toll_id: allPartTollIdList,
+                  data_list: results,
+                });
+                connection.end();
+              }
 
               /*if (results['part_toll'] != null) {
                 const partTollList = results['part_toll'].split('-');
@@ -231,15 +274,7 @@ app.get('/api/:item/:id?',
                 );
               }*/
 
-              res.json({
-                error: {
-                  code: CODE_SUCCESS,
-                  message: 'ok',
-                },
-                all_part_toll_id: allPartTollIdList,
-                data_list: results,
-              });
-              connection.end();
+
             }
           });
         //connection.end();
