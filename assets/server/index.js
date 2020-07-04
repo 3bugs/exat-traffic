@@ -202,8 +202,9 @@ app.get('/api/:item/:id?',
                   null
                 );
 
-                const sql = `SELECT *
-                             FROM markers
+                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, r.name AS route_name
+                             FROM markers m 
+                                 INNER JOIN routes r ON m.route_id = r.id 
                              WHERE id IN (${partTollIdListCsv})`;
                 connection.query(
                   sql,
@@ -219,6 +220,14 @@ app.get('/api/:item/:id?',
                       });
                       connection.end();
                     } else {
+                      results.forEach(costToll => {
+                        const partTollMarkerList = costToll['part_toll_id'].map(partTollId => {
+                          const filteredMarkerList = partTollResults.filter(partTollMarker => partTollMarker.id === partTollId);
+                          return filteredMarkerList.length > 0 ? filteredMarkerList[0] : null;
+                        });
+                        costToll['part_toll_markers'] = partTollMarkerList;
+                      });
+
                       res.json({
                         error: {
                           code: CODE_SUCCESS,
