@@ -100,9 +100,10 @@ app.get('/api/:item/:id?',
       console.log('connected as id ' + connection.threadId);
     });*/
 
+    let whereClause;
     switch (req.params.item) {
       case 'gate_in':
-        const whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
+        whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
           `SELECT temp.route_name, 
                     temp.route_id AS gate_in_route_id, 
@@ -148,6 +149,7 @@ app.get('/api/:item/:id?',
         break;
 
       case 'cost_toll_by_gate_in':
+        whereClause = req.params.id == null ? 'true' : `ct.gate_in_id = ${req.params.id}`;
         connection.query(
           `SELECT ct.id,
                     m.name,
@@ -163,7 +165,7 @@ app.get('/api/:item/:id?',
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ct.gate_in_id = ${req.params.id} 
+             WHERE ${whereClause} 
              ORDER BY route_id`,
           (error, results, fields) => {
             if (error) {
