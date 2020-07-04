@@ -244,48 +244,20 @@ app.get('/api/:item/:id?',
                   }
                 );
               } else {
+                results.forEach(costToll => {
+                  costToll['part_toll_markers'] = [];
+                });
                 res.json({
                   error: {
                     code: CODE_SUCCESS,
                     message: 'ok',
                   },
-                  all_part_toll_id: allPartTollIdList,
+                  all_part_toll_id: [],
+                  all_part_toll_markers: [],
                   data_list: results,
                 });
                 connection.end();
               }
-
-              /*if (results['part_toll'] != null) {
-                const partTollList = results['part_toll'].split('-');
-                const partTollListCsv = partTollList.reduce(
-                  (total, partToll) => total == null ? partToll : `${total}, ${partToll}`,
-                  null
-                );
-
-                const sql = `SELECT *
-                             FROM markers
-                             WHERE id IN (${partTollListCsv})`;
-                connection.query(
-                  sql,
-                  (error, partTollResults, fields) => {
-                    if (error) {
-                      res.json({
-                        error: {
-                          code: CODE_FAILED,
-                          message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                        },
-                        data_list: null,
-                      });
-                      connection.end();
-                      return;
-                    } else {
-                      //results['part_toll_list'] = partTollResults;
-                    }
-                  }
-                );
-              }*/
-
-
             }
           });
         //connection.end();
