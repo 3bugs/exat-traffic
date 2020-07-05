@@ -91,7 +91,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
       parent: _controller,
       curve: Curves.fastOutSlowIn,
     );
-    Future.delayed(Duration.zero, () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       _controller.forward();
     });
 
@@ -149,22 +149,19 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              Visibility(
-                visible: _splashImageUrl != null,
-                child: _splashImageUrl != null
-                    ? Container(
-                        padding: EdgeInsets.all(getPlatformSize(24.0)),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(_splashImageUrl),
-                              fit: BoxFit.contain,
-                            ),
+              _splashImageUrl != null
+                  ? Container(
+                      padding: EdgeInsets.all(getPlatformSize(24.0)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(_splashImageUrl),
+                            fit: BoxFit.contain,
                           ),
                         ),
-                      )
-                    : SizedBox.shrink(),
-              ),
+                      ),
+                    )
+                  : SizedBox.shrink(),
             ],
           ),
         ),

@@ -1,49 +1,37 @@
-import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 
-class CostTollModel {
+class MarkerModel {
   final int id;
   final String name;
   final int routeId;
   final String routeName;
   final double latitude;
   final double longitude;
-  final int cost4Wheels;
-  final int cost6To10Wheels;
-  final int costOver10Wheels;
-  final List<MarkerModel> partTollMarkerList;
+  final int categoryId;
   bool selected;
 
-  CostTollModel({
+  MarkerModel({
     @required this.id,
     @required this.name,
     @required this.routeId,
     @required this.routeName,
     @required this.latitude,
     @required this.longitude,
-    @required this.cost4Wheels,
-    @required this.cost6To10Wheels,
-    @required this.costOver10Wheels,
-    @required this.partTollMarkerList,
+    @required this.categoryId,
     @required this.selected,
   });
 
-  factory CostTollModel.fromJson(Map<String, dynamic> json) {
-    return CostTollModel(
+  factory MarkerModel.fromJson(Map<String, dynamic> json) {
+    return MarkerModel(
       id: json['id'],
       name: json['name'],
       routeId: json['route_id'],
       routeName: json['route_name'],
       latitude: json['lat'],
       longitude: json['lng'],
-      cost4Wheels: json['cost_less4'],
-      cost6To10Wheels: json['cost_4to10'],
-      costOver10Wheels: json['cost_over10'],
-      partTollMarkerList: json['part_toll_markers']
-          .map<MarkerModel>((markerJson) => MarkerModel.fromJson(markerJson))
-          .toList(),
+      categoryId: json['cate_id'],
       selected: false,
     );
   }

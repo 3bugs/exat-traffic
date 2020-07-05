@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -49,6 +50,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
   final Map<MarkerId, Marker> _gateInMarkerMap = <MarkerId, Marker>{};
   final Map<MarkerId, Marker> _costTollMarkerMap = <MarkerId, Marker>{};
+  final Map<MarkerId, Marker> _partTollMarkerMap = <MarkerId, Marker>{};
   final Set<Polyline> _polyLines = <Polyline>{};
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
@@ -135,6 +137,29 @@ class _MyRouteMainState extends State<MyRouteMain> {
     });
   }
 
+  void _addPartTollMarker(MarkerModel partTollMarker) {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('marker-${partTollMarker.id.toString()}');
+
+    final Marker marker = Marker(
+      markerId: markerId,
+      position: LatLng(partTollMarker.latitude, partTollMarker.longitude),
+      //icon: markerModel.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon,
+      //alpha: markerModel.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      infoWindow: (true)
+          ? InfoWindow(
+              title: partTollMarker.name,
+              snippet: partTollMarker.routeName,
+            )
+          : InfoWindow.noText,
+      onTap: () {},
+    );
+
+    setState(() {
+      _partTollMarkerMap[markerId] = marker;
+    });
+  }
+
   // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
   // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
   void _fetchGateIn() async {
@@ -192,7 +217,15 @@ class _MyRouteMainState extends State<MyRouteMain> {
         List dataList = responseBodyJson['data_list'];
         List<CostTollModel> costTollList =
             dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson)).toList();
-        print('Number of Gate In : ${costTollList.length}');
+
+        print('Number of Cost Toll : ${costTollList.length}');
+        costTollList.forEach((costToll) {
+          print(
+              'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList.length}');
+          costToll.partTollMarkerList
+              .map((partTollMarker) => print('--- ${partTollMarker.name}'))
+              .toList();
+        });
 
         setState(() {
           _costTollList = costTollList;
@@ -262,12 +295,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
       false,
       (previousValue, costToll) => previousValue || costToll.selected,
     );
-    if (_costTollList != null) {
-      _costTollMarkerMap.clear();
-      for (CostTollModel costToll in _costTollList) {
-        if (costToll.selected || (!costToll.selected && !isCostTollSelected)) {
-          _addCostTollMarker(costToll);
-        }
+    _costTollMarkerMap.clear();
+    _partTollMarkerMap.clear();
+    for (CostTollModel costToll in _costTollList) {
+      if (costToll.selected || (!costToll.selected && !isCostTollSelected)) {
+        _addCostTollMarker(costToll);
+      }
+      if (costToll.selected) {
+        costToll.partTollMarkerList.map((partToll) => _addPartTollMarker(partToll)).toList();
       }
     }
   }
@@ -448,7 +483,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
               });*/
             },
             markers: Set<Marker>.of(_gateInMarkerMap.values)
-                .union(Set<Marker>.of(_costTollMarkerMap.values)),
+                .union(Set<Marker>.of(_costTollMarkerMap.values))
+                .union(Set<Marker>.of(_partTollMarkerMap.values)),
             polylines: _polyLines,
           ),
 
