@@ -1,3 +1,5 @@
+import 'package:exattraffic/bloc/bloc_provider.dart';
+import 'package:exattraffic/bloc/login_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold.dart';
@@ -10,7 +12,12 @@ import 'package:exattraffic/constants.dart' as Constants;
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return wrapSystemUiOverlayStyle(child: LoginMain());
+    return BlocProvider(
+      bloc: LoginBloc(),
+      child: wrapSystemUiOverlayStyle(
+        child: LoginMain(),
+      ),
+    );
   }
 }
 
@@ -133,7 +140,10 @@ class _LoginMainState extends State<LoginMain> {
                       MyButton(
                         text: 'Login',
                         onClickButton: () {
-                          //alert(context, 'Login', 'Test login');
+                          final loginBloc = BlocProvider.of<LoginBloc>(context);
+                          loginBloc.setLoginData("promlert@gmail.com", "abc123");
+                          return;
+
                           Navigator.pop(context);
                           Navigator.push(
                             context,
@@ -231,13 +241,35 @@ class _LoginFieldState extends State<LoginField> {
                     ),
                   ),
                 ),
-                TextField(
-                  decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: getPlatformSize(4.0)),
-                      border: InputBorder.none,
-                      hintText: widget.hint),
-                ),
+                widget.label == 'USERNAME / EMAIL'
+                    ? StreamBuilder<String>(
+                        stream: BlocProvider.of<LoginBloc>(context).emailStream,
+                        builder: (context, snapshot) {
+                          String email = snapshot.data != null ? snapshot.data : widget.hint;
+
+                          return TextField(
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: getPlatformSize(4.0)),
+                              border: InputBorder.none,
+                              hintText: email,
+                            ),
+                          );
+                        })
+                    : StreamBuilder<String>(
+                        stream: BlocProvider.of<LoginBloc>(context).passwordStream,
+                        builder: (context, snapshot) {
+                          String password = snapshot.data != null ? snapshot.data : widget.hint;
+
+                          return TextField(
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: getPlatformSize(4.0)),
+                              border: InputBorder.none,
+                              hintText: password,
+                            ),
+                          );
+                        }),
               ],
             ),
           ),
