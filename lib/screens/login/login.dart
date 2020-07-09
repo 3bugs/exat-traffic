@@ -1,5 +1,5 @@
-import 'package:exattraffic/bloc/bloc_provider.dart';
-import 'package:exattraffic/bloc/login_bloc.dart';
+import 'package:exattraffic/bloc_old/bloc_provider.dart';
+import 'package:exattraffic/bloc_old/login_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold.dart';
