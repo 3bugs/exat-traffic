@@ -8,16 +8,19 @@ abstract class RouteState extends Equatable {
   final List<CostTollModel> costTollList;
   final GateInModel selectedGateIn;
   final CostTollModel selectedCostToll;
+  final Map<String, dynamic> googleRoute;
 
   const RouteState({
     this.gateInList,
     this.costTollList,
     this.selectedGateIn,
     this.selectedCostToll,
+    this.googleRoute,
   });
 
   @override
-  List<Object> get props => [gateInList, costTollList, selectedGateIn, selectedCostToll];
+  List<Object> get props =>
+      [gateInList, costTollList, selectedGateIn, selectedCostToll, googleRoute];
 }
 
 class FetchGateInInitial extends RouteState {}
@@ -33,14 +36,12 @@ class FetchGateInSuccess extends RouteState {
 class FetchCostTollInitial extends RouteState {
   const FetchCostTollInitial({
     @required gateInList,
-    @required costTollList,
     @required selectedGateIn,
-    @required selectedCostToll,
   }) : super(
           gateInList: gateInList,
-          costTollList: costTollList,
+          costTollList: null,
           selectedGateIn: selectedGateIn,
-          selectedCostToll: selectedCostToll,
+          selectedCostToll: null,
         );
 }
 
@@ -48,11 +49,11 @@ class FetchCostTollFailure extends RouteState {
   const FetchCostTollFailure({
     @required gateInList,
   }) : super(
-    gateInList: gateInList,
-    costTollList: null,
-    selectedGateIn: null,
-    selectedCostToll: null,
-  );
+          gateInList: gateInList,
+          costTollList: null,
+          selectedGateIn: null,
+          selectedCostToll: null,
+        );
 }
 
 class FetchCostTollSuccess extends RouteState {
@@ -61,9 +62,54 @@ class FetchCostTollSuccess extends RouteState {
     @required costTollList,
     @required selectedGateIn,
   }) : super(
-    gateInList: gateInList,
-    costTollList: costTollList,
-    selectedGateIn: selectedGateIn,
-    selectedCostToll: null,
-  );
+          gateInList: gateInList,
+          costTollList: costTollList,
+          selectedGateIn: selectedGateIn,
+          selectedCostToll: null,
+        );
+}
+
+class FetchDirectionsInitial extends RouteState {
+  const FetchDirectionsInitial({
+    @required gateInList,
+    @required costTollList,
+    @required selectedGateIn,
+    @required selectedCostToll,
+  }) : super(
+          gateInList: gateInList,
+          costTollList: costTollList,
+          selectedGateIn: selectedGateIn,
+          selectedCostToll: selectedCostToll,
+          googleRoute: null,
+        );
+}
+
+class FetchDirectionsFailure extends RouteState {
+  const FetchDirectionsFailure({
+    @required gateInList,
+    @required costTollList,
+    @required selectedGateIn,
+  }) : super(
+          gateInList: gateInList,
+          costTollList: costTollList,
+          selectedGateIn: selectedGateIn,
+          selectedCostToll: null,
+          googleRoute: null,
+        );
+}
+
+class FetchDirectionsSuccess extends RouteState {
+  const FetchDirectionsSuccess({
+    @required gateInList,
+    @required costTollList,
+    @required selectedGateIn,
+    @required selectedCostToll,
+    @required googleRoute,
+  }) : super(
+          gateInList: gateInList,
+          costTollList: costTollList,
+          selectedGateIn: selectedGateIn,
+          selectedCostToll: selectedCostToll,
+          googleRoute: googleRoute,
+        );
 }

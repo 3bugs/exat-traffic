@@ -99,9 +99,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-        title: gateIn.name,
-        snippet: gateIn.routeName,
-      )
+              title: gateIn.name,
+              snippet: gateIn.routeName,
+            )
           : InfoWindow.noText,
       onTap: () {
         _selectGateInMarker(context, gateIn);
@@ -120,12 +120,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-        title: costToll.name,
-        snippet: costToll.routeName,
-      )
+              title: costToll.name,
+              snippet: costToll.routeName,
+            )
           : InfoWindow.noText,
       onTap: () {
-        //_selectCostTollMarker(context, costToll);
+        _selectCostTollMarker(context, costToll);
       },
     );
   }
@@ -141,9 +141,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
       //alpha: markerModel.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-        title: partTollMarker.name,
-        snippet: partTollMarker.routeName,
-      )
+              title: partTollMarker.name,
+              snippet: partTollMarker.routeName,
+            )
           : InfoWindow.noText,
       onTap: () {},
     );
@@ -175,7 +175,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   void _createMarkersFromModel() {
     bool isGateInSelected = _gateInList.fold(
       false,
-          (previousValue, gateIn) => previousValue || gateIn.selected,
+      (previousValue, gateIn) => previousValue || gateIn.selected,
     );
     _gateInMarkerMap.clear();
     for (GateInModel gateIn in _gateInList) {
@@ -186,7 +186,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
     bool isCostTollSelected = _costTollList.fold(
       false,
-          (previousValue, costToll) => previousValue || costToll.selected,
+      (previousValue, costToll) => previousValue || costToll.selected,
     );
     _costTollMarkerMap.clear();
     _partTollMarkerMap.clear();
@@ -220,9 +220,11 @@ class _MyRouteMainState extends State<MyRouteMain> {
     _fetchCostTollByGateIn(selectedGateIn);*/
   }
 
-  void _selectCostTollMarker(CostTollModel selectedCostToll) async {
+  void _selectCostTollMarker(BuildContext context, CostTollModel selectedCostToll) {
+    context.bloc<RouteBloc>().add(CostTollSelected(selectedCostToll: selectedCostToll));
+
     // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
-    if (selectedCostToll.selected) return;
+    /*if (selectedCostToll.selected) return;
 
     setState(() {
       _selectedCostToll = selectedCostToll;
@@ -237,33 +239,21 @@ class _MyRouteMainState extends State<MyRouteMain> {
       LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude),
       LatLng(_selectedCostToll.latitude, _selectedCostToll.longitude),
     );
-    createRoute(route['overview_polyline']['points']);
+    createRoutePolyline(route['overview_polyline']['points']);
     setState(() {
       _googleRoute = route;
-    });
+    });*/
   }
 
-  void createRoute(String encodedPoly) async {
+  Polyline createRoutePolyline(String encodedPoly) {
     final List<LatLng> latLngList = _convertToLatLngList(_decodePoly(encodedPoly));
 
-    setState(() {
-      _polyLines.clear();
-      _polyLines.add(
-        Polyline(
-          polylineId: PolylineId('1'),
-          width: 6,
-          points: latLngList,
-          color: Color(0xFF747474).withOpacity(1.0),
-        ),
-      );
-    });
-
-    // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
-    new Future.delayed(Duration(milliseconds: 1000), () async {
-      LatLngBounds latLngBounds = _boundsFromLatLngList(latLngList);
-      final GoogleMapController controller = await _googleMapController.future;
-      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
-    });
+    return Polyline(
+      polylineId: PolylineId('1'),
+      width: 6,
+      points: latLngList,
+      color: Color(0xFF747474).withOpacity(1.0),
+    );
   }
 
   List<LatLng> _convertToLatLngList(List points) {
@@ -297,8 +287,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
       var result1 = (result >> 1) * 0.00001;
       lList.add(result1);
     } while (index < len);
-    for (var i = 2; i < lList.length; i++)
-      lList[i] += lList[i - 2];
+    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
     print(lList.toString());
     return lList;
   }
@@ -339,9 +328,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   _afterLayout(_) {
     final RenderBox mainContainerRenderBox = _keyGoogleMaps.currentContext.findRenderObject();
     setState(() {
-      _googleMapsTop = mainContainerRenderBox
-          .localToGlobal(Offset.zero)
-          .dy;
+      _googleMapsTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _googleMapsHeight = mainContainerRenderBox.size.height;
     });
   }
@@ -369,6 +356,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 final List<CostTollModel> costTollList = state.costTollList ?? List();
                 final selectedGateIn = state.selectedGateIn;
                 final selectedCostToll = state.selectedCostToll;
+                final googleRoute = state.googleRoute;
 
                 List<GateInModel> filteredGateInList = gateInList.where((GateInModel gateIn) {
                   return selectedGateIn == null ? true : gateIn.selected;
@@ -377,12 +365,21 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   return _createGateInMarkerFromModel(context, gateIn);
                 }).toSet();
 
-                List<CostTollModel> filteredCostTollList = costTollList.where((CostTollModel costToll) {
+                List<CostTollModel> filteredCostTollList =
+                    costTollList.where((CostTollModel costToll) {
                   return selectedCostToll == null ? true : costToll.selected;
                 }).toList();
                 Set<Marker> costTollMarkerSet = filteredCostTollList.map((CostTollModel costToll) {
                   return _createCostTollMarkerFromModel(context, costToll);
                 }).toSet();
+
+                final Set<Polyline> polyLineSet = <Polyline>{};
+                Polyline polyline;
+                if (googleRoute != null) {
+                  polyline =
+                      createRoutePolyline(googleRoute['overview_polyline']['points']);
+                  polyLineSet.add(polyline);
+                }
 
                 if (state is FetchGateInSuccess) {
                   // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
@@ -406,6 +403,13 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     final GoogleMapController controller = await _googleMapController.future;
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
+                } else if (state is FetchDirectionsSuccess) {
+                  // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
+                  new Future.delayed(Duration(milliseconds: 1000), () async {
+                    LatLngBounds latLngBounds = _boundsFromLatLngList(polyline.points);
+                    final GoogleMapController controller = await _googleMapController.future;
+                    controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                  });
                 }
 
                 return GoogleMap(
@@ -426,7 +430,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   });*/
                   },
                   markers: gateInMarkerSet.union(costTollMarkerSet),
-                  //polylines: _polyLines,
+                  polylines: polyLineSet,
                 );
               },
             ),
@@ -434,10 +438,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
             // ช่องเลือกทางเข้า/ทางออก
             Positioned(
               top: getPlatformSize(-32.0),
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               child: Container(
                 padding: EdgeInsets.only(
                   left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
@@ -501,7 +502,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                               ),*/
                               Image(
                                 image:
-                                AssetImage('assets/images/route/ic_marker_origin-xxxhdpi.png'),
+                                    AssetImage('assets/images/route/ic_marker_origin-xxxhdpi.png'),
                                 width: getPlatformSize(16.0),
                                 height: getPlatformSize(16.0 * 28.42 / 21.13),
                               ),
@@ -731,7 +732,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                   isDense: true,
                                   isExpanded: true,
                                   onChanged: (CostTollModel costToll) {
-                                    _selectCostTollMarker(costToll);
+                                    _selectCostTollMarker(context, costToll);
 
                                     final CameraPosition position = CameraPosition(
                                       target: LatLng(costToll.latitude, costToll.longitude),

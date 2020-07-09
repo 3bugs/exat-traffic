@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:exattraffic/models/cost_toll_model.dart';
 
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:flutter/foundation.dart';
@@ -18,4 +19,10 @@ class GateInSelected extends RouteEvent {
   });
 }
 
-class CostTollSelected extends RouteEvent {}
+class CostTollSelected extends RouteEvent {
+  final CostTollModel selectedCostToll;
+
+  CostTollSelected({
+    @required this.selectedCostToll
+  });
+}

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
 
@@ -35,9 +37,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
       yield FetchCostTollInitial(
         gateInList: currentState.gateInList,
-        costTollList: null,
         selectedGateIn: selectedGateIn,
-        selectedCostToll: null,
       );
 
       try {
@@ -54,6 +54,43 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
         yield FetchCostTollFailure(
           gateInList: currentState.gateInList,
+        );
+      }
+    } else if (event is CostTollSelected) {
+      final CostTollModel selectedCostToll = event.selectedCostToll;
+
+      // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
+      if (currentState.selectedCostToll == selectedCostToll) return;
+
+      currentState.costTollList.forEach((costToll) {
+        costToll.selected = selectedCostToll == costToll;
+      });
+
+      yield FetchDirectionsInitial(
+        gateInList: currentState.gateInList,
+        costTollList: currentState.costTollList,
+        selectedGateIn: currentState.selectedGateIn,
+        selectedCostToll: selectedCostToll,
+      );
+
+      try {
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        final route = await googleMapsServices.getRoute(
+          LatLng(currentState.selectedGateIn.latitude, currentState.selectedGateIn.longitude),
+          LatLng(selectedCostToll.latitude, selectedCostToll.longitude),
+        );
+        yield FetchDirectionsSuccess(
+          gateInList: currentState.gateInList,
+          costTollList: currentState.costTollList,
+          selectedGateIn: currentState.selectedGateIn,
+          selectedCostToll: selectedCostToll,
+          googleRoute: route,
+        );
+      } catch (_) {
+        yield FetchDirectionsFailure(
+          gateInList: currentState.gateInList,
+          costTollList: currentState.costTollList,
+          selectedGateIn: currentState.selectedGateIn,
         );
       }
     }
