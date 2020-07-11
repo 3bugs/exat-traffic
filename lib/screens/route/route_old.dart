@@ -338,14 +338,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
     });
     _createMarkersFromModel();
 
-    Map<String, dynamic> route = await _googleMapsServices.getRoute(
+    /*Map<String, dynamic> route = await _googleMapsServices.getRoute(
       LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude),
       LatLng(_selectedCostToll.latitude, _selectedCostToll.longitude),
     );
     createRoute(route['overview_polyline']['points']);
     setState(() {
       _googleRoute = route;
-    });
+    });*/
   }
 
   void createRoute(String encodedPoly) async {

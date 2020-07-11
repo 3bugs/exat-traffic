@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -75,9 +76,15 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
       try {
         final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+
+        final List<LatLng> partTollLatLngList = selectedCostToll.partTollMarkerList
+            .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
+            .toList();
+
         final route = await googleMapsServices.getRoute(
           LatLng(currentState.selectedGateIn.latitude, currentState.selectedGateIn.longitude),
           LatLng(selectedCostToll.latitude, selectedCostToll.longitude),
+          partTollLatLngList,
         );
         yield FetchDirectionsSuccess(
           gateInList: currentState.gateInList,
@@ -93,6 +100,15 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           selectedGateIn: currentState.selectedGateIn,
         );
       }
+    } else if (event is UpdateCurrentLocation) {
+      yield LocationTrackingUpdated(
+        gateInList: currentState.gateInList,
+        costTollList: currentState.costTollList,
+        selectedGateIn: currentState.selectedGateIn,
+        selectedCostToll: currentState.selectedCostToll,
+        googleRoute: currentState.googleRoute,
+        currentLocation: event.currentLocation,
+      );
     }
   }
 }
@@ -145,17 +161,6 @@ Future<List<CostTollModel>> _fetchCostTollByGateIn(GateInModel gateIn) async {
       });
 
       return costTollList;
-
-      // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
-      /*new Future.delayed(Duration(milliseconds: 1000), () async {
-        List<LatLng> costTollLatLngList = costTollList
-            .map((costToll) => LatLng(costToll.latitude, costToll.longitude))
-            .toList();
-        costTollLatLngList.add(LatLng(_selectedGateIn.latitude, _selectedGateIn.longitude));
-        LatLngBounds latLngBounds = _boundsFromLatLngList(costTollLatLngList);
-        final GoogleMapController controller = await _googleMapController.future;
-        controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
-      });*/
     } else {
       print(error.message);
       throw Exception(error.message);

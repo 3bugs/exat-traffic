@@ -8,6 +8,7 @@ class CostTollModel {
   final String name;
   final int routeId;
   final String routeName;
+  final int categoryId;
   final double latitude;
   final double longitude;
   final int cost4Wheels;
@@ -21,6 +22,7 @@ class CostTollModel {
     @required this.name,
     @required this.routeId,
     @required this.routeName,
+    @required this.categoryId,
     @required this.latitude,
     @required this.longitude,
     @required this.cost4Wheels,
@@ -36,6 +38,7 @@ class CostTollModel {
       name: json['name'],
       routeId: json['route_id'],
       routeName: json['route_name'],
+      categoryId: json['cate_id'],
       latitude: json['lat'],
       longitude: json['lng'],
       cost4Wheels: json['cost_less4'],

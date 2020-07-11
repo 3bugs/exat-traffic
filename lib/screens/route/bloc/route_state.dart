@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
 
 abstract class RouteState extends Equatable {
   final List<GateInModel> gateInList;
@@ -9,6 +10,7 @@ abstract class RouteState extends Equatable {
   final GateInModel selectedGateIn;
   final CostTollModel selectedCostToll;
   final Map<String, dynamic> googleRoute;
+  final Position currentLocation;
 
   const RouteState({
     this.gateInList,
@@ -16,11 +18,12 @@ abstract class RouteState extends Equatable {
     this.selectedGateIn,
     this.selectedCostToll,
     this.googleRoute,
+    this.currentLocation,
   });
 
   @override
   List<Object> get props =>
-      [gateInList, costTollList, selectedGateIn, selectedCostToll, googleRoute];
+      [gateInList, costTollList, selectedGateIn, selectedCostToll, googleRoute, currentLocation];
 }
 
 class FetchGateInInitial extends RouteState {}
@@ -42,6 +45,7 @@ class FetchCostTollInitial extends RouteState {
           costTollList: null,
           selectedGateIn: selectedGateIn,
           selectedCostToll: null,
+          currentLocation: null,
         );
 }
 
@@ -111,5 +115,23 @@ class FetchDirectionsSuccess extends RouteState {
           selectedGateIn: selectedGateIn,
           selectedCostToll: selectedCostToll,
           googleRoute: googleRoute,
+        );
+}
+
+class LocationTrackingUpdated extends RouteState {
+  const LocationTrackingUpdated({
+    @required gateInList,
+    @required costTollList,
+    @required selectedGateIn,
+    @required selectedCostToll,
+    @required googleRoute,
+    @required currentLocation,
+  }) : super(
+          gateInList: gateInList,
+          costTollList: costTollList,
+          selectedGateIn: selectedGateIn,
+          selectedCostToll: selectedCostToll,
+          googleRoute: googleRoute,
+          currentLocation: currentLocation,
         );
 }

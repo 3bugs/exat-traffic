@@ -8,6 +8,7 @@ class GateInModel {
   final int routeId;
   final String routeName;
   final int markerId;
+  final int categoryId;
   final double latitude;
   final double longitude;
   final bool enable;
@@ -20,6 +21,7 @@ class GateInModel {
     @required this.routeId,
     @required this.routeName,
     @required this.markerId,
+    @required this.categoryId,
     @required this.latitude,
     @required this.longitude,
     @required this.enable,
@@ -34,6 +36,7 @@ class GateInModel {
       routeId: json['gate_in_route_id'],
       routeName: json['route_name'],
       markerId: json['marker_id'],
+      categoryId: json['cate_id'],
       latitude: json['lat'],
       longitude: json['lng'],
       enable: json['enable'] == 1,

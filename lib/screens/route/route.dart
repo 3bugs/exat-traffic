@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,6 +45,7 @@ class MyRouteMain extends StatefulWidget {
 class _MyRouteMainState extends State<MyRouteMain> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
+  StreamSubscription<Position> _positionStreamSubscription;
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
@@ -56,6 +58,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   BitmapDescriptor _originMarkerIcon, _originMarkerIconLarge;
   BitmapDescriptor _destinationMarkerIcon, _destinationMarkerIconLarge;
   BitmapDescriptor _tollPlazaMarkerIcon;
+  BitmapDescriptor _carMarkerIcon;
 
   Future<void> _moveMapToCurrentPosition(BuildContext context) async {
     final Position position = await Geolocator().getCurrentPosition(
@@ -84,7 +87,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-              title: gateIn.name,
+              title: gateIn.name + (kReleaseMode ? "" : " [${gateIn.categoryId}]"),
               snippet: gateIn.routeName,
             )
           : InfoWindow.noText,
@@ -105,7 +108,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-              title: costToll.name,
+              title: costToll.name + (kReleaseMode ? "" : " [${costToll.categoryId}]"),
               snippet: costToll.routeName,
             )
           : InfoWindow.noText,
@@ -123,14 +126,26 @@ class _MyRouteMainState extends State<MyRouteMain> {
       markerId: markerId,
       position: LatLng(partTollMarker.latitude, partTollMarker.longitude),
       icon: _tollPlazaMarkerIcon,
-      //alpha: markerModel.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
-              title: partTollMarker.name,
+              title: partTollMarker.name + (kReleaseMode ? "" : " [${partTollMarker.categoryId}]"),
               snippet: partTollMarker.routeName,
             )
           : InfoWindow.noText,
       onTap: () {},
+    );
+  }
+
+  Marker _createCurrentLocationMarker(Position currentLocation) {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('current-location');
+
+    return Marker(
+      markerId: markerId,
+      position: LatLng(currentLocation.latitude, currentLocation.longitude),
+      icon: _carMarkerIcon,
+      rotation: currentLocation.heading,
+      anchor: const Offset(0.5, 0.5),
     );
   }
 
@@ -156,10 +171,18 @@ class _MyRouteMainState extends State<MyRouteMain> {
       ImageConfiguration(devicePixelRatio: 2.5),
       'assets/images/map_markers/ic_marker_toll_plaza_small.png',
     );
+
+    _carMarkerIcon = await BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 2.5),
+      'assets/images/map_markers/ic_marker_car-w60.png',
+    );
   }
 
   void _selectGateInMarker(BuildContext context, GateInModel selectedGateIn) {
     context.bloc<RouteBloc>().add(GateInSelected(selectedGateIn: selectedGateIn));
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription.pause();
+    }
   }
 
   void _selectCostTollMarker(BuildContext context, CostTollModel selectedCostToll) {
@@ -234,16 +257,22 @@ class _MyRouteMainState extends State<MyRouteMain> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-
-    /*BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_origin.png',
-    ).then((value) {
-      _originMarkerIcon = value;
-    });*/
-
     _setupCustomMarker();
+
     //_fetchGateIn();
+  }
+
+  void _setupLocationUpdate(BuildContext context) {
+    const LocationOptions locationOptions = LocationOptions(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 10,
+    );
+
+    final Stream<Position> positionStream = Geolocator().getPositionStream(locationOptions);
+    _positionStreamSubscription = positionStream.listen((Position position) {
+      print("Current location: ${position.latitude}, ${position.longitude}");
+      context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
+    });
   }
 
   _afterLayout(_) {
@@ -261,12 +290,16 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        RouteBloc routeBloc = RouteBloc();
-        routeBloc.add(ListGateIn());
-        return routeBloc;
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<RouteBloc>(
+          create: (context) {
+            RouteBloc routeBloc = RouteBloc();
+            routeBloc.add(ListGateIn());
+            return routeBloc;
+          },
+        )
+      ],
       child: Container(
         child: Stack(
           overflow: Overflow.visible,
@@ -278,6 +311,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 final selectedGateIn = state.selectedGateIn;
                 final selectedCostToll = state.selectedCostToll;
                 final googleRoute = state.googleRoute;
+                final currentLocation = state.currentLocation;
 
                 List<GateInModel> filteredGateInList = gateInList.where((GateInModel gateIn) {
                   return selectedGateIn == null ? true : gateIn.selected;
@@ -306,6 +340,11 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 if (googleRoute != null) {
                   polyline = createRoutePolyline(googleRoute['overview_polyline']['points']);
                   polyLineSet.add(polyline);
+                }
+
+                Set<Marker> currentLocationSet = Set();
+                if (currentLocation != null) {
+                  currentLocationSet.add(_createCurrentLocationMarker(currentLocation));
                 }
 
                 if (state is FetchGateInSuccess) {
@@ -337,6 +376,19 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     final GoogleMapController controller = await _googleMapController.future;
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
+
+                  // get last known มาก่อน จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+                  Geolocator().getLastKnownPosition().then((Position position) {
+                    context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
+                  });
+
+                  if (_positionStreamSubscription == null) {
+                    _setupLocationUpdate(context);
+                    _positionStreamSubscription.pause();
+                  }
+                  if (_positionStreamSubscription.isPaused) {
+                    _positionStreamSubscription.resume();
+                  }
                 }
 
                 return GoogleMap(
@@ -356,7 +408,10 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     _zoomLevel = position.zoom;
                   });*/
                   },
-                  markers: gateInMarkerSet.union(costTollMarkerSet).union(partTollSet),
+                  markers: gateInMarkerSet
+                      .union(costTollMarkerSet)
+                      .union(partTollSet)
+                      .union(currentLocationSet),
                   polylines: polyLineSet,
                 );
               },

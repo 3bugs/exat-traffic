@@ -344,6 +344,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                       ),
                     ],
                   )),
+
               Expanded(
                 child: Stack(
                   children: <Widget>[
@@ -561,7 +562,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                             child: Consumer<LanguageModel>(
                                               builder: (context, language, child) {
                                                 return Text(
-                                                  'ค้นหาบริการผู้ใช้ทาง',
+                                                  'ค้นหาบริการ',
                                                   style: getTextStyle(
                                                     language.lang,
                                                     color: Color(0xFF454F63),
