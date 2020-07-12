@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -92,6 +93,20 @@ Future<void> alert(BuildContext context, String title, String content) {
       );
     },
   );
+}
+
+double getDistance(double lat1, double lng1, double lat2, double lng2) {
+  const R = 6371e3; // metres
+
+  final double t1 = lat1 * pi / 180; // φ, λ in radians
+  final double t2 = lat2 * pi / 180;
+  final double dt = (lat2 - lat1) * pi / 180;
+  final double dl = (lng2 - lng1) * pi / 180;
+
+  final double a = sin(dt / 2) * sin(dt / 2) + cos(t1) * cos(t2) * sin(dl / 2) * sin(dl / 2);
+  final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+  return R * c; // in metres
 }
 
 /*Future<List<dynamic>> fetchDataList(url) async {

@@ -11,6 +11,7 @@ class MarkerModel {
   final double longitude;
   final int categoryId;
   bool selected;
+  bool notified;
 
   MarkerModel({
     @required this.id,
@@ -21,6 +22,7 @@ class MarkerModel {
     @required this.longitude,
     @required this.categoryId,
     @required this.selected,
+    @required this.notified,
   });
 
   factory MarkerModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class MarkerModel {
       longitude: json['lng'],
       categoryId: json['cate_id'],
       selected: false,
+      notified: false,
     );
   }
 

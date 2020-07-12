@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -60,13 +61,39 @@ class _MyRouteMainState extends State<MyRouteMain> {
   BitmapDescriptor _tollPlazaMarkerIcon;
   BitmapDescriptor _carMarkerIcon;
 
+  Timer _locationTimer;
+  bool _myLocationEnabled = false;
+  LatLng _mapTarget;
+  double _mapZoomLevel;
+
+  void _handleClickMyLocation(BuildContext context) {
+    _moveMapToCurrentPosition(context);
+    setState(() {
+      _myLocationEnabled = true;
+    });
+
+    if (_locationTimer != null) {
+      _locationTimer.cancel();
+    }
+    _locationTimer = Timer(Duration(seconds: 10), () {
+      setState(() {
+        _myLocationEnabled = false;
+      });
+    });
+  }
+
+  void _handleCameraMove(CameraPosition cameraPosition) {
+    _mapTarget = cameraPosition.target;
+    _mapZoomLevel = cameraPosition.zoom;
+  }
+  
   Future<void> _moveMapToCurrentPosition(BuildContext context) async {
     final Position position = await Geolocator().getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
     final CameraPosition currentPosition = CameraPosition(
       target: LatLng(position.latitude, position.longitude),
-      zoom: 10,
+      zoom: _mapZoomLevel ?? 15,
     );
     _moveMapToPosition(context, currentPosition);
   }
@@ -306,12 +333,21 @@ class _MyRouteMainState extends State<MyRouteMain> {
           children: <Widget>[
             BlocBuilder<RouteBloc, RouteState>(
               builder: (context, state) {
+                print("***** BLOC_BUILDER *****");
+
                 final List<GateInModel> gateInList = state.gateInList ?? List();
                 final List<CostTollModel> costTollList = state.costTollList ?? List();
-                final selectedGateIn = state.selectedGateIn;
-                final selectedCostToll = state.selectedCostToll;
+                final GateInModel selectedGateIn = state.selectedGateIn;
+                final CostTollModel selectedCostToll = state.selectedCostToll;
                 final googleRoute = state.googleRoute;
-                final currentLocation = state.currentLocation;
+                final Position currentLocation = state.currentLocation;
+                final AlertModel notification = state.notification;
+
+                if (notification != null) {
+                  Future.delayed(Duration.zero, () {
+                    alert(context, notification.title, notification.message);
+                  });
+                }
 
                 List<GateInModel> filteredGateInList = gateInList.where((GateInModel gateIn) {
                   return selectedGateIn == null ? true : gateIn.selected;
@@ -348,6 +384,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                 }
 
                 if (state is FetchGateInSuccess) {
+                  print("STATE: FetchGateInSuccess");
+
                   // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
                   new Future.delayed(Duration(milliseconds: 1000), () async {
                     List<LatLng> gateInLatLngList = gateInList
@@ -358,6 +396,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
                 } else if (state is FetchCostTollSuccess) {
+                  print("STATE: FetchCostTollSuccess");
+
                   // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
                   new Future.delayed(Duration(milliseconds: 1000), () async {
                     List<LatLng> costTollLatLngList = costTollList
@@ -370,6 +410,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
                 } else if (state is FetchDirectionsSuccess) {
+                  print("STATE: FetchDirectionsSuccess");
+
                   // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
                   new Future.delayed(Duration(milliseconds: 1000), () async {
                     LatLngBounds latLngBounds = _boundsFromLatLngList(polyline.points);
@@ -398,16 +440,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   ),*/
                   mapType: MapType.normal,
                   initialCameraPosition: INITIAL_POSITION,
-                  myLocationEnabled: false,
+                  myLocationEnabled: _myLocationEnabled,
+                  myLocationButtonEnabled: false,
+                  trafficEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _googleMapController.complete(controller);
                     //_moveMapToCurrentPosition(context);
                   },
-                  onCameraMove: (CameraPosition position) {
-                    /*setState(() {
-                    _zoomLevel = position.zoom;
-                  });*/
-                  },
+                  onCameraMove: _handleCameraMove,
                   markers: gateInMarkerSet
                       .union(costTollMarkerSet)
                       .union(partTollSet)
@@ -794,7 +834,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
             // map tools
             Container(
               padding: EdgeInsets.only(
-                top: getPlatformSize(100.0),
+                top: getPlatformSize(90.0),
                 left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                 right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
               ),
@@ -808,7 +848,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                       iconHeight: getPlatformSize(21.0),
                       marginTop: getPlatformSize(10.0),
                       isChecked: false,
-                      onClick: () {},
+                      onClick: () => _handleClickMyLocation(context),
                     ),
                   ],
                 ),

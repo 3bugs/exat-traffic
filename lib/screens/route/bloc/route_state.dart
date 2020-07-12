@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ abstract class RouteState extends Equatable {
   final CostTollModel selectedCostToll;
   final Map<String, dynamic> googleRoute;
   final Position currentLocation;
+  final AlertModel notification;
 
   const RouteState({
     this.gateInList,
@@ -19,11 +21,37 @@ abstract class RouteState extends Equatable {
     this.selectedCostToll,
     this.googleRoute,
     this.currentLocation,
+    this.notification,
   });
 
+  /*RouteState copyWith({
+    List<GateInModel> gateInList,
+    List<CostTollModel> costTollList,
+    GateInModel selectedGateIn,
+    CostTollModel selectedCostToll,
+    Map<String, dynamic> googleRoute,
+    Position currentLocation,
+  }) {
+    return RouteState(
+      gateInList: gateInList ?? this.gateInList,
+      costTollList: costTollList ?? this.costTollList,
+      selectedGateIn: selectedGateIn ?? this.selectedGateIn,
+      selectedCostToll: selectedCostToll ?? this.selectedCostToll,
+      googleRoute: googleRoute ?? this.googleRoute,
+      currentLocation: currentLocation ?? this.currentLocation,
+    );
+  }*/
+
   @override
-  List<Object> get props =>
-      [gateInList, costTollList, selectedGateIn, selectedCostToll, googleRoute, currentLocation];
+  List<Object> get props => [
+        gateInList,
+        costTollList,
+        selectedGateIn,
+        selectedCostToll,
+        googleRoute,
+        currentLocation,
+        notification
+      ];
 }
 
 class FetchGateInInitial extends RouteState {}
@@ -126,6 +154,7 @@ class LocationTrackingUpdated extends RouteState {
     @required selectedCostToll,
     @required googleRoute,
     @required currentLocation,
+    @required notification,
   }) : super(
           gateInList: gateInList,
           costTollList: costTollList,
@@ -133,5 +162,6 @@ class LocationTrackingUpdated extends RouteState {
           selectedCostToll: selectedCostToll,
           googleRoute: googleRoute,
           currentLocation: currentLocation,
+          notification: notification,
         );
 }

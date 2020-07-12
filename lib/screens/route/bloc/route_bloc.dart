@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
@@ -101,6 +103,32 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         );
       }
     } else if (event is UpdateCurrentLocation) {
+      List<MarkerModel> partTollList = currentState.selectedCostToll.partTollMarkerList;
+      Position currentLocation = event.currentLocation;
+
+      AlertModel notification;
+      for (int i = 0; i < partTollList.length; i++) {
+        MarkerModel partToll = partTollList[i];
+        double distanceInMeters = await Geolocator().distanceBetween(
+          partToll.latitude,
+          partToll.longitude,
+          currentLocation.latitude,
+          currentLocation.longitude,
+        );
+        if (distanceInMeters < 1000 && !partToll.notified) {
+          partToll.notified = true;
+
+          String tollFee =
+              "▶ รถ 4 ล้อ:  ${'xxx'} บาท\n▶ รถ 6-10 ล้อ:  ${'xxx'} บาท\n▶ รถเกิน 10 ล้อ:  ${'xxx'} บาท";
+          notification = AlertModel(
+            title: "เตรียมจ่ายค่าผ่านทาง",
+            message:
+                "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง${partToll.name} กรุณาเตรียมเงินค่าผ่านทาง:\n\n${tollFee}",
+          );
+          break;
+        }
+      }
+
       yield LocationTrackingUpdated(
         gateInList: currentState.gateInList,
         costTollList: currentState.costTollList,
@@ -108,6 +136,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         selectedCostToll: currentState.selectedCostToll,
         googleRoute: currentState.googleRoute,
         currentLocation: event.currentLocation,
+        notification: notification,
       );
     }
   }
