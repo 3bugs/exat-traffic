@@ -61,7 +61,9 @@ class FetchGateInFailure extends RouteState {}
 class FetchGateInSuccess extends RouteState {
   const FetchGateInSuccess({
     @required gateInList,
-  }) : super(gateInList: gateInList);
+  }) : super(
+          gateInList: gateInList,
+        );
 }
 
 class FetchCostTollInitial extends RouteState {

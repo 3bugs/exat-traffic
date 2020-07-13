@@ -61,7 +61,5 @@ class Font {
 }
 
 class Api {
-  static const String MY_API_BASED_URL = 'http://163.47.9.26/api';
-  static const String FETCH_GATE_IN_URL = MY_API_BASED_URL + '/gate_in';
-  static const String FETCH_COST_TOLL_BY_GATE_IN_URL = MY_API_BASED_URL + '/cost_toll_by_gate_in';
+  static const String SERVER = "http://163.47.9.26";
 }

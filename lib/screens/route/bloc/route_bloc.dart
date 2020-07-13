@@ -1,18 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:exattraffic/models/alert_model.dart';
-import 'package:exattraffic/models/marker_model.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:bloc/bloc.dart';
 
 import 'package:exattraffic/screens/route/bloc/bloc.dart';
-import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/error_model.dart';
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
+import 'package:exattraffic/models/alert_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
   RouteBloc() : super(FetchGateInInitial());
@@ -23,7 +20,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
     if (event is ListGateIn) {
       try {
-        final gateInList = await _fetchGateIn();
+        final gateInList = await MyApi.fetchGateIn();
         yield FetchGateInSuccess(gateInList: gateInList);
       } catch (_) {
         yield FetchGateInFailure();
@@ -44,7 +41,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       );
 
       try {
-        final costTollList = await _fetchCostTollByGateIn(selectedGateIn);
+        final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn);
         yield FetchCostTollSuccess(
           gateInList: currentState.gateInList,
           costTollList: costTollList,
@@ -139,63 +136,5 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         notification: notification,
       );
     }
-  }
-}
-
-// https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
-// https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
-Future<List<GateInModel>> _fetchGateIn() async {
-  final response = await http.get(Constants.Api.FETCH_GATE_IN_URL);
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> responseBodyJson = json.decode(response.body);
-    ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
-
-    if (error.code == 0) {
-      List dataList = responseBodyJson['data_list'];
-      List<GateInModel> gateInList =
-          dataList.map((gateInJson) => GateInModel.fromJson(gateInJson)).toList();
-      print('Number of Gate In : ${gateInList.length}');
-
-      return gateInList;
-    } else {
-      print(error.message);
-      throw Exception(error.message);
-    }
-  } else {
-    print('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
-    throw Exception('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
-  }
-}
-
-Future<List<CostTollModel>> _fetchCostTollByGateIn(GateInModel gateIn) async {
-  final response = await http.get('${Constants.Api.FETCH_COST_TOLL_BY_GATE_IN_URL}/${gateIn.id}');
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> responseBodyJson = json.decode(response.body);
-    ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
-
-    if (error.code == 0) {
-      List dataList = responseBodyJson['data_list'];
-      List<CostTollModel> costTollList =
-          dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson)).toList();
-
-      print('Number of Cost Toll : ${costTollList.length}');
-      costTollList.forEach((costToll) {
-        print(
-            'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList.length}');
-        costToll.partTollMarkerList
-            .map((partTollMarker) => print('--- ${partTollMarker.name}'))
-            .toList();
-      });
-
-      return costTollList;
-    } else {
-      print(error.message);
-      throw Exception(error.message);
-    }
-  } else {
-    print('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
-    throw Exception('เกิดข้อผิดพลาดในการเชื่อมต่อ Server');
   }
 }

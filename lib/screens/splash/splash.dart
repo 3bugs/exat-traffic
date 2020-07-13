@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -27,57 +28,6 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   Animation<double> _animation;
   String _splashImageUrl;
 
-  void _fetchSplashData() async {
-    final String url = 'http://163.47.9.26:8081/posts/detailByName';
-
-    Map data = {
-      "deviceToken": "testToken",
-      "deviceType": "A",
-      "screenWidth": "480",
-      "screenHeight": "720",
-      "lang": "TH",
-      "lat": "13.66237545",
-      "lng": "100.6431732",
-      "altitude": "",
-      "status": "1",
-      "name": "splashscreen",
-    };
-    final body = json.encode(data);
-
-    final response = await http.post(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 84a65e5a9f8dac91c9f573aa417a246e",
-      },
-      body: body,
-    );
-
-    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    print("${response.statusCode}");
-    print("${response.body}");
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> responseJsonBody = json.decode(response.body);
-      if (responseJsonBody['status_code'].toString() == '200') {
-        setState(() {
-          _splashImageUrl = 'http://163.47.9.26${responseJsonBody['data']['cover']}';
-        });
-      } else {
-        // handle error
-      }
-    } else {
-      // handle error
-    }
-
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MyScaffold()),
-      );
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -96,7 +46,25 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     });
 
     Future.delayed(const Duration(milliseconds: 3000), () {
-      _fetchSplashData();
+      _fetchSplashData(context);
+    });
+  }
+
+  void _fetchSplashData(BuildContext context) async {
+    try {
+      Map<String, dynamic> dataMap = await ExatApi.fetchSplash(context);
+      setState(() {
+        _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
+      });
+    } catch (_) {
+      // do nothing
+    }
+
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyScaffold()),
+      );
     });
   }
 

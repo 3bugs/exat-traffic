@@ -10,6 +10,12 @@ class MarkerModel {
   final double latitude;
   final double longitude;
   final int categoryId;
+  final String streamMobile;
+  final String streamWeb;
+  /*final String imageType;
+  final String imageSize;*/
+  final String imagePath;
+  final String direction;
   bool selected;
   bool notified;
 
@@ -21,6 +27,12 @@ class MarkerModel {
     @required this.latitude,
     @required this.longitude,
     @required this.categoryId,
+    @required this.streamMobile,
+    @required this.streamWeb,
+    /*@required this.imageType,
+    @required this.imageSize,*/
+    @required this.imagePath,
+    @required this.direction,
     @required this.selected,
     @required this.notified,
   });
@@ -34,6 +46,10 @@ class MarkerModel {
       latitude: json['lat'],
       longitude: json['lng'],
       categoryId: json['cate_id'],
+      streamMobile: json['stream_mobile'],
+      streamWeb: json['stream_web'],
+      imagePath: json['image_path'],
+      direction: json['direction'],
       selected: false,
       notified: false,
     );

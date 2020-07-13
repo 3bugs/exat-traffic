@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
-import 'package:exattraffic/models/cost_toll_model.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:exattraffic/models/gate_in_model.dart';
-import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:exattraffic/models/cost_toll_model.dart';
 
 abstract class RouteEvent extends Equatable {
   @override

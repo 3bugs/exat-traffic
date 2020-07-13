@@ -52,6 +52,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
     target: LatLng(13.7563, 100.5018), // Bangkok
     zoom: 10,
   );
+  static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 10; // km per hour
 
   double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
@@ -419,8 +420,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
 
-                  // get last known มาก่อน จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                  Geolocator().getLastKnownPosition().then((Position position) {
+                  // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+                  Geolocator().getCurrentPosition().then((Position position) {
                     context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
                   });
 
@@ -430,6 +431,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   }
                   if (_positionStreamSubscription.isPaused) {
                     _positionStreamSubscription.resume();
+                  }
+                } else if (state is LocationTrackingUpdated) {
+                  if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
+                    final CameraPosition position = CameraPosition(
+                      target: LatLng(currentLocation.latitude, currentLocation.longitude),
+                      zoom: _mapZoomLevel ?? 15,
+                    );
+                    _moveMapToPosition(context, position);
                   }
                 }
 
