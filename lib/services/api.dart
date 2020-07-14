@@ -1,4 +1,3 @@
-import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
@@ -9,6 +8,8 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/error_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
@@ -128,6 +129,25 @@ class ExatApi {
           dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
       return markerList;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<List<CategoryModel>> fetchCategories(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/categories/view";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"type": "markers"},
+    );
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      List<CategoryModel> categoryList =
+          dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+
+      return categoryList;
     } else {
       throw Exception(responseResult.data);
     }

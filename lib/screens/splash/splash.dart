@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:exattraffic/services/api.dart';
-import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/screens/scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/home/home.dart';
@@ -45,27 +48,37 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
       _controller.forward();
     });
 
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       _fetchSplashData(context);
     });
   }
 
   void _fetchSplashData(BuildContext context) async {
-    try {
-      Map<String, dynamic> dataMap = await ExatApi.fetchSplash(context);
-      setState(() {
-        _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
-      });
-    } catch (_) {
-      // do nothing
+    GeolocationStatus geolocationStatus = await Geolocator().checkGeolocationPermissionStatus();
+    if (geolocationStatus == GeolocationStatus.granted) {
+      try {
+        ExatApi.fetchSplash(context).then((dataMap) {
+          setState(() {
+            _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
+          });
+        });
+      } catch (_) {
+        // do nothing
+      }
+    } else {
+      try {
+        Map<String, dynamic> dataMap = await ExatApi.fetchSplash(context);
+        setState(() {
+          _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
+        });
+      } catch (_) {
+        // do nothing
+      }
     }
 
-    Future.delayed(const Duration(milliseconds: 3000), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MyScaffold()),
-      );
-    });
+    //Future.delayed(Duration.zero, () {
+    context.bloc<AppBloc>().add(FetchMarker());
+    //});
   }
 
   @override
@@ -76,61 +89,77 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: null,
-      //backgroundColor: Colors.blue,
-      body: DecoratedBox(
-        position: DecorationPosition.background,
-        decoration: BoxDecoration(
-          //color: Colors.red,
-          image: DecorationImage(
-            image: AssetImage('assets/images/login/bg_login.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            //horizontal: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
-            horizontal: 0.0,
-            vertical: 0.0,
-          ),
-          child: Stack(
-            children: <Widget>[
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    ScaleTransition(
-                      scale: _animation,
-                      alignment: Alignment.center,
-                      child: Image(
-                        image: AssetImage('assets/images/login/exat_logo.png'),
-                        width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-                        height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-                      ),
-                    ),
-                    /*SizedBox(
-                  height: getPlatformSize(28.0),
-                ),
-                CircularProgressIndicator(),*/
-                  ],
-                ),
+    return BlocListener<AppBloc, AppState>(
+      listener: (context, state) {
+        if (state is FetchMarkerSuccess) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MyScaffold(
+                appBloc: context.bloc<AppBloc>(),
               ),
-              _splashImageUrl != null
-                  ? Container(
-                      padding: EdgeInsets.all(getPlatformSize(24.0)),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(_splashImageUrl),
-                            fit: BoxFit.contain,
-                          ),
+            ),
+          );
+        } else if (state is FetchMarkerFailure) {
+          alert(context, "Error", state.message);
+        }
+      },
+      child: Scaffold(
+        appBar: null,
+        //backgroundColor: Colors.blue,
+        body: DecoratedBox(
+          position: DecorationPosition.background,
+          decoration: BoxDecoration(
+            //color: Colors.red,
+            image: DecorationImage(
+              image: AssetImage('assets/images/login/bg_login.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              //horizontal: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
+              horizontal: 0.0,
+              vertical: 0.0,
+            ),
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      ScaleTransition(
+                        scale: _animation,
+                        alignment: Alignment.center,
+                        child: Image(
+                          image: AssetImage('assets/images/login/exat_logo.png'),
+                          width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+                          height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                         ),
                       ),
-                    )
-                  : SizedBox.shrink(),
-            ],
+                      /*SizedBox(
+                    height: getPlatformSize(28.0),
+                  ),
+                  CircularProgressIndicator(),*/
+                    ],
+                  ),
+                ),
+                _splashImageUrl != null
+                    ? Container(
+                        padding: EdgeInsets.all(getPlatformSize(24.0)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(_splashImageUrl),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ],
+            ),
           ),
         ),
       ),

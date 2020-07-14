@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 
 class MarkerModel {
@@ -10,6 +11,7 @@ class MarkerModel {
   final double latitude;
   final double longitude;
   final int categoryId;
+  CategoryModel category;
   final String streamMobile;
   final String streamWeb;
   /*final String imageType;
@@ -18,6 +20,12 @@ class MarkerModel {
   final String direction;
   bool selected;
   bool notified;
+
+  /*set category(CategoryModel value) {
+    _category = value;
+  }
+
+  CategoryModel get category => _category;*/
 
   MarkerModel({
     @required this.id,
@@ -54,6 +62,8 @@ class MarkerModel {
       notified: false,
     );
   }
+
+
 
   @override
   String toString() {

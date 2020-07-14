@@ -2,13 +2,21 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 
 import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:flutter/cupertino.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final BuildContext context;
+  List<MarkerModel> _markerList;
+  List<CategoryModel> _categoryList;
 
-  AppBloc({this.context}) : super(MarkerInitial());
+  AppBloc({this.context}) : super(FetchMarkerInitial());
+
+  List<MarkerModel> get markerList => _markerList;
+
+  List<CategoryModel> get categoryList => _categoryList;
 
   @override
   Stream<AppState> mapEventToState(AppEvent event) async* {
@@ -16,10 +24,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event is FetchMarker) {
       try {
-        final markerList = await ExatApi.fetchMarkers(context);
-        yield MarkerSuccess(markerList: markerList);
-      } catch (_) {
-        yield MarkerFailure();
+        _categoryList = await ExatApi.fetchCategories(context);
+        _markerList = await ExatApi.fetchMarkers(context);
+        _markerList.forEach((marker) {
+          setMarkerCategory(marker);
+        });
+        yield FetchMarkerSuccess(markerList: markerList);
+      } catch (e) {
+        yield FetchMarkerFailure(message: e.toString());
+      }
+    }
+  }
+
+  void setMarkerCategory(MarkerModel marker) {
+    if (_categoryList != null) {
+      List filteredCategoryList =
+          _categoryList.where((category) => category.id == marker.categoryId).toList();
+      if (filteredCategoryList.length > 0) {
+        marker.category = filteredCategoryList[0];
       }
     }
   }
