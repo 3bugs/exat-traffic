@@ -19,35 +19,10 @@ void main() => runApp(
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    /*return MaterialApp(
-      title: 'EXAT Traffic',
-      theme: ThemeData(
-        //fontFamily: 'DBHeavent',
-        *//*textTheme: TextTheme(
-            bodyText1: TextStyle(
-
-            ),
-          ),*//*
-        primaryColor: Constants.App.PRIMARY_COLOR,
-        accentColor: Constants.App.PRIMARY_COLOR,
-        bottomSheetTheme: BottomSheetThemeData(
-          backgroundColor: Colors.black.withOpacity(0.0),
-        ),
-      ),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<AppBloc>(
-            create: (context) => AppBloc(context: context),
-          ),
-        ],
-        child: Splash(),
-      ),
-    );*/
-
     return MultiBlocProvider(
       providers: [
         BlocProvider<AppBloc>(
-          create: (context) => AppBloc(context: context),
+          create: (context) => AppBloc(),
         ),
       ],
       child: MaterialApp(

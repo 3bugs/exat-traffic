@@ -100,29 +100,46 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         );
       }
     } else if (event is UpdateCurrentLocation) {
-      List<MarkerModel> partTollList = currentState.selectedCostToll.partTollMarkerList;
+      GateInModel selectedGateIn = currentState.selectedGateIn;
+      CostTollModel selectedCostToll = currentState.selectedCostToll;
+      List<MarkerModel> partTollList = selectedCostToll.partTollMarkerList;
       Position currentLocation = event.currentLocation;
 
       AlertModel notification;
-      for (int i = 0; i < partTollList.length; i++) {
-        MarkerModel partToll = partTollList[i];
-        double distanceInMeters = await Geolocator().distanceBetween(
-          partToll.latitude,
-          partToll.longitude,
+
+      if (!selectedGateIn.notified) {
+        notification = await _getTollPlazaNotification(
+          selectedGateIn.name,
+          selectedGateIn.latitude,
+          selectedGateIn.longitude,
           currentLocation.latitude,
           currentLocation.longitude,
         );
-        if (distanceInMeters < 1000 && !partToll.notified) {
-          partToll.notified = true;
+        selectedGateIn.notified = notification != null;
+      }
 
-          String tollFee =
-              "▶ รถ 4 ล้อ:  ${'xxx'} บาท\n▶ รถ 6-10 ล้อ:  ${'xxx'} บาท\n▶ รถเกิน 10 ล้อ:  ${'xxx'} บาท";
-          notification = AlertModel(
-            title: "เตรียมจ่ายค่าผ่านทาง",
-            message:
-                "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง${partToll.name} กรุณาเตรียมเงินค่าผ่านทาง:\n\n${tollFee}",
+      if (!selectedCostToll.notified) {
+        notification = await _getTollPlazaNotification(
+          selectedCostToll.name,
+          selectedCostToll.latitude,
+          selectedCostToll.longitude,
+          currentLocation.latitude,
+          currentLocation.longitude,
+        );
+        selectedCostToll.notified = notification != null;
+      }
+
+      for (int i = 0; i < partTollList.length; i++) {
+        MarkerModel partToll = partTollList[i];
+        if (!partToll.notified) {
+          notification = await _getTollPlazaNotification(
+            partToll.name,
+            partToll.latitude,
+            partToll.longitude,
+            currentLocation.latitude,
+            currentLocation.longitude,
           );
-          break;
+          partToll.notified = notification != null;
         }
       }
 
@@ -136,5 +153,27 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         notification: notification,
       );
     }
+  }
+
+  Future<AlertModel> _getTollPlazaNotification(String name,
+      double lat1,
+      double lng1,
+      double lat2,
+      double lng2,) async {
+    const int DISTANCE_THRESHOLD_METER = 1000;
+    AlertModel notification;
+
+    double distanceInMeters = await Geolocator().distanceBetween(lat1, lng1, lat2, lng2);
+    if (distanceInMeters < DISTANCE_THRESHOLD_METER) {
+      String tollFee =
+          "▶ รถ 4 ล้อ:  ${'xxx'} บาท\n▶ รถ 6-10 ล้อ:  ${'xxx'} บาท\n▶ รถเกิน 10 ล้อ:  ${'xxx'} บาท";
+      notification = AlertModel(
+        title: "เตรียมจ่ายค่าผ่านทาง",
+        message:
+        "อีก ${(distanceInMeters / 1000).toStringAsFixed(
+            1)} กม. ถึง$name กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
+      );
+    }
+    return notification;
   }
 }

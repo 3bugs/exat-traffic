@@ -77,7 +77,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     }
 
     //Future.delayed(Duration.zero, () {
-    context.bloc<AppBloc>().add(FetchMarker());
+    context.bloc<AppBloc>().add(FetchMarker(context: context));
     //});
   }
 
@@ -95,9 +95,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => MyScaffold(
-                appBloc: context.bloc<AppBloc>(),
-              ),
+              builder: (context) => MyScaffold(),
             ),
           );
         } else if (state is FetchMarkerFailure) {

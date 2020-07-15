@@ -8,11 +8,10 @@ import 'package:exattraffic/services/api.dart';
 import 'package:flutter/cupertino.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-  final BuildContext context;
   List<MarkerModel> _markerList;
   List<CategoryModel> _categoryList;
 
-  AppBloc({this.context}) : super(FetchMarkerInitial());
+  AppBloc() : super(FetchMarkerInitial());
 
   List<MarkerModel> get markerList => _markerList;
 
@@ -24,8 +23,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event is FetchMarker) {
       try {
-        _categoryList = await ExatApi.fetchCategories(context);
-        _markerList = await ExatApi.fetchMarkers(context);
+        _categoryList = await ExatApi.fetchCategories(event.context);
+        _markerList = await ExatApi.fetchMarkers(event.context);
         _markerList.forEach((marker) {
           setMarkerCategory(marker);
         });

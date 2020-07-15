@@ -16,6 +16,7 @@ class CostTollModel {
   final int costOver10Wheels;
   final List<MarkerModel> partTollMarkerList;
   bool selected;
+  bool notified;
 
   CostTollModel({
     @required this.id,
@@ -30,6 +31,7 @@ class CostTollModel {
     @required this.costOver10Wheels,
     @required this.partTollMarkerList,
     @required this.selected,
+    @required this.notified,
   });
 
   factory CostTollModel.fromJson(Map<String, dynamic> json) {
@@ -48,6 +50,7 @@ class CostTollModel {
           .map<MarkerModel>((markerJson) => MarkerModel.fromJson(markerJson))
           .toList(),
       selected: false,
+      notified: false,
     );
   }
 

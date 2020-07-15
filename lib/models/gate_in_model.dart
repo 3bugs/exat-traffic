@@ -14,6 +14,7 @@ class GateInModel {
   final bool enable;
   final int costTollCount;
   bool selected;
+  bool notified;
 
   GateInModel({
     @required this.id,
@@ -27,6 +28,7 @@ class GateInModel {
     @required this.enable,
     @required this.costTollCount,
     @required this.selected,
+    @required this.notified,
   });
 
   factory GateInModel.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class GateInModel {
       enable: json['enable'] == 1,
       costTollCount: json['cost_tolls_count'],
       selected: false,
+      notified: false,
     );
   }
 
