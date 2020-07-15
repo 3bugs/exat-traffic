@@ -6,6 +6,8 @@ import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 
 abstract class RouteEvent extends Equatable {
+  RouteEvent();
+
   @override
   List<Object> get props => [];
 }

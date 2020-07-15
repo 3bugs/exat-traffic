@@ -1,39 +1,38 @@
 import 'dart:async';
+import 'package:exattraffic/app/app_bloc.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
+import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/map_test.dart';
+import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
+import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 
 class Home extends StatelessWidget {
-  Home({
-    @required this.onClickMapTool,
-  });
-
-  final Function onClickMapTool;
-
   @override
   Widget build(BuildContext context) {
-    return HomeMain(onClickMapTool: onClickMapTool);
+    return HomeMain();
   }
 }
 
 class HomeMain extends StatefulWidget {
-  HomeMain({
-    @required this.onClickMapTool,
-  });
-
-  final Function onClickMapTool;
-
   @override
   _HomeMainState createState() => _HomeMainState();
 }
 
 class _HomeMainState extends State<HomeMain> {
+  final GlobalKey _keyMainContainer = GlobalKey();
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
   final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
@@ -41,11 +40,23 @@ class _HomeMainState extends State<HomeMain> {
   //final Uuid uuid = Uuid();
   Timer _timer;
   bool _mapToolLayerChecked = false;
+  bool _showSearchOptions = false;
+  int _bottomSheetIndex = 0;
+  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
     zoom: 8,
   );
+  static const double SEARCH_BOX_TOP_POSITION = -37.0;
+  static const double MAP_TOOL_TOP_POSITION = 42.0;
+
+  List<String> _searchHintList = [
+    'ค้นหา',
+    'Search',
+    '搜索',
+  ];
 
   Future<void> _moveToCurrentPosition(BuildContext context) async {
     final Position position =
@@ -93,6 +104,14 @@ class _HomeMainState extends State<HomeMain> {
     print('Response body: ${response.body}');*/
   }
 
+  void _handleClickMapTool(int toolIndex, bool checked) {
+    if (toolIndex == 2) {
+      setState(() {
+        _bottomSheetIndex = checked ? 1 : 0;
+      });
+    }
+  }
+
   @override
   void initState() {
     _timer = Timer.periodic(new Duration(seconds: 1), (timer) {
@@ -105,6 +124,14 @@ class _HomeMainState extends State<HomeMain> {
     super.initState();
   }
 
+  _afterLayout(_) {
+    final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
+    setState(() {
+      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      _mainContainerHeight = mainContainerRenderBox.size.height;
+    });
+  }
+
   @override
   void dispose() {
     _timer.cancel();
@@ -113,92 +140,409 @@ class _HomeMainState extends State<HomeMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      /*decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.redAccent,
-          width: 2.0,
+    return BlocProvider<HomeBloc>(
+      create: (context) {
+        List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
+        List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
+        HomeBloc homeBloc = HomeBloc(markerList: markerList, categoryList: categoryList);
+        return homeBloc;
+      },
+      child: Container(
+        key: _keyMainContainer,
+        /*decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.redAccent,
+              width: 2.0,
+            ),
+          ),*/
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            MapTool selectedMapTool;
+
+            if (state is MapToolChange) {
+              selectedMapTool = state.selectedMapTool;
+            }
+
+            return Stack(
+              overflow: Overflow.visible,
+              children: <Widget>[
+                GoogleMap(
+                  key: _keyGoogleMaps,
+                  mapType: MapType.normal,
+                  initialCameraPosition: INITIAL_POSITION,
+                  myLocationEnabled: false,
+                  myLocationButtonEnabled: false,
+                  onMapCreated: (GoogleMapController controller) {
+                    _googleMapController.complete(controller);
+                    _moveToCurrentPosition(context);
+                  },
+                  onTap: (LatLng latLng) {
+                    _addMarker(latLng);
+                    _sendToVisualization(latLng);
+                  },
+                  markers: Set<Marker>.of(_markers.values),
+                ),
+
+                // Map tools
+                Container(
+                  padding: EdgeInsets.only(
+                    top: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                    left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                    right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                  ),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Column(
+                      children: <Widget>[
+                        MapToolItem(
+                          icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                          iconWidth: getPlatformSize(16.4),
+                          iconHeight: getPlatformSize(18.3),
+                          marginTop: getPlatformSize(0.0),
+                          isChecked: false,
+                          onClick: () {},
+                        ),
+
+                        // around me
+                        MapToolItem(
+                          icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
+                          iconWidth: getPlatformSize(26.6),
+                          iconHeight: getPlatformSize(21.6),
+                          marginTop: getPlatformSize(10.0),
+                          isChecked: selectedMapTool == MapTool.aroundMe,
+                          onClick: () {
+                            context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
+
+                            /*Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MapTest()),
+                            );*/
+                          },
+                        ),
+
+                        // layer
+                        MapToolItem(
+                          icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
+                          iconWidth: getPlatformSize(15.5),
+                          iconHeight: getPlatformSize(16.5),
+                          marginTop: getPlatformSize(10.0),
+                          isChecked: selectedMapTool == MapTool.layer,
+                          onClick: () {
+                            context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
+                          },
+                        ),
+
+                        MapToolItem(
+                          icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                          iconWidth: getPlatformSize(21.0),
+                          iconHeight: getPlatformSize(21.0),
+                          marginTop: getPlatformSize(10.0),
+                          isChecked: false,
+                          onClick: () {
+                            setState(() {
+                              _markers.clear();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // ช่อง search
+                Visibility(
+                  visible: true,
+                  child: Positioned(
+                    width: MediaQuery.of(context).size.width,
+                    top: getPlatformSize(SEARCH_BOX_TOP_POSITION),
+                    left: 0.0,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                        right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: getPlatformSize(
+                                  Constants.HomeScreen.SEARCH_BOX_VERTICAL_POSITION),
+                            ),
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x22777777),
+                                  blurRadius: getPlatformSize(10.0),
+                                  spreadRadius: getPlatformSize(5.0),
+                                  offset: Offset(
+                                    getPlatformSize(2.0), // move right
+                                    getPlatformSize(2.0), // move down
+                                  ),
+                                ),
+                              ],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: getPlatformSize(6.0),
+                                bottom: getPlatformSize(6.0),
+                                left: getPlatformSize(20.0),
+                                right: getPlatformSize(12.0),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Image(
+                                    image: AssetImage('assets/images/home/ic_search.png'),
+                                    width: getPlatformSize(16.0),
+                                    height: getPlatformSize(16.0),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: getPlatformSize(16.0),
+                                        right: getPlatformSize(16.0),
+                                      ),
+                                      child: Consumer<LanguageModel>(
+                                        builder: (context, language, child) {
+                                          return TextField(
+                                            onTap: () {
+                                              setState(() {
+                                                _showSearchOptions = true;
+                                              });
+                                            },
+                                            decoration: InputDecoration(
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.only(
+                                                top: getPlatformSize(4.0),
+                                                bottom: getPlatformSize(4.0),
+                                              ),
+                                              border: InputBorder.none,
+                                              hintText: _searchHintList[language.lang],
+                                            ),
+                                            style: getTextStyle(language.lang),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        print('close search');
+                                        setState(() {
+                                          _showSearchOptions = false;
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                                      child: Container(
+                                        width: getPlatformSize(36.0),
+                                        height: getPlatformSize(36.0),
+                                        //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                        child: Center(
+                                          child: Image(
+                                            image: AssetImage(
+                                                'assets/images/home/ic_close_search.png'),
+                                            width: getPlatformSize(24.0),
+                                            height: getPlatformSize(24.0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // รูปแบบการค้นหา (บริการผู้ใช้ทาง/เส้นทาง)
+                Visibility(
+                  visible: _showSearchOptions,
+                  child: Positioned(
+                    width: MediaQuery.of(context).size.width,
+                    top: getPlatformSize(65.0 + SEARCH_BOX_TOP_POSITION),
+                    left: 0.0,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                        right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x22777777),
+                              blurRadius: getPlatformSize(10.0),
+                              spreadRadius: getPlatformSize(5.0),
+                              offset: Offset(
+                                getPlatformSize(2.0), // move right
+                                getPlatformSize(2.0), // move down
+                              ),
+                            ),
+                          ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                          ),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            // ค้นหาบริการผู้ใช้ทาง
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(
+                                      getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                  topRight: Radius.circular(
+                                      getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: getPlatformSize(18.0),
+                                    horizontal: getPlatformSize(20.0),
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        width: getPlatformSize(10.0),
+                                        height: getPlatformSize(10.0),
+                                        margin: EdgeInsets.only(
+                                          right: getPlatformSize(16.0),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF3497FD),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(getPlatformSize(3.0)),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Consumer<LanguageModel>(
+                                          builder: (context, language, child) {
+                                            return Text(
+                                              'ค้นหาบริการ',
+                                              style: getTextStyle(
+                                                language.lang,
+                                                color: Color(0xFF454F63),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // เส้นคั่น
+                            Container(
+                              margin: EdgeInsets.only(
+                                left: getPlatformSize(20.0),
+                                right: getPlatformSize(20.0),
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Color(0xFFF4F4F4),
+                                    width: getPlatformSize(1.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // ค้นหาเส้นทาง
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(
+                                      getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                  bottomRight: Radius.circular(
+                                      getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: getPlatformSize(18.0),
+                                    horizontal: getPlatformSize(20.0),
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        width: getPlatformSize(10.0),
+                                        height: getPlatformSize(10.0),
+                                        margin: EdgeInsets.only(
+                                          right: getPlatformSize(16.0),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF3ACCE1),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(getPlatformSize(3.0)),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Consumer<LanguageModel>(
+                                          builder: (context, language, child) {
+                                            return Text(
+                                              'ค้นหาเส้นทาง',
+                                              style: getTextStyle(
+                                                language.lang,
+                                                color: Color(0xFF454F63),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // bottom sheet
+                Visibility(
+                  visible: true,
+                  child: IndexedStack(
+                    index: selectedMapTool == MapTool.none ? 0 : 1,
+                    children: <Widget>[
+                      HomeBottomSheet(
+                        collapsePosition:
+                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                      ),
+                      LayerBottomSheet(
+                        collapsePosition:
+                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
+                                _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                        expandPosition: getPlatformSize(SEARCH_BOX_TOP_POSITION) - 1,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-      ),*/
-      child: Stack(
-        children: <Widget>[
-          GoogleMap(
-            key: _keyGoogleMaps,
-            mapType: MapType.normal,
-            initialCameraPosition: INITIAL_POSITION,
-            myLocationEnabled: false,
-            myLocationButtonEnabled: false,
-            onMapCreated: (GoogleMapController controller) {
-              _googleMapController.complete(controller);
-              _moveToCurrentPosition(context);
-            },
-            onTap: (LatLng latLng) {
-              _addMarker(latLng);
-              _sendToVisualization(latLng);
-            },
-            markers: Set<Marker>.of(_markers.values),
-          ),
-          Container(
-            padding: EdgeInsets.only(
-              top: getPlatformSize(42.0),
-              left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-              right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-            ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Column(
-                children: <Widget>[
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
-                    iconWidth: getPlatformSize(16.4),
-                    iconHeight: getPlatformSize(18.3),
-                    marginTop: getPlatformSize(0.0),
-                    isChecked: false,
-                    onClick: () {},
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
-                    iconWidth: getPlatformSize(26.6),
-                    iconHeight: getPlatformSize(21.6),
-                    marginTop: getPlatformSize(10.0),
-                    isChecked: false,
-                    onClick: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MapTest()),
-                      );
-                    },
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
-                    iconWidth: getPlatformSize(15.5),
-                    iconHeight: getPlatformSize(16.5),
-                    marginTop: getPlatformSize(10.0),
-                    isChecked: _mapToolLayerChecked,
-                    onClick: () {
-                      setState(() {
-                        _mapToolLayerChecked = !_mapToolLayerChecked;
-                      });
-                      widget.onClickMapTool(2, _mapToolLayerChecked);
-                    },
-                  ),
-                  MapToolItem(
-                    icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                    iconWidth: getPlatformSize(21.0),
-                    iconHeight: getPlatformSize(21.0),
-                    marginTop: getPlatformSize(10.0),
-                    isChecked: false,
-                    onClick: () {
-                      setState(() {
-                        _markers.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

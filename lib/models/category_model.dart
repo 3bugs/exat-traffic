@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CategoryType {
   static const int TOLL_PLAZA = 10;
@@ -10,6 +11,7 @@ class CategoryType {
   static const int U_TURN = 18;
   static const int ENTRANCE = 23;
   static const int EXIT = 24;
+  static const int EAST_PASS = 197;
 }
 
 class CategoryModel {
@@ -18,9 +20,12 @@ class CategoryModel {
   final int code; // category id ที่ไม่เปลี่ยนไปตามภาษา
   final String markerIconUrl;
   final AssetImage markerIconAsset;
+  final BitmapDescriptor markerIconBitmap;
   final AssetImage filterOffIconAsset;
   final AssetImage filterOnIconAsset;
   bool selected;
+
+  static Map<int, BitmapDescriptor> categoryIconMap = Map();
 
   CategoryModel({
     @required this.id,
@@ -28,6 +33,7 @@ class CategoryModel {
     @required this.code,
     @required this.markerIconUrl,
     @required this.markerIconAsset,
+    @required this.markerIconBitmap,
     @required this.filterOffIconAsset,
     @required this.filterOnIconAsset,
     @required this.selected,
@@ -53,7 +59,8 @@ class CategoryModel {
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_rest_area_on.png');
         break;
       case CategoryType.POLICE_STATION:
-        markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_police_station_small.png');
+        markerIconAsset =
+            AssetImage('assets/images/map_markers/ic_marker_police_station_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_police_station_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_police_station_on.png');
         break;
@@ -80,6 +87,7 @@ class CategoryModel {
       code: json['cate_code'],
       markerIconUrl: json['icon'],
       markerIconAsset: markerIconAsset,
+      markerIconBitmap: categoryIconMap[json['cate_code']],
       filterOffIconAsset: filterOffIconAsset,
       filterOnIconAsset: filterOnIconAsset,
       selected: false,

@@ -63,8 +63,6 @@ class MarkerModel {
     );
   }
 
-
-
   @override
   String toString() {
     return '${this.name}';
