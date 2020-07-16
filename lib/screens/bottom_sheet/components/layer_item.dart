@@ -1,3 +1,5 @@
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,12 +13,14 @@ class LayerItemView extends StatelessWidget {
     @required this.layerItem,
     @required this.isFirstItem,
     @required this.isLastItem,
+    @required this.selected,
     @required this.onClick,
   });
 
-  final LayerItemModel layerItem;
+  final CategoryModel layerItem;
   final bool isFirstItem;
   final bool isLastItem;
+  final bool selected;
   final Function onClick;
 
   @override
@@ -46,7 +50,7 @@ class LayerItemView extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       width: getPlatformSize(2.0),
-                      color: layerItem.isChecked
+                      color: selected
                           ? Constants.BottomSheet.LAYER_ITEM_BORDER_COLOR_ON
                           : Constants.BottomSheet.LAYER_ITEM_BORDER_COLOR_OFF,
                     ),
@@ -56,9 +60,9 @@ class LayerItemView extends StatelessWidget {
                   ),
                   child: Center(
                     child: Image(
-                      image: layerItem.isChecked ? layerItem.iconOn : layerItem.iconOff,
-                      width: layerItem.iconWidth,
-                      height: layerItem.iconHeight,
+                      image: selected ? layerItem.filterOnIconAsset : layerItem.filterOffIconAsset,
+                      width: layerItem.filterIconWidth,
+                      height: layerItem.filterIconHeight,
                     ),
                   ),
                 ),
@@ -70,7 +74,7 @@ class LayerItemView extends StatelessWidget {
               ),
               child: Consumer<LanguageModel>(
                 builder: (context, language, child) {
-                  String name;
+                  /*String name;
                   switch (language.lang) {
                     case 0:
                       name = layerItem.text;
@@ -81,16 +85,16 @@ class LayerItemView extends StatelessWidget {
                     case 2:
                       name = '高速公路';
                       break;
-                  }
+                  }*/
 
                   return Text(
-                    name,
+                    layerItem.name,
                     style: getTextStyle(
-                      language.lang,
+                      0, //language.lang, // todo: ************************************
                       sizeTh: Constants.Font.SMALLER_SIZE_TH,
                       sizeEn: Constants.Font.SMALLER_SIZE_EN,
                       heightTh: 1.0,
-                      color: layerItem.isChecked ? Constants.App.PRIMARY_COLOR : Constants.Font.DEFAULT_COLOR,
+                      color: selected ? Constants.App.PRIMARY_COLOR : Constants.Font.DEFAULT_COLOR,
                       //isBold: layerItem.isChecked,
                     ),
                   );

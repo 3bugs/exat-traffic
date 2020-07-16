@@ -1,4 +1,7 @@
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -133,8 +136,8 @@ class LayerItemList extends StatefulWidget {
     LayerItemModel(
       text: 'ทางขึ้น',
       textEn: 'In',
-      iconOn: AssetImage('assets/images/layers/ic_layer_in_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_in_off.png'),
+      iconOn: AssetImage('assets/images/layers/ic_layer_entrance_on.png'),
+      iconOff: AssetImage('assets/images/layers/ic_layer_entrance_off.png'),
       iconWidth: getPlatformSize(36.44),
       iconHeight: getPlatformSize(27.11),
       isChecked: false,
@@ -151,33 +154,43 @@ class LayerItemList extends StatefulWidget {
 class _LayerItemListState extends State<LayerItemList> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //height: getPlatformSize(70.0),
-      child: ListView.separated(
-        itemCount: widget._layerItemModelList.length,
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          LayerItemModel selectedLayerItem = widget._layerItemModelList[index];
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
 
-          return LayerItemView(
-            layerItem: selectedLayerItem,
-            isFirstItem: index == 0,
-            isLastItem: index == widget._layerItemModelList.length - 1,
-            onClick: () {
-              setState(() {
-                selectedLayerItem.isChecked = !selectedLayerItem.isChecked;
-                widget._onSelectLayerItem(context, selectedLayerItem);
-              });
+        print('--------------------------------------- LAYER LIST BUILDER');
+
+        List<CategoryModel> categoryList = state.categoryList;
+        Map<int, bool> categorySelectedMap = state.categorySelectedMap;
+
+        return Container(
+          //height: getPlatformSize(70.0),
+          child: ListView.separated(
+            itemCount: categoryList.length,
+            scrollDirection: Axis.horizontal,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              CategoryModel selectedLayerItem = categoryList[index];
+
+              return LayerItemView(
+                layerItem: selectedLayerItem,
+                isFirstItem: index == 0,
+                isLastItem: index == categoryList.length - 1,
+                selected: categorySelectedMap[selectedLayerItem.code],
+                onClick: () {
+                  context.bloc<HomeBloc>().add(ClickMarkerLayer(
+                    category: selectedLayerItem,
+                  ));
+                },
+              );
             },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            width: getPlatformSize(0.0),
-          );
-        },
-      ),
+            separatorBuilder: (BuildContext context, int index) {
+              return SizedBox(
+                width: getPlatformSize(0.0),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

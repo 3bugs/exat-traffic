@@ -141,7 +141,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   ScreenProps _currentScreenProps = screenPropsList[0];
 
   initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+    //WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
 
     _fragmentList = [
       Home(),
@@ -203,7 +203,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
           title: Text('Home'),
         )*/
           drawer: Drawer(
-            child: MyDrawer(_mainContainerTop),
+            child: MyDrawer(),
           ),
           bottomNavigationBar: MyNavBar(
             onClickTab: _handleClickTab,

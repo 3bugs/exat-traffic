@@ -321,11 +321,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<RouteBloc>(
-          create: (context) {
-            RouteBloc routeBloc = RouteBloc();
-            routeBloc.add(ListGateIn());
-            return routeBloc;
-          },
+          create: (context) => RouteBloc()..add(ListGateIn()),
         )
       ],
       child: Container(

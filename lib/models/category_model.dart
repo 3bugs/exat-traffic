@@ -1,3 +1,4 @@
+import 'package:exattraffic/etc/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
@@ -23,6 +24,8 @@ class CategoryModel {
   final BitmapDescriptor markerIconBitmap;
   final AssetImage filterOffIconAsset;
   final AssetImage filterOnIconAsset;
+  final double filterIconWidth;
+  final double filterIconHeight;
   bool selected;
 
   static Map<int, BitmapDescriptor> categoryIconMap = Map();
@@ -36,48 +39,72 @@ class CategoryModel {
     @required this.markerIconBitmap,
     @required this.filterOffIconAsset,
     @required this.filterOnIconAsset,
+    @required this.filterIconWidth,
+    @required this.filterIconHeight,
     @required this.selected,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     AssetImage markerIconAsset, filterOffIconAsset, filterOnIconAsset;
+    double filterIconWidth, filterIconHeight;
 
     switch (json['cate_code']) {
       case CategoryType.TOLL_PLAZA:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_toll_plaza_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_toll_plaza_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_toll_plaza_on.png');
+        filterIconWidth = getPlatformSize(35.43);
+        filterIconHeight = getPlatformSize(35.43);
         break;
       case CategoryType.CCTV:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_cctv_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_cctv_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_cctv_on.png');
+        filterIconWidth = getPlatformSize(36.23);
+        filterIconHeight = getPlatformSize(30.01);
         break;
       case CategoryType.REST_AREA:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_rest_area_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_rest_area_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_rest_area_on.png');
+        filterIconWidth = getPlatformSize(49.0);
+        filterIconHeight = getPlatformSize(49.0);
         break;
       case CategoryType.POLICE_STATION:
         markerIconAsset =
             AssetImage('assets/images/map_markers/ic_marker_police_station_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_police_station_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_police_station_on.png');
+        filterIconWidth = getPlatformSize(35.32);
+        filterIconHeight = getPlatformSize(27.64);
         break;
       case CategoryType.U_TURN:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_uturn_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_uturn_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_uturn_on.png');
+        filterIconWidth = getPlatformSize(27.91);
+        filterIconHeight = getPlatformSize(34.59);
+        break;
+      case CategoryType.EAST_PASS:
+        markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_easy_pass_small.png');
+        filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_easy_pass_off.png');
+        filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_easy_pass_on.png');
+        filterIconWidth = getPlatformSize(42.78);
+        filterIconHeight = getPlatformSize(37.91);
         break;
       case CategoryType.ENTRANCE:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_entrance_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_entrance_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_entrance_on.png');
+        filterIconWidth = getPlatformSize(28.81);
+        filterIconHeight = getPlatformSize(38.72);
         break;
       case CategoryType.EXIT:
         markerIconAsset = AssetImage('assets/images/map_markers/ic_marker_exit_small.png');
         filterOffIconAsset = AssetImage('assets/images/layers/ic_layer_exit_off.png');
         filterOnIconAsset = AssetImage('assets/images/layers/ic_layer_exit_on.png');
+        filterIconWidth = getPlatformSize(28.81);
+        filterIconHeight = getPlatformSize(38.72);
         break;
     }
 
@@ -90,6 +117,8 @@ class CategoryModel {
       markerIconBitmap: categoryIconMap[json['cate_code']],
       filterOffIconAsset: filterOffIconAsset,
       filterOnIconAsset: filterOnIconAsset,
+      filterIconWidth: filterIconWidth,
+      filterIconHeight: filterIconHeight,
       selected: false,
     );
   }

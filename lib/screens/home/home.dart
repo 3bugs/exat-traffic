@@ -3,6 +3,7 @@ import 'package:exattraffic/app/app_bloc.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,9 +40,7 @@ class _HomeMainState extends State<HomeMain> {
 
   //final Uuid uuid = Uuid();
   Timer _timer;
-  bool _mapToolLayerChecked = false;
   bool _showSearchOptions = false;
-  int _bottomSheetIndex = 0;
   double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
@@ -104,22 +103,16 @@ class _HomeMainState extends State<HomeMain> {
     print('Response body: ${response.body}');*/
   }
 
-  void _handleClickMapTool(int toolIndex, bool checked) {
-    if (toolIndex == 2) {
-      setState(() {
-        _bottomSheetIndex = checked ? 1 : 0;
-      });
-    }
-  }
-
   @override
   void initState() {
-    _timer = Timer.periodic(new Duration(seconds: 1), (timer) {
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+
+    /*_timer = Timer.periodic(new Duration(seconds: 1), (timer) {
       setState(() {
         _markers.removeWhere((key, value) =>
             new DateTime.now().millisecondsSinceEpoch - int.parse(key.value) > 60000);
       });
-    });
+    });*/
 
     super.initState();
   }
@@ -130,6 +123,27 @@ class _HomeMainState extends State<HomeMain> {
       _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
+  }
+
+  Marker _createMarker(BuildContext context, MarkerModel marker) {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('marker-${marker.id.toString()}');
+
+    return Marker(
+      markerId: markerId,
+      position: LatLng(marker.latitude, marker.longitude),
+      icon: marker.category.markerIconBitmap,
+      alpha: 1.0,
+      infoWindow: (true)
+          ? InfoWindow(
+              title: marker.name + (kReleaseMode ? "" : " [${marker.category.code}]"),
+              snippet: marker.category.name,
+            )
+          : InfoWindow.noText,
+      onTap: () {
+        //_selectGateInMarker(context, marker);
+      },
+    );
   }
 
   @override
@@ -144,43 +158,49 @@ class _HomeMainState extends State<HomeMain> {
       create: (context) {
         List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
         List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
-        HomeBloc homeBloc = HomeBloc(markerList: markerList, categoryList: categoryList);
-        return homeBloc;
+        return HomeBloc(markerList: markerList, categoryList: categoryList);
       },
-      child: Container(
-        key: _keyMainContainer,
-        /*decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.redAccent,
-              width: 2.0,
-            ),
-          ),*/
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            MapTool selectedMapTool;
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
 
-            if (state is MapToolChange) {
-              selectedMapTool = state.selectedMapTool;
-            }
+          print('--------------------------------------- HOME BUILDER');
 
-            return Stack(
+          MapTool selectedMapTool = state.selectedMapTool;
+          List<MarkerModel> markerList = state.markerList;
+          List<CategoryModel> categoryList = state.categoryList;
+          Map<int, bool> categorySelectedMap = state.categorySelectedMap;
+
+          Set<Marker> markerSet = markerList.map((MarkerModel marker) {
+            return _createMarker(context, marker);
+          }).toSet();
+
+          return Container(
+            key: _keyMainContainer,
+            /*decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.redAccent,
+                width: 2.0,
+              ),
+            ),*/
+            child: Stack(
               overflow: Overflow.visible,
               children: <Widget>[
                 GoogleMap(
                   key: _keyGoogleMaps,
                   mapType: MapType.normal,
                   initialCameraPosition: INITIAL_POSITION,
-                  myLocationEnabled: false,
+                  myLocationEnabled: true,
                   myLocationButtonEnabled: false,
+                  trafficEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _googleMapController.complete(controller);
                     _moveToCurrentPosition(context);
                   },
                   onTap: (LatLng latLng) {
-                    _addMarker(latLng);
-                    _sendToVisualization(latLng);
+                    /*_addMarker(latLng);
+                      _sendToVisualization(latLng);*/
                   },
-                  markers: Set<Marker>.of(_markers.values),
+                  markers: markerSet,
                 ),
 
                 // Map tools
@@ -214,9 +234,9 @@ class _HomeMainState extends State<HomeMain> {
                             context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
 
                             /*Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => MapTest()),
-                            );*/
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MapTest()),
+                                );*/
                           },
                         ),
 
@@ -239,9 +259,9 @@ class _HomeMainState extends State<HomeMain> {
                           marginTop: getPlatformSize(10.0),
                           isChecked: false,
                           onClick: () {
-                            setState(() {
+                            /*setState(() {
                               _markers.clear();
-                            });
+                            });*/
                           },
                         ),
                       ],
@@ -523,26 +543,23 @@ class _HomeMainState extends State<HomeMain> {
                     index: selectedMapTool == MapTool.none ? 0 : 1,
                     children: <Widget>[
                       HomeBottomSheet(
-                        collapsePosition:
-                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                                _mainContainerHeight -
-                                getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
+                        collapsePosition: _mainContainerHeight -
+                            getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
                         expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
                       ),
                       LayerBottomSheet(
-                        collapsePosition:
-                            getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION) +
-                                _mainContainerHeight -
-                                getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
-                        expandPosition: getPlatformSize(SEARCH_BOX_TOP_POSITION) - 1,
+                        collapsePosition: _mainContainerHeight -
+                            getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                        // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
                       ),
                     ],
                   ),
                 ),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -51,10 +51,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (event is FetchMarker) {
       try {
         _categoryList = await ExatApi.fetchCategories(event.context);
-        _markerList = await ExatApi.fetchMarkers(event.context);
-        _markerList.forEach((marker) {
+
+        List<MarkerModel> tempMarkerList = await ExatApi.fetchMarkers(event.context);
+        tempMarkerList.forEach((marker) {
           setMarkerCategory(marker);
         });
+        // filter เฉพาะ marker ที่อยู่ใน category ที่มี
+        _markerList = tempMarkerList.where((marker) => marker.category != null).toList();
+
         yield FetchMarkerSuccess(markerList: markerList);
       } catch (e) {
         yield FetchMarkerFailure(message: e.toString());
@@ -65,9 +69,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   void setMarkerCategory(MarkerModel marker) {
     if (_categoryList != null) {
       List filteredCategoryList =
-      _categoryList.where((category) => category.id == marker.categoryId).toList();
+          _categoryList.where((category) => category.id == marker.categoryId).toList();
       if (filteredCategoryList.length > 0) {
         marker.category = filteredCategoryList[0];
+        print('CATEGORY SET: ${marker.name}');
+      } else {
+        print('CATEGORY NOT SET: ${marker.name}');
       }
     }
   }

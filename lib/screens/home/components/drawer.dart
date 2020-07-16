@@ -6,9 +6,8 @@ import 'package:exattraffic/etc/utils.dart';
 class MyDrawer extends StatelessWidget {
   static final double MARGIN_LEFT = 34.0;
 
-  MyDrawer(this.mainContainerTop);
+  MyDrawer();
 
-  final double mainContainerTop;
   final List<DrawerItemModel> _drawerItemList = [
     DrawerItemModel(
       text: 'เกี่ยวกับเรา',

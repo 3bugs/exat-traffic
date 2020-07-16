@@ -144,8 +144,13 @@ class ExatApi {
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
+
+      // filter ให้เหลือเฉพาะ category ที่ใช้งาน (status = 1)
+      List filteredDataList =
+          dataList.where((markerJson) => markerJson['status'] == 1).toList();
+
       List<CategoryModel> categoryList =
-          dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+          filteredDataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
 
       return categoryList;
     } else {

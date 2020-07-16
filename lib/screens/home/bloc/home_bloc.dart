@@ -16,40 +16,77 @@ import 'package:exattraffic/models/marker_model.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final List<MarkerModel> markerList;
   final List<CategoryModel> categoryList;
+  Map<int, bool> categorySelectedMap = Map();
 
   HomeBloc({
     @required this.markerList,
     @required this.categoryList,
-  }) : super(MapToolChange(selectedMapTool: MapTool.none));
+  }) : super(MapToolChange(
+          selectedMapTool: MapTool.none,
+          markerList: List<MarkerModel>(),
+          categoryList: List<CategoryModel>(),
+          categorySelectedMap: Map<int, bool>(),
+        )) {
+    print('******************** Category List ********************');
+    categoryList.forEach((category) {
+      print('- Name: ${category.name}, Bitmap: ${category.markerIconBitmap}');
+
+      // เริ่มต้น กำหนดให้แสดง marker ทุกประเภท
+      categorySelectedMap[category.code] = true;
+    });
+  }
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
     final currentState = state;
 
     if (event is ClickMapTool) {
-      if (currentState is MapToolChange) {
-        if (currentState.selectedMapTool == MapTool.none) {
-          yield MapToolChange(
-            selectedMapTool: event.mapTool,
-            markerList: [],
-          );
-        } else if (currentState.selectedMapTool == MapTool.layer) {
+      //if (currentState is MapToolChange) {
+      if (currentState.selectedMapTool == MapTool.none) {
+        yield MapToolChange(
+          selectedMapTool: event.mapTool,
+          markerList: markerList,
+          categoryList: categoryList,
+          categorySelectedMap: categorySelectedMap,
+        );
+      } else {
+        if (currentState.selectedMapTool == MapTool.layer) {
           yield MapToolChange(
             selectedMapTool: event.mapTool == MapTool.layer ? MapTool.none : MapTool.aroundMe,
-            markerList: markerList,
+            markerList: event.mapTool == MapTool.layer
+                ? List<MarkerModel>()
+                : markerList.where((marker) => marker.id > 250).toList(),
+            categoryList: categoryList,
+            categorySelectedMap: categorySelectedMap,
           );
         } else {
           yield MapToolChange(
             selectedMapTool: event.mapTool == MapTool.aroundMe ? MapTool.none : MapTool.layer,
-            markerList: markerList.where((marker) => marker.id > 200).toList(),
+            markerList: event.mapTool == MapTool.aroundMe ? List<MarkerModel>() : markerList,
+            categoryList: categoryList,
+            categorySelectedMap: categorySelectedMap,
           );
         }
-        return;
       }
-      if (currentState is HomeState) {
-        yield MapToolChange(selectedMapTool: MapTool.none);
-        return;
-      }
+      return;
+      //}
+    } else if (event is ClickMarkerLayer) {
+      print('********** YIELD MarkerLayerChange');
+
+      CategoryModel clickedCategory = event.category;
+      categorySelectedMap[clickedCategory.code] = !categorySelectedMap[clickedCategory.code];
+
+      List<MarkerModel> tempMarkerList =
+          markerList.where((marker) => categorySelectedMap[marker.category.code]).toList();
+
+      categorySelectedMap = Map.from(categorySelectedMap);
+
+      yield MarkerLayerChange(
+        selectedMapTool: state.selectedMapTool,
+        markerList: tempMarkerList, // todo: *****
+        categoryList: categoryList,
+        categorySelectedMap: categorySelectedMap,
+      );
     }
   }
 }
