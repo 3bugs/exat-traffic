@@ -119,7 +119,7 @@ class CategoryModel {
       filterOnIconAsset: filterOnIconAsset,
       filterIconWidth: filterIconWidth,
       filterIconHeight: filterIconHeight,
-      selected: false,
+      selected: true,
     );
   }
 

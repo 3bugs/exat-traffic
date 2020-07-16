@@ -59,6 +59,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         // filter เฉพาะ marker ที่อยู่ใน category ที่มี
         _markerList = tempMarkerList.where((marker) => marker.category != null).toList();
 
+        _markerList.forEach((marker) {
+          print(
+              "***** MARKER [${marker.name}] - lat: ${marker.latitude}, lng: ${marker.longitude}");
+        });
+
         yield FetchMarkerSuccess(markerList: markerList);
       } catch (e) {
         yield FetchMarkerFailure(message: e.toString());

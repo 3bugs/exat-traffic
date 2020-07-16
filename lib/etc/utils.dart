@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:exattraffic/constants.dart' as Constants;
@@ -93,6 +94,29 @@ Future<void> alert(BuildContext context, String title, String content) {
       );
     },
   );
+}
+
+LatLngBounds boundsFromLatLngList(List<LatLng> latLngList) {
+  double x0, x1, y0, y1;
+  for (LatLng latLng in latLngList) {
+    if (latLng.latitude < 13 ||
+        latLng.longitude < 100.3 ||
+        latLng.latitude > 15 ||
+        latLng.longitude > 100.8) {
+      continue;
+    }
+
+    if (x0 == null) {
+      x0 = x1 = latLng.latitude;
+      y0 = y1 = latLng.longitude;
+    } else {
+      if (latLng.latitude > x1) x1 = latLng.latitude;
+      if (latLng.latitude < x0) x0 = latLng.latitude;
+      if (latLng.longitude > y1) y1 = latLng.longitude;
+      if (latLng.longitude < y0) y0 = latLng.longitude;
+    }
+  }
+  return LatLngBounds(northeast: LatLng(x1, y1), southwest: LatLng(x0, y0));
 }
 
 double getDistance(double lat1, double lng1, double lat2, double lng2) {

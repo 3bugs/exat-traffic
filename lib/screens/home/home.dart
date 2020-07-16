@@ -162,17 +162,29 @@ class _HomeMainState extends State<HomeMain> {
       },
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-
           print('--------------------------------------- HOME BUILDER');
 
           MapTool selectedMapTool = state.selectedMapTool;
           List<MarkerModel> markerList = state.markerList;
           List<CategoryModel> categoryList = state.categoryList;
-          Map<int, bool> categorySelectedMap = state.categorySelectedMap;
+          //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 
           Set<Marker> markerSet = markerList.map((MarkerModel marker) {
             return _createMarker(context, marker);
           }).toSet();
+
+          if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
+              state is MarkerLayerChange) {
+            new Future.delayed(Duration(milliseconds: 1000), () async {
+              List<LatLng> markerLatLngList =
+                  markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
+              LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
+              final GoogleMapController controller = await _googleMapController.future;
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
+            });
+          } else if (state is MapToolChange && state.selectedMapTool == MapTool.none) {
+            _moveToCurrentPosition(context);
+          }
 
           return Container(
             key: _keyMainContainer,
@@ -187,11 +199,19 @@ class _HomeMainState extends State<HomeMain> {
               children: <Widget>[
                 GoogleMap(
                   key: _keyGoogleMaps,
+                  padding: EdgeInsets.only(
+                    //bottom: (state.selectedMapTool == MapTool.layer) || (state.selectedMapTool == MapTool.aroundMe) ? getPlatformSize(100.0) : 0.0,
+                    top: getPlatformSize(20.0),
+                    bottom: getPlatformSize(140.0),
+                    left: getPlatformSize(0.0),
+                    right: getPlatformSize(50.0),
+                  ),
                   mapType: MapType.normal,
                   initialCameraPosition: INITIAL_POSITION,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                   trafficEnabled: false,
+                  zoomControlsEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
                     _googleMapController.complete(controller);
                     _moveToCurrentPosition(context);
@@ -220,7 +240,10 @@ class _HomeMainState extends State<HomeMain> {
                           iconHeight: getPlatformSize(18.3),
                           marginTop: getPlatformSize(0.0),
                           isChecked: false,
-                          onClick: () {},
+                          showProgress: false,
+                          onClick: () {
+                            alert(context, 'EXAT Traffic', 'Under construction, coming soon :)');
+                          },
                         ),
 
                         // around me
@@ -230,6 +253,7 @@ class _HomeMainState extends State<HomeMain> {
                           iconHeight: getPlatformSize(21.6),
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.aroundMe,
+                          showProgress: state.showProgress,
                           onClick: () {
                             context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
 
@@ -247,21 +271,22 @@ class _HomeMainState extends State<HomeMain> {
                           iconHeight: getPlatformSize(16.5),
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.layer,
+                          showProgress: false,
                           onClick: () {
                             context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
                           },
                         ),
 
+                        // current location
                         MapToolItem(
                           icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
                           iconWidth: getPlatformSize(21.0),
                           iconHeight: getPlatformSize(21.0),
                           marginTop: getPlatformSize(10.0),
                           isChecked: false,
+                          showProgress: false,
                           onClick: () {
-                            /*setState(() {
-                              _markers.clear();
-                            });*/
+                            _moveToCurrentPosition(context);
                           },
                         ),
                       ],
@@ -556,6 +581,15 @@ class _HomeMainState extends State<HomeMain> {
                     ],
                   ),
                 ),
+
+                Visibility(
+                  visible: state.showProgress,
+                  child: Container(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -572,6 +606,7 @@ class MapToolItem extends StatelessWidget {
     @required this.iconHeight,
     @required this.marginTop,
     @required this.isChecked,
+    @required this.showProgress,
     @required this.onClick,
   });
 
@@ -580,6 +615,7 @@ class MapToolItem extends StatelessWidget {
   final double iconHeight;
   final double marginTop;
   final bool isChecked;
+  final bool showProgress;
   final Function onClick;
 
   static const double SIZE = 45.0;
@@ -626,11 +662,19 @@ class MapToolItem extends StatelessWidget {
             Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
           ),
           child: Center(
-            child: Image(
-              image: icon,
-              width: iconWidth,
-              height: iconHeight,
-            ),
+            child: showProgress
+                ? SizedBox(
+                    width: getPlatformSize(18.0),
+                    height: getPlatformSize(18.0),
+                    child: CircularProgressIndicator(
+                      strokeWidth: getPlatformSize(3),
+                    ),
+                  )
+                : Image(
+                    image: icon,
+                    width: iconWidth,
+                    height: iconHeight,
+                  ),
           ),
         ),
       ),

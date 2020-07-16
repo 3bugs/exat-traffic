@@ -1,4 +1,5 @@
 import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -160,7 +161,7 @@ class _LayerItemListState extends State<LayerItemList> {
         print('--------------------------------------- LAYER LIST BUILDER');
 
         List<CategoryModel> categoryList = state.categoryList;
-        Map<int, bool> categorySelectedMap = state.categorySelectedMap;
+        //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 
         return Container(
           //height: getPlatformSize(70.0),
@@ -175,7 +176,7 @@ class _LayerItemListState extends State<LayerItemList> {
                 layerItem: selectedLayerItem,
                 isFirstItem: index == 0,
                 isLastItem: index == categoryList.length - 1,
-                selected: categorySelectedMap[selectedLayerItem.code],
+                selected: selectedLayerItem.selected,
                 onClick: () {
                   context.bloc<HomeBloc>().add(ClickMarkerLayer(
                     category: selectedLayerItem,

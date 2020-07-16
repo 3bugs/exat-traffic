@@ -50,7 +50,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
       _controller.forward();
     });
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 200), () {
       _fetchSplashData(context);
     });
   }

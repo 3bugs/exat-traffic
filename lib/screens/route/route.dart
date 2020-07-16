@@ -52,7 +52,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
     target: LatLng(13.7563, 100.5018), // Bangkok
     zoom: 10,
   );
-  static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 10; // km per hour
+  static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 20; // km per hour
 
   double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
@@ -264,22 +264,6 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return lList;
   }
 
-  LatLngBounds _boundsFromLatLngList(List<LatLng> latLngList) {
-    double x0, x1, y0, y1;
-    for (LatLng latLng in latLngList) {
-      if (x0 == null) {
-        x0 = x1 = latLng.latitude;
-        y0 = y1 = latLng.longitude;
-      } else {
-        if (latLng.latitude > x1) x1 = latLng.latitude;
-        if (latLng.latitude < x0) x0 = latLng.latitude;
-        if (latLng.longitude > y1) y1 = latLng.longitude;
-        if (latLng.longitude < y0) y0 = latLng.longitude;
-      }
-    }
-    return LatLngBounds(northeast: LatLng(x1, y1), southwest: LatLng(x0, y0));
-  }
-
   @override
   void initState() {
     super.initState();
@@ -388,7 +372,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                     List<LatLng> gateInLatLngList = gateInList
                         .map((gateIn) => LatLng(gateIn.latitude, gateIn.longitude))
                         .toList();
-                    LatLngBounds latLngBounds = _boundsFromLatLngList(gateInLatLngList);
+                    LatLngBounds latLngBounds = boundsFromLatLngList(gateInLatLngList);
                     final GoogleMapController controller = await _googleMapController.future;
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
@@ -402,7 +386,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                         .toList();
                     costTollLatLngList
                         .add(LatLng(selectedGateIn.latitude, selectedGateIn.longitude));
-                    LatLngBounds latLngBounds = _boundsFromLatLngList(costTollLatLngList);
+                    LatLngBounds latLngBounds = boundsFromLatLngList(costTollLatLngList);
                     final GoogleMapController controller = await _googleMapController.future;
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
@@ -411,7 +395,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
                   // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
                   new Future.delayed(Duration(milliseconds: 1000), () async {
-                    LatLngBounds latLngBounds = _boundsFromLatLngList(polyline.points);
+                    LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
                     final GoogleMapController controller = await _googleMapController.future;
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
                   });
@@ -440,9 +424,9 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
                 return GoogleMap(
                   key: _keyGoogleMaps,
-                  /*padding: EdgeInsets.only(
-                    top: getPlatformSize(20.0),
-                  ),*/
+                  padding: EdgeInsets.only(
+                    right: getPlatformSize(15.0),
+                  ),
                   mapType: MapType.normal,
                   initialCameraPosition: INITIAL_POSITION,
                   myLocationEnabled: _myLocationEnabled,
@@ -853,6 +837,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                       iconHeight: getPlatformSize(21.0),
                       marginTop: getPlatformSize(10.0),
                       isChecked: false,
+                      showProgress: false,
                       onClick: () => _handleClickMyLocation(context),
                     ),
                   ],
