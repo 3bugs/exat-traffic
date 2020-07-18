@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+import 'package:exattraffic/models/core_configs_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/models/category_model.dart';
@@ -14,10 +16,12 @@ class MarkerModel {
   CategoryModel category;
   final String streamMobile;
   final String streamWeb;
+
   /*final String imageType;
   final String imageSize;*/
   final String imagePath;
   final String direction;
+  final List<CoreConfigModel> coreConfigList;
   bool selected;
   bool notified;
 
@@ -26,6 +30,24 @@ class MarkerModel {
   }
 
   CategoryModel get category => _category;*/
+
+  /*@override
+  List<Object> get props => [
+        id,
+        name,
+        routeId,
+        routeName,
+        latitude,
+        longitude,
+        categoryId,
+        category,
+        streamMobile,
+        streamWeb,
+        imagePath,
+        direction,
+        selected,
+        notified,
+      ];*/
 
   MarkerModel({
     @required this.id,
@@ -41,11 +63,14 @@ class MarkerModel {
     @required this.imageSize,*/
     @required this.imagePath,
     @required this.direction,
+    @required this.coreConfigList,
     @required this.selected,
     @required this.notified,
   });
 
   factory MarkerModel.fromJson(Map<String, dynamic> json) {
+    var coreConfigJson = json['core_configs'] ?? List();
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
@@ -58,6 +83,9 @@ class MarkerModel {
       streamWeb: json['stream_web'],
       imagePath: json['image_path'],
       direction: json['direction'],
+      coreConfigList: coreConfigJson
+          .map<CoreConfigModel>((coreConfigJson) => CoreConfigModel.fromJson(coreConfigJson))
+          .toList(),
       selected: false,
       notified: false,
     );

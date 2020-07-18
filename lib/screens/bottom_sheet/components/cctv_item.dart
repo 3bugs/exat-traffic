@@ -49,7 +49,7 @@ class CctvItemView extends StatelessWidget {
                         ? BorderSide.none
                         : BorderSide(
                             color: Color(0xFFC7C7C7),
-                            width: getPlatformSize(1.0),
+                            width: getPlatformSize(0.0),
                           ),
                   ),
                 ),

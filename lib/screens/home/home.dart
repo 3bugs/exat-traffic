@@ -584,12 +584,59 @@ class _HomeMainState extends State<HomeMain> {
 
                 Visibility(
                   visible: state.showProgress,
+                  child: Center(
+                    child: Container(
+                      width: getPlatformSize(105.0),
+                      height: getPlatformSize(105.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(1.0),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x44777777),
+                            blurRadius: getPlatformSize(20.0),
+                            spreadRadius: getPlatformSize(10.0),
+                            offset: Offset(
+                              getPlatformSize(0.0), // move right
+                              getPlatformSize(0.0), // move down
+                            ),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                bottom: getPlatformSize(5.0),
+                              ),
+                              child: Image(
+                                width: getPlatformSize(80.0),
+                                height: getPlatformSize(80.0),
+                                image: AssetImage('assets/images/login/exat_logo_no_text.png'),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: getPlatformSize(105.0),
+                            height: getPlatformSize(105.0),
+                            child: CircularProgressIndicator(),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                /*Visibility(
+                  visible: state.showProgress,
                   child: Container(
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                ),
+                ),*/
               ],
             ),
           );
@@ -653,7 +700,7 @@ class MapToolItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            if (onClick != null) {
+            if (onClick != null && !showProgress) {
               onClick();
             }
           },

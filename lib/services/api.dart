@@ -146,13 +146,28 @@ class ExatApi {
       List dataList = responseResult.data;
 
       // filter ให้เหลือเฉพาะ category ที่ใช้งาน (status = 1)
-      List filteredDataList =
-          dataList.where((markerJson) => markerJson['status'] == 1).toList();
+      List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
 
       List<CategoryModel> categoryList =
           filteredDataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
 
       return categoryList;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<MarkerModel> fetchMarkerDetails(BuildContext context, int id) async {
+    final String url = "$EXAT_API_BASED_URL/markers/view";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"id": id},
+    );
+    if (responseResult.success) {
+      Map<String, dynamic> markerJson = responseResult.data;
+      return MarkerModel.fromJson(markerJson);
     } else {
       throw Exception(responseResult.data);
     }

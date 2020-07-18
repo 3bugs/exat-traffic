@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -43,6 +44,20 @@ class CategoryModel {
     @required this.filterIconHeight,
     @required this.selected,
   });
+
+  /*@override
+  List<Object> get props => [
+        id,
+        name,
+        markerIconUrl,
+        markerIconAsset,
+        markerIconBitmap,
+        filterOffIconAsset,
+        filterOnIconAsset,
+        filterIconWidth,
+        filterIconHeight,
+        selected,
+      ];*/
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     AssetImage markerIconAsset, filterOffIconAsset, filterOnIconAsset;
@@ -120,6 +135,34 @@ class CategoryModel {
       filterIconWidth: filterIconWidth,
       filterIconHeight: filterIconHeight,
       selected: true,
+    );
+  }
+
+  CategoryModel copyWith({
+    int id,
+    String name,
+    int code,
+    String markerIconUrl,
+    AssetImage markerIconAsset,
+    BitmapDescriptor markerIconBitmap,
+    AssetImage filterOffIconAsset,
+    AssetImage filterOnIconAsset,
+    double filterIconWidth,
+    double filterIconHeight,
+    bool selected,
+  }) {
+    return CategoryModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      code: code ?? this.code,
+      markerIconUrl: markerIconUrl ?? this.markerIconUrl,
+      markerIconAsset: markerIconAsset ?? this.markerIconAsset,
+      markerIconBitmap: markerIconBitmap ?? this.markerIconBitmap,
+      filterOffIconAsset: filterOffIconAsset ?? this.filterOffIconAsset,
+      filterOnIconAsset: filterOnIconAsset ?? this.filterOnIconAsset,
+      filterIconWidth: filterIconWidth ?? this.filterIconWidth,
+      filterIconHeight: filterIconHeight ?? this.filterIconHeight,
+      selected: selected ?? this.selected,
     );
   }
 
