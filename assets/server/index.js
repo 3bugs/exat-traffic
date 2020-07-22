@@ -75,6 +75,8 @@ app.get('/location', function (req, res) {
 io.on('connection', function (socket) {
   console.log('client connected');
 
+  fetchData();
+
   socket.on('disconnect', function () {
     console.log('client disconnected');
   });
