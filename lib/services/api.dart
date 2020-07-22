@@ -128,6 +128,12 @@ class ExatApi {
       List<MarkerModel> markerList =
           dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
+      print('***** MARKER COUNT: ${markerList.length}');
+      markerList.forEach((marker) {
+        print(
+            "***** MARKER [${marker.name}] - lat: ${marker.latitude}, lng: ${marker.longitude}, category id: ${marker.categoryId}");
+      });
+
       return markerList;
     } else {
       throw Exception(responseResult.data);
@@ -146,10 +152,16 @@ class ExatApi {
       List dataList = responseResult.data;
 
       // filter ให้เหลือเฉพาะ category ที่ใช้งาน (status = 1)
-      List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
+      //List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
 
       List<CategoryModel> categoryList =
-          filteredDataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+          dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+
+      print('***** CATEGORY COUNT: ${categoryList.length}');
+      categoryList.forEach((category) {
+        print(
+            "***** CATEGORY [${category.name}] - category id: ${category.id}, category code: ${category.code}");
+      });
 
       return categoryList;
     } else {
