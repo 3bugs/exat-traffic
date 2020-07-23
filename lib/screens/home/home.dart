@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'package:exattraffic/app/app_bloc.dart';
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/models/marker_model.dart';
-import 'package:exattraffic/screens/home/bloc/bloc.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -16,9 +13,14 @@ import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/screens/home/map_test.dart';
+//import 'package:exattraffic/screens/home/map_test.dart';
 import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
+import 'package:exattraffic/app/app_bloc.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
+import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -242,7 +244,10 @@ class _HomeMainState extends State<HomeMain> {
                           isChecked: false,
                           showProgress: false,
                           onClick: () {
-                            alert(context, 'EXAT Traffic', 'Under construction, coming soon :)');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SchematicMaps()),
+                            );
                           },
                         ),
 
