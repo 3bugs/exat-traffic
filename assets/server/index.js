@@ -108,6 +108,15 @@ app.get('/api/:item/:id?',
 
     let whereClause;
     switch (req.params.item) {
+      case 'user_tracking':
+        res.json({
+          error: {
+            code: CODE_SUCCESS,
+            message: 'บันทึกข้อมูลสำเร็จ',
+          },
+          data_list: null,
+        });
+        break;
       case 'gate_in':
         whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(

@@ -591,8 +591,8 @@ class _HomeMainState extends State<HomeMain> {
                   visible: state.showProgress,
                   child: Center(
                     child: Container(
-                      width: getPlatformSize(105.0),
-                      height: getPlatformSize(105.0),
+                      width: getPlatformSize(70.0),
+                      height: getPlatformSize(70.0),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(1.0),
                         shape: BoxShape.circle,
@@ -616,17 +616,19 @@ class _HomeMainState extends State<HomeMain> {
                                 bottom: getPlatformSize(5.0),
                               ),
                               child: Image(
-                                width: getPlatformSize(80.0),
-                                height: getPlatformSize(80.0),
+                                width: getPlatformSize(50.0),
+                                height: getPlatformSize(50.0),
                                 image: AssetImage('assets/images/login/exat_logo_no_text.png'),
                                 fit: BoxFit.contain,
                               ),
                             ),
                           ),
                           SizedBox(
-                            width: getPlatformSize(105.0),
-                            height: getPlatformSize(105.0),
-                            child: CircularProgressIndicator(),
+                            width: getPlatformSize(70.0),
+                            height: getPlatformSize(70.0),
+                            child: CircularProgressIndicator(
+                              strokeWidth: getPlatformSize(3.0),
+                            ),
                           )
                         ],
                       ),
