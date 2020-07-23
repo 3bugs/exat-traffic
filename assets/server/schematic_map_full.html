@@ -10,7 +10,7 @@
         crossorigin="anonymous">-->
   <!--<link rel="stylesheet" href="css/main.css">-->
   <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">-->
-  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+  <!--<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />-->
   <style>
     html, body {
       padding: 0;
@@ -4583,7 +4583,7 @@
 
 <!--<script src="https://code.jquery.com/jquery-1.11.1.js"></script>-->
 <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<!--<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>-->
 
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>-->
 <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -4730,8 +4730,8 @@
       const canvasHeight = this.ctx.canvas.height;
       this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 70;
-      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 70;
+      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 30;
+      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 30;
 
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);
@@ -4852,7 +4852,7 @@
   $(function () {
     $('#logo').hide();
     /*$("#svg-container").attachDragger();*/
-    const schematicMap = new SchematicMap(3);
+    const schematicMap = new SchematicMap(5);
 
     const svgWrapper = document.getElementById("svg-wrapper");
     svgWrapper.addEventListener("touchstart", handleTouchStart, false);
