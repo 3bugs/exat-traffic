@@ -4830,11 +4830,34 @@
     const touches = evt.changedTouches;
     console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
 
+    const svgContainer = $('#svg-container');
     const svgWrapper = $('#svg-wrapper');
     const diffX = touches[0].pageX - touchStart.x;
     const diffY = touches[0].pageY - touchStart.y;
-    svgWrapper.css('left', svgWrapperLeft + diffX);
-    svgWrapper.css('top', svgWrapperTop + diffY);
+
+    const containerWidth = svgContainer.width();
+    const containerHeight = svgContainer.height();
+    const wrapperWidth = svgWrapper.width();
+    const wrapperHeight = svgWrapper.height();
+
+    let newLeft, newTop;
+    if (svgWrapperLeft + diffX > 0) {
+      newLeft = 0;
+    } else if (svgWrapperLeft + diffX < containerWidth - wrapperWidth) {
+      newLeft = containerWidth - wrapperWidth;
+    } else {
+      newLeft = svgWrapperLeft + diffX;
+    }
+    if (svgWrapperTop + diffY > 0) {
+      newTop = 0;
+    } else if (svgWrapperTop + diffY < containerHeight - wrapperHeight) {
+      newTop = containerHeight - wrapperHeight;
+    } else {
+      newTop = svgWrapperTop + diffY;
+    }
+
+    svgWrapper.css('left', newLeft);
+    svgWrapper.css('top', newTop);
   };
 
   $(function () {
