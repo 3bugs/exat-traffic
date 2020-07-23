@@ -9,6 +9,7 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
         crossorigin="anonymous">-->
   <!--<link rel="stylesheet" href="css/main.css">-->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <style>
     html, body {
       padding: 0;
@@ -37,7 +38,7 @@
 <!--<div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; background-color: #f8f8f8; border: 0px solid red">
   <div class="main-container" style="border: 0px solid red; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%">-->
 <div id="main-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; border: 0px solid pink">
-  <div id="svg-container" class="dragscroll" style="overflow: hidden; width: 540px; height: 600px; border: 0px solid grey; cursor: pointer">
+  <div id="svg-container" class="draggable" style="overflow: hidden; width: 540px; height: 600px; border: 0px solid grey; cursor: pointer">
     <div id="svg-wrapper" style="position: relative; display: flex; width: 100%; height: 100%; border: solid 0px #ddd">
       <!--<div id="data" style="position: fixed; top: 0; right: 0; width: 260px; height: 100%; padding: 5px; background-color: navajowhite; border: 1px solid #ccc; overflow: auto"></div>-->
 
@@ -4579,9 +4580,11 @@
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<!--<script src="https://code.jquery.com/jquery-1.11.1.js"></script>-->
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>-->
-<script src="node_modules/dragscroll/dragscroll.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!--<script src="node_modules/dragscroll/dragscroll.js"></script>-->
 <script src="/socket.io/socket.io.js"></script>
 <script src="cctv.js"></script>
 <script>
@@ -4770,7 +4773,8 @@
 <script>
   $(function () {
     $('#logo').hide();
-    const schematicMap = new SchematicMap(1);
+    $('#svg-wrapper').draggable();
+    const schematicMap = new SchematicMap(2);
   });
 </script>
 </body>
