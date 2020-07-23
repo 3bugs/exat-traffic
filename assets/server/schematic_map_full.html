@@ -10,6 +10,7 @@
         crossorigin="anonymous">-->
   <!--<link rel="stylesheet" href="css/main.css">-->
   <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">-->
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
   <style>
     html, body {
       padding: 0;
@@ -4580,7 +4581,10 @@
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<!--<script src="https://code.jquery.com/jquery-1.11.1.js"></script>-->
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>-->
 <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
@@ -4793,10 +4797,56 @@
 </script>
 
 <script>
+  let touchStart;
+  let svgWrapperTop = 0, svgWrapperLeft = 0;
+
+  handleTouchStart = (evt) => {
+    evt.preventDefault();
+    console.log('----- TOUCH START');
+    const touches = evt.changedTouches;
+    touchStart = {x: touches[0].pageX, y: touches[0].pageY};
+    console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+    //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
+  };
+
+  handleTouchEnd = (evt) => {
+    evt.preventDefault();
+    console.log('----- TOUCH END');
+    const touches = evt.changedTouches;
+    console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+
+    const svgWrapper = $('#svg-wrapper');
+    svgWrapperLeft = parseInt(svgWrapper.css('left'), 10);
+    svgWrapperTop = parseInt(svgWrapper.css('top'), 10);
+  };
+
+  handleTouchCancel = () => {
+
+  };
+
+  handleTouchMove = (evt) => {
+    evt.preventDefault();
+    console.log('----- TOUCH MOVE');
+    const touches = evt.changedTouches;
+    console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+
+    const svgWrapper = $('#svg-wrapper');
+    const diffX = touches[0].pageX - touchStart.x;
+    const diffY = touches[0].pageY - touchStart.y;
+    svgWrapper.css('left', svgWrapperLeft + diffX);
+    svgWrapper.css('top', svgWrapperTop + diffY);
+  };
+
   $(function () {
     $('#logo').hide();
     /*$("#svg-container").attachDragger();*/
-    const schematicMap = new SchematicMap(3);
+    const schematicMap = new SchematicMap(2);
+
+    const svgWrapper = document.getElementById("svg-wrapper");
+    svgWrapper.addEventListener("touchstart", handleTouchStart, false);
+    svgWrapper.addEventListener("touchend", handleTouchEnd, false);
+    svgWrapper.addEventListener("touchcancel", handleTouchCancel, false);
+    svgWrapper.addEventListener("touchmove", handleTouchMove, false);
   });
 </script>
 </body>
