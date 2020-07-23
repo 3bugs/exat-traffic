@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <title>EXAT Traffic - Schematic Map</title>
   <!--<link rel="stylesheet"
@@ -4597,6 +4597,8 @@
   const LONGITUDE_LEFT = 100.171288;
   const LONGITUDE_RIGHT = 101.087897
 
+  const CANVAS_SCALE = 2;
+
   $(function () {
     const socket = io();
     const idList = [
@@ -4743,15 +4745,15 @@
         svgContainer.width(MAP_WIDTH * height / MAP_HEIGHT);
         /*myCanvas.height(height);
         myCanvas.width(MAP_WIDTH * height / MAP_HEIGHT);*/
-        this.ctx.canvas.height = this.scale * height;
-        this.ctx.canvas.width = this.scale * MAP_WIDTH * height / MAP_HEIGHT;
+        this.ctx.canvas.height = CANVAS_SCALE * this.scale * height;
+        this.ctx.canvas.width = CANVAS_SCALE * this.scale * MAP_WIDTH * height / MAP_HEIGHT;
       } else {
         svgContainer.width(width);
         svgContainer.height(MAP_HEIGHT * width / MAP_WIDTH);
         /*myCanvas.width(width);
         myCanvas.height(MAP_HEIGHT * width / MAP_WIDTH);*/
-        this.ctx.canvas.width = this.scale * width;
-        this.ctx.canvas.height = this.scale * MAP_HEIGHT * width / MAP_WIDTH;
+        this.ctx.canvas.width = CANVAS_SCALE * this.scale * width;
+        this.ctx.canvas.height = CANVAS_SCALE * this.scale * MAP_HEIGHT * width / MAP_WIDTH;
       }
 
       const svgWrapper = $('#svg-wrapper');

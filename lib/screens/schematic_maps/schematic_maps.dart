@@ -36,11 +36,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
       body: DecoratedBox(
         position: DecorationPosition.background,
         decoration: BoxDecoration(
-          //color: Colors.red,
-          image: DecorationImage(
+          color: Color(0xFF333333),
+          /*image: DecorationImage(
             image: AssetImage('assets/images/login/bg_login.jpg'),
             fit: BoxFit.cover,
-          ),
+          ),*/
         ),
         child: SafeArea(
           child: Padding(
@@ -48,32 +48,37 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
               left: 0, //getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
               right: 0, //getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
             ),
-            child: WebView(
-              initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                //_controller.complete(webViewController);
-              },
-              // TODO(iskakaushik): Remove this when collection literals makes it to stable.
-              // ignore: prefer_collection_literals
-              javascriptChannels: <JavascriptChannel>[
-                //_toasterJavascriptChannel(context),
-              ].toSet(),
-              /*navigationDelegate: (NavigationRequest request) {
-                if (request.url.startsWith('https://www.youtube.com/')) {
-                  print('blocking navigation to $request}');
-                  return NavigationDecision.prevent;
-                }
-                print('allowing navigation to $request');
-                return NavigationDecision.navigate;
-              },*/
-              onPageStarted: (String url) {
-                print('Page started loading: $url');
-              },
-              onPageFinished: (String url) {
-                print('Page finished loading: $url');
-              },
-              gestureNavigationEnabled: true,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: 4621.4 / 5134,
+                child: WebView(
+                  initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html',
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController webViewController) {
+                    //_controller.complete(webViewController);
+                  },
+                  // TODO(iskakaushik): Remove this when collection literals makes it to stable.
+                  // ignore: prefer_collection_literals
+                  javascriptChannels: <JavascriptChannel>[
+                    //_toasterJavascriptChannel(context),
+                  ].toSet(),
+                  /*navigationDelegate: (NavigationRequest request) {
+                    if (request.url.startsWith('https://www.youtube.com/')) {
+                      print('blocking navigation to $request}');
+                      return NavigationDecision.prevent;
+                    }
+                    print('allowing navigation to $request');
+                    return NavigationDecision.navigate;
+                  },*/
+                  onPageStarted: (String url) {
+                    print('Page started loading: $url');
+                  },
+                  onPageFinished: (String url) {
+                    print('Page finished loading: $url');
+                  },
+                  gestureNavigationEnabled: true,
+                ),
+              ),
             ),
           ),
         ),
