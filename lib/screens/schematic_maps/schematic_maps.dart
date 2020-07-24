@@ -28,6 +28,7 @@ class SchematicMapsMain extends StatefulWidget {
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
+  bool _showCctv = true;
 
   /*Set<JavascriptChannel> _javascriptChannel(BuildContext context) {
     return Set.from([
@@ -82,8 +83,22 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Visibility(
-                                visible: false,
-                                child: Material(
+                                visible: true,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(getPlatformSize(0.0)),
+                                    child: Image(
+                                      image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
+                                      width: getPlatformSize(32.0 * 20.0 / 17.6),
+                                      height: getPlatformSize(32.0),
+                                    ),
+                                  ),
+                                ),
+                                /*child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: () {},
@@ -105,7 +120,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                       ),
                                     ),
                                   ),
-                                ),
+                                ),*/
                               ),
                               Material(
                                 color: Colors.transparent,
@@ -239,13 +254,17 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         iconWidth: getPlatformSize(23.16),
                         iconHeight: getPlatformSize(19.19),
                         marginTop: getPlatformSize(0.0),
-                        isChecked: false,
+                        isChecked: _showCctv,
                         showProgress: false,
                         onClick: () async {
+                          bool showCctv = !_showCctv;
+                          setState(() {
+                            _showCctv = showCctv;
+                          });
                           final WebViewController controller =
                               await _controller.future;
                           controller.evaluateJavascript(
-                              'schematicMap.setCctvVisible(false);');
+                              'schematicMap.setCctvVisible($showCctv);');
                         },
                       ),
                     ],
