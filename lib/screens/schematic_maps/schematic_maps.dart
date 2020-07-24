@@ -206,8 +206,10 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         isChecked: false,
                         showProgress: false,
                         onClick: () async {
-                          final WebViewController controller = await _controller.future;
-                          controller.evaluateJavascript('schematicMap.changeZoom(1);');
+                          final WebViewController controller =
+                              await _controller.future;
+                          controller.evaluateJavascript(
+                              'schematicMap.changeZoom(1);');
                         },
                       ),
                       SizedBox(
@@ -222,8 +224,10 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         isChecked: false,
                         showProgress: false,
                         onClick: () async {
-                          final WebViewController controller = await _controller.future;
-                          controller.evaluateJavascript('schematicMap.changeZoom(-1);');
+                          final WebViewController controller =
+                              await _controller.future;
+                          controller.evaluateJavascript(
+                              'schematicMap.changeZoom(-1);');
                         },
                       ),
                       SizedBox(
@@ -237,7 +241,12 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         marginTop: getPlatformSize(0.0),
                         isChecked: false,
                         showProgress: false,
-                        onClick: () {},
+                        onClick: () async {
+                          final WebViewController controller =
+                              await _controller.future;
+                          controller.evaluateJavascript(
+                              'schematicMap.setCctvVisible(false);');
+                        },
                       ),
                     ],
                   ),

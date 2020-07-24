@@ -4896,6 +4896,8 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
+    this.showCctv = true;
+
     $(window).resize(() => {
       this.resizeSvgContainer();
     });
@@ -4916,10 +4918,16 @@
       this.resizeSvgContainer();
     };
 
-    this.drawMapMarker = function () {
+    this.setCctvVisible = visible => {
+      this.showCctv = visible;
+      this.drawMapMarker();
+    };
+
+    this.drawMapMarker = () => {
       const canvasWidth = this.ctx.canvas.width;
       const canvasHeight = this.ctx.canvas.height;
-      this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+      this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      if (!this.showCctv) return;
 
       let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 65;
       let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 65;
