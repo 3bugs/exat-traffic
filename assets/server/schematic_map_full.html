@@ -5000,8 +5000,8 @@
       const touches = evt.changedTouches;
       console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
 
-      const diffX = touches[0].pageX - touchStart.x;
-      const diffY = touches[0].pageY - touchStart.y;
+      const diffX = touches[0].pageX - this.touchStart.x;
+      const diffY = touches[0].pageY - this.touchStart.y;
 
       const containerWidth = this.svgContainer.width();
       const containerHeight = this.svgContainer.height();
