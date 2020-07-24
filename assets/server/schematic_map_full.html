@@ -4626,7 +4626,7 @@
   const LONGITUDE_LEFT = 100.171288;
   const LONGITUDE_RIGHT = 101.087897
 
-  const CANVAS_SCALE = 3;
+  const CANVAS_SCALE = 1;
 
   $(function () {
     const socket = io();
@@ -4666,13 +4666,13 @@
         if (trafficIndex == null) {
           color = '#808080';
         } else if (trafficIndex < 0.25) {
-          color = '#800000'
+          color = '#790A11'
         } else if (trafficIndex < 0.5) {
-          color = 'red';
+          color = '#EB222C';
         } else if (trafficIndex < 0.75) {
-          color = 'orange';
+          color = '#FDBD02';
         } else {
-          color = 'green';
+          color = '#22B573';
         }
 
         /*$('.chunk').css('fill', 'pink');
@@ -4717,12 +4717,19 @@
     });
 
     this.setZoomLevel = function (zoomLevel) {
+      if (zoomLevel < 1 || zoomLevel > 10) return;
+
       this.scale = zoomLevel;
       this.resizeSvgContainer();
     };
 
-    this.increaseZoom = function (zoom) {
-      this.scale = this.scale + zoom;
+    this.changeZoom = function (zoom) {
+      if ((zoom < 0 && this.scale <= 1) || (zoom > 0 && this.scale >= 10)) {
+        return;
+      }
+
+      this.scale += zoom;
+      this.resizeSvgContainer();
     };
 
     this.drawMapMarker = function () {
@@ -4730,8 +4737,8 @@
       const canvasHeight = this.ctx.canvas.height;
       this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 30;
-      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 30;
+      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 65;
+      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 65;
 
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);
@@ -4764,15 +4771,15 @@
         svgContainer.width(MAP_WIDTH * height / MAP_HEIGHT);
         /*myCanvas.height(height);
         myCanvas.width(MAP_WIDTH * height / MAP_HEIGHT);*/
-        this.ctx.canvas.height = CANVAS_SCALE * this.scale * height;
-        this.ctx.canvas.width = CANVAS_SCALE * this.scale * MAP_WIDTH * height / MAP_HEIGHT;
+        this.ctx.canvas.height = this.scale * height;
+        this.ctx.canvas.width = this.scale * MAP_WIDTH * height / MAP_HEIGHT;
       } else {
         svgContainer.width(width);
         svgContainer.height(MAP_HEIGHT * width / MAP_WIDTH);
         /*myCanvas.width(width);
         myCanvas.height(MAP_HEIGHT * width / MAP_WIDTH);*/
-        this.ctx.canvas.width = CANVAS_SCALE * this.scale * width;
-        this.ctx.canvas.height = CANVAS_SCALE * this.scale * MAP_HEIGHT * width / MAP_WIDTH;
+        this.ctx.canvas.width = this.scale * width;
+        this.ctx.canvas.height = this.scale * MAP_HEIGHT * width / MAP_WIDTH;
       }
 
       const svgWrapper = $('#svg-wrapper');
@@ -4781,12 +4788,13 @@
 
       console.log(`CTX CANVAS - Width: ${this.ctx.canvas.width}, Height: ${this.ctx.canvas.height}`);
 
-      this.drawMapMarker(10);
+      this.drawMapMarker();
     };
   }
 </script>
 
 <script>
+  let schematicMap;
   let touchStart;
   let svgWrapperTop = 0, svgWrapperLeft = 0;
 
@@ -4852,7 +4860,7 @@
   $(function () {
     $('#logo').hide();
     /*$("#svg-container").attachDragger();*/
-    const schematicMap = new SchematicMap(5);
+    schematicMap = new SchematicMap(1);
 
     const svgWrapper = document.getElementById("svg-wrapper");
     svgWrapper.addEventListener("touchstart", handleTouchStart, false);
