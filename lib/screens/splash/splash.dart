@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity/connectivity.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -50,8 +51,13 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
       _controller.forward();
     });
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _fetchSplashData(context);
+    Future.delayed(const Duration(milliseconds: 200), () async {
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        alert(context, "ไม่มีการเชื่อมต่อ", "EXAT Traffic ไม่สามารถทำงานได้หากไม่มีการเชื่อมต่อเครือข่าย");
+      } else {
+        _fetchSplashData(context);
+      }
     });
   }
 

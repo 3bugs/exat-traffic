@@ -243,30 +243,41 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      _keyDrawer.currentState.openDrawer();
-                                    },
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(getPlatformSize(0.0)),
-                                    ),
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                        left: getPlatformSize(3.0),
-                                        right: getPlatformSize(3.0),
-                                        top: getPlatformSize(2.0),
-                                        bottom: getPlatformSize(3.0),
+                                Row(
+                                  children: <Widget>[
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          _keyDrawer.currentState.openDrawer();
+                                        },
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(getPlatformSize(3.0)),
+                                        ),
+                                        child: Container(
+                                          padding: EdgeInsets.only(
+                                            left: getPlatformSize(3.0),
+                                            right: getPlatformSize(12.0),
+                                            top: getPlatformSize(6.0),
+                                            bottom: getPlatformSize(8.0),
+                                          ),
+                                          child: Image(
+                                            image: AssetImage('assets/images/home/ic_menu.png'),
+                                            width: getPlatformSize(22.0),
+                                            height: getPlatformSize(20.0),
+                                          ),
+                                        ),
                                       ),
-                                      child: Image(
-                                        image: AssetImage('assets/images/home/ic_menu.png'),
-                                        width: getPlatformSize(22.0),
-                                        height: getPlatformSize(20.0),
-                                      ),
                                     ),
-                                  ),
+
+                                    Image(
+                                      image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
+                                      width: getPlatformSize(24.0 * 20.0 / 17.6),
+                                      height: getPlatformSize(24.0),
+                                    ),
+                                  ],
                                 ),
+
                                 Material(
                                   color: Colors.transparent,
                                   child: InkWell(
@@ -403,8 +414,8 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       sizeTh: isBigScreen ? 55.0 : 44.0,
       sizeEn: isBigScreen ? 40.0 : 32.0,
       color: Colors.white,
-      heightTh: 0.8,
-      heightEn: 1.0,
+      heightTh: 1.1,
+      heightEn: 1.4,
     );
   }
 }
