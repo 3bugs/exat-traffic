@@ -4722,7 +4722,8 @@
     };
 
     this.increaseZoom = function (zoom) {
-      this.scale = this.scale + zoom;
+      this.scale += zoom;
+      this.resizeSvgContainer();
     };
 
     this.drawMapMarker = function () {
@@ -4781,12 +4782,13 @@
 
       console.log(`CTX CANVAS - Width: ${this.ctx.canvas.width}, Height: ${this.ctx.canvas.height}`);
 
-      this.drawMapMarker(10);
+      this.drawMapMarker();
     };
   }
 </script>
 
 <script>
+  let schematicMap;
   let touchStart;
   let svgWrapperTop = 0, svgWrapperLeft = 0;
 
@@ -4852,7 +4854,7 @@
   $(function () {
     $('#logo').hide();
     /*$("#svg-container").attachDragger();*/
-    const schematicMap = new SchematicMap(5);
+    schematicMap = new SchematicMap(1);
 
     const svgWrapper = document.getElementById("svg-wrapper");
     svgWrapper.addEventListener("touchstart", handleTouchStart, false);
