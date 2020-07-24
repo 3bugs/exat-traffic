@@ -1,5 +1,5 @@
-import 'package:exattraffic/bloc_old/bloc_provider.dart';
-import 'package:exattraffic/bloc_old/login_bloc.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -13,11 +13,8 @@ import 'package:exattraffic/constants.dart' as Constants;
 class SchematicMaps extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      bloc: LoginBloc(),
-      child: wrapSystemUiOverlayStyle(
-        child: SchematicMapsMain(),
-      ),
+    return wrapSystemUiOverlayStyle(
+      child: SchematicMapsMain(),
     );
   }
 }
@@ -28,6 +25,8 @@ class SchematicMapsMain extends StatefulWidget {
 }
 
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
+  final Completer<WebViewController> _controller = Completer<WebViewController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +54,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                   initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html',
                   javascriptMode: JavascriptMode.unrestricted,
                   onWebViewCreated: (WebViewController webViewController) {
-                    //_controller.complete(webViewController);
+                    _controller.complete(webViewController);
                   },
                   // TODO(iskakaushik): Remove this when collection literals makes it to stable.
                   // ignore: prefer_collection_literals
