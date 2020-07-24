@@ -4717,11 +4717,17 @@
     });
 
     this.setZoomLevel = function (zoomLevel) {
+      if (zoomLevel < 1 || zoomLevel > 10) return;
+
       this.scale = zoomLevel;
       this.resizeSvgContainer();
     };
 
-    this.increaseZoom = function (zoom) {
+    this.changeZoom = function (zoom) {
+      if ((zoom < 0 && this.scale <= 1) || (zoom > 0 && this.scale >= 10)) {
+        return;
+      }
+
       this.scale += zoom;
       this.resizeSvgContainer();
     };
