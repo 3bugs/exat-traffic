@@ -4975,7 +4975,7 @@
       this.drawMapMarker();
     };
 
-    this.handleTouchStart = function (evt) {
+    this.handleTouchStart = evt => {
       evt.preventDefault();
       console.log('----- TOUCH START');
       const touches = evt.changedTouches;
@@ -4984,7 +4984,7 @@
       //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
     };
 
-    this.handleTouchEnd = function (evt) {
+    this.handleTouchEnd = evt => {
       evt.preventDefault();
       console.log('----- TOUCH END');
       const touches = evt.changedTouches;
@@ -4994,7 +4994,7 @@
       this.svgWrapperTop = parseInt(this.svgWrapper.css('top'), 10);
     };
 
-    this.handleTouchMove = function (evt) {
+    this.handleTouchMove = evt => {
       evt.preventDefault();
       console.log('----- TOUCH MOVE');
       const touches = evt.changedTouches;
