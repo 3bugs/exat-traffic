@@ -4626,7 +4626,7 @@
   const LONGITUDE_LEFT = 100.171288;
   const LONGITUDE_RIGHT = 101.087897
 
-  const CANVAS_SCALE = 3;
+  const CANVAS_SCALE = 1;
 
   $(function () {
     const socket = io();
@@ -4737,8 +4737,8 @@
       const canvasHeight = this.ctx.canvas.height;
       this.ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 30;
-      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 30;
+      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 65;
+      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 65;
 
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);
@@ -4771,15 +4771,15 @@
         svgContainer.width(MAP_WIDTH * height / MAP_HEIGHT);
         /*myCanvas.height(height);
         myCanvas.width(MAP_WIDTH * height / MAP_HEIGHT);*/
-        this.ctx.canvas.height = CANVAS_SCALE * this.scale * height;
-        this.ctx.canvas.width = CANVAS_SCALE * this.scale * MAP_WIDTH * height / MAP_HEIGHT;
+        this.ctx.canvas.height = this.scale * height;
+        this.ctx.canvas.width = this.scale * MAP_WIDTH * height / MAP_HEIGHT;
       } else {
         svgContainer.width(width);
         svgContainer.height(MAP_HEIGHT * width / MAP_WIDTH);
         /*myCanvas.width(width);
         myCanvas.height(MAP_HEIGHT * width / MAP_WIDTH);*/
-        this.ctx.canvas.width = CANVAS_SCALE * this.scale * width;
-        this.ctx.canvas.height = CANVAS_SCALE * this.scale * MAP_HEIGHT * width / MAP_WIDTH;
+        this.ctx.canvas.width = this.scale * width;
+        this.ctx.canvas.height = this.scale * MAP_HEIGHT * width / MAP_WIDTH;
       }
 
       const svgWrapper = $('#svg-wrapper');
