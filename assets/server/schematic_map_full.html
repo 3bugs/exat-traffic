@@ -4943,8 +4943,8 @@
       this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       if (!this.showCctv) return;
 
-      let markerDrawWidth = this.scale * CCTV_MARKER_WIDTH / 65;
-      let markerDrawHeight = this.scale * CCTV_MARKER_HEIGHT / 65;
+      let markerDrawWidth = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_WIDTH / 65;
+      let markerDrawHeight = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_HEIGHT / 65;
 
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);

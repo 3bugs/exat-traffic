@@ -28,7 +28,7 @@ class SchematicMapsMain extends StatefulWidget {
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
-  bool _showCctv = true;
+  bool _showCctv = false;
 
   /*Set<JavascriptChannel> _javascriptChannel(BuildContext context) {
     return Set.from([
@@ -92,9 +92,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                   child: Padding(
                                     padding: EdgeInsets.all(getPlatformSize(0.0)),
                                     child: Image(
-                                      image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
-                                      width: getPlatformSize(32.0 * 20.0 / 17.6),
-                                      height: getPlatformSize(32.0),
+                                      image: AssetImage('assets/images/login/exat_logo_white_no_text-w200.png'),
+                                      width: getPlatformSize(24.0 * 20.0 / 17.6),
+                                      height: getPlatformSize(24.0),
                                     ),
                                   ),
                                 ),
@@ -207,7 +207,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         marginTop: getPlatformSize(0.0),
                         isChecked: false,
                         showProgress: false,
-                        onClick: () {},
+                        onClick: () {
+                          alert(context, 'EXAT Traffic', 'Under construction, coming soon :)');
+                        },
                       ),
                       SizedBox(
                         width: getPlatformSize(15.0),
@@ -232,7 +234,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                       ),
                       MapToolItem(
                         icon: AssetImage(
-                            'assets/images/schematic_maps/ic_zoom_in.png'),
+                            'assets/images/schematic_maps/ic_zoom_out.png'),
                         iconWidth: getPlatformSize(18.52),
                         iconHeight: getPlatformSize(18.52),
                         marginTop: getPlatformSize(0.0),
