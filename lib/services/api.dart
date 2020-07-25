@@ -98,7 +98,7 @@ class MyApi {
 class ExatApi {
   static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8081';
 
-  static Future<Map<String, dynamic>> fetchSplash(BuildContext context) async {
+  static Future<List<Map<String, dynamic>>> fetchSplash(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/posts/detailByName";
 
     ResponseResult responseResult = await _makeRequest(

@@ -26,19 +26,16 @@ class SchematicMapsMain extends StatefulWidget {
 }
 
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
-  final Completer<WebViewController> _controller =
-      Completer<WebViewController>();
+  final Completer<WebViewController> _controller = Completer<WebViewController>();
   bool _showCctv = false;
 
-  Set<JavascriptChannel> _javascriptChannel(BuildContext context) {
-    return Set.from([
-      JavascriptChannel(
-        name: 'Test',
-        onMessageReceived: (JavascriptMessage message) {
-          print(message.message);
-        },
-      ),
-    ]);
+  JavascriptChannel _cctvJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+      name: 'Test',
+      onMessageReceived: (JavascriptMessage message) {
+        print(message.message);
+      },
+    );
   }
 
   @override
@@ -58,19 +55,19 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
         child: SafeArea(
           child: Column(
             children: <Widget>[
-              // ปุ่ม Home
+              // พื้นที่ด้านบน maps (ปุ่ม home)
               Flexible(
                 flex: 1,
                 child: Padding(
                     padding: EdgeInsets.only(
                       left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                      right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN) -
-                          getPlatformSize(10.0),
+                      right:
+                          getPlatformSize(Constants.App.HORIZONTAL_MARGIN) - getPlatformSize(10.0),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        // ปุ่มเมนูแฮมเบอร์เกอร์, ปุ่มโทร
+                        // exat logo
                         Padding(
                           padding: EdgeInsets.only(
                             left: getPlatformSize(0.0),
@@ -83,7 +80,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Visibility(
-                                visible: true,
+                                visible: false,
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
@@ -92,7 +89,8 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                   child: Padding(
                                     padding: EdgeInsets.all(getPlatformSize(0.0)),
                                     child: Image(
-                                      image: AssetImage('assets/images/login/exat_logo_white_no_text-w200.png'),
+                                      image: AssetImage(
+                                          'assets/images/login/exat_logo_white_no_text-w200.png'),
                                       width: getPlatformSize(24.0 * 20.0 / 17.6),
                                       height: getPlatformSize(24.0),
                                     ),
@@ -136,8 +134,8 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                     height: getPlatformSize(44.0),
                                     child: Center(
                                       child: Image(
-                                        image: AssetImage(
-                                            'assets/images/schematic_maps/ic_home.png'),
+                                        image:
+                                            AssetImage('assets/images/schematic_maps/ic_home.png'),
                                         width: getPlatformSize(20.69),
                                         height: getPlatformSize(17.19),
                                       ),
@@ -157,22 +155,22 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                 padding: EdgeInsets.only(
                   left: 0,
                   //getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
-                  right:
-                      0, //getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
+                  right: 0, //getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
                 ),
                 child: Center(
                   child: AspectRatio(
                     aspectRatio: 4621.4 / 5134,
                     child: WebView(
-                      initialUrl:
-                          'http://163.47.9.26/demo/schematic_map_full.html',
+                      initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html',
                       javascriptMode: JavascriptMode.unrestricted,
                       onWebViewCreated: (WebViewController webViewController) {
                         _controller.complete(webViewController);
                       },
                       // TODO(iskakaushik): Remove this when collection literals makes it to stable.
                       // ignore: prefer_collection_literals
-                      javascriptChannels: _javascriptChannel(context),
+                      javascriptChannels: <JavascriptChannel>[
+                        _cctvJavascriptChannel(context),
+                      ].toSet(),
                       /*navigationDelegate: (NavigationRequest request) {
                         if (request.url.startsWith('https://www.youtube.com/')) {
                           print('blocking navigation to $request}');
@@ -193,15 +191,15 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                 ),
               ),
 
+              // พื้นที่ด้านล่าง maps (ปุ่มเครื่องมือ)
               Flexible(
-                flex: 1,
+                flex: 2,
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       MapToolItem(
-                        icon: AssetImage(
-                            'assets/images/map_tools/ic_map_tool_location.png'),
+                        icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
                         iconWidth: getPlatformSize(21.0),
                         iconHeight: getPlatformSize(21.0),
                         marginTop: getPlatformSize(0.0),
@@ -215,44 +213,37 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                         width: getPlatformSize(15.0),
                       ),
                       MapToolItem(
-                        icon: AssetImage(
-                            'assets/images/schematic_maps/ic_zoom_in.png'),
+                        icon: AssetImage('assets/images/schematic_maps/ic_zoom_in.png'),
                         iconWidth: getPlatformSize(18.52),
                         iconHeight: getPlatformSize(18.52),
                         marginTop: getPlatformSize(0.0),
                         isChecked: false,
                         showProgress: false,
                         onClick: () async {
-                          final WebViewController controller =
-                              await _controller.future;
-                          controller.evaluateJavascript(
-                              'schematicMap.changeZoom(1);');
+                          final WebViewController controller = await _controller.future;
+                          controller.evaluateJavascript('schematicMap.changeZoom(1);');
                         },
                       ),
                       SizedBox(
                         width: getPlatformSize(15.0),
                       ),
                       MapToolItem(
-                        icon: AssetImage(
-                            'assets/images/schematic_maps/ic_zoom_out.png'),
+                        icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
                         iconWidth: getPlatformSize(18.52),
                         iconHeight: getPlatformSize(18.52),
                         marginTop: getPlatformSize(0.0),
                         isChecked: false,
                         showProgress: false,
                         onClick: () async {
-                          final WebViewController controller =
-                              await _controller.future;
-                          controller.evaluateJavascript(
-                              'schematicMap.changeZoom(-1);');
+                          final WebViewController controller = await _controller.future;
+                          controller.evaluateJavascript('schematicMap.changeZoom(-1);');
                         },
                       ),
                       SizedBox(
                         width: getPlatformSize(15.0),
                       ),
                       MapToolItem(
-                        icon: AssetImage(
-                            'assets/images/schematic_maps/ic_cctv.png'),
+                        icon: AssetImage('assets/images/schematic_maps/ic_cctv.png'),
                         iconWidth: getPlatformSize(23.16),
                         iconHeight: getPlatformSize(19.19),
                         marginTop: getPlatformSize(0.0),
@@ -263,10 +254,8 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                           setState(() {
                             _showCctv = showCctv;
                           });
-                          final WebViewController controller =
-                              await _controller.future;
-                          controller.evaluateJavascript(
-                              'schematicMap.setCctvVisible($showCctv);');
+                          final WebViewController controller = await _controller.future;
+                          controller.evaluateJavascript('schematicMap.setCctvVisible($showCctv);');
                         },
                       ),
                     ],

@@ -64,24 +64,47 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   void _fetchSplashData(BuildContext context) async {
     GeolocationStatus geolocationStatus = await Geolocator().checkGeolocationPermissionStatus();
     if (geolocationStatus == GeolocationStatus.granted) {
-      try {
+      ExatApi.fetchSplash(context).then((dataMap) {
+        print('SPLASH SCREEN FETCHED');
+        print('http://163.47.9.26${dataMap[0]['cover']}');
+
+        setState(() {
+          _splashImageUrl = 'http://163.47.9.26${dataMap[0]['cover']}';
+        });
+      });
+
+      /*try {
         ExatApi.fetchSplash(context).then((dataMap) {
+          print('SPLASH SCREEN FETCHED');
+          print('http://163.47.9.26${dataMap['cover']}');
+
           setState(() {
             _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
           });
         });
       } catch (_) {
-        // do nothing
-      }
+        print('ERROR LOADING SPLASH SCREEN');
+      }*/
     } else {
-      try {
+      Map<String, dynamic> dataMap = await ExatApi.fetchSplash(context);
+      print('SPLASH SCREEN FETCHED');
+      print('http://163.47.9.26${dataMap['cover']}');
+
+      setState(() {
+        _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
+      });
+
+      /*try {
         Map<String, dynamic> dataMap = await ExatApi.fetchSplash(context);
+        print('SPLASH SCREEN FETCHED');
+        print('http://163.47.9.26${dataMap['cover']}');
+
         setState(() {
           _splashImageUrl = 'http://163.47.9.26${dataMap['cover']}';
         });
       } catch (_) {
-        // do nothing
-      }
+        print('ERROR LOADING SPLASH SCREEN');
+      }*/
     }
 
     //Future.delayed(Duration.zero, () {
