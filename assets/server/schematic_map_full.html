@@ -39,6 +39,8 @@
 <div style="position: absolute; left: 10px; top: 10px;">
   <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
   <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
+  <input type="checkbox" id="cb-toggle-cctv">
+  <label for="cb-toggle-cctv" style="color: white"> CCTV</label>
 </div>
 <!--<div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; background-color: #f8f8f8; border: 0px solid red">
   <div class="main-container" style="border: 0px solid red; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%">-->
@@ -4901,7 +4903,7 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
-    this.showCctv = true;
+    this.showCctv = false;
 
     $(window).resize(() => {
       this.resizeSvgContainer();
@@ -5078,9 +5080,13 @@
   let schematicMap;
 
   $(function () {
-    $('#logo').hide();
-    /*$("#svg-container").attachDragger();*/
     schematicMap = new SchematicMap(1);
+
+    $('#logo').hide();
+
+    $("#cb-toggle-cctv").change(function() {
+      schematicMap.setCctvVisible(this.checked);
+    });
 
     const svgWrapper = document.getElementById("svg-wrapper");
     svgWrapper.addEventListener("touchstart", schematicMap.handleTouchStart, false);
