@@ -36,6 +36,10 @@
 </head>
 
 <body>
+<div style="position: fixed">
+  <button onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
+  <button onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
+</div>
 <!--<div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; background-color: #f8f8f8; border: 0px solid red">
   <div class="main-container" style="border: 0px solid red; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%">-->
 <div id="main-container"
@@ -4882,8 +4886,9 @@
   function SchematicMap(initialScale) {
     this.scale = initialScale;
 
-    this.svgWrapper = $('#svg-wrapper');
+    this.mainContainer = $('#main-container');
     this.svgContainer = $('#svg-container');
+    this.svgWrapper = $('#svg-wrapper');
 
     this.canvas = document.getElementById("my-canvas");
     this.ctx = this.canvas.getContext("2d");
@@ -4948,39 +4953,70 @@
       });
     };
 
-    this.resizeSvgContainer = function () {
-      const mainContainer = $('#main-container');
-      const svgContainer = $('#svg-container');
-
-      const width = mainContainer.width();
-      const height = mainContainer.height();
+    this.resizeSvgContainer = () => {
+      const width = this.mainContainer.width();
+      const height = this.mainContainer.height();
 
       //alert(`Width: ${width}, Height: ${height}`);
 
       const mapRatio = MAP_WIDTH / MAP_HEIGHT;
       if (width / height > mapRatio) {
-        svgContainer.height(height);
-        svgContainer.width(MAP_WIDTH * height / MAP_HEIGHT);
+        this.svgContainer.height(height);
+        this.svgContainer.width(MAP_WIDTH * height / MAP_HEIGHT);
         /*myCanvas.height(height);
         myCanvas.width(MAP_WIDTH * height / MAP_HEIGHT);*/
         this.ctx.canvas.height = this.scale * height;
         this.ctx.canvas.width = this.scale * MAP_WIDTH * height / MAP_HEIGHT;
       } else {
-        svgContainer.width(width);
-        svgContainer.height(MAP_HEIGHT * width / MAP_WIDTH);
+        this.svgContainer.width(width);
+        this.svgContainer.height(MAP_HEIGHT * width / MAP_WIDTH);
         /*myCanvas.width(width);
         myCanvas.height(MAP_HEIGHT * width / MAP_WIDTH);*/
         this.ctx.canvas.width = this.scale * width;
         this.ctx.canvas.height = this.scale * MAP_HEIGHT * width / MAP_WIDTH;
       }
 
-      const svgWrapper = $('#svg-wrapper');
-      svgWrapper.css('width', Math.floor(100 * this.scale) + '%');
-      svgWrapper.css('height', Math.floor(100 * this.scale) + '%');
+      // หา anchor point บน svg-wrapper
+      const svgContainerCenter = {x: this.svgContainer.width() / 2, y: this.svgContainer.height() / 2};
+      const svgWrapperPosition = {
+        left: parseInt(this.svgWrapper.css('left'), 10),
+        top: parseInt(this.svgWrapper.css('top'), 10),
+      };
+      const svgOldAnchorPoint = {
+        x: svgContainerCenter.x - svgWrapperPosition.left,
+        y: svgContainerCenter.y - svgWrapperPosition.top,
+      };
+      const svgWrapperOldSize = {width: this.svgWrapper.width(), height: this.svgWrapper.height()};
 
+      // resize svg-wrapper
+      this.svgWrapper.css('width', Math.floor(100 * this.scale) + '%');
+      this.svgWrapper.css('height', Math.floor(100 * this.scale) + '%');
       console.log(`CTX CANVAS - Width: ${this.ctx.canvas.width}, Height: ${this.ctx.canvas.height}`);
 
+      // translate svg-wrapper เพื่อคง anchor point ไว้
+      const svgWrapperNewSize = {width: this.svgWrapper.width(), height: this.svgWrapper.height()};
+      const svgNewAnchorPoint = {
+        x: svgOldAnchorPoint.x * (svgWrapperNewSize.width / svgWrapperOldSize.width),
+        y: svgOldAnchorPoint.y * (svgWrapperNewSize.height / svgWrapperOldSize.height),
+      };
+
+      let newLeft = svgWrapperPosition.left - (svgNewAnchorPoint.x - svgOldAnchorPoint.x);
+      if (newLeft > 0) {
+        newLeft = 0;
+      } else if (newLeft + svgWrapperNewSize.width < this.svgContainer.width()) {
+        newLeft = this.svgContainer.width() - svgWrapperNewSize.width;
+      }
+      let newTop = svgWrapperPosition.top - (svgNewAnchorPoint.y - svgOldAnchorPoint.y);
+      if (newTop > 0) {
+        newTop = 0;
+      } else if (newTop + svgWrapperNewSize.height < this.svgContainer.height()) {
+        newTop = this.svgContainer.height() - svgWrapperNewSize.height;
+      }
+      this.svgWrapper.css('left', newLeft);
+      this.svgWrapper.css('top', newTop);
+
       this.drawMapMarker();
+      //this.adjustWrapperPosition();
     };
 
     this.handleTouchStart = evt => {
@@ -4990,6 +5026,9 @@
       this.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
       console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
       //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
+
+      this.svgWrapperLeft = parseInt(this.svgWrapper.css('left'), 10);
+      this.svgWrapperTop = parseInt(this.svgWrapper.css('top'), 10);
     };
 
     this.handleTouchEnd = evt => {
@@ -4997,9 +5036,6 @@
       console.log('----- TOUCH END');
       const touches = evt.changedTouches;
       console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
-
-      this.svgWrapperLeft = parseInt(this.svgWrapper.css('left'), 10);
-      this.svgWrapperTop = parseInt(this.svgWrapper.css('top'), 10);
     };
 
     this.handleTouchMove = evt => {
@@ -5044,7 +5080,7 @@
   $(function () {
     $('#logo').hide();
     /*$("#svg-container").attachDragger();*/
-    schematicMap = new SchematicMap(1);
+    schematicMap = new SchematicMap(3);
 
     const svgWrapper = document.getElementById("svg-wrapper");
     svgWrapper.addEventListener("touchstart", schematicMap.handleTouchStart, false);
