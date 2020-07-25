@@ -30,7 +30,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
       Completer<WebViewController>();
   bool _showCctv = false;
 
-  /*Set<JavascriptChannel> _javascriptChannel(BuildContext context) {
+  Set<JavascriptChannel> _javascriptChannel(BuildContext context) {
     return Set.from([
       JavascriptChannel(
         name: 'Test',
@@ -39,7 +39,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
         },
       ),
     ]);
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +172,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                       },
                       // TODO(iskakaushik): Remove this when collection literals makes it to stable.
                       // ignore: prefer_collection_literals
-                      //javascriptChannels: _javascriptChannel(context),
+                      javascriptChannels: _javascriptChannel(context),
                       /*navigationDelegate: (NavigationRequest request) {
                         if (request.url.startsWith('https://www.youtube.com/')) {
                           print('blocking navigation to $request}');

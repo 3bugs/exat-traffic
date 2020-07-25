@@ -40,6 +40,7 @@
   <div>
     <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
     <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
+    <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(1.3)">FIT</button>
   </div>
   <div style="margin-top: 5px">
     <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(1)">1X</button>
@@ -4893,6 +4894,7 @@
 
 <script>
   function SchematicMap(initialScale) {
+    const self = this;
     this.scale = initialScale;
 
     this.mainContainer = $('#main-container');
@@ -4910,11 +4912,29 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
-    this.showCctv = false;
+    this.showCctv = false
+
+    addTouchHandler();
+    addClickCanvasHandler();
 
     $(window).resize(() => {
       this.resizeSvgContainer();
     });
+
+    function addTouchHandler() {
+      self.svgWrapper.get(0).addEventListener("touchstart", handleTouchStart, false);
+      self.svgWrapper.get(0).addEventListener("touchend", handleTouchEnd, false);
+      //svgWrapper.addEventListener("touchcancel", handleTouchCancel, false);
+      self.svgWrapper.get(0).addEventListener("touchmove", handleTouchMove, false);
+
+      self.svgWrapper.get(0).onmousedown = handleTouchStart;
+      self.svgWrapper.get(0).onmousemove = handleTouchMove;
+      document.onmouseup = handleTouchEnd;
+    }
+
+    function addClickCanvasHandler() {
+      self.canvas.addEventListener('click', handleClickCanvas);
+    }
 
     this.setZoomLevel = function (zoomLevel) {
       if (zoomLevel < 1 || zoomLevel > 10) return;
@@ -4928,7 +4948,7 @@
         return;
       }
 
-      this.scale += zoom;
+      this.scale = Math.floor(this.scale) + zoom;
       this.resizeSvgContainer();
     };
 
@@ -4951,13 +4971,20 @@
 
       cctvList.forEach(cctv => {
         if (cctv.status === 1) {
+          const left = (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
+          const top = (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
+
           this.ctx.drawImage(
             this.scale === 1 ? this.imgMapMarker : this.imgMapMarker,
-            (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2),
-            (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight,
+            left,
+            top,
             markerDrawWidth,
             markerDrawHeight
           );
+
+          cctv.boundary = {
+            left, top, right: left + markerDrawWidth - 1, bottom: top + markerDrawHeight - 1,
+          };
         }
       });
     };
@@ -5021,6 +5048,12 @@
       } else if (newTop + svgWrapperNewSize.height < this.svgContainer.height()) {
         newTop = this.svgContainer.height() - svgWrapperNewSize.height;
       }
+
+      if (this.scale === 1.3) {
+        newLeft = -0.18 * svgWrapperNewSize.width;
+        newTop = -0.13 * svgWrapperNewSize.height;
+      }
+
       this.svgWrapper.css('left', newLeft);
       this.svgWrapper.css('top', newTop);
 
@@ -5028,35 +5061,35 @@
       //this.adjustWrapperPosition();
     };
 
-    this.handleTouchStart = evt => {
+    function handleTouchStart(evt) {
       evt.preventDefault();
       console.log('----- TOUCH START');
 
       if (evt.changedTouches) {
         const touches = evt.changedTouches;
-        this.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
+        self.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
         console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
       } else {
-        this.touchStart = {x: evt.clientX, y: evt.clientY};
+        self.touchStart = {x: evt.clientX, y: evt.clientY};
       }
       //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
 
-      this.svgWrapperLeft = parseInt(this.svgWrapper.css('left'), 10);
-      this.svgWrapperTop = parseInt(this.svgWrapper.css('top'), 10);
-    };
+      self.svgWrapperLeft = parseInt(self.svgWrapper.css('left'), 10);
+      self.svgWrapperTop = parseInt(self.svgWrapper.css('top'), 10);
+    }
 
-    this.handleTouchEnd = evt => {
+    function handleTouchEnd(evt) {
       evt.preventDefault();
       console.log('----- TOUCH END');
-      this.touchStart = null;
-      this.svgWrapper.hide().show(0); // refresh
+      self.touchStart = null;
+      self.svgWrapper.hide().show(0); // refresh
 
       /*const touches = evt.changedTouches;
       console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);*/
-    };
+    }
 
-    this.handleTouchMove = evt => {
-      if (this.touchStart == null) return;
+    function handleTouchMove(evt) {
+      if (self.touchStart == null) return;
 
       evt.preventDefault();
       console.log('----- TOUCH MOVE');
@@ -5065,37 +5098,57 @@
       if (evt.changedTouches) {
         const touches = evt.changedTouches;
         console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
-        diffX = touches[0].pageX - this.touchStart.x;
-        diffY = touches[0].pageY - this.touchStart.y;
+        diffX = touches[0].pageX - self.touchStart.x;
+        diffY = touches[0].pageY - self.touchStart.y;
       } else {
-        diffX = evt.clientX - this.touchStart.x;
-        diffY = evt.clientY - this.touchStart.y;
+        diffX = evt.clientX - self.touchStart.x;
+        diffY = evt.clientY - self.touchStart.y;
       }
 
-      const containerWidth = this.svgContainer.width();
-      const containerHeight = this.svgContainer.height();
-      const wrapperWidth = this.svgWrapper.width();
-      const wrapperHeight = this.svgWrapper.height();
+      const containerWidth = self.svgContainer.width();
+      const containerHeight = self.svgContainer.height();
+      const wrapperWidth = self.svgWrapper.width();
+      const wrapperHeight = self.svgWrapper.height();
 
       let newLeft, newTop;
-      if (this.svgWrapperLeft + diffX > 0) {
+      if (self.svgWrapperLeft + diffX > 0) {
         newLeft = 0;
-      } else if (this.svgWrapperLeft + diffX < containerWidth - wrapperWidth) {
+      } else if (self.svgWrapperLeft + diffX < containerWidth - wrapperWidth) {
         newLeft = containerWidth - wrapperWidth;
       } else {
-        newLeft = this.svgWrapperLeft + diffX;
+        newLeft = self.svgWrapperLeft + diffX;
       }
-      if (this.svgWrapperTop + diffY > 0) {
+      if (self.svgWrapperTop + diffY > 0) {
         newTop = 0;
-      } else if (this.svgWrapperTop + diffY < containerHeight - wrapperHeight) {
+      } else if (self.svgWrapperTop + diffY < containerHeight - wrapperHeight) {
         newTop = containerHeight - wrapperHeight;
       } else {
-        newTop = this.svgWrapperTop + diffY;
+        newTop = self.svgWrapperTop + diffY;
       }
 
-      this.svgWrapper.css('left', newLeft);
-      this.svgWrapper.css('top', newTop);
-      //this.svgWrapper.hide().show(0); // refresh
+      self.svgWrapper.css('left', newLeft);
+      self.svgWrapper.css('top', newTop);
+      //self.svgWrapper.hide().show(0); // refresh
+    }
+
+    function handleClickCanvas(evt) {
+      const rect = self.canvas.getBoundingClientRect();
+      const x = evt.clientX - rect.left;
+      const y = evt.clientY - rect.top;
+      console.log(`x: ${x}, y: ${y}`);
+      //alert(`x: ${x}, y: ${y}`);
+
+      if (self.showCctv) {
+        for (let i = 0; i < cctvList.length; i++) {
+          const cctv = cctvList[i];
+          if (cctv.boundary) {
+            if (x > cctv.boundary.left && x < cctv.boundary.right && y > cctv.boundary.top && y < cctv.boundary.bottom) {
+              alert(cctv.name);
+              break;
+            }
+          }
+        }
+      }
     }
   }
 </script>
@@ -5107,20 +5160,11 @@
     schematicMap = new SchematicMap(1);
 
     $('#logo').hide();
-
     $("#cb-toggle-cctv").change(function () {
       schematicMap.setCctvVisible(this.checked);
     });
 
-    const svgWrapper = document.getElementById("svg-wrapper");
-    svgWrapper.addEventListener("touchstart", schematicMap.handleTouchStart, false);
-    svgWrapper.addEventListener("touchend", schematicMap.handleTouchEnd, false);
-    //svgWrapper.addEventListener("touchcancel", handleTouchCancel, false);
-    svgWrapper.addEventListener("touchmove", schematicMap.handleTouchMove, false);
-
-    svgWrapper.onmousedown = schematicMap.handleTouchStart;
-    svgWrapper.onmousemove = schematicMap.handleTouchMove;
-    document.onmouseup = schematicMap.handleTouchEnd;
+    //Test('55555');
   });
 </script>
 </body>
