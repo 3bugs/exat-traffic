@@ -4771,7 +4771,7 @@
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>-->
 <!--<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
-<script src="node_modules/dragscroll/dragscroll.js"></script>
+<!--<script src="node_modules/dragscroll/dragscroll.js"></script>-->
 
 <!--<script>
   $.fn.attachDragger = function () {
@@ -5024,9 +5024,14 @@
     this.handleTouchStart = evt => {
       evt.preventDefault();
       console.log('----- TOUCH START');
-      const touches = evt.changedTouches;
-      this.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
-      console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+
+      if (evt.changedTouches) {
+        const touches = evt.changedTouches;
+        this.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
+        console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+      } else {
+        this.touchStart = {x: evt.clientX, y: evt.clientY};
+      }
       //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
 
       this.svgWrapperLeft = parseInt(this.svgWrapper.css('left'), 10);
@@ -5036,18 +5041,29 @@
     this.handleTouchEnd = evt => {
       evt.preventDefault();
       console.log('----- TOUCH END');
-      const touches = evt.changedTouches;
-      console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+      this.touchStart = null;
+      this.svgWrapper.hide().show(0); // refresh
+
+      /*const touches = evt.changedTouches;
+      console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);*/
     };
 
     this.handleTouchMove = evt => {
+      if (this.touchStart == null) return;
+
       evt.preventDefault();
       console.log('----- TOUCH MOVE');
-      const touches = evt.changedTouches;
-      console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
 
-      const diffX = touches[0].pageX - this.touchStart.x;
-      const diffY = touches[0].pageY - this.touchStart.y;
+      let diffX, diffY;
+      if (evt.changedTouches) {
+        const touches = evt.changedTouches;
+        console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
+        diffX = touches[0].pageX - this.touchStart.x;
+        diffY = touches[0].pageY - this.touchStart.y;
+      } else {
+        diffX = evt.clientX - this.touchStart.x;
+        diffY = evt.clientY - this.touchStart.y;
+      }
 
       const containerWidth = this.svgContainer.width();
       const containerHeight = this.svgContainer.height();
@@ -5072,6 +5088,7 @@
 
       this.svgWrapper.css('left', newLeft);
       this.svgWrapper.css('top', newTop);
+      this.svgWrapper.hide().show(0); // refresh
     }
   }
 </script>
@@ -5093,6 +5110,10 @@
     svgWrapper.addEventListener("touchend", schematicMap.handleTouchEnd, false);
     //svgWrapper.addEventListener("touchcancel", handleTouchCancel, false);
     svgWrapper.addEventListener("touchmove", schematicMap.handleTouchMove, false);
+
+    svgWrapper.onmousedown = schematicMap.handleTouchStart;
+    svgWrapper.onmousemove = schematicMap.handleTouchMove;
+    svgWrapper.onmouseup = schematicMap.handleTouchEnd;
   });
 </script>
 </body>
