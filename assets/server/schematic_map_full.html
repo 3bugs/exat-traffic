@@ -37,10 +37,17 @@
 
 <body>
 <div style="position: absolute; left: 10px; top: 10px;">
-  <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
-  <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
-  <input type="checkbox" id="cb-toggle-cctv">
-  <label for="cb-toggle-cctv" style="color: white"> CCTV</label>
+  <div>
+    <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
+    <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
+  </div>
+  <div style="margin-top: 5px">
+    <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(1)">1X</button>
+    <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(5)">5X</button>
+    <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(10)">10X</button>
+    <input type="checkbox" id="cb-toggle-cctv">
+    <label for="cb-toggle-cctv" style="color: white"> CCTV</label>
+  </div>
 </div>
 <!--<div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; background-color: #f8f8f8; border: 0px solid red">
   <div class="main-container" style="border: 0px solid red; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%">-->
@@ -5101,7 +5108,7 @@
 
     $('#logo').hide();
 
-    $("#cb-toggle-cctv").change(function() {
+    $("#cb-toggle-cctv").change(function () {
       schematicMap.setCctvVisible(this.checked);
     });
 
