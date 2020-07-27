@@ -4893,9 +4893,11 @@
 </script>
 
 <script>
-  function SchematicMap(initialScale) {
+  function SchematicMap({initialScale, backendMode, editMode}) {
     const self = this;
     this.scale = initialScale;
+    this.backendMode = backendMode;
+    this.editMode = editMode;
 
     this.mainContainer = $('#main-container');
     this.svgContainer = $('#svg-container');
@@ -5064,11 +5066,38 @@
       evt.preventDefault();
       console.log('----- TOUCH START');
 
+      // ถ้า get จาก svgContainer.css จะได้ค่า auto เลยต้องคำนวณหาเอง
+      const svgContainerLeft = (self.mainContainer.width() - self.svgContainer.width()) / 2;
+      const svgContainerTop = (self.mainContainer.height() - self.svgContainer.height()) / 2;
+
       if (evt.changedTouches) {
         const touches = evt.changedTouches;
+
+        // ตำแหน่ง x, y บน canvas
+        const x = touches[0].pageX - svgContainerLeft - parseInt(self.svgWrapper.css('left'), 10);
+        const y = touches[0].pageY - svgContainerTop - parseInt(self.svgWrapper.css('top'), 10);
+        console.log(`handleTouchStart - x: ${x}, y: ${y}`);
+
+        const cctv = getCctv({x, y});
+        // ถ้าคลิกโดนหมุดกล้อง ไม่ต้อง touch start
+        if (cctv && self.showCctv) {
+          //alert(cctv.name);
+          return;
+        }
+
         self.touchStart = {x: touches[0].pageX, y: touches[0].pageY};
-        console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);
       } else {
+        // ตำแหน่ง x, y บน canvas
+        const x = evt.clientX - svgContainerLeft - parseInt(self.svgWrapper.css('left'), 10);
+        const y = evt.clientY - svgContainerTop - parseInt(self.svgWrapper.css('top'), 10);
+        console.log(`handleTouchStart - x: ${x}, y: ${y}`);
+
+        const cctv = getCctv({x, y});
+        // ถ้าคลิกโดนหมุดกล้อง ไม่ต้อง touch start
+        if (cctv && self.showCctv) {
+          return;
+        }
+
         self.touchStart = {x: evt.clientX, y: evt.clientY};
       }
       //console.log('top: ' + $('#svg-wrapper').position().top + ', left: ' + $('#svg-wrapper').position().left);
@@ -5134,20 +5163,28 @@
       const rect = self.canvas.getBoundingClientRect();
       const x = evt.clientX - rect.left;
       const y = evt.clientY - rect.top;
-      console.log(`x: ${x}, y: ${y}`);
+      console.log(`handleClickCanvas - x: ${x}, y: ${y}`);
       //alert(`x: ${x}, y: ${y}`);
 
       if (self.showCctv) {
-        for (let i = 0; i < cctvList.length; i++) {
-          const cctv = cctvList[i];
-          if (cctv.boundary) {
-            if (x > cctv.boundary.left && x < cctv.boundary.right && y > cctv.boundary.top && y < cctv.boundary.bottom) {
-              alert(cctv.name);
-              break;
-            }
+        const clickedCctv = getCctv({x, y});
+        if (clickedCctv != null) {
+          alert(clickedCctv.name);
+        }
+      }
+    }
+
+    function getCctv({x, y}) {
+      for (let i = 0; i < cctvList.length; i++) {
+        const cctv = cctvList[i];
+        if (cctv.boundary) {
+          if (x > cctv.boundary.left && x < cctv.boundary.right &&
+            y > cctv.boundary.top && y < cctv.boundary.bottom) {
+            return cctv;
           }
         }
       }
+      return null;
     }
   }
 </script>
@@ -5156,7 +5193,15 @@
   let schematicMap;
 
   $(function () {
-    schematicMap = new SchematicMap(1);
+    const urlParams = new URLSearchParams(window.location.search);
+    const backendMode = urlParams.get('backend');
+    const editMode = urlParams.get('edit');
+
+    schematicMap = new SchematicMap({
+      initialScale: 1,
+      backendMode,
+      editMode,
+    });
 
     //$('#logo').hide();
     $("#cb-toggle-cctv").change(function () {

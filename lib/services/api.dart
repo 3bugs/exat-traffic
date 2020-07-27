@@ -98,7 +98,7 @@ class MyApi {
 class ExatApi {
   static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8081';
 
-  static Future<List<Map<String, dynamic>>> fetchSplash(BuildContext context) async {
+  static Future<List> fetchSplash(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/posts/detailByName";
 
     ResponseResult responseResult = await _makeRequest(
@@ -109,7 +109,11 @@ class ExatApi {
       },
     );
     if (responseResult.success) {
-      return responseResult.data;
+      if (responseResult.data is List) {
+        return responseResult.data;
+      } else {
+        return new List()..add(responseResult.data);
+      }
     } else {
       throw Exception(responseResult.data);
     }
