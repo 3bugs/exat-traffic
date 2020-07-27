@@ -4969,16 +4969,21 @@
       this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       if (!this.showCctv) return;
 
-      let markerDrawWidth = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_WIDTH / 65;
-      let markerDrawHeight = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_HEIGHT / 65;
+      let markerDrawWidth = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_WIDTH / (self.backendMode ? 45 : 65);
+      let markerDrawHeight = (this.scale > 6 ? 6 : this.scale) * CCTV_MARKER_HEIGHT / (self.backendMode ? 45 : 65);
 
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);
 
       cctvList.forEach(cctv => {
         if (cctv.status === 1) {
-          const left = (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
-          const top = (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
+          let left = (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
+          let top = (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
+
+          if (cctv.x != null && cctv.y != null) {
+            left = (canvasWidth * cctv.x) - (markerDrawWidth / 2);
+            top = (canvasHeight * cctv.y) - markerDrawHeight;
+          }
 
           this.ctx.drawImage(
             this.scale === 1 ? this.imgMapMarker : this.imgMapMarker,
@@ -5200,8 +5205,10 @@
 
       if (self.cctvToMove) {
         console.log('MOVE CCTV: ' + self.cctvToMove.name);
-        self.cctvToMove.latitude = LATITUDE_TOP - (y * (LATITUDE_TOP - LATITUDE_BOTTOM) / self.ctx.canvas.height);
-        self.cctvToMove.longitude = (x * (LONGITUDE_RIGHT - LONGITUDE_LEFT) / self.ctx.canvas.width) + LONGITUDE_LEFT;
+        /*self.cctvToMove.latitude = LATITUDE_TOP - (y * (LATITUDE_TOP - LATITUDE_BOTTOM) / self.ctx.canvas.height);
+        self.cctvToMove.longitude = (x * (LONGITUDE_RIGHT - LONGITUDE_LEFT) / self.ctx.canvas.width) + LONGITUDE_LEFT;*/
+        self.cctvToMove.x = x / self.ctx.canvas.width;
+        self.cctvToMove.y = y / self.ctx.canvas.height;
         self.drawMapMarker();
       }
     }
@@ -5213,11 +5220,10 @@
       console.log(`handleMouseUpCanvas - x: ${x}, y: ${y}`);
 
       if (self.cctvToMove) {
-        const scaleX = x / self.ctx.canvas.width;
-        const scaleY = y / self.ctx.canvas.height;
-
-        // todo: update scaleX, scaleY to db
-
+        self.cctvToMove.x = x / self.ctx.canvas.width;
+        self.cctvToMove.y = y / self.ctx.canvas.height;
+        self.drawMapMarker();
+        saveCctvPosition();
         self.cctvToMove = null;
       }
     }
@@ -5233,6 +5239,11 @@
         }
       }
       return null;
+    }
+
+    function saveCctvPosition() {
+      // todo: update x, y to db
+      //self.cctvToMove.x, self.cctvToMove.y
     }
   }
 </script>
