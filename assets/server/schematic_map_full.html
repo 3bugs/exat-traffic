@@ -4914,10 +4914,11 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
-    this.showCctv = false
+    this.cctvToMove = null;
+    this.showCctv = false;
 
     addTouchHandler();
-    addClickCanvasHandler();
+    addCanvasHandler();
 
     $(window).resize(() => {
       this.resizeSvgContainer();
@@ -4934,8 +4935,11 @@
       document.onmouseup = handleTouchEnd;
     }
 
-    function addClickCanvasHandler() {
+    function addCanvasHandler() {
       self.canvas.addEventListener('click', handleClickCanvas);
+      self.canvas.addEventListener('mousedown', handleMouseDownCanvas);
+      self.canvas.addEventListener('mousemove', handleMouseMoveCanvas);
+      self.canvas.addEventListener('mouseup', handleMouseUpCanvas);
     }
 
     this.setZoomLevel = function (zoomLevel) {
@@ -5174,6 +5178,50 @@
       }
     }
 
+    function handleMouseDownCanvas(evt) {
+      const rect = self.canvas.getBoundingClientRect();
+      const x = evt.clientX - rect.left;
+      const y = evt.clientY - rect.top;
+      console.log(`handleMouseDownCanvas - x: ${x}, y: ${y}`);
+
+      if (self.showCctv && self.editMode) {
+        const cctv = getCctv({x, y});
+        if (cctv != null) {
+          self.cctvToMove = cctv;
+        }
+      }
+    }
+
+    function handleMouseMoveCanvas(evt) {
+      const rect = self.canvas.getBoundingClientRect();
+      const x = evt.clientX - rect.left;
+      const y = evt.clientY - rect.top;
+      //console.log(`handleMouseMoveCanvas - x: ${x}, y: ${y}`);
+
+      if (self.cctvToMove) {
+        console.log('MOVE CCTV: ' + self.cctvToMove.name);
+        self.cctvToMove.latitude = LATITUDE_TOP - (y * (LATITUDE_TOP - LATITUDE_BOTTOM) / self.ctx.canvas.height);
+        self.cctvToMove.longitude = (x * (LONGITUDE_RIGHT - LONGITUDE_LEFT) / self.ctx.canvas.width) + LONGITUDE_LEFT;
+        self.drawMapMarker();
+      }
+    }
+
+    function handleMouseUpCanvas(evt) {
+      const rect = self.canvas.getBoundingClientRect();
+      const x = evt.clientX - rect.left;
+      const y = evt.clientY - rect.top;
+      console.log(`handleMouseUpCanvas - x: ${x}, y: ${y}`);
+
+      if (self.cctvToMove) {
+        const scaleX = x / self.ctx.canvas.width;
+        const scaleY = y / self.ctx.canvas.height;
+
+        // todo: update scaleX, scaleY to db
+
+        self.cctvToMove = null;
+      }
+    }
+
     function getCctv({x, y}) {
       for (let i = 0; i < cctvList.length; i++) {
         const cctv = cctvList[i];
@@ -5194,8 +5242,8 @@
 
   $(function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const backendMode = urlParams.get('backend');
-    const editMode = urlParams.get('edit');
+    const backendMode = parseInt(urlParams.get('backend')) === 1;
+    const editMode = parseInt(urlParams.get('edit')) === 1;
 
     schematicMap = new SchematicMap({
       initialScale: 1,
