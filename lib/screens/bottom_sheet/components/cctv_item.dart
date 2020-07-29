@@ -96,7 +96,7 @@ class CctvItemView extends StatelessWidget {
                               Radius.circular(getPlatformSize(9.0)),
                             ),
                             child: Image(
-                              image: cctvModel.image,
+                              image: null, //cctvModel.image,
                               width: getPlatformSize(100.0),
                               height: getPlatformSize(65.0),
                               fit: BoxFit.cover,

@@ -274,19 +274,19 @@ class CctvList extends StatefulWidget {
   final List<CctvModel> _cctvList = <CctvModel>[
     CctvModel(
       name: 'ทางลงลาดพร้าว',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      //image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
     ),
     CctvModel(
       name: 'รามอินทรา',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      //image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
     ),
     CctvModel(
       name: 'สุขาภิบาล 5',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
+      //image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
     ),
     CctvModel(
       name: 'โยธิน',
-      image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
+      //image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
     ),
   ];
 
