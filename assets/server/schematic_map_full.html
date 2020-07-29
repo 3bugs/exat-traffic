@@ -5091,7 +5091,7 @@
         // ถ้าคลิกโดนหมุดกล้อง ไม่ต้อง touch start
         if (cctv && self.showCctv) {
           //alert(cctv.name);
-          handleClickCctv(cctv.name);
+          CCTV.postMessage(cctv.name);
           return;
         }
 

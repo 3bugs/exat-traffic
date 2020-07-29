@@ -31,7 +31,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
 
   JavascriptChannel _cctvJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
-      name: 'handleClickCctv',
+      name: 'CCTV',
       onMessageReceived: (JavascriptMessage jsMessage) {
         print(jsMessage.message);
         alert(context, "CCTV", jsMessage.message);
