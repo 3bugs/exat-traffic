@@ -46,12 +46,14 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
         int markerId = int.parse(jsMessage.message);
         List<MarkerModel> list =
             _getCctvList(context).where((cctv) => cctv.id == markerId).toList();
-        alert(context, "CCTV", list[0].name);
+        //alert(context, "CCTV", list[0].name);
 
-        //alert(context, "CCTV", jsMessage.message);
+        assert(list.isNotEmpty);
+        if (list.isNotEmpty) {
+          list[0].showDetailsScreen(context);
+        }
 
         // todo: fetch marker details & navigate to CCTV details page
-
         /*setState(() {
           _isLoading = true;
         });
@@ -203,7 +205,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                       child: AspectRatio(
                         aspectRatio: 4621.4 / 5134,
                         child: WebView(
-                          initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html',
+                          initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html?backend=0',
                           javascriptMode: JavascriptMode.unrestricted,
                           onWebViewCreated: (WebViewController webViewController) {
                             _controller.complete(webViewController);

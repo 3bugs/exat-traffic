@@ -1,9 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:exattraffic/models/core_configs_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/models/core_configs_model.dart';
+import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
 
 class MarkerModel {
   final int id;
@@ -89,6 +91,28 @@ class MarkerModel {
       selected: false,
       notified: false,
     );
+  }
+
+  void showDetailsScreen(BuildContext context) {
+    assert(this.category != null);
+    if (this.category == null) return;
+
+    switch (this.category.code) {
+      case CategoryType.CCTV:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CctvDetails(
+                CctvModel(
+                  name: this.name,
+                  streamUrl: this.streamMobile,
+                  imageUrl: this.imagePath,
+                )
+            ),
+          ),
+        );
+        break;
+    }
   }
 
   @override

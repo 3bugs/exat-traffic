@@ -155,25 +155,7 @@ class _HomeMainState extends State<HomeMain> {
   }
 
   void _handleClickMarker(BuildContext context, MarkerModel marker) {
-    assert(marker.category != null);
-    if (marker.category == null) return;
-
-    switch (marker.category.code) {
-      case CategoryType.CCTV:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CctvDetails(
-              CctvModel(
-                name: marker.name,
-                streamUrl: marker.streamMobile,
-                imageUrl: marker.imagePath,
-              )
-            ),
-          ),
-        );
-        break;
-    }
+    marker.showDetailsScreen(context);
   }
 
   @override

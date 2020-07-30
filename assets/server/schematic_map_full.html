@@ -5292,7 +5292,10 @@
       editMode,
     });
 
-    //$('#logo').hide();
+    if (!backendMode) {
+      $('#logo').hide();
+    }
+    
     $("#cb-toggle-cctv").change(function () {
       schematicMap.setCctvVisible(this.checked);
     });
