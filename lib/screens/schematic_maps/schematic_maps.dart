@@ -43,9 +43,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
       onMessageReceived: (JavascriptMessage jsMessage) async {
         print(jsMessage.message);
 
-        int markerId = int.parse(jsMessage.message);
+        /*int markerId = int.parse(jsMessage.message);
         List<MarkerModel> list = _cctvList.where((cctv) => cctv.id == markerId).toList();
-        alert(context, "CCTV", list[0].name);
+        alert(context, "CCTV", list[0].name);*/
 
         //alert(context, "CCTV", jsMessage.message);
 
@@ -307,10 +307,10 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 _showCctv = showCctv;
                               });
 
-                              if (showCctv) {
+                              /*if (showCctv) {
                                 controller
                                     .evaluateJavascript('schematicMap.setCctvList($_cctvList);');
-                              }
+                              }*/
                               controller
                                   .evaluateJavascript('schematicMap.setCctvVisible($showCctv);');
                             },
