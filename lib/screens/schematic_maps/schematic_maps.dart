@@ -72,11 +72,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      List<MarkerModel> markerList =
+      /*List<MarkerModel> markerList =
           BlocProvider.of<AppBloc>(context).markerList;
       _cctvList = markerList
           .where((marker) => marker.category.code == CategoryType.CCTV)
-          .toList();
+          .toList();*/
     });
   }
 
@@ -295,6 +295,12 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             showProgress: false,
                             onClick: () async {
                               final WebViewController controller = await _controller.future;
+
+                              List<MarkerModel> markerList =
+                                  BlocProvider.of<AppBloc>(context).markerList;
+                              _cctvList = markerList
+                                  .where((marker) => marker.category.code == CategoryType.CCTV)
+                                  .toList();
 
                               bool showCctv = !_showCctv;
                               setState(() {
