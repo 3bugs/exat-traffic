@@ -4964,6 +4964,8 @@
     }
 
     this.setCctvVisible = visible => {
+      fetchCctv();
+      
       this.showCctv = visible;
       this.drawMapMarker();
     };
