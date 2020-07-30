@@ -80,6 +80,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
     return markerList.where((marker) => marker.category.code == CategoryType.CCTV).toList();
   }
 
+  void _handleClickScaleButton(String scale) async {
+    final WebViewController controller = await _controller.future;
+    controller.evaluateJavascript('schematicMap.setZoomLevel($scale);');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,80 +244,116 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                   Flexible(
                     flex: 3,
                     child: Center(
-                      child: Row(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          MapToolItem(
-                            icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                            iconWidth: getPlatformSize(21.0),
-                            iconHeight: getPlatformSize(21.0),
-                            marginTop: getPlatformSize(0.0),
-                            isChecked: false,
-                            showProgress: false,
-                            onClick: () {
-                              alert(context, 'EXAT Traffic', 'Under construction, coming soon :)');
-                            },
-                          ),
-                          SizedBox(
-                            width: getPlatformSize(15.0),
-                          ),
-                          MapToolItem(
-                            icon: AssetImage('assets/images/schematic_maps/ic_zoom_in.png'),
-                            iconWidth: getPlatformSize(18.52),
-                            iconHeight: getPlatformSize(18.52),
-                            marginTop: getPlatformSize(0.0),
-                            isChecked: false,
-                            showProgress: false,
-                            onClick: () async {
-                              final WebViewController controller = await _controller.future;
-                              controller.evaluateJavascript('schematicMap.changeZoom(1);');
-                            },
-                          ),
-                          SizedBox(
-                            width: getPlatformSize(15.0),
-                          ),
-                          MapToolItem(
-                            icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
-                            iconWidth: getPlatformSize(18.52),
-                            iconHeight: getPlatformSize(18.52),
-                            marginTop: getPlatformSize(0.0),
-                            isChecked: false,
-                            showProgress: false,
-                            onClick: () async {
-                              final WebViewController controller = await _controller.future;
-                              controller.evaluateJavascript('schematicMap.changeZoom(-1);');
-                            },
-                          ),
-                          SizedBox(
-                            width: getPlatformSize(15.0),
-                          ),
-                          MapToolItem(
-                            icon: AssetImage('assets/images/schematic_maps/ic_cctv.png'),
-                            iconWidth: getPlatformSize(23.16),
-                            iconHeight: getPlatformSize(19.19),
-                            marginTop: getPlatformSize(0.0),
-                            isChecked: _showCctv,
-                            showProgress: false,
-                            onClick: () async {
-                              final WebViewController controller = await _controller.future;
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              MapToolItem(
+                                icon:
+                                    AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                                iconWidth: getPlatformSize(21.0),
+                                iconHeight: getPlatformSize(21.0),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: false,
+                                showProgress: false,
+                                onClick: () {
+                                  alert(context, 'EXAT Traffic',
+                                      'Under construction, coming soon :)');
+                                },
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(15.0),
+                              ),
+                              MapToolItem(
+                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_in.png'),
+                                iconWidth: getPlatformSize(18.52),
+                                iconHeight: getPlatformSize(18.52),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: false,
+                                showProgress: false,
+                                onClick: () async {
+                                  final WebViewController controller = await _controller.future;
+                                  controller.evaluateJavascript('schematicMap.changeZoom(1);');
+                                },
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(15.0),
+                              ),
+                              MapToolItem(
+                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
+                                iconWidth: getPlatformSize(18.52),
+                                iconHeight: getPlatformSize(18.52),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: false,
+                                showProgress: false,
+                                onClick: () async {
+                                  final WebViewController controller = await _controller.future;
+                                  controller.evaluateJavascript('schematicMap.changeZoom(-1);');
+                                },
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(15.0),
+                              ),
+                              MapToolItem(
+                                icon: AssetImage('assets/images/schematic_maps/ic_cctv.png'),
+                                iconWidth: getPlatformSize(23.16),
+                                iconHeight: getPlatformSize(19.19),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: _showCctv,
+                                showProgress: false,
+                                onClick: () async {
+                                  final WebViewController controller = await _controller.future;
 
-                              String jsonCctvList = jsonEncode(_getCctvList(context));
-                              /*print('*********************************');
-                              print(jsonCctvList);
-                              print('*********************************');*/
+                                  String jsonCctvList = jsonEncode(_getCctvList(context));
+                                  /*print('*********************************');
+                                  print(jsonCctvList);
+                                  print('*********************************');*/
 
-                              bool showCctv = !_showCctv;
-                              setState(() {
-                                _showCctv = showCctv;
-                              });
+                                  bool showCctv = !_showCctv;
+                                  setState(() {
+                                    _showCctv = showCctv;
+                                  });
 
-                              if (showCctv) {
-                                controller
-                                    .evaluateJavascript('schematicMap.setCctvList($jsonCctvList);');
-                              }
-                              controller
-                                  .evaluateJavascript('schematicMap.setCctvVisible($showCctv);');
-                            },
+                                  if (showCctv) {
+                                    controller.evaluateJavascript(
+                                        'schematicMap.setCctvList($jsonCctvList);');
+                                  }
+                                  controller.evaluateJavascript(
+                                      'schematicMap.setCctvVisible($showCctv);');
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: getPlatformSize(10.0)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ScaleButton(
+                                  text: "X1",
+                                  onClick: () {
+                                    _handleClickScaleButton("1");
+                                  }),
+                              SizedBox(width: getPlatformSize(8.0)),
+                              ScaleButton(
+                                  text: "X2",
+                                  onClick: () {
+                                    _handleClickScaleButton("5");
+                                  }),
+                              SizedBox(width: getPlatformSize(8.0)),
+                              ScaleButton(
+                                  text: "X3",
+                                  onClick: () {
+                                    _handleClickScaleButton("10");
+                                  }),
+                              SizedBox(width: getPlatformSize(8.0)),
+                              ScaleButton(
+                                  text: "FIT",
+                                  onClick: () {
+                                    _handleClickScaleButton("1.3");
+                                  }),
+                            ],
                           ),
                         ],
                       ),
@@ -325,6 +366,53 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
               child: _isLoading ? MyProgressIndicator() : SizedBox.shrink(),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScaleButton extends StatelessWidget {
+  final String text;
+  final Function onClick;
+
+  ScaleButton({
+    @required this.text,
+    @required this.onClick,
+  });
+
+  static const double SIZE = 40.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: getPlatformSize(SIZE),
+      height: getPlatformSize(SIZE),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.26),
+        shape: BoxShape.circle,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            if (onClick != null) {
+              onClick();
+            }
+          },
+          //highlightColor: Constants.App.PRIMARY_COLOR,
+          borderRadius: BorderRadius.all(
+            Radius.circular(getPlatformSize(SIZE) / 2),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: getTextStyle(
+                0,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
     );

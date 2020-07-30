@@ -1,5 +1,7 @@
 import 'dart:async';
-import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
+import 'package:exattraffic/models/marker_categories/police_station_model.dart';
+import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -9,37 +11,37 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/components/tool_item.dart';
 
-class RestAreaDetails extends StatelessWidget {
-  RestAreaDetails(this._cctvModel);
+class PoliceStationDetails extends StatelessWidget {
+  PoliceStationDetails(this._policeStationModel);
 
-  final CctvModel _cctvModel;
+  final PoliceStationModel _policeStationModel;
 
   @override
   Widget build(BuildContext context) {
-    return wrapSystemUiOverlayStyle(child: RestAreaDetailsMain(_cctvModel));
+    return wrapSystemUiOverlayStyle(child: PoliceStationDetailsMain(_policeStationModel));
   }
 }
 
-class RestAreaDetailsMain extends StatefulWidget {
-  RestAreaDetailsMain(this._cctvModel);
+class PoliceStationDetailsMain extends StatefulWidget {
+  PoliceStationDetailsMain(this._policeStationModel);
 
-  final CctvModel _cctvModel;
+  final PoliceStationModel _policeStationModel;
 
   @override
-  _RestAreaDetailsMainState createState() => _RestAreaDetailsMainState();
+  _PoliceStationDetailsMainState createState() => _PoliceStationDetailsMainState();
 }
 
-class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
-  int _checkedToolItemIndex = 0;
-
+class _PoliceStationDetailsMainState extends State<PoliceStationDetailsMain> {
   void _handleClickTool(int toolItemIndex) {
-    setState(() {
-      _checkedToolItemIndex = toolItemIndex;
-    });
+    switch (toolItemIndex) {
+      case 0: // phone
+        break;
+      case 1: // directions
+        break;
+    }
   }
 
   void _handleClickClose(BuildContext context) {
-    //todo: stop video, etc.
     Navigator.pop(context);
   }
 
@@ -104,7 +106,7 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                       String name;
                       switch (language.lang) {
                         case 0:
-                          name = widget._cctvModel.name;
+                          name = widget._policeStationModel.name;
                           break;
                         case 1:
                           name = 'About Us';
@@ -128,7 +130,7 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                   ),
                 ),
                 SizedBox(
-                  height: getPlatformSize(15.0),
+                  height: getPlatformSize(25.0),
                 ),
                 Container(
                   height: getPlatformSize(240.0),
@@ -156,49 +158,6 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                   ),*/
                 ),
                 SizedBox(
-                  height: getPlatformSize(24.0),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: getPlatformSize(Constants.CctvPlayerScreen.HORIZONTAL_MARGIN),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      ServiceItem(
-                        'ที่จอดรถ',
-                        AssetImage('assets/images/rest_area_details/ic_rest_area_parking.png'),
-                        getPlatformSize(28.4),
-                        getPlatformSize(27.45),
-                      ),
-                      ServiceItem(
-                        'ห้องน้ำ',
-                        AssetImage('assets/images/rest_area_details/ic_rest_area_toilet.png'),
-                        getPlatformSize(29.0),
-                        getPlatformSize(30.96),
-                      ),
-                      ServiceItem(
-                        'น้ำมัน',
-                        AssetImage('assets/images/rest_area_details/ic_rest_area_fuel.png'),
-                        getPlatformSize(33.89),
-                        getPlatformSize(28.43),
-                      ),
-                      ServiceItem(
-                        'อาหาร',
-                        AssetImage('assets/images/rest_area_details/ic_rest_area_food.png'),
-                        getPlatformSize(18.66),
-                        getPlatformSize(27.97),
-                      ),
-                      ServiceItem(
-                        'กาแฟ',
-                        AssetImage('assets/images/rest_area_details/ic_rest_area_cafe.png'),
-                        getPlatformSize(21.89),
-                        getPlatformSize(32.87),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
                   height: getPlatformSize(28.0),
                 ),
                 Padding(
@@ -208,85 +167,29 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      ToolItem(
-                        'ภาพเคลื่อนไหว',
-                        AssetImage('assets/images/cctv_details/ic_video.png'),
-                        getPlatformSize(30.79),
-                        getPlatformSize(25.51),
-                        this._checkedToolItemIndex == 0,
-                            () => this._handleClickTool(0),
-                      ),
-                      ToolItem(
-                        'ภาพถ่าย',
-                        AssetImage('assets/images/cctv_details/ic_picture.png'),
-                        getPlatformSize(23.67),
-                        getPlatformSize(20.06),
-                        this._checkedToolItemIndex == 1,
-                            () => this._handleClickTool(1),
-                      ),
+                      widget._policeStationModel.phone != null &&
+                              widget._policeStationModel.phone.trim().isNotEmpty
+                          ? ToolItem(
+                              'โทรศัพท์',
+                              AssetImage('assets/images/police_station_details/ic_phone.png'),
+                              getPlatformSize(16.0),
+                              getPlatformSize(24.0),
+                              false,
+                              () => this._handleClickTool(0),
+                            )
+                          : SizedBox.shrink(),
                       ToolItem(
                         'เส้นทาง',
                         AssetImage('assets/images/cctv_details/ic_route.png'),
                         getPlatformSize(27.06),
                         getPlatformSize(35.21),
-                        this._checkedToolItemIndex == 2,
-                            () => this._handleClickTool(2),
+                        false,
+                        () => this._handleClickTool(1),
                       ),
                     ],
                   ),
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ServiceItem extends StatefulWidget {
-  const ServiceItem(
-    this._text,
-    this._icon,
-    this._iconWidth,
-    this._iconHeight,
-  );
-
-  final String _text;
-  final AssetImage _icon;
-  final double _iconWidth;
-  final double _iconHeight;
-
-  @override
-  _ServiceItemState createState() => _ServiceItemState();
-}
-
-class _ServiceItemState extends State<ServiceItem> {
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: Center(
-        child: Container(
-          width: getPlatformSize(56.0),
-          height: getPlatformSize(52.0),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.white,
-              width: getPlatformSize(2.0),
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(
-                getPlatformSize(13.0),
-              ),
-            ),
-          ),
-          child: Center(
-            child: Image(
-              image: widget._icon,
-              width: widget._iconWidth,
-              height: widget._iconHeight,
-              fit: BoxFit.contain,
             ),
           ),
         ),

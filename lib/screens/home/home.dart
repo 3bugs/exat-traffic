@@ -21,8 +21,8 @@ import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
-import 'package:exattraffic/models/cctv_model.dart';
-import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
+import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 
 class Home extends StatelessWidget {

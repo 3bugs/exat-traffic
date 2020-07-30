@@ -22,7 +22,7 @@ class NotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListItem(
-      marginTop: getPlatformSize(isFirstItem ? 42.0 : 7.0),
+      marginTop: getPlatformSize(isFirstItem ? 21.0 : 7.0),
       marginBottom: getPlatformSize(isLastItem ? 21.0 : 7.0),
       padding: EdgeInsets.only(
         left: getPlatformSize(16.0),

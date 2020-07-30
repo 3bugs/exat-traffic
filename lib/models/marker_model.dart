@@ -1,9 +1,13 @@
+import 'package:exattraffic/models/marker_categories/police_station_model.dart';
+import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
+import 'package:exattraffic/screens/marker_details/police_station_details.dart';
+import 'package:exattraffic/screens/marker_details/rest_area_details.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/models/core_configs_model.dart';
-import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
+import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 
 class MarkerModel {
   final int id;
@@ -21,6 +25,10 @@ class MarkerModel {
   final String imageSize;*/
   final String imagePath;
   final String direction;
+  final String phone;
+  final int groupId;
+  final double x;
+  final double y;
   final List<CoreConfigModel> coreConfigList;
   bool selected;
   bool notified;
@@ -63,6 +71,10 @@ class MarkerModel {
     @required this.imageSize,*/
     @required this.imagePath,
     @required this.direction,
+    @required this.phone,
+    @required this.groupId,
+    @required this.x,
+    @required this.y,
     @required this.coreConfigList,
     @required this.selected,
     @required this.notified,
@@ -83,6 +95,10 @@ class MarkerModel {
       streamWeb: json['stream_web'],
       imagePath: json['image_path'],
       direction: json['direction'],
+      phone: json['tel'],
+      groupId: json['group_id'],
+      x: json['x'],
+      y: json['y'],
       coreConfigList: coreConfigJson
           .map<CoreConfigModel>((coreConfigJson) => CoreConfigModel.fromJson(coreConfigJson))
           .toList(),
@@ -100,13 +116,59 @@ class MarkerModel {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CctvDetails(
-                CctvModel(
-                  name: this.name,
-                  streamUrl: this.streamMobile,
-                  imageUrl: this.imagePath,
-                )
-            ),
+            builder: (context) => CctvDetails(CctvModel(
+              name: this.name,
+              streamUrl: this.streamMobile,
+              imageUrl: this.imagePath,
+            )),
+          ),
+        );
+        break;
+      case CategoryType.REST_AREA:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RestAreaDetails(RestAreaModel(
+              name: this.name,
+              imageUrl: this.imagePath,
+              hasParkingLot: this
+                  .coreConfigList
+                  .where((coreConfig) => coreConfig.code == "parking")
+                  .toList()
+                  .isNotEmpty,
+              hasToilet: this
+                  .coreConfigList
+                  .where((coreConfig) => coreConfig.code == "toilet")
+                  .toList()
+                  .isNotEmpty,
+              hasGasStation: this
+                  .coreConfigList
+                  .where((coreConfig) => coreConfig.code == "gas_station")
+                  .toList()
+                  .isNotEmpty,
+              hasRestaurant: this
+                  .coreConfigList
+                  .where((coreConfig) => coreConfig.code == "restaurant")
+                  .toList()
+                  .isNotEmpty,
+              hasCafe: this
+                  .coreConfigList
+                  .where((coreConfig) => coreConfig.code == "cafe")
+                  .toList()
+                  .isNotEmpty,
+            )),
+          ),
+        );
+        break;
+      case CategoryType.POLICE_STATION:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PoliceStationDetails(PoliceStationModel(
+              name: this.name,
+              imageUrl: this.imagePath,
+              phone: this.phone,
+            )),
           ),
         );
         break;
@@ -119,11 +181,11 @@ class MarkerModel {
   }
 
   Map toJson() => {
-    'id': this.id,
-    'name': this.name,
-    'lat': this.latitude,
-    'lng': this.longitude,
-  };
+        'id': this.id,
+        'name': this.name,
+        'lat': this.latitude,
+        'lng': this.longitude,
+      };
 }
 
 /*

@@ -7,7 +7,7 @@ import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/login/login.dart';

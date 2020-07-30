@@ -5,8 +5,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/models/cctv_model.dart';
-import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
+import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/models/cctv_model.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/models/language_model.dart';
 
 class CctvItemView extends StatelessWidget {

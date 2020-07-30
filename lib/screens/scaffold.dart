@@ -94,7 +94,7 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // notification
     id: 4,
-    showDate: true,
+    showDate: false,
     titleList: [
       'การแจ้งเตือน',
       'Notification',

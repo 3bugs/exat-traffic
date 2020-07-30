@@ -82,6 +82,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       } else {
         print('CATEGORY NOT SET: ${marker.name}');
       }
+      //assert(filteredCategoryList.length > 0);
     }
   }
 }
