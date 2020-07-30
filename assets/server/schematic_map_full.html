@@ -5117,6 +5117,7 @@
         // ถ้าคลิกโดนหมุดกล้อง ไม่ต้อง touch start
         if (cctv && self.showCctv) {
           //alert(cctv.name);
+          console.log(`CCTV clicked: [${cctv.id}] ${cctv.name}`);
           CCTV.postMessage(cctv.id.toString());
           return;
         }
