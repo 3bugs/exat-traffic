@@ -4914,7 +4914,12 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
-    this.cctvList = [];
+    this.cctvList = cctvList.map(cctv => {
+      cctv.lat = cctv.latitude;
+      cctv.lng = cctv.longitude;
+      return cctv;
+    }).filter(cctv => cctv.status === 1);
+    
     this.cctvToMove = null;
     this.showCctv = false;
 
@@ -4964,8 +4969,8 @@
     }
 
     this.setCctvVisible = visible => {
-      fetchCctv();
-      
+      //fetchCctv();
+
       this.showCctv = visible;
       this.drawMapMarker();
     };
