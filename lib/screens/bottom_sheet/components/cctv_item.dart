@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/cctv_model.dart';
-import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 
 class CctvItemView extends StatelessWidget {
@@ -96,7 +95,8 @@ class CctvItemView extends StatelessWidget {
                               Radius.circular(getPlatformSize(9.0)),
                             ),
                             child: Image(
-                              image: null, //cctvModel.image,
+                              image: AssetImage('assets/images/home/toll_plaza_dummy_${Random().nextInt(2) + 1}.jpg'),
+                              //cctvModel.image,
                               width: getPlatformSize(100.0),
                               height: getPlatformSize(65.0),
                               fit: BoxFit.cover,

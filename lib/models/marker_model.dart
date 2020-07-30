@@ -1,8 +1,6 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/cctv_model.dart';
 import 'package:exattraffic/models/core_configs_model.dart';
 import 'package:exattraffic/screens/cctv_details/cctv_details.dart';
@@ -121,6 +119,7 @@ class MarkerModel {
   }
 
   Map toJson() => {
+    'id': this.id,
     'name': this.name,
     'lat': this.latitude,
     'lng': this.longitude,

@@ -4914,7 +4914,7 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
-    // ใช้ static data ไปก่อนชั่วคราว
+    // หน้าเว็บ ใช้ static data ไปก่อนชั่วคราว
     this.cctvList = cctvList; /*cctvList.map(cctv => {
       cctv.lat = cctv.latitude;
       cctv.lng = cctv.longitude;
@@ -4965,9 +4965,10 @@
       this.resizeSvgContainer();
     };
 
+    // สำหรับกำหนด cctv list มาจากแอพ
     this.setCctvList = cctvList => {
       console.log(cctvList);
-      this.cctvList = JSON.parse(cctvList);
+      this.cctvList = cctvList; //JSON.parse(cctvList);
     }
 
     this.setCctvVisible = visible => {
@@ -5295,7 +5296,7 @@
     if (!backendMode) {
       $('#logo').hide();
     }
-    
+
     $("#cb-toggle-cctv").change(function () {
       schematicMap.setCctvVisible(this.checked);
     });
