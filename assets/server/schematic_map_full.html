@@ -4915,11 +4915,11 @@
     this.svgWrapperLeft = 0;
 
     // ใช้ static data ไปก่อนชั่วคราว
-    this.cctvList = cctvList.map(cctv => {
+    this.cctvList = cctvList; /*cctvList.map(cctv => {
       cctv.lat = cctv.latitude;
       cctv.lng = cctv.longitude;
       return cctv;
-    }).filter(cctv => cctv.status === 1);
+    }).filter(cctv => cctv.status === 1);*/
 
     this.cctvToMove = null;
     this.showCctv = false;
