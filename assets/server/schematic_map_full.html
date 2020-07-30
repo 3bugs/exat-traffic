@@ -4914,6 +4914,7 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
+    this.cctvList = [];
     this.cctvToMove = null;
     this.showCctv = false;
 
@@ -4958,13 +4959,16 @@
       this.resizeSvgContainer();
     };
 
-    this.setCctvVisible = visible => {
-      fetchCctv();
+    this.setCctvList = cctvList => {
+      this.cctvList = cctvList;
+    }
 
+    this.setCctvVisible = visible => {
       this.showCctv = visible;
       this.drawMapMarker();
     };
 
+    // ไม่ใช้, ไปเอา cctv list จาก app แทน
     function fetchCctv() {
       $.ajax({
         url: 'http://163.47.9.26:8081/markers/list',
@@ -4974,7 +4978,7 @@
           alert('ok');
         },
         error: function () {
-
+          alert('error');
         },
       });
     }
@@ -4991,10 +4995,10 @@
       console.log(`CANVAS - Width: ${canvasWidth}, Height: ${canvasHeight}`);
       console.log(`MARKER DRAW - Width: ${markerDrawWidth}, Height: ${markerDrawHeight}`);
 
-      cctvList.forEach(cctv => {
-        if (cctv.status === 1) {
-          let left = (canvasWidth * (cctv.longitude - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
-          let top = (canvasHeight * (LATITUDE_TOP - cctv.latitude) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
+      this.cctvList.forEach(cctv => {
+        if (true /*cctv.status === 1*/) {
+          let left = (canvasWidth * (cctv.lng - LONGITUDE_LEFT) / (LONGITUDE_RIGHT - LONGITUDE_LEFT)) - (markerDrawWidth / 2);
+          let top = (canvasHeight * (LATITUDE_TOP - cctv.lat) / (LATITUDE_TOP - LATITUDE_BOTTOM)) - markerDrawHeight;
 
           if (cctv.x != null && cctv.y != null) {
             left = (canvasWidth * cctv.x) - (markerDrawWidth / 2);
@@ -5222,8 +5226,8 @@
 
       if (self.cctvToMove) {
         console.log('MOVE CCTV: ' + self.cctvToMove.name);
-        /*self.cctvToMove.latitude = LATITUDE_TOP - (y * (LATITUDE_TOP - LATITUDE_BOTTOM) / self.ctx.canvas.height);
-        self.cctvToMove.longitude = (x * (LONGITUDE_RIGHT - LONGITUDE_LEFT) / self.ctx.canvas.width) + LONGITUDE_LEFT;*/
+        /*self.cctvToMove.lat = LATITUDE_TOP - (y * (LATITUDE_TOP - LATITUDE_BOTTOM) / self.ctx.canvas.height);
+        self.cctvToMove.lng = (x * (LONGITUDE_RIGHT - LONGITUDE_LEFT) / self.ctx.canvas.width) + LONGITUDE_LEFT;*/
         self.cctvToMove.x = x / self.ctx.canvas.width;
         self.cctvToMove.y = y / self.ctx.canvas.height;
         self.drawMapMarker();
@@ -5246,8 +5250,8 @@
     }
 
     function getCctv({x, y}) {
-      for (let i = 0; i < cctvList.length; i++) {
-        const cctv = cctvList[i];
+      for (let i = 0; i < self.cctvList.length; i++) {
+        const cctv = self.cctvList[i];
         if (cctv.boundary) {
           if (x > cctv.boundary.left && x < cctv.boundary.right &&
             y > cctv.boundary.top && y < cctv.boundary.bottom) {

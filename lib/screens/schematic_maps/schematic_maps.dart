@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/category_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -272,11 +275,23 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             isChecked: _showCctv,
                             showProgress: false,
                             onClick: () async {
+                              final WebViewController controller = await _controller.future;
+
+                              List<MarkerModel> markerList =
+                                  BlocProvider.of<AppBloc>(context).markerList;
+                              List<MarkerModel> cctvList = markerList
+                                  .where((marker) => marker.category.code == CategoryType.CCTV)
+                                  .toList();
+
                               bool showCctv = !_showCctv;
                               setState(() {
                                 _showCctv = showCctv;
                               });
-                              final WebViewController controller = await _controller.future;
+
+                              if (showCctv) {
+                                controller
+                                    .evaluateJavascript('schematicMap.setCctvList($cctvList);');
+                              }
                               controller
                                   .evaluateJavascript('schematicMap.setCctvVisible($showCctv);');
                             },
