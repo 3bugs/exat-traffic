@@ -35,17 +35,23 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller = Completer<WebViewController>();
   bool _showCctv = false;
   bool _isLoading = false;
+  List<MarkerModel> _cctvList;
 
   JavascriptChannel _cctvJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
       name: 'CCTV',
       onMessageReceived: (JavascriptMessage jsMessage) async {
         print(jsMessage.message);
+
+        int markerId = int.parse(jsMessage.message);
+        List<MarkerModel> list = _cctvList.where((cctv) => cctv.id == markerId).toList();
+        alert(context, "CCTV", list[0].name);
+
         //alert(context, "CCTV", jsMessage.message);
 
         // todo: fetch marker details & navigate to CCTV details page
 
-        setState(() {
+        /*setState(() {
           _isLoading = true;
         });
         try {
@@ -56,9 +62,22 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
         }
         setState(() {
           _isLoading = false;
-        });
+        });*/
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () {
+      List<MarkerModel> markerList =
+          BlocProvider.of<AppBloc>(context).markerList;
+      _cctvList = markerList
+          .where((marker) => marker.category.code == CategoryType.CCTV)
+          .toList();
+    });
   }
 
   @override
@@ -277,12 +296,6 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             onClick: () async {
                               final WebViewController controller = await _controller.future;
 
-                              List<MarkerModel> markerList =
-                                  BlocProvider.of<AppBloc>(context).markerList;
-                              List<MarkerModel> cctvList = markerList
-                                  .where((marker) => marker.category.code == CategoryType.CCTV)
-                                  .toList();
-
                               bool showCctv = !_showCctv;
                               setState(() {
                                 _showCctv = showCctv;
@@ -290,7 +303,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
 
                               if (showCctv) {
                                 controller
-                                    .evaluateJavascript('schematicMap.setCctvList($cctvList);');
+                                    .evaluateJavascript('schematicMap.setCctvList($_cctvList);');
                               }
                               controller
                                   .evaluateJavascript('schematicMap.setCctvVisible($showCctv);');

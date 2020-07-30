@@ -4919,7 +4919,7 @@
       cctv.lng = cctv.longitude;
       return cctv;
     }).filter(cctv => cctv.status === 1);
-    
+
     this.cctvToMove = null;
     this.showCctv = false;
 
@@ -4975,7 +4975,6 @@
       this.drawMapMarker();
     };
 
-    // ไม่ใช้, ไปเอา cctv list จาก app แทน
     function fetchCctv() {
       $.ajax({
         url: 'http://163.47.9.26:8081/markers/list',
@@ -5118,7 +5117,7 @@
         // ถ้าคลิกโดนหมุดกล้อง ไม่ต้อง touch start
         if (cctv && self.showCctv) {
           //alert(cctv.name);
-          CCTV.postMessage(cctv.name);
+          CCTV.postMessage(cctv.id.toString());
           return;
         }
 
