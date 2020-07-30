@@ -4966,9 +4966,8 @@
     };
 
     this.setCctvList = cctvList => {
-      //this.cctvList = cctvList;
       console.log(cctvList);
-      console.log('CCTV List Set');
+      this.cctvList = JSON.parse(cctvList);
     }
 
     this.setCctvVisible = visible => {

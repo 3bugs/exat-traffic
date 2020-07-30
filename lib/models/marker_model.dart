@@ -95,6 +95,12 @@ class MarkerModel {
   String toString() {
     return '${this.name}';
   }
+
+  Map toJson() => {
+    'name': this.name,
+    'lat': this.latitude,
+    'lng': this.longitude,
+  };
 }
 
 /*

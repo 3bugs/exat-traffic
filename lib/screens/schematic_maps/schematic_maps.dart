@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/category_model.dart';
@@ -35,7 +36,6 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller = Completer<WebViewController>();
   bool _showCctv = false;
   bool _isLoading = false;
-  List<MarkerModel> _cctvList;
 
   JavascriptChannel _cctvJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
@@ -43,9 +43,10 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
       onMessageReceived: (JavascriptMessage jsMessage) async {
         print(jsMessage.message);
 
-        /*int markerId = int.parse(jsMessage.message);
-        List<MarkerModel> list = _cctvList.where((cctv) => cctv.id == markerId).toList();
-        alert(context, "CCTV", list[0].name);*/
+        int markerId = int.parse(jsMessage.message);
+        List<MarkerModel> list =
+            _getCctvList(context).where((cctv) => cctv.id == markerId).toList();
+        alert(context, "CCTV", list[0].name);
 
         //alert(context, "CCTV", jsMessage.message);
 
@@ -70,14 +71,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
   @override
   void initState() {
     super.initState();
+  }
 
-    Future.delayed(Duration.zero, () {
-      /*List<MarkerModel> markerList =
-          BlocProvider.of<AppBloc>(context).markerList;
-      _cctvList = markerList
-          .where((marker) => marker.category.code == CategoryType.CCTV)
-          .toList();*/
-    });
+  List<MarkerModel> _getCctvList(BuildContext context) {
+    List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+    return markerList.where((marker) => marker.category.code == CategoryType.CCTV).toList();
   }
 
   @override
@@ -296,21 +294,20 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                             onClick: () async {
                               final WebViewController controller = await _controller.future;
 
-                              List<MarkerModel> markerList =
-                                  BlocProvider.of<AppBloc>(context).markerList;
-                              _cctvList = markerList
-                                  .where((marker) => marker.category.code == CategoryType.CCTV)
-                                  .toList();
+                              String jsonCctvList = jsonEncode(_getCctvList(context));
+                              /*print('*********************************');
+                              print(jsonCctvList);
+                              print('*********************************');*/
 
                               bool showCctv = !_showCctv;
                               setState(() {
                                 _showCctv = showCctv;
                               });
 
-                              /*if (showCctv) {
+                              if (showCctv) {
                                 controller
-                                    .evaluateJavascript('schematicMap.setCctvList($_cctvList);');
-                              }*/
+                                    .evaluateJavascript('schematicMap.setCctvList($jsonCctvList);');
+                              }
                               controller
                                   .evaluateJavascript('schematicMap.setCctvVisible($showCctv);');
                             },
