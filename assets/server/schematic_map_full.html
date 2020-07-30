@@ -4914,6 +4914,7 @@
     this.svgWrapperTop = 0;
     this.svgWrapperLeft = 0;
 
+    // ใช้ static data ไปก่อนชั่วคราว
     this.cctvList = cctvList.map(cctv => {
       cctv.lat = cctv.latitude;
       cctv.lng = cctv.longitude;
@@ -4971,7 +4972,7 @@
     }
 
     this.setCctvVisible = visible => {
-      fetchCctv();
+      //fetchCctv();
 
       this.showCctv = visible;
       this.drawMapMarker();
