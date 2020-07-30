@@ -4959,9 +4959,25 @@
     };
 
     this.setCctvVisible = visible => {
+      fetchCctv();
+
       this.showCctv = visible;
       this.drawMapMarker();
     };
+
+    function fetchCctv() {
+      $.ajax({
+        url: 'http://163.47.9.26:8081/markers/list',
+        type: 'post',
+        contentType: 'application/json',
+        success: function () {
+          alert('ok');
+        },
+        error: function () {
+
+        },
+      });
+    }
 
     this.drawMapMarker = () => {
       const canvasWidth = this.ctx.canvas.width;
