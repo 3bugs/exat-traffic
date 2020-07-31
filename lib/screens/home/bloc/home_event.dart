@@ -1,9 +1,9 @@
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 
 abstract class HomeEvent extends Equatable {
   HomeEvent();

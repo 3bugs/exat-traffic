@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -13,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+
 //import 'package:exattraffic/screens/home/map_test.dart';
 import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
@@ -24,6 +26,7 @@ import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
+import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -40,6 +43,8 @@ class HomeMain extends StatefulWidget {
 class _HomeMainState extends State<HomeMain> {
   final GlobalKey _keyMainContainer = GlobalKey();
   final GlobalKey _keyGoogleMaps = GlobalKey();
+  final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
+
   final Completer<GoogleMapController> _googleMapController = Completer();
   final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
 
@@ -166,13 +171,25 @@ class _HomeMainState extends State<HomeMain> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HomeBloc>(
-      create: (context) {
-        List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
-        List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
-        return HomeBloc(markerList: markerList, categoryList: categoryList);
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeBloc>(
+          create: (context) {
+            List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
+            List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
+            return HomeBloc(markerList: markerList, categoryList: categoryList);
+          },
+        ),
+        BlocProvider<MarkerBloc>(
+          create: (context) {
+            return MarkerBloc();
+          },
+        ),
+      ],
       child: BlocBuilder<HomeBloc, HomeState>(
+        buildWhen: (previousState, state) {
+          return true;
+        },
         builder: (context, state) {
           print('--------------------------------------- HOME BUILDER');
 
@@ -596,6 +613,43 @@ class _HomeMainState extends State<HomeMain> {
                     ],
                   ),
                 ),
+
+                BlocListener<MarkerBloc, MarkerState>(
+                  listener: (context, state) {
+                    if (state is ShowTollPlazaBottomSheet) {
+                      _keyTollPlazaBottomSheet.currentState.toggleSheet();
+                    }
+                  },
+                  child: BlocBuilder<MarkerBloc, MarkerState>(
+                    builder: (context, state) {
+                      TollPlazaModel tollPlaza;
+
+                      if (state is ShowTollPlazaBottomSheet) {
+                        tollPlaza = state.tollPlaza;
+                      }
+                      return TollPlazaBottomSheet(
+                        key: _keyTollPlazaBottomSheet,
+                        collapsePosition: _mainContainerHeight,
+                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                        tollPlazaModel:  tollPlaza,
+                      );
+                    },
+                  ),
+                ),
+
+                /*BlocBuilder<MarkerBloc, MarkerState>(
+                  builder: (context, state) {
+                    if (state is ShowTollPlazaBottomSheet) {
+                      _keyTollPlazaBottomSheet.currentState.toggleSheet();
+                    }
+
+                    return TollPlazaBottomSheet(
+                      key: _keyTollPlazaBottomSheet,
+                      collapsePosition: _mainContainerHeight + getPlatformSize(1.0),
+                      expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                    );
+                  },
+                ),*/
 
                 Visibility(
                   visible: state.showProgress,

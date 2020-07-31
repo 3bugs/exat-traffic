@@ -1,5 +1,6 @@
 import 'package:exattraffic/models/marker_categories/police_station_model.dart';
 import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/screens/marker_details/police_station_details.dart';
 import 'package:exattraffic/screens/marker_details/rest_area_details.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/models/core_configs_model.dart';
 import 'package:exattraffic/screens/marker_details/cctv_details.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MarkerModel {
   final int id;
@@ -171,6 +173,11 @@ class MarkerModel {
             )),
           ),
         );
+        break;
+      case CategoryType.TOLL_PLAZA:
+        //context.bloc<HomeBloc>().add(ClickTollPlaza(marker: this));
+        print("TOLL PLAZA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
+        BlocProvider.of<MarkerBloc>(context).add(ClickTollPlaza(marker: this));
         break;
     }
   }

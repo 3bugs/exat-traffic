@@ -156,6 +156,9 @@ class _LayerItemListState extends State<LayerItemList> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeState>(
+      buildWhen: (previousState, state) {
+        return true;
+      },
       builder: (context, state) {
 
         print('--------------------------------------- LAYER LIST BUILDER');
