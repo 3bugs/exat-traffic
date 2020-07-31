@@ -1,4 +1,5 @@
 import 'package:exattraffic/models/drawer_item_model.dart';
+import 'package:exattraffic/screens/_etc/about.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -13,7 +14,15 @@ class MyDrawer extends StatelessWidget {
       text: 'เกี่ยวกับเรา',
       icon: AssetImage('assets/images/drawer/ic_about_us.png'),
       onClick: (BuildContext context) {
+        // ปิด drawer
         Navigator.pop(context);
+        // เปิดหน้า About Us
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => About(),
+          ),
+        );
       },
     ),
     DrawerItemModel(

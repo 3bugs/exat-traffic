@@ -197,7 +197,9 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                      widget.tollPlazaModel.name,
+                                      widget.tollPlazaModel != null
+                                          ? widget.tollPlazaModel.name
+                                          : "",
                                       style: getTextStyle(
                                         language.lang,
                                         isBold: true,
@@ -302,11 +304,24 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                               ),
                               child: Row(
                                 children: <Widget>[
-                                  _getFeeItem(language.lang, 6, widget.tollPlazaModel.cost4Wheels),
                                   _getFeeItem(
-                                      language.lang, 6, widget.tollPlazaModel.cost6To10Wheels),
+                                      language.lang,
+                                      6,
+                                      widget.tollPlazaModel != null
+                                          ? widget.tollPlazaModel.cost4Wheels
+                                          : 0),
                                   _getFeeItem(
-                                      language.lang, 6, widget.tollPlazaModel.costOver10Wheels),
+                                      language.lang,
+                                      6,
+                                      widget.tollPlazaModel != null
+                                          ? widget.tollPlazaModel.cost6To10Wheels
+                                          : 0),
+                                  _getFeeItem(
+                                      language.lang,
+                                      6,
+                                      widget.tollPlazaModel != null
+                                          ? widget.tollPlazaModel.costOver10Wheels
+                                          : 0),
                                 ],
                               ),
                             ),

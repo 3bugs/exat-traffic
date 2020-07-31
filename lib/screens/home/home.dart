@@ -631,7 +631,7 @@ class _HomeMainState extends State<HomeMain> {
                         key: _keyTollPlazaBottomSheet,
                         collapsePosition: _mainContainerHeight,
                         expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
-                        tollPlazaModel:  tollPlaza,
+                        tollPlazaModel: tollPlaza,
                       );
                     },
                   ),

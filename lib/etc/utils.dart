@@ -61,6 +61,20 @@ TextStyle getTextStyle(
         );
 }
 
+TextStyle getHeadlineTextStyle(BuildContext context, {int lang = 0}) {
+  final bool isBigScreen =
+      screenWidth(context) > getPlatformSize(400) && screenHeight(context) > getPlatformSize(700);
+
+  return getTextStyle(
+    lang,
+    sizeTh: isBigScreen ? 55.0 : 44.0,
+    sizeEn: isBigScreen ? 40.0 : 32.0,
+    color: Colors.white,
+    heightTh: 1.1,
+    heightEn: 1.4,
+  );
+}
+
 Size screenSize(BuildContext context) {
   return MediaQuery.of(context).size;
 }

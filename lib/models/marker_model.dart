@@ -176,7 +176,6 @@ class MarkerModel {
         break;
       case CategoryType.TOLL_PLAZA:
         //context.bloc<HomeBloc>().add(ClickTollPlaza(marker: this));
-        print("TOLL PLAZA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
         BlocProvider.of<MarkerBloc>(context).add(ClickTollPlaza(marker: this));
         break;
     }
