@@ -1,4 +1,7 @@
 import 'package:exattraffic/models/FAQ_model.dart';
+import 'package:exattraffic/models/about_model.dart';
+import 'package:exattraffic/models/add_answers_model.dart';
+import 'package:exattraffic/models/consent_model.dart';
 import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
@@ -211,6 +214,27 @@ class ExatApi {
     }
   }
 
+  static Future<AddAnswersModel> addAnswers(BuildContext context,String id,String score) async {
+    final String url = "$EXAT_API_BASED_URL/answers/add";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"quest_id":id,
+        "score":score,
+        "detail":"xxx",
+        "token": "testToken device answer"
+      },
+    );
+    if (responseResult.success) {
+      AddAnswersModel _model = AddAnswersModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
   static Future<FAQModel> fetchFAQ(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/questions/faq";
 
@@ -222,6 +246,46 @@ class ExatApi {
     if (responseResult.success) {
 
       FAQModel _model = FAQModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<AboutModel> fetchAbout(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/posts/detailByName";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {
+        "name": "aboutus",
+      },
+    );
+    if (responseResult.success) {
+
+      AboutModel _model = AboutModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<ConsentModel> fetchConsent(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/posts/detailByName";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {
+        "name": "terms",
+      },
+    );
+    if (responseResult.success) {
+
+      ConsentModel _model = ConsentModel.fromJson(responseResult.decode);
 
       return _model;
     } else {

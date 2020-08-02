@@ -47,7 +47,7 @@ class _YourScaffoldState extends State<YourScaffold> {
                   titleList: widget.titleList,
                   showDate: false,
                   leftIcon: HeaderIcon(
-                    image: AssetImage('assets/images/home/ic_back.png'),
+                    image: AssetImage('assets/images/home/ic_back_white.png'),
                     onClick: () {
                       Navigator.pop(context);
                     },

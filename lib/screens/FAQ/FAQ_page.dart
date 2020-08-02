@@ -81,6 +81,7 @@ class _FAQPageState extends State<FAQPage> {
               visible: open[index],
               child: Container(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Divider(),
                     Container(

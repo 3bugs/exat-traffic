@@ -1,9 +1,13 @@
 import 'dart:math';
 
+import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+import 'consent_presenter.dart';
 
 class ConsentPage extends StatefulWidget {
   @override
@@ -19,13 +23,15 @@ class _ConsentPageState extends State<ConsentPage> {
   ];
 
   bool checkValue = false;
+  ConsentPresenter _presenter;
 
   String _getDummyText() {
     return new List(1000).fold("", (previousValue, element) => previousValue + "TEST-${Random().nextInt(100).toString()} ");
   }
 
   Widget _content(){
-    return Container(
+    return _presenter.consentModel==null?DataLoading():
+    Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
 //          border: Border.all(
@@ -49,7 +55,7 @@ class _ConsentPageState extends State<ConsentPage> {
   Widget _title(){
     return Container(
       child: Center(
-        child: Text("ข้อกำหนดและเงื่อนไข", style: getTextStyle(0)),
+        child: Text(_presenter.consentModel.data[0].title, style: getTextStyle(0)),
       ),
     );
   }
@@ -57,6 +63,7 @@ class _ConsentPageState extends State<ConsentPage> {
   Widget _body(){
     return  Expanded(
       child: Container(
+        width: double.maxFinite,
         decoration: BoxDecoration(
             border: Border.all(
               color: Color(0x11000000),
@@ -66,7 +73,7 @@ class _ConsentPageState extends State<ConsentPage> {
         ),
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
-          child: Text(_getDummyText()),
+          child: Text(_presenter.consentModel.data[0].content),
         ),
       ),
     );
@@ -97,7 +104,27 @@ class _ConsentPageState extends State<ConsentPage> {
 //                    side: BorderSide(color: Colors.red)
               ),
               onPressed: () {
-                print("send");
+                if(checkValue) {
+                  print("send");
+                  Navigator.pop(context);
+                }else{
+                  Alert(
+                    context: context,
+                    type: AlertType.error,
+                    title: "เกิดข้อผิดพลาด",
+                    desc: "กรุณากดยอมรับเงือนไข",
+                    buttons: [
+                      DialogButton(
+                        child: Text(
+                          "OK",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        width: 120,
+                      )
+                    ],
+                  ).show();
+                }
               },
               color: Colors.blue,
               child: Text(
@@ -109,6 +136,13 @@ class _ConsentPageState extends State<ConsentPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    _presenter = ConsentPresenter(this);
+    _presenter.getConsent();
+    super.initState();
   }
 
   @override

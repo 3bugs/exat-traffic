@@ -1,10 +1,13 @@
 import 'dart:math';
 
+import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
+
+import 'about_presenter.dart';
 
 class AboutPage extends StatefulWidget {
   @override
@@ -18,10 +21,13 @@ class _AboutPageState extends State<AboutPage> {
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
   List<String> _titleList = ["เกี่ยวกับเรา", "About Us", "关于我们"];
+  AboutPresenter _presenter;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+    _presenter = AboutPresenter(this);
+    _presenter.getAbout();
     super.initState();
   }
 
@@ -89,7 +95,8 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget _body(){
-    return Expanded(
+    return _presenter.aboutModel==null?Expanded(child: DataLoading()):
+    Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(
           vertical: getPlatformSize(10.0),
@@ -106,7 +113,6 @@ class _AboutPageState extends State<AboutPage> {
                 height: getPlatformSize(15.0),
               ),
               _iconLink(),
-
             ],
           ),
 
@@ -117,7 +123,7 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget _textData(){
     return Container(
-        child: Text(_getDummyText())
+        child: Text(_presenter.aboutModel.data[0].content),
     );
   }
 

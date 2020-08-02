@@ -1,6 +1,5 @@
 import 'package:exattraffic/environment/base_presenter.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
-import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/api.dart';
