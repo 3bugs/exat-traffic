@@ -1,3 +1,5 @@
+import 'package:exattraffic/models/FAQ_model.dart';
+import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
@@ -17,10 +19,12 @@ import 'package:exattraffic/models/marker_model.dart';
 class ResponseResult {
   final bool success;
   final dynamic data;
+  final dynamic decode;
 
   const ResponseResult({
     @required this.success,
     @required this.data,
+    this.decode,
   });
 }
 
@@ -189,6 +193,42 @@ class ExatApi {
     }
   }
 
+  static Future<QuestionnaireModel> fetchQuestions(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/questions/view";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"mode": "1"},
+    );
+    if (responseResult.success) {
+
+       QuestionnaireModel _model = QuestionnaireModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<FAQModel> fetchFAQ(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/questions/faq";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {},
+    );
+    if (responseResult.success) {
+
+      FAQModel _model = FAQModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
   static Future<ResponseResult> _makeRequest(
       BuildContext context, String url, Map<String, dynamic> paramMap) async {
     Position currentLocation = await _getCurrentPosition();
@@ -221,12 +261,13 @@ class ExatApi {
     print("API Request Body: $body");
     print("API Response Status Code: ${response.statusCode}");
     print("API Response Body: ${response.body}");
+    print("API Response Body decode: ${json.decode(response.body)}");
     print("-------------------------------------------------------");
 
     if (response.statusCode == 200) {
       Map<String, dynamic> responseJsonBody = json.decode(response.body);
       if (responseJsonBody['status_code'].toString() == '200') {
-        return ResponseResult(success: true, data: responseJsonBody['data']);
+        return ResponseResult(success: true, data: responseJsonBody['data'],decode: responseJsonBody);
       } else {
         print(responseJsonBody['error']);
         return ResponseResult(success: false, data: responseJsonBody['error']);

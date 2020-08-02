@@ -52,10 +52,10 @@ class _TestOverlapState extends State<TestOverlap> {
             height: _mainContainerHeight + overlapHeight,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.pink.withOpacity(0.5),
-                  width: getPlatformSize(5.0),
-                ),
+//                border: Border.all(
+//                  color: Colors.pink.withOpacity(0.5),
+//                  width: getPlatformSize(5.0),
+//                ),
               ),
               child: SingleChildScrollView(
                 child: Padding(
