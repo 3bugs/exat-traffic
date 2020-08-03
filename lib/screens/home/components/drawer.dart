@@ -1,8 +1,13 @@
 import 'package:exattraffic/models/drawer_item_model.dart';
-import 'package:exattraffic/screens/_etc/about.dart';
+import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
+import 'package:exattraffic/screens/about/about_page.dart';
+import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
+import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
 import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
+
+import '../../_etc/test_overlap.dart';
 
 class MyDrawer extends StatelessWidget {
   static final double MARGIN_LEFT = 34.0;
@@ -20,7 +25,7 @@ class MyDrawer extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => About(),
+            builder: (context) => AboutPage(),
           ),
         );
       },
@@ -30,6 +35,12 @@ class MyDrawer extends StatelessWidget {
       icon: AssetImage('assets/images/drawer/ic_questionnaire.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => QuestionnairePage(),
+          ),
+        );
       },
     ),
     DrawerItemModel(
@@ -53,6 +64,35 @@ class MyDrawer extends StatelessWidget {
         Navigator.pop(context);
       },
     ),
+
+    DrawerItemModel(
+      text: 'ข้อกำหนดและเงื่อนไข',
+      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      onClick: (BuildContext context) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConsentPage(),
+          ),
+        );
+      },
+    ),
+
+    DrawerItemModel(
+      text: 'FAQ',
+      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      onClick: (BuildContext context) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FAQPage(),
+          ),
+        );
+      },
+    ),
+
     DrawerItemModel(
       text: 'ออกจากระบบ',
       icon: AssetImage('assets/images/drawer/ic_logout.png'),
