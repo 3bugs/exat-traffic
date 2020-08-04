@@ -73,6 +73,7 @@ flutter:
     - assets/images/cctv_details/
     - assets/images/rest_area_details/
     - assets/images/police_station_details/
+    - assets/images/toll_plaza_details/
     - assets/images/layers/
     - assets/images/map_markers/
     - assets/images/route/
