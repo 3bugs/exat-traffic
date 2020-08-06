@@ -92,7 +92,7 @@ class _HelpPageState extends State<HelpPage> {
               autoPlay: false,
               enlargeCenterPage: true,
               enableInfiniteScroll: false,
-              aspectRatio: 5 / 7,
+              aspectRatio: 1.8/3,
               onPageChanged: (index, reason) {
                 setState(() {
                   _current = index;
