@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/*import 'package:flutter_socket_io/socket_io_manager.dart';
+import 'package:flutter_socket_io/flutter_socket_io.dart';*/
+//import 'package:socket_io_client/socket_io_client.dart' as IO;
+//import 'package:adhara_socket_io/adhara_socket_io.dart';
+
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
@@ -31,15 +36,61 @@ class HomeBottomSheet extends StatefulWidget {
   _HomeBottomSheetState createState() => _HomeBottomSheetState();
 }
 
-class _HomeBottomSheetState extends State<HomeBottomSheet>  {
+class _HomeBottomSheetState extends State<HomeBottomSheet> {
   final GlobalKey<BottomSheetScaffoldState> _keyBottomSheetScaffold = GlobalKey();
 
   LayerItemModel _selectedExpressWay;
   bool _bottomSheetExpanded = false;
 
+  //SocketIO _socketIO;
+
   @override
   void initState() {
     super.initState();
+
+    /*IO.Socket socket = IO.io("http://163.47.9.26", <String, dynamic>{
+      'autoConnect': false,
+    });
+    socket.on('connect', (_) {
+      print("Socket.IO connected!");
+    });
+    socket.on('update-traffic', (data) {
+      print(data);
+    });
+    print("Connecting 163.47.9.26 ...");
+    socket.connect();*/
+
+    /////////////////////////////////////////////////////////////////////
+
+    /*_socketIO = SocketIOManager().createSocketIO(
+      "http://163.47.9.26",
+      "",
+      socketStatusCallback: _socketStatus,
+    );
+    //call init socket before doing anything
+    _socketIO.init();
+    //subscribe event
+    _socketIO.subscribe("update-traffic", _onSocketInfo);
+    //connect socket
+    _socketIO.connect();*/
+  }
+
+  @override
+  void dispose() {
+    /*if (_socketIO != null) {
+      _socketIO.unSubscribe("update-traffic");
+      _socketIO.disconnect();
+    }
+    SocketIOManager().destroySocket(_socketIO);*/
+    super.dispose();
+  }
+
+  void _socketStatus(dynamic data) {
+    print("Socket status: " + data);
+  }
+
+  void _onSocketInfo(dynamic data) {
+    print("Socket info: " + data);
   }
 
   void _handleClickUpDownSheet() {
@@ -101,31 +152,31 @@ class _HomeBottomSheetState extends State<HomeBottomSheet>  {
                   ),
                   _selectedExpressWay == null
                       ? SizedBox(
-                    width: getPlatformSize(42.0),
-                  )
+                          width: getPlatformSize(42.0),
+                        )
                       : Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        _handleClickBack(context);
-                      },
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(getPlatformSize(21.0)),
-                      ),
-                      child: Container(
-                        width: getPlatformSize(42.0),
-                        height: getPlatformSize(42.0),
-                        //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                        child: Center(
-                          child: Image(
-                            image: AssetImage('assets/images/home/ic_back.png'),
-                            width: getPlatformSize(12.0),
-                            height: getPlatformSize(12.0),
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _handleClickBack(context);
+                            },
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(getPlatformSize(21.0)),
+                            ),
+                            child: Container(
+                              width: getPlatformSize(42.0),
+                              height: getPlatformSize(42.0),
+                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                              child: Center(
+                                child: Image(
+                                  image: AssetImage('assets/images/home/ic_back.png'),
+                                  width: getPlatformSize(12.0),
+                                  height: getPlatformSize(12.0),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     child: Center(
                       child: Consumer<LanguageModel>(

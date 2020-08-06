@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "940329200041",
+    "firebase_url": "https://hap-app-f55bd.firebaseio.com",
+    "project_id": "hap-app-f55bd",
+    "storage_bucket": "hap-app-f55bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940329200041:android:4efb633f440cd67df93cb8",
+        "android_client_info": {
+          "package_name": "com.twofellows.tpso"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "940329200041-rtcnu1smm7vq6t6raep3olhsl5lk95cb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYfflmgL8Ip4a2xa8h-sETRAz4S2uCmAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "940329200041-rtcnu1smm7vq6t6raep3olhsl5lk95cb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "940329200041-cusokkmnj44g3odn1u4vk69tq0b7dc0t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.2fellows.tpso"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940329200041:android:780622ec2c7652c8f93cb8",
+        "android_client_info": {
+          "package_name": "isymphonyz.exat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "940329200041-rtcnu1smm7vq6t6raep3olhsl5lk95cb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYfflmgL8Ip4a2xa8h-sETRAz4S2uCmAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "940329200041-rtcnu1smm7vq6t6raep3olhsl5lk95cb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "940329200041-cusokkmnj44g3odn1u4vk69tq0b7dc0t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.2fellows.tpso"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
