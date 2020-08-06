@@ -41,8 +41,8 @@ class CctvItemView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: _rnd.nextInt(2) == 0 ? Color(0xFFE60606) : Color(0xFF4ABA20),
-                      width: getPlatformSize(5.0),
+                      color: _rnd.nextInt(2) == 0 ? Color(0xFFEB222C) : Color(0xFF22B573),
+                      width: getPlatformSize(11.0),
                     ),
                     bottom: isLastItem
                         ? BorderSide.none
@@ -112,12 +112,12 @@ class CctvItemView extends StatelessWidget {
             isFirstItem
                 ? SizedBox.shrink()
                 : Positioned(
-                    top: getPlatformSize(-4.0),
-                    left: getPlatformSize(12),
+                    top: getPlatformSize(-5.0),
+                    left: getPlatformSize(13.5),
                     child: Image(
                       image: AssetImage('assets/images/home/ic_arrow_down.png'),
-                      width: getPlatformSize(9.0),
-                      height: getPlatformSize(8.0),
+                      width: getPlatformSize(12.26),
+                      height: getPlatformSize(10.49),
                       fit: BoxFit.contain,
                     ),
                   ),
