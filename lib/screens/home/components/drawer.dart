@@ -68,7 +68,7 @@ class MyDrawer extends StatelessWidget {
 
     DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',
-      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      icon: AssetImage(''),
       onClick: (BuildContext context) {
         Navigator.pop(context);
         Navigator.push(
@@ -82,7 +82,7 @@ class MyDrawer extends StatelessWidget {
 
     DrawerItemModel(
       text: 'FAQ',
-      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      icon: AssetImage(''),
       onClick: (BuildContext context) {
         Navigator.pop(context);
         Navigator.push(
@@ -96,7 +96,7 @@ class MyDrawer extends StatelessWidget {
 
     DrawerItemModel(
       text: 'Help',
-      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      icon: AssetImage(''),
       onClick: (BuildContext context) {
         Navigator.pop(context);
         Navigator.push(
