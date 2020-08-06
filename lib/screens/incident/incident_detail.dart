@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:exattraffic/components/data_loading.dart';
@@ -7,29 +6,35 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:store_redirect/store_redirect.dart';
 
-import 'about_presenter.dart';
+import 'incident_detail_presenter.dart';
 
-class AboutPage extends StatefulWidget {
+class IncidentDetailPage extends StatefulWidget {
+  int id;
+
+  IncidentDetailPage({
+    this.id,
+  });
+
   @override
-  _AboutPageState createState() => _AboutPageState();
+  _IncidentDetailPageState createState() => _IncidentDetailPageState();
 }
 
-class _AboutPageState extends State<AboutPage> {
+class _IncidentDetailPageState extends State<IncidentDetailPage> {
   final GlobalKey _keyDummyContainer = GlobalKey();
+  IncidentDetailPresenter _presenter;
 
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เกี่ยวกับเรา", "About Us", "关于我们"];
-  AboutPresenter _presenter;
+  List<String> _titleList = ["เหตุการณ์", "Incident", "事件"];
 
   @override
   void initState() {
+//    print("IncidentDetailPage ID : ${widget.id}");
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-    _presenter = AboutPresenter(this);
-    _presenter.getAbout();
+    _presenter = IncidentDetailPresenter(this);
+    _presenter.getIncidentDetail(widget.id);
     super.initState();
   }
 
@@ -45,7 +50,9 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget _content(){
-    return  Stack(
+    return _presenter.incidentDetailModel == null ? DataLoading():
+
+      Stack(
       key: _keyDummyContainer,
       overflow: Overflow.visible,
       children: <Widget>[
@@ -89,7 +96,7 @@ class _AboutPageState extends State<AboutPage> {
         ),
       ),
       child: Image(
-        image: AssetImage('assets/images/login/exat_logo.png'),
+        image: NetworkImage("${_presenter.incidentDetailModel.data.cover}"),
         width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
         height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
       ),
@@ -97,7 +104,8 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget _body(){
-    return _presenter.aboutModel==null?Expanded(child: DataLoading()):
+    return
+//      _presenter.aboutModel==null?Expanded(child: DataLoading()):
     Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -105,19 +113,7 @@ class _AboutPageState extends State<AboutPage> {
           horizontal: 0.0,
         ),
         child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: getPlatformSize(10.0),
-              ),
-              _textData(),
-              SizedBox(
-                height: getPlatformSize(15.0),
-              ),
-              _iconLink(),
-            ],
-          ),
-
+          child: _textData(),
         ),
       ),
     );
@@ -125,73 +121,35 @@ class _AboutPageState extends State<AboutPage> {
 
   Widget _textData(){
     return Container(
-        child: Text(_presenter.aboutModel.data[0].content),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(height: 10,),
+          Text(_presenter.incidentDetailModel.data.title,style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),),
+          SizedBox(height: 10,),
+          Text(_presenter.incidentDetailModel.data.detail,style: TextStyle(
+            fontSize: 16,
+          ),),
+        ],
+      ),
+//      child: Text(_presenter.aboutModel.data[0].content),
     );
   }
 
-  Widget _iconLink(){
-    return Row(
-      children: <Widget>[
 
-        Platform.isIOS? InkWell(
-          onTap: (){
-            StoreRedirect.redirect(androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
-          },
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: 70,
-                height: 70,
-//          color: Colors.red,
-                child: Image.network(_presenter.aboutModel.data[0].reference[0].cover),
-              ),
-
-              Container(
-                alignment: Alignment.center,
-//              color: Colors.red,
-                width: 70,
-                height: 30,
-                child: Text(_presenter.aboutModel.data[0].reference[0].title,style: TextStyle(fontSize: 9),),
-              ),
-            ],
-          ),
-        ):
-        InkWell(
-          onTap: (){
-            StoreRedirect.redirect(androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
-          },
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: 70,
-                height: 70,
-//          color: Colors.green,
-                child: Image.network(_presenter.aboutModel.data[0].reference[1].cover),
-              ),
-              Container(
-                alignment: Alignment.center,
-//              color: Colors.green,
-                width: 70,
-                height: 30,
-                child: Text(_presenter.aboutModel.data[0].reference[1].title,style: TextStyle(fontSize: 9),),
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(
-          width: 15,
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
-      // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
-      child: _content()
+        titleList: _titleList,
+        // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
+        child: _content()
     );
   }
 }
+
+
+
