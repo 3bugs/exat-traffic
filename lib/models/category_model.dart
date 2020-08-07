@@ -1,9 +1,14 @@
-import 'package:equatable/equatable.dart';
-import 'package:exattraffic/etc/utils.dart';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:exattraffic/etc/map_helper.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:exattraffic/etc/utils.dart';
 
 class CategoryType {
   static const int TOLL_PLAZA = 10;
@@ -127,7 +132,7 @@ class CategoryModel {
       id: json['id'],
       name: json['name'],
       code: json['cate_code'],
-      markerIconUrl: json['icon'],
+      markerIconUrl: Constants.Api.SERVER + json['icon'],
       markerIconAsset: markerIconAsset,
       markerIconBitmap: categoryIconMap[json['cate_code']],
       filterOffIconAsset: filterOffIconAsset,
@@ -136,6 +141,14 @@ class CategoryModel {
       filterIconHeight: filterIconHeight,
       selected: true,
     );
+  }
+
+  Future<BitmapDescriptor> getNetworkIcon() async {
+    /*final File markerImageFile = await DefaultCacheManager().getSingleFile(this.markerIconUrl);
+    final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
+    return BitmapDescriptor.fromBytes(markerImageBytes);*/
+
+    return MapHelper.getMarkerImageFromUrl(this.markerIconUrl);
   }
 
   CategoryModel copyWith({

@@ -135,14 +135,31 @@ class _HomeMainState extends State<HomeMain> {
     });
   }
 
-  Marker _createMarker(BuildContext context, MarkerModel marker) {
+  Future<Set<Marker>> _createMarkerSet(BuildContext context, List<MarkerModel> markerList) async {
+    Set<Marker> markerSet = {};
+    for (MarkerModel markerModel in markerList) {
+      Marker marker = await _createMarker(context, markerModel);
+      markerSet.add(marker);
+    }
+    return markerSet;
+
+    /*return markerList.map((MarkerModel marker) async {
+      return await _createMarker(context, marker);
+    }).toSet();*/
+  }
+
+  Future<Marker> _createMarker(BuildContext context, MarkerModel marker) async {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('marker-${marker.id.toString()}');
+
+    BitmapDescriptor markerIcon = await marker.category.getNetworkIcon();
 
     return Marker(
       markerId: markerId,
       position: LatLng(marker.latitude, marker.longitude),
-      icon: marker.category.markerIconBitmap,
+      //icon: marker.category.markerIconBitmap, // local icon
+      icon: markerIcon,
+      // network icon
       alpha: 1.0,
       infoWindow: (true)
           ? InfoWindow(
@@ -198,19 +215,19 @@ class _HomeMainState extends State<HomeMain> {
           List<CategoryModel> categoryList = state.categoryList;
           //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 
-          Set<Marker> markerSet = markerList.map((MarkerModel marker) {
+          /*Set<Marker> markerSet = markerList.map((MarkerModel marker) {
             return _createMarker(context, marker);
-          }).toSet();
+          }).toSet();*/
 
           if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
               state is MarkerLayerChange) {
-            new Future.delayed(Duration(milliseconds: 1000), () async {
+            /*new Future.delayed(Duration(milliseconds: 1000), () async {
               List<LatLng> markerLatLngList =
                   markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
               LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
               final GoogleMapController controller = await _googleMapController.future;
               controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
-            });
+            });*/
           } else if (state is MapToolChange && state.selectedMapTool == MapTool.none) {
             _moveToCurrentPosition(context);
           }
@@ -226,31 +243,50 @@ class _HomeMainState extends State<HomeMain> {
             child: Stack(
               overflow: Overflow.visible,
               children: <Widget>[
-                GoogleMap(
-                  key: _keyGoogleMaps,
-                  padding: EdgeInsets.only(
-                    //bottom: (state.selectedMapTool == MapTool.layer) || (state.selectedMapTool == MapTool.aroundMe) ? getPlatformSize(100.0) : 0.0,
-                    top: getPlatformSize(20.0),
-                    bottom: getPlatformSize(140.0),
-                    left: getPlatformSize(0.0),
-                    right: getPlatformSize(50.0),
-                  ),
-                  mapType: MapType.normal,
-                  initialCameraPosition: INITIAL_POSITION,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  trafficEnabled: false,
-                  zoomControlsEnabled: false,
-                  onMapCreated: (GoogleMapController controller) {
-                    _googleMapController.complete(controller);
-                    _moveToCurrentPosition(context);
-                  },
-                  onTap: (LatLng latLng) {
-                    /*_addMarker(latLng);
-                      _sendToVisualization(latLng);*/
-                  },
-                  markers: markerSet,
-                ),
+                FutureBuilder(
+                    future: _createMarkerSet(context, markerList),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
+                            state is MarkerLayerChange) {
+                          new Future.delayed(Duration(milliseconds: 1000), () async {
+                            List<LatLng> markerLatLngList =
+                            markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
+                            LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
+                            final GoogleMapController controller = await _googleMapController.future;
+                            controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
+                          });
+                        }
+                      }
+
+                      if (true /*snapshot.hasData*/) {
+                        return GoogleMap(
+                          key: _keyGoogleMaps,
+                          padding: EdgeInsets.only(
+                            //bottom: (state.selectedMapTool == MapTool.layer) || (state.selectedMapTool == MapTool.aroundMe) ? getPlatformSize(100.0) : 0.0,
+                            top: getPlatformSize(20.0),
+                            bottom: getPlatformSize(140.0),
+                            left: getPlatformSize(0.0),
+                            right: getPlatformSize(50.0),
+                          ),
+                          mapType: MapType.normal,
+                          initialCameraPosition: INITIAL_POSITION,
+                          myLocationEnabled: true,
+                          myLocationButtonEnabled: false,
+                          trafficEnabled: false,
+                          zoomControlsEnabled: false,
+                          onMapCreated: (GoogleMapController controller) {
+                            _googleMapController.complete(controller);
+                            _moveToCurrentPosition(context);
+                          },
+                          onTap: (LatLng latLng) {
+                            /*_addMarker(latLng);
+                              _sendToVisualization(latLng);*/
+                          },
+                          markers: snapshot.hasData ? snapshot.data : null,
+                        );
+                      }
+                    }),
 
                 // Map tools
                 Container(

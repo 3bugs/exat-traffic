@@ -10,6 +10,9 @@ class MyFcm {
   MyFcm(this.context);
 
   configFcm() {
+    _firebaseMessaging.subscribeToTopic('message_incident');
+    _firebaseMessaging.subscribeToTopic('message_event');
+
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
