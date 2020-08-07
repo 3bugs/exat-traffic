@@ -34,7 +34,7 @@ class Data {
   String title;
   String excerpt;
   String content;
-  Null bgColor;
+  dynamic bgColor;
   String status;
   int parent;
   int sort;

@@ -2,6 +2,9 @@ import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
 import 'package:exattraffic/models/add_answers_model.dart';
 import 'package:exattraffic/models/consent_model.dart';
+import 'package:exattraffic/models/help_model.dart';
+import 'package:exattraffic/models/incident_detail_model.dart';
+import 'package:exattraffic/models/incident_list_model.dart';
 import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
@@ -266,6 +269,72 @@ class ExatApi {
     if (responseResult.success) {
 
       AboutModel _model = AboutModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<HelpModel> fetchHelp(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/posts/detailByName";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {
+        "name": "help",
+      },
+    );
+    if (responseResult.success) {
+
+      HelpModel _model = HelpModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<IncidentListModel> fetchIncidentList(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/messages/list";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {
+        "altitude":null,
+        "status":"1",
+        "limit":2
+      },
+    );
+    if (responseResult.success) {
+
+      IncidentListModel _model = IncidentListModel.fromJson(responseResult.decode);
+
+      return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<IncidentDetailModel> fetchIncidentDetail(BuildContext context,int id) async {
+    final String url = "$EXAT_API_BASED_URL/messages/view";
+
+    print("id = $id");
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {
+        "altitude":null,
+        "status":"1",
+        "id":id
+      },
+    );
+    if (responseResult.success) {
+
+      IncidentDetailModel _model = IncidentDetailModel.fromJson(responseResult.decode);
 
       return _model;
     } else {
