@@ -1,16 +1,13 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
-
-import 'components/bottom_sheet_scaffold.dart';
+import 'package:exattraffic/screens/bottom_sheet/components/bottom_sheet_scaffold.dart';
+import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/screens/bottom_sheet/components/toll_plaza_lane_item.dart';
 
 class TollPlazaBottomSheet extends StatefulWidget {
   TollPlazaBottomSheet({
@@ -31,6 +28,7 @@ class TollPlazaBottomSheet extends StatefulWidget {
 class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
   final GlobalKey<BottomSheetScaffoldState> _keyBottomSheetScaffold = GlobalKey();
 
+  static const TEXT_COLOR = Color(0xFF818181);
   bool _bottomSheetExpanded = false;
 
   @override
@@ -87,8 +85,6 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
   }
 
   Widget _getFeeItem(int language, int widthFlex, int fee) {
-    const TEXT_COLOR = Color(0xFF818181);
-
     return Expanded(
       flex: widthFlex,
       child: Column(
@@ -112,6 +108,13 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
             ),
             child: Text(
               fee.toString(),
+              /*style: GoogleFonts.kanit(
+                textStyle: TextStyle(
+                  fontSize: getPlatformSize(30.0),
+                  fontWeight: FontWeight.bold,
+                  color: TEXT_COLOR,
+                ),
+              ),*/
               style: getTextStyle(
                 1,
                 color: TEXT_COLOR,
@@ -273,7 +276,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                     'assets/images/route/ic_car_small.png',
                                     46.0,
                                     25.8,
-                                    10,
+                                    15,
                                   ),
                                   _getCarItem(
                                     language.lang,
@@ -282,7 +285,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                     'assets/images/route/ic_car_medium-new.png',
                                     84.65,
                                     38.66,
-                                    1,
+                                    3,
                                   ),
                                   _getCarItem(
                                     language.lang,
@@ -298,54 +301,100 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                             ),
 
                             // ค่าผ่านทาง
-                            Padding(
-                              padding: EdgeInsets.only(
-                                right: getPlatformSize(16.0),
-                              ),
-                              child: Row(
-                                children: <Widget>[
-                                  _getFeeItem(
-                                      language.lang,
-                                      6,
-                                      widget.tollPlazaModel != null
-                                          ? widget.tollPlazaModel.cost4Wheels
-                                          : 0),
-                                  _getFeeItem(
-                                      language.lang,
-                                      6,
-                                      widget.tollPlazaModel != null
-                                          ? widget.tollPlazaModel.cost6To10Wheels
-                                          : 0),
-                                  _getFeeItem(
-                                      language.lang,
-                                      6,
-                                      widget.tollPlazaModel != null
-                                          ? widget.tollPlazaModel.costOver10Wheels
-                                          : 0),
-                                ],
-                              ),
-                            ),
+                            widget.tollPlazaModel != null
+                                ? (widget.tollPlazaModel.cost4Wheels == -1
+                                    ? Container(
+                                        padding: EdgeInsets.only(
+                                          top: getPlatformSize(10.0),
+                                          bottom: getPlatformSize(10.0),
+                                          right: getPlatformSize(16.0),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "ค่าผ่านทางตามระยะทาง",
+                                            style: getTextStyle(
+                                              language.lang,
+                                              color: TEXT_COLOR,
+                                              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                                              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+                                              heightTh: 1.0,
+                                              heightEn: 1.2,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: EdgeInsets.only(
+                                          right: getPlatformSize(16.0),
+                                        ),
+                                        child: Row(
+                                          children: <Widget>[
+                                            _getFeeItem(
+                                              language.lang,
+                                              6,
+                                              widget.tollPlazaModel.cost4Wheels,
+                                            ),
+                                            _getFeeItem(
+                                              language.lang,
+                                              6,
+                                              widget.tollPlazaModel.cost6To10Wheels,
+                                            ),
+                                            _getFeeItem(
+                                              language.lang,
+                                              6,
+                                              widget.tollPlazaModel.costOver10Wheels,
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                : SizedBox.shrink(),
 
                             // เส้นคั่น
                             Container(
                               height: 0.0,
                               margin: EdgeInsets.symmetric(
-                                vertical: getPlatformSize(8.0),
-                                horizontal: getPlatformSize(0.0),
+                                vertical: getPlatformSize(4.0),
+                                horizontal: getPlatformSize(4.0),
                               ),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Color(0x707070).withOpacity(0.6),
+                                    color: Color(0x707070).withOpacity(0.3),
                                     width: getPlatformSize(0.0),
                                   ),
                                 ),
                               ),
                             ),
 
-                            SizedBox(
-                              height: getPlatformSize(500.0),
-                            ),
+                            widget.tollPlazaModel != null
+                                ? Container(
+                                    height: 210.0,
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.only(
+                                      top: getPlatformSize(10.0),
+                                      bottom: getPlatformSize(20.0),
+                                    ),
+                                    child: ListView.separated(
+                                      itemCount: widget.tollPlazaModel.laneList.length,
+                                      scrollDirection: Axis.horizontal,
+                                      physics: BouncingScrollPhysics(),
+                                      itemBuilder: (BuildContext context, int index) {
+                                        TollPlazaLaneModel lane =
+                                            widget.tollPlazaModel.laneList[index];
+
+                                        return TollPlazaLaneItemView(
+                                          laneItem: lane,
+                                          isFirstItem: index == 0,
+                                          isLastItem:
+                                              index == widget.tollPlazaModel.laneList.length - 1,
+                                        );
+                                      },
+                                      separatorBuilder: (BuildContext context, int index) {
+                                        return SizedBox.shrink();
+                                      },
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
                           ],
                         ),
                       ),

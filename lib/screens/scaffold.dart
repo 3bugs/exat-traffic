@@ -1,4 +1,5 @@
-import 'package:exattraffic/components/header.dart';
+import 'package:exattraffic/main.dart';
+import 'package:exattraffic/services/fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ import 'package:exattraffic/screens/route/route.dart';
 import 'package:exattraffic/models/screen_props.dart';
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/components/lazy_indexed_stack.dart';
+import 'package:exattraffic/components/header.dart';
 
 //import 'package:exattraffic/components/fade_indexed_stack.dart';
 //import 'package:exattraffic/components/animated_indexed_stack.dart';
@@ -136,7 +138,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   ScreenProps _currentScreenProps = screenPropsList[0];
 
   initState() {
-    //WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+    new Future.delayed(Duration.zero,() {
+      MyFcm(context).configFcm();
+    });
 
     _fragmentList = [
       Home(),

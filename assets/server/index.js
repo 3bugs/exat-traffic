@@ -37,7 +37,7 @@ app.use(function (req, res, next) {
 });
 
 //ENABLE CORS
-app.all('/', function(req, res, next) {
+app.all('/', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
@@ -90,8 +90,45 @@ io.on('connection', function (socket) {
   });
 });
 
-app.get('/api/:item/:id?',
-  (req, res) => {
+app.get('/api/route_traffic', (req, res) => {
+  const promiseList = [];
+
+  // เอาเฉพาะสายทางของ exat
+  [1, 3, 4, 5, 6, 7, 8, 10].forEach(routeId => {
+    const promise = fetch('https://alg.exat.co.th/api/roads/' + routeId, {
+      method: 'get',
+      headers: {'Authorization': 'Token 8a4e96ed4c9281af4d0c2189c6a72551fe940b43'},
+    })
+      .then(result => result.json())
+      .then(result => result[0].chunks);
+
+    promiseList.push(promise);
+  })
+
+  Promise.all(promiseList).then(resultList => {
+    const allRouteChunks = resultList.reduce((total, chunks) => {
+      return total.concat(chunks.map(chunk => {
+          return {
+            id: chunk.chunk_id,
+            idx: chunk.traffic_index
+          };
+        })
+      );
+    }, []);
+
+    console.log(allRouteChunks);
+    //io.emit('update-traffic', allRouteChunks);
+    res.json({
+      error: {
+        code: CODE_SUCCESS,
+        message: 'ok',
+      },
+      data_list: allRouteChunks,
+    });
+  });
+});
+
+app.get('/api/:item/:id?', (req, res) => {
     const connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
@@ -124,7 +161,9 @@ app.get('/api/:item/:id?',
           },
           data_list: null,
         });
+        connection.end();
         break;
+
       case 'gate_in':
         whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
@@ -289,7 +328,7 @@ app.get('/api/:item/:id?',
   }
 );
 
-new cronJob("*/1 * * * *", function () {
+new cronJob("*/5 * * * *", function () {
   console.log('CRON JOB RUN: ' + new Date());
   fetchData();
 }, null, true);

@@ -37,6 +37,10 @@ dependencies:
   rflutter_alert: ^1.0.3
   store_redirect: ^1.0.2
   carousel_slider: ^2.2.1
+  #flutter_socket_io: ^0.6.0
+  #socket_io_client: ^0.9.11
+  #adhara_socket_io: ^0.4.2+1
+  firebase_messaging: ^6.0.16
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -75,6 +79,7 @@ flutter:
     - assets/images/cctv_details/
     - assets/images/rest_area_details/
     - assets/images/police_station_details/
+    - assets/images/toll_plaza_details/
     - assets/images/layers/
     - assets/images/map_markers/
     - assets/images/route/

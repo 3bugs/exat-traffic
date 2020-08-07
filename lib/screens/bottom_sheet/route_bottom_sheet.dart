@@ -316,7 +316,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                           'assets/images/route/ic_car_small.png',
                           46.0,
                           25.8,
-                          10,
+                          15,
                         ),
                         _getCarItem(
                           language.lang,
@@ -325,7 +325,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                           'assets/images/route/ic_car_medium-new.png',
                           84.65,
                           38.66,
-                          1,
+                          3,
                         ),
                         _getCarItem(
                           language.lang,

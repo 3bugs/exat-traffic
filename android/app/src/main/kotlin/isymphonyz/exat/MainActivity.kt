@@ -1,4 +1,4 @@
-package th.co.exat.android.exattraffic
+package isymphonyz.exat;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
