@@ -368,7 +368,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
 
                             widget.tollPlazaModel != null
                                 ? Container(
-                                    height: 210.0,
+                                    height: getPlatformSize(234.0),
                                     alignment: Alignment.center,
                                     padding: EdgeInsets.only(
                                       top: getPlatformSize(10.0),

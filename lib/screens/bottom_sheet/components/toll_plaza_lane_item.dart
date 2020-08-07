@@ -107,7 +107,7 @@ class TollPlazaLaneItemView extends StatelessWidget {
                 color: Colors.white,
                 isBold: true,
                 //sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                sizeEn: getPlatformSize(12.0),
+                sizeEn: 10.5,
                 heightEn: 1.0,
               ),
             ),
