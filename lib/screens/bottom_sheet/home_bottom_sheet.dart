@@ -39,7 +39,7 @@ class HomeBottomSheet extends StatefulWidget {
 class _HomeBottomSheetState extends State<HomeBottomSheet> {
   final GlobalKey<BottomSheetScaffoldState> _keyBottomSheetScaffold = GlobalKey();
 
-  LayerItemModel _selectedExpressWay;
+  ExpressWayModel _selectedExpressWay;
   bool _bottomSheetExpanded = false;
 
   //SocketIO _socketIO;
@@ -109,7 +109,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     });
   }
 
-  void _handleClickExpressWay(BuildContext context, LayerItemModel expressWayModel) {
+  void _handleClickExpressWay(BuildContext context, ExpressWayModel expressWayModel) {
     setState(() {
       _selectedExpressWay = expressWayModel;
     });
@@ -256,32 +256,32 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
 class ExpressWayList extends StatelessWidget {
   ExpressWayList(this._onSelectExpressWay);
 
-  final List<LayerItemModel> _expressWayList = <LayerItemModel>[
-    LayerItemModel(
+  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
+    ExpressWayModel(
       name: 'ทางพิเศษศรีรัช',
       image: AssetImage('assets/images/home/express_way_srirach.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษฉลองรัช',
       image: AssetImage('assets/images/home/express_way_chalong.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษบูรพาวิถี',
       image: AssetImage('assets/images/home/express_way_burapa.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษเฉลิมมหานคร',
       image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษอุดรรัถยา',
       image: AssetImage('assets/images/home/express_way_udorn.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษสายบางนา',
       image: AssetImage('assets/images/home/express_way_bangna.jpg'),
     ),
-    LayerItemModel(
+    ExpressWayModel(
       name: 'ทางพิเศษกาญจนาภิเษก',
       image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
     ),
@@ -298,7 +298,7 @@ class ExpressWayList extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         physics: BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          LayerItemModel selectedExpressWay = _expressWayList[index];
+          ExpressWayModel selectedExpressWay = _expressWayList[index];
 
           return ExpressWayImageView(
             expressWay: selectedExpressWay,
@@ -361,7 +361,7 @@ class _CctvListState extends State<CctvList> {
             physics: BouncingScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
               return ExpressWayTextView(
-                expressWay: LayerItemModel(
+                expressWay: ExpressWayModel(
                   name: 'ทางพิเศษศรีรัช',
                   image: AssetImage('assets/images/home/express_way_srirach.jpg'),
                 ),

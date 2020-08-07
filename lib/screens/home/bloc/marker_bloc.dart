@@ -32,10 +32,8 @@ class MarkerBloc extends Bloc<MarkerEvent, MarkerState> {
 
   int _getFeeValue(List<CoreConfigModel> coreConfigList, String type) {
     List<CoreConfigModel> list =
-    coreConfigList.where((coreConfig) => coreConfig.code == "4").toList();
-    return (list.isNotEmpty && list[0].value != null && list[0].value
-        .trim()
-        .isNotEmpty)
+        coreConfigList.where((coreConfig) => coreConfig.code == type).toList();
+    return (list.isNotEmpty && list[0].value != null && list[0].value.trim().isNotEmpty)
         ? int.parse(list[0].value)
         : -1;
   }
@@ -43,7 +41,6 @@ class MarkerBloc extends Bloc<MarkerEvent, MarkerState> {
   List<TollPlazaLaneModel> _getLaneList(List<CoreConfigModel> coreConfigList) {
     List<TollPlazaLaneModel> laneList = List();
 
-    print("******************** LANE ********************");
     coreConfigList
         .where((coreConfig) => coreConfig.code == "markers_channel")
         .forEach((coreConfig) {

@@ -69,7 +69,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
           print('SPLASH SCREEN FETCHED');
 
           setState(() {
-            _splashImageUrl = 'http://163.47.9.26${dataList[0]['cover']}';
+            _splashImageUrl = '${dataList[0]['cover']}';
           });
         });
       } catch (_) {
@@ -81,7 +81,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
         print('SPLASH SCREEN FETCHED');
 
         setState(() {
-          _splashImageUrl = 'http://163.47.9.26${dataList[0]['cover']}';
+          _splashImageUrl = '${dataList[0]['cover']}';
         });
       } catch (_) {
         print('ERROR LOADING SPLASH SCREEN');

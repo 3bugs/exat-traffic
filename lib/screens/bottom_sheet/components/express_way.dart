@@ -14,7 +14,7 @@ class ExpressWayImageView extends StatelessWidget {
     @required this.onClick,
   });
 
-  final LayerItemModel expressWay;
+  final ExpressWayModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
   final Function onClick;
@@ -95,7 +95,7 @@ class ExpressWayTextView extends StatelessWidget {
     @required this.isLastItem,
   });
 
-  final LayerItemModel expressWay;
+  final ExpressWayModel expressWay;
   final bool isFirstItem;
   final bool isLastItem;
 
@@ -116,7 +116,7 @@ class ExpressWayTextView extends StatelessWidget {
             child: InkWell(
               onTap: () {},
               borderRadius: BorderRadius.all(
-                Radius.circular(getPlatformSize(6.0)),
+                Radius.circular(getPlatformSize(10.0)),
               ),
               child: Container(
                 padding: EdgeInsets.symmetric(

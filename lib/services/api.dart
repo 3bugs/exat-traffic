@@ -126,6 +126,21 @@ class ExatApi {
     }
   }
 
+  static Future<List> fetchExpressWays(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/routes/list";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {},
+    );
+    if (responseResult.success) {
+      return responseResult.data;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
   static Future<List<MarkerModel>> fetchMarkers(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/markers/all";
 
@@ -205,8 +220,7 @@ class ExatApi {
       {"mode": "1"},
     );
     if (responseResult.success) {
-
-       QuestionnaireModel _model = QuestionnaireModel.fromJson(responseResult.decode);
+      QuestionnaireModel _model = QuestionnaireModel.fromJson(responseResult.decode);
 
       return _model;
     } else {
@@ -214,17 +228,13 @@ class ExatApi {
     }
   }
 
-  static Future<AddAnswersModel> addAnswers(BuildContext context,String id,String score) async {
+  static Future<AddAnswersModel> addAnswers(BuildContext context, String id, String score) async {
     final String url = "$EXAT_API_BASED_URL/answers/add";
 
     ResponseResult responseResult = await _makeRequest(
       context,
       url,
-      {"quest_id":id,
-        "score":score,
-        "detail":"xxx",
-        "token": "testToken device answer"
-      },
+      {"quest_id": id, "score": score, "detail": "xxx", "token": "testToken device answer"},
     );
     if (responseResult.success) {
       AddAnswersModel _model = AddAnswersModel.fromJson(responseResult.decode);
@@ -244,7 +254,6 @@ class ExatApi {
       {},
     );
     if (responseResult.success) {
-
       FAQModel _model = FAQModel.fromJson(responseResult.decode);
 
       return _model;
@@ -264,7 +273,6 @@ class ExatApi {
       },
     );
     if (responseResult.success) {
-
       AboutModel _model = AboutModel.fromJson(responseResult.decode);
 
       return _model;
@@ -284,7 +292,6 @@ class ExatApi {
       },
     );
     if (responseResult.success) {
-
       ConsentModel _model = ConsentModel.fromJson(responseResult.decode);
 
       return _model;
@@ -331,7 +338,8 @@ class ExatApi {
     if (response.statusCode == 200) {
       Map<String, dynamic> responseJsonBody = json.decode(response.body);
       if (responseJsonBody['status_code'].toString() == '200') {
-        return ResponseResult(success: true, data: responseJsonBody['data'],decode: responseJsonBody);
+        return ResponseResult(
+            success: true, data: responseJsonBody['data'], decode: responseJsonBody);
       } else {
         print(responseJsonBody['error']);
         return ResponseResult(success: false, data: responseJsonBody['error']);
