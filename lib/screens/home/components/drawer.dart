@@ -1,17 +1,19 @@
+import 'package:flutter/material.dart';
+
+import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
-import 'package:exattraffic/screens/consent/consent_page.dart';
+//import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
-import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 
 import '../../_etc/test_overlap.dart';
 
 class MyDrawer extends StatelessWidget {
-  static final double MARGIN_LEFT = 34.0;
+  static final double MARGIN_LEFT = getPlatformSize(34.0);
 
   MyDrawer();
 
@@ -48,25 +50,46 @@ class MyDrawer extends StatelessWidget {
       text: 'การตั้งค่า',
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
-        Navigator.pop(context);
+        //Navigator.pop(context);
+        alert(context, "EXAT Traffic", "Under construction, coming soon!");
       },
     ),
     DrawerItemModel(
-      text: 'ความช่วยเหลือ',
+      text: 'ช่วยเหลือ',
       icon: AssetImage('assets/images/drawer/ic_help.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HelpPage(),
+          ),
+        );
+      },
+    ),
+    DrawerItemModel(
+      text: 'คำถามที่พบบ่อย',
+      icon: AssetImage('assets/images/drawer/ic_faq.png'),
+      onClick: (BuildContext context) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FAQPage(),
+          ),
+        );
       },
     ),
     DrawerItemModel(
       text: 'วิดเจ็ต',
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
-        Navigator.pop(context);
+        //Navigator.pop(context);
+        alert(context, "EXAT Traffic", "Under construction, coming soon!");
       },
     ),
 
-    DrawerItemModel(
+    /*DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',
       icon: AssetImage(''),
       onClick: (BuildContext context) {
@@ -78,43 +101,14 @@ class MyDrawer extends StatelessWidget {
           ),
         );
       },
-    ),
-
-    DrawerItemModel(
-      text: 'FAQ',
-      icon: AssetImage(''),
-      onClick: (BuildContext context) {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FAQPage(),
-          ),
-        );
-      },
-    ),
-
-    DrawerItemModel(
-      text: 'Help',
-      icon: AssetImage(''),
-      onClick: (BuildContext context) {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HelpPage(),
-          ),
-        );
-      },
-    ),
-
-    DrawerItemModel(
+    ),*/
+    /*DrawerItemModel(
       text: 'ออกจากระบบ',
       icon: AssetImage('assets/images/drawer/ic_logout.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
       },
-    ),
+    ),*/
   ];
 
   @override
@@ -152,7 +146,7 @@ class MyDrawer extends StatelessWidget {
                           Radius.circular(getPlatformSize(12.0)),
                         ),
                         child: Image(
-                          image: AssetImage('assets/images/drawer/promlert.jpg'),
+                          image: AssetImage('assets/images/drawer/ic_launcher.png'),
                           width: getPlatformSize(64.0),
                           height: getPlatformSize(64.0),
                           fit: BoxFit.cover,
@@ -192,11 +186,11 @@ class MyDrawer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'พร้อมเลิศ หล่อวิจิตร',
+                        'EXAT Traffic',
                         //'Promlert Lovichit',
                         style: getTextStyle(
                           1,
-                          sizeEn: 22.0,
+                          sizeEn: Constants.Font.BIGGEST_SIZE_EN,
                           color: Colors.white,
                         ),
                       ),

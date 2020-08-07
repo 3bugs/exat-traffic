@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:flutter/rendering.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/drawer_item_model.dart';
@@ -15,7 +16,7 @@ class DrawerItemView extends StatelessWidget {
     @required this.paddingLeft,
   });
 
-  final double ITEM_HEIGHT = 53.0;
+  final double ITEM_HEIGHT = getPlatformSize(53.0);
   final DrawerItemModel drawerItemModel;
   final bool isFirstItem;
   final bool isLastItem;

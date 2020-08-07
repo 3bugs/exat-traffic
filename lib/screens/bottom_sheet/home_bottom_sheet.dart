@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/screens/marker_details/cctv_details.dart';
+import 'package:exattraffic/services/api.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
@@ -253,9 +255,16 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
   }
 }
 
-class ExpressWayList extends StatelessWidget {
+class ExpressWayList extends StatefulWidget {
   ExpressWayList(this._onSelectExpressWay);
 
+  final Function _onSelectExpressWay;
+
+  @override
+  _ExpressWayListState createState() => _ExpressWayListState();
+}
+
+class _ExpressWayListState extends State<ExpressWayList> {
   final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
     ExpressWayModel(
       name: 'ทางพิเศษศรีรัช',
@@ -287,34 +296,53 @@ class ExpressWayList extends StatelessWidget {
     ),
   ];
 
-  final Function _onSelectExpressWay;
+  //List<ExpressWayModel> _expressWayList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () {
+      _fetchExpressWayData(context);
+    });
+  }
+
+  void _fetchExpressWayData(BuildContext context) async {
+    List<ExpressWayModel> expressWayList = await ExatApi.fetchExpressWays(context);
+    print('************* EXPRESS WAY LIST ***************');
+    print(expressWayList.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: getPlatformSize(120.0),
-      child: ListView.separated(
-        itemCount: _expressWayList.length,
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          ExpressWayModel selectedExpressWay = _expressWayList[index];
+      child: _expressWayList == null
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.separated(
+              itemCount: _expressWayList.length,
+              scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                ExpressWayModel selectedExpressWay = _expressWayList[index];
 
-          return ExpressWayImageView(
-            expressWay: selectedExpressWay,
-            isFirstItem: index == 0,
-            isLastItem: index == _expressWayList.length - 1,
-            onClick: () {
-              _onSelectExpressWay(context, selectedExpressWay);
-            },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            width: getPlatformSize(0.0),
-          );
-        },
-      ),
+                return ExpressWayImageView(
+                  expressWay: selectedExpressWay,
+                  isFirstItem: index == 0,
+                  isLastItem: index == _expressWayList.length - 1,
+                  onClick: () {
+                    widget._onSelectExpressWay(context, selectedExpressWay);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox(
+                  width: getPlatformSize(0.0),
+                );
+              },
+            ),
     );
   }
 }

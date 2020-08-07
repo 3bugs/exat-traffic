@@ -2,6 +2,7 @@ import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
 import 'package:exattraffic/models/add_answers_model.dart';
 import 'package:exattraffic/models/consent_model.dart';
+import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/help_model.dart';
 import 'package:exattraffic/models/incident_detail_model.dart';
 import 'package:exattraffic/models/incident_list_model.dart';
@@ -129,7 +130,7 @@ class ExatApi {
     }
   }
 
-  static Future<List> fetchExpressWays(BuildContext context) async {
+  static Future<List<ExpressWayModel>> fetchExpressWays(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/routes/list";
 
     ResponseResult responseResult = await _makeRequest(
@@ -138,7 +139,13 @@ class ExatApi {
       {},
     );
     if (responseResult.success) {
-      return responseResult.data;
+      List dataList = responseResult.data;
+      //return dataList.map((expressWayJson) => ExpressWayModel.fromJson(expressWayJson)).toList();
+      return dataList
+          .asMap()
+          .entries
+          .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key))
+          .toList();
     } else {
       throw Exception(responseResult.data);
     }
@@ -295,7 +302,6 @@ class ExatApi {
       },
     );
     if (responseResult.success) {
-
       HelpModel _model = HelpModel.fromJson(responseResult.decode);
 
       return _model;
@@ -310,14 +316,9 @@ class ExatApi {
     ResponseResult responseResult = await _makeRequest(
       context,
       url,
-      {
-        "altitude":null,
-        "status":"1",
-        "limit":2
-      },
+      {"altitude": null, "status": "1", "limit": 2},
     );
     if (responseResult.success) {
-
       IncidentListModel _model = IncidentListModel.fromJson(responseResult.decode);
 
       return _model;
@@ -326,7 +327,7 @@ class ExatApi {
     }
   }
 
-  static Future<IncidentDetailModel> fetchIncidentDetail(BuildContext context,int id) async {
+  static Future<IncidentDetailModel> fetchIncidentDetail(BuildContext context, int id) async {
     final String url = "$EXAT_API_BASED_URL/messages/view";
 
     print("id = $id");
@@ -334,14 +335,9 @@ class ExatApi {
     ResponseResult responseResult = await _makeRequest(
       context,
       url,
-      {
-        "altitude":null,
-        "status":"1",
-        "id":id
-      },
+      {"altitude": null, "status": "1", "id": id},
     );
     if (responseResult.success) {
-
       IncidentDetailModel _model = IncidentDetailModel.fromJson(responseResult.decode);
 
       return _model;
