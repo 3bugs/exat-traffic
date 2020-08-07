@@ -1,11 +1,11 @@
-class AboutModel {
+class HelpModel {
   List<Data> data;
   String error;
   String statusCode;
 
-  AboutModel({this.data, this.error, this.statusCode});
+  HelpModel({this.data, this.error, this.statusCode});
 
-  AboutModel.fromJson(Map<String, dynamic> json) {
+  HelpModel.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = new List<Data>();
       json['data'].forEach((v) {

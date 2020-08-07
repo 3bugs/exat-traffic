@@ -1,6 +1,5 @@
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
-
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 
@@ -39,11 +38,11 @@ class _FAQPageState extends State<FAQPage> {
 
   Widget _datacard(int index){
     return Card(
-      margin: EdgeInsets.only(top: 10),
+      margin: EdgeInsets.only(top: 20,right: 5,left: 5),
       clipBehavior: Clip.antiAlias,
       child: Container(
-        padding: EdgeInsets.only(top: 10,bottom: 10,right: 20,left: 20),
-        color: open[index]?Color(0x11000000): Colors.white,
+        padding: EdgeInsets.only(top: 10,bottom: 10,right: 10,left: 10),
+        color: open[index]?Color(0x22000000): Colors.white,
 //                height: 200,
         width: double.infinity,
         child: Column(
@@ -58,7 +57,6 @@ class _FAQPageState extends State<FAQPage> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
-
                     onTap: (){
                       setState(() {
                         if(open[index]){
@@ -70,6 +68,7 @@ class _FAQPageState extends State<FAQPage> {
                     },
                     child: Container(
 //                              color: Colors.red,
+                      height: 50,
                       width: 25,
                       child: open[index]?Icon(Icons.keyboard_arrow_up): Icon(Icons.keyboard_arrow_down),
                     ),

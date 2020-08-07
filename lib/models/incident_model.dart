@@ -11,5 +11,5 @@ class IncidentModel {
   final String name;
   final String description;
   final String date;
-  final AssetImage image;
+  final NetworkImage image;
 }

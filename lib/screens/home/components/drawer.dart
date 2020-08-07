@@ -2,6 +2,7 @@ import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
 import 'package:exattraffic/screens/consent/consent_page.dart';
+import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,7 @@ class MyDrawer extends StatelessWidget {
 
     DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',
-      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      icon: AssetImage(''),
       onClick: (BuildContext context) {
         Navigator.pop(context);
         Navigator.push(
@@ -81,13 +82,27 @@ class MyDrawer extends StatelessWidget {
 
     DrawerItemModel(
       text: 'FAQ',
-      icon: AssetImage('assets/images/drawer/ic_widget.png'),
+      icon: AssetImage(''),
       onClick: (BuildContext context) {
         Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => FAQPage(),
+          ),
+        );
+      },
+    ),
+
+    DrawerItemModel(
+      text: 'Help',
+      icon: AssetImage(''),
+      onClick: (BuildContext context) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HelpPage(),
           ),
         );
       },
