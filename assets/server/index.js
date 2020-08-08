@@ -228,7 +228,7 @@ app.get('/api/:item/:id?', (req, res) => {
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ${whereClause} AND AND ct.enable = 1 AND m.enable = 1
+             WHERE ${whereClause} AND ct.enable = 1 AND m.enable = 1
              ORDER BY route_id`,
           (error, results, fields) => {
             if (error) {
