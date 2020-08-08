@@ -266,7 +266,7 @@ app.get('/api/:item/:id?', (req, res) => {
                   null
                 );
 
-                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, r.name AS route_name
+                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, m.enable, r.name AS route_name
                              FROM markers m 
                                  INNER JOIN routes r ON m.route_id = r.id 
                              WHERE m.id IN (${partTollIdListCsv})`;
