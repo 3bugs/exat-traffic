@@ -136,7 +136,7 @@ class _HomeMainState extends State<HomeMain> {
   }
 
   Future<Set<Marker>> _createMarkerSet(BuildContext context, List<MarkerModel> markerList) async {
-    Set<Marker> markerSet = {};
+    Set<Marker> markerSet = Set();
     for (MarkerModel markerModel in markerList) {
       Marker marker = await _createMarker(context, markerModel);
       markerSet.add(marker);

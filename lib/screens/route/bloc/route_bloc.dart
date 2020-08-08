@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bloc/bloc.dart';
@@ -10,9 +11,16 @@ import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/models/category_model.dart';
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
-  RouteBloc() : super(FetchGateInInitial());
+  final List<MarkerModel> markerList;
+  final List<CategoryModel> categoryList;
+
+  RouteBloc({
+    @required this.markerList,
+    @required this.categoryList,
+  }) : super(FetchGateInInitial());
 
   @override
   Stream<RouteState> mapEventToState(RouteEvent event) async* {
@@ -42,12 +50,41 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
       try {
         final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn);
+
+        // replace part toll marker ด้วย marker ที่โหลดมาตอนเข้าแอพ
+        costTollList.forEach((CostTollModel costTollModel) {
+          assert(this.markerList != null);
+          assert(costTollModel.partTollMarkerList != null);
+
+          List<MarkerModel> newPartTollMarkerList =
+              costTollModel.partTollMarkerList.map((MarkerModel partTollMarker) {
+            List<MarkerModel> filteredMarkerList = this.markerList.where((MarkerModel marker) {
+              return (marker.latitude == partTollMarker.latitude) &&
+                  (marker.longitude == partTollMarker.longitude);
+            }).toList();
+
+            //print("********** FILTERED MARKER LIST COUNT: ${filteredMarkerList.length}");
+
+            if (filteredMarkerList.length == 0) {
+              print(
+                  "MARKER name: ${partTollMarker.name}, categoryId: ${partTollMarker.categoryId}, latitude: ${partTollMarker.latitude}, longitude: ${partTollMarker.longitude}"
+              );
+            }
+            assert(filteredMarkerList.length > 0);
+            return filteredMarkerList[0];
+          }).toList();
+
+          costTollModel.partTollMarkerList = newPartTollMarkerList;
+        });
+
         yield FetchCostTollSuccess(
           gateInList: currentState.gateInList,
           costTollList: costTollList,
           selectedGateIn: selectedGateIn,
         );
-      } catch (_) {
+      } catch (error) {
+        print(error);
+
         currentState.gateInList.forEach((gateIn) {
           gateIn.selected = false;
         });
@@ -155,11 +192,13 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     }
   }
 
-  Future<AlertModel> _getTollPlazaNotification(String name,
-      double lat1,
-      double lng1,
-      double lat2,
-      double lng2,) async {
+  Future<AlertModel> _getTollPlazaNotification(
+    String name,
+    double lat1,
+    double lng1,
+    double lat2,
+    double lng2,
+  ) async {
     const int DISTANCE_THRESHOLD_METER = 1000;
     AlertModel notification;
 
@@ -170,8 +209,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       notification = AlertModel(
         title: "เตรียมจ่ายค่าผ่านทาง",
         message:
-        "อีก ${(distanceInMeters / 1000).toStringAsFixed(
-            1)} กม. ถึง$name กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
+            "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง$name กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
       );
     }
     return notification;

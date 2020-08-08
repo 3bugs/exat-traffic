@@ -14,7 +14,7 @@ class CostTollModel {
   final int cost4Wheels;
   final int cost6To10Wheels;
   final int costOver10Wheels;
-  final List<MarkerModel> partTollMarkerList;
+  List<MarkerModel> partTollMarkerList;
   bool selected;
   bool notified;
 
