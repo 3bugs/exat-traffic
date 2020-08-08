@@ -48,7 +48,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         selectedGateIn: selectedGateIn,
       );
 
-      //try {
+      try {
         final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn);
 
         // replace part toll marker ด้วย marker ที่โหลดมาตอนเข้าแอพ
@@ -62,8 +62,6 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
               return (marker.latitude == partTollMarker.latitude) &&
                   (marker.longitude == partTollMarker.longitude);
             }).toList();
-
-            //print("********** FILTERED MARKER LIST COUNT: ${filteredMarkerList.length}");
 
             if (filteredMarkerList.length == 0) {
               print(
@@ -82,7 +80,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           costTollList: costTollList,
           selectedGateIn: selectedGateIn,
         );
-      /*} catch (error) {
+      } catch (error) {
         print(error);
 
         currentState.gateInList.forEach((gateIn) {
@@ -92,7 +90,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         yield FetchCostTollFailure(
           gateInList: currentState.gateInList,
         );
-      }*/
+      }
     } else if (event is CostTollSelected) {
       final CostTollModel selectedCostToll = event.selectedCostToll;
 
