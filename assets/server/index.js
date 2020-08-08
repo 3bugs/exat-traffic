@@ -224,7 +224,10 @@ app.get('/api/:item/:id?', (req, res) => {
                     ct.part_toll,
                     ct.cost_less4,
                     ct.cost_4to10,
-                    ct.cost_over10
+                    ct.cost_over10,
+                    ct.enable AS cost_toll_enable,
+                    m.enable AS marker_enable,
+                    m.id AS marker_id
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
