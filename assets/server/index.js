@@ -289,7 +289,7 @@ app.get('/api/:item/:id?', (req, res) => {
                           const filteredMarkerList = partTollResults.filter(partTollMarker => partTollMarker.id === partTollId);
                           return filteredMarkerList.length > 0 ? filteredMarkerList[0] : null;
                         });
-                        costToll['part_toll_markers'] = partTollMarkerList;
+                        costToll['part_toll_markers'] = partTollMarkerList.filter(marker => marker != null);
                       });
 
                       res.json({
