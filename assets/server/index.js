@@ -184,9 +184,10 @@ app.get('/api/:item/:id?', (req, res) => {
                    FROM cost_tolls ct
                             INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
                             INNER JOIN routes r ON gi.route_id = r.id
-                   WHERE ${whereClause}
+                   WHERE ${whereClause} AND gi.enable = 1 AND ct.enable = 1
                    GROUP BY ct.gate_in_id) AS temp
                       INNER JOIN markers m ON temp.marker_id = m.id
+                   WHERE m.enable = 1
              ORDER BY temp.route_id, temp.gate_in_id`,
           (error, results, fields) => {
             if (error) {
@@ -227,7 +228,7 @@ app.get('/api/:item/:id?', (req, res) => {
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ${whereClause}
+             WHERE ${whereClause} AND AND ct.enable = 1 AND m.enable = 1
              ORDER BY route_id`,
           (error, results, fields) => {
             if (error) {
