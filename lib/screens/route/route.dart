@@ -454,6 +454,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                       myLocationEnabled: _myLocationEnabled,
                       myLocationButtonEnabled: false,
                       trafficEnabled: false,
+                      mapToolbarEnabled: false,
                       onMapCreated: (GoogleMapController controller) {
                         _googleMapController.complete(controller);
                         //_moveMapToCurrentPosition(context);
