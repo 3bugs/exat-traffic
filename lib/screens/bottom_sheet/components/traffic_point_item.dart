@@ -1,3 +1,4 @@
+import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
@@ -34,6 +35,31 @@ class TrafficPointView extends StatelessWidget {
     return newUrl;
   }
 
+  Color _getTrafficStatus() {
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% _getTrafficStatus(): ${Random().nextInt(10000)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+    List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
+        .where((pointData) => pointData.pointId == trafficPoint.pointId)
+        .toList();
+    if (filteredTrafficPointData.isNotEmpty) {
+      final trafficPointData = filteredTrafficPointData[0];
+      switch (trafficPointData.status) {
+        case TrafficPointDataModel.STATUS_GREEN:
+          return Color(0xFF22B573);
+        case TrafficPointDataModel.STATUS_ORANGE:
+          return Color(0xFFF7882C);
+        case TrafficPointDataModel.STATUS_RED:
+          return Color(0xFFEB222C);
+        case TrafficPointDataModel.STATUS_DARK_RED:
+          return Color(0xFF790A11);
+        default:
+          return Colors.black;
+      }
+    } else {
+      return Color(0xFFAAAAAA);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -54,7 +80,7 @@ class TrafficPointView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: Color(0xFFAAAAAA),
+                      color: _getTrafficStatus(),
                       //_rnd.nextInt(2) == 0 ? Color(0xFFEB222C) : Color(0xFF22B573),
                       width: getPlatformSize(11.0),
                     ),

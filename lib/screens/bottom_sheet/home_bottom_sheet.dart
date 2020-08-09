@@ -1,18 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-
-/*import 'package:flutter_socket_io/socket_io_manager.dart';
-import 'package:flutter_socket_io/flutter_socket_io.dart';*/
-//import 'package:socket_io_client/socket_io_client.dart' as IO;
-//import 'package:adhara_socket_io/adhara_socket_io.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
-import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/models/marker_model.dart';
@@ -30,6 +25,8 @@ List<String> expressWayHeaderList = [
 ];
 
 class HomeBottomSheet extends StatefulWidget {
+  static final List<TrafficPointDataModel> trafficPointDataList = List();
+
   HomeBottomSheet({
     @required this.expandPosition,
     @required this.collapsePosition,
@@ -47,47 +44,40 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
 
   ExpressWayModel _selectedExpressWay;
   bool _bottomSheetExpanded = false;
-
   //SocketIO _socketIO;
+  Timer _timer;
+
+  void _fetchTrafficData(Function callback) {
+    MyApi.fetchTrafficData().then((trafficPointDataList) {
+      print("++++++++++++++++++++ TRAFFIC DATA ++++++++++++++++++++");
+      print(trafficPointDataList);
+      print("-------------------- TRAFFIC DATA --------------------");
+
+      HomeBottomSheet.trafficPointDataList.clear();
+      HomeBottomSheet.trafficPointDataList.addAll(trafficPointDataList);
+
+      if (callback != null) {
+        callback();
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
 
-    /*IO.Socket socket = IO.io("http://163.47.9.26", <String, dynamic>{
-      'autoConnect': false,
+    _timer = Timer.periodic(new Duration(seconds: 30), (timer) {
+      //timer.tick.toString();
+      _fetchTrafficData(() {
+        setState(() {});
+      });
     });
-    socket.on('connect', (_) {
-      print("Socket.IO connected!");
-    });
-    socket.on('update-traffic', (data) {
-      print(data);
-    });
-    print("Connecting 163.47.9.26 ...");
-    socket.connect();*/
-
-    /////////////////////////////////////////////////////////////////////
-
-    /*_socketIO = SocketIOManager().createSocketIO(
-      "http://163.47.9.26",
-      "",
-      socketStatusCallback: _socketStatus,
-    );
-    //call init socket before doing anything
-    _socketIO.init();
-    //subscribe event
-    _socketIO.subscribe("update-traffic", _onSocketInfo);
-    //connect socket
-    _socketIO.connect();*/
+    _fetchTrafficData(null);
   }
 
   @override
   void dispose() {
-    /*if (_socketIO != null) {
-      _socketIO.unSubscribe("update-traffic");
-      _socketIO.disconnect();
-    }
-    SocketIOManager().destroySocket(_socketIO);*/
+    _timer.cancel();
     super.dispose();
   }
 
@@ -157,31 +147,31 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                   ),
                   _selectedExpressWay == null
                       ? SizedBox(
-                          width: getPlatformSize(42.0),
-                        )
+                    width: getPlatformSize(42.0),
+                  )
                       : Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              _handleClickBack(context);
-                            },
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(getPlatformSize(21.0)),
-                            ),
-                            child: Container(
-                              width: getPlatformSize(42.0),
-                              height: getPlatformSize(42.0),
-                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                              child: Center(
-                                child: Image(
-                                  image: AssetImage('assets/images/home/ic_back.png'),
-                                  width: getPlatformSize(12.0),
-                                  height: getPlatformSize(12.0),
-                                ),
-                              ),
-                            ),
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        _handleClickBack(context);
+                      },
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(getPlatformSize(21.0)),
+                      ),
+                      child: Container(
+                        width: getPlatformSize(42.0),
+                        height: getPlatformSize(42.0),
+                        //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                        child: Center(
+                          child: Image(
+                            image: AssetImage('assets/images/home/ic_back.png'),
+                            width: getPlatformSize(12.0),
+                            height: getPlatformSize(12.0),
                           ),
                         ),
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: Center(
                       child: Consumer<LanguageModel>(
@@ -248,10 +238,10 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                     return index == 0
                         ? ExpressWayList(_handleClickExpressWay)
                         : ExpressWayDetails(
-                            Key(_selectedExpressWay.name),
-                            _selectedExpressWay,
-                            _handleClickTrafficPoint,
-                          );
+                      Key(_selectedExpressWay.name),
+                      _selectedExpressWay,
+                      _handleClickTrafficPoint,
+                    );
                   },
                   itemCount: 2,
                   index: _selectedExpressWay == null ? 0 : 1,
@@ -289,7 +279,9 @@ class _ExpressWayListState extends State<ExpressWayList> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+      List<MarkerModel> markerList = BlocProvider
+          .of<AppBloc>(context)
+          .markerList;
       // ถ้าเอา fetch api ไปใส่ใน future builder โดยตรง จะทำให้ fetch ใหม่ทุกครั้งที่กลับมา list express way
       _futureExpressWayList = ExatApi.fetchExpressWays(context, markerList);
     });
@@ -304,30 +296,30 @@ class _ExpressWayListState extends State<ExpressWayList> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.separated(
-                  itemCount: snapshot.data.length,
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (BuildContext context, int index) {
-                    ExpressWayModel selectedExpressWay = snapshot.data[index];
+            itemCount: snapshot.data.length,
+            scrollDirection: Axis.horizontal,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              ExpressWayModel selectedExpressWay = snapshot.data[index];
 
-                    return ExpressWayImageView(
-                      expressWay: selectedExpressWay,
-                      isFirstItem: index == 0,
-                      isLastItem: index == snapshot.data.length - 1,
-                      onClick: () {
-                        widget._onSelectExpressWay(context, selectedExpressWay);
-                      },
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(
-                      width: getPlatformSize(0.0),
-                    );
-                  },
-                )
+              return ExpressWayImageView(
+                expressWay: selectedExpressWay,
+                isFirstItem: index == 0,
+                isLastItem: index == snapshot.data.length - 1,
+                onClick: () {
+                  widget._onSelectExpressWay(context, selectedExpressWay);
+                },
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return SizedBox(
+                width: getPlatformSize(0.0),
+              );
+            },
+          )
               : Center(
-                  child: CircularProgressIndicator(),
-                );
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
@@ -369,63 +361,66 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% _ExpressWayDetailsState build() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
     return widget._expressWay != null
         ? Column(
-            children: <Widget>[
-              // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
-              Container(
-                height: getPlatformSize(44.0),
-                child: ListView.separated(
-                  itemCount: widget._expressWay.legList.length,
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (BuildContext context, int index) {
-                    LegModel leg = widget._expressWay.legList[index];
+      children: <Widget>[
+        // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
+        Container(
+          height: getPlatformSize(44.0),
+          child: ListView.separated(
+            itemCount: widget._expressWay.legList.length,
+            scrollDirection: Axis.horizontal,
+            physics: BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              LegModel leg = widget._expressWay.legList[index];
 
-                    return LegView(
-                      legModel: leg,
-                      isFirstItem: index == 0,
-                      isLastItem: index == widget._expressWay.legList.length - 1,
-                      selected: leg == _selectedLeg,
-                      onSelectLeg: _handleClickLeg,
-                    );
+              return LegView(
+                legModel: leg,
+                isFirstItem: index == 0,
+                isLastItem: index == widget._expressWay.legList.length - 1,
+                selected: leg == _selectedLeg,
+                onSelectLeg: _handleClickLeg,
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return SizedBox.shrink();
+            },
+          ),
+        ),
+
+        _selectedLeg != null
+            ?
+        // traffic point list
+        Expanded(
+          child: Container(
+            child: ListView.separated(
+              itemCount: _selectedLeg.trafficPointList.length,
+              scrollDirection: Axis.vertical,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                TrafficPointModel trafficPoint = _selectedLeg.trafficPointList[index];
+
+                return TrafficPointView(
+                  trafficPoint: trafficPoint,
+                  isFirstItem: index == 0,
+                  isLastItem: index == _selectedLeg.trafficPointList.length - 1,
+                  onClick: () {
+                    widget._onSelectTrafficPoint(context, trafficPoint);
                   },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox.shrink();
-                  },
-                ),
-              ),
-
-              _selectedLeg != null
-                  ?
-                  // traffic point list
-                  Expanded(
-                      child: Container(
-                        child: ListView.separated(
-                          itemCount: _selectedLeg.trafficPointList.length,
-                          scrollDirection: Axis.vertical,
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            TrafficPointModel trafficPoint = _selectedLeg.trafficPointList[index];
-
-                            return TrafficPointView(
-                              trafficPoint: trafficPoint,
-                              isFirstItem: index == 0,
-                              isLastItem: index == _selectedLeg.trafficPointList.length - 1,
-                              onClick: () {
-                                widget._onSelectTrafficPoint(context, trafficPoint);
-                              },
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                    )
-                  : SizedBox.shrink(),
-            ],
-          )
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox.shrink();
+              },
+            ),
+          ),
+        )
+            : SizedBox.shrink(),
+      ],
+    )
         : SizedBox.shrink();
   }
 }

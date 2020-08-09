@@ -136,6 +136,36 @@ class TrafficPointModel {
   }
 }
 
+class TrafficPointDataModel {
+  static const String STATUS_GREEN = "green";
+  static const String STATUS_ORANGE = "orange";
+  static const String STATUS_RED = "red";
+  static const String STATUS_DARK_RED = "dark_red";
+
+  TrafficPointDataModel({
+    @required this.pointId,
+    @required this.status,
+    @required this.trafficIndex,
+  });
+
+  final int pointId;
+  final String status; // สีเส้น: green, orange, red, dark_red
+  final double trafficIndex;
+
+  factory TrafficPointDataModel.fromJson(Map<String, dynamic> json) {
+    return TrafficPointDataModel(
+      pointId: json['point_id'],
+      status: json['status'],
+      trafficIndex: json['traffic_index'].toDouble(),
+    );
+  }
+
+  @override
+  String toString() {
+    return "{ pointId: ${this.pointId}, status: ${this.status}, trafficIndex: ${this.trafficIndex} }";
+  }
+}
+
 List _chunkDataList = [
   {
     "algRouteId": 1,
