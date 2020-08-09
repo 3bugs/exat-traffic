@@ -8,6 +8,9 @@ const mysql = require('mysql');
 const cronJob = require("cron").CronJob;
 const fetch = require('node-fetch');
 
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache();
+
 const CODE_FAILED = 1;
 const CODE_SUCCESS = 0;
 
@@ -91,6 +94,26 @@ io.on('connection', function (socket) {
 });
 
 app.get('/api/route_traffic', (req, res) => {
+  const allRoutePoints = myCache.get('traffic-data');
+  if (allRoutePoints == null) {
+    res.json({
+      error: {
+        code: CODE_FAILED,
+        message: 'Cache not found',
+      },
+      data_list: [],
+    });
+  } else {
+    res.json({
+      error: {
+        code: CODE_SUCCESS,
+        message: 'ok',
+      },
+      data_list: allRoutePoints,
+    });
+  }
+  return; //////////////////////////////////////////////////////////////////////////
+
   const promiseList = [];
 
   // เอาเฉพาะสายทางของ exat
@@ -106,24 +129,23 @@ app.get('/api/route_traffic', (req, res) => {
   })
 
   Promise.all(promiseList).then(resultList => {
-    const allRouteChunks = resultList.reduce((total, chunks) => {
+    const allRoutePoints = resultList.reduce((total, chunks) => {
       return total.concat(chunks.map(chunk => {
-          return {
-            id: chunk.chunk_id,
-            idx: chunk.traffic_index
-          };
+          return chunk.points;
         })
       );
+    }, []).reduce((total, points) => {
+      return total.concat(points);
     }, []);
 
-    console.log(allRouteChunks);
-    //io.emit('update-traffic', allRouteChunks);
+    //console.log(allRoutePoints);
+
     res.json({
       error: {
         code: CODE_SUCCESS,
         message: 'ok',
       },
-      data_list: allRouteChunks,
+      data_list: allRoutePoints,
     });
   });
 });
@@ -184,9 +206,10 @@ app.get('/api/:item/:id?', (req, res) => {
                    FROM cost_tolls ct
                             INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
                             INNER JOIN routes r ON gi.route_id = r.id
-                   WHERE ${whereClause} 
+                   WHERE ${whereClause} AND gi.enable = 1 AND ct.enable = 1
                    GROUP BY ct.gate_in_id) AS temp
                       INNER JOIN markers m ON temp.marker_id = m.id
+                   WHERE m.enable = 1
              ORDER BY temp.route_id, temp.gate_in_id`,
           (error, results, fields) => {
             if (error) {
@@ -223,11 +246,14 @@ app.get('/api/:item/:id?', (req, res) => {
                     ct.part_toll,
                     ct.cost_less4,
                     ct.cost_4to10,
-                    ct.cost_over10
+                    ct.cost_over10,
+                    ct.enable AS cost_toll_enable,
+                    m.enable AS marker_enable,
+                    m.id AS marker_id
              FROM cost_tolls ct
                       INNER JOIN markers m ON ct.marker_id = m.id
                       INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ${whereClause} 
+             WHERE ${whereClause} AND ct.enable = 1
              ORDER BY route_id`,
           (error, results, fields) => {
             if (error) {
@@ -266,10 +292,10 @@ app.get('/api/:item/:id?', (req, res) => {
                   null
                 );
 
-                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, r.name AS route_name
+                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, m.enable, r.name AS route_name
                              FROM markers m 
                                  INNER JOIN routes r ON m.route_id = r.id 
-                             WHERE m.id IN (${partTollIdListCsv})`;
+                             WHERE m.id IN (${partTollIdListCsv}) AND m.enable = 1`;
                 connection.query(
                   sql,
                   (error, partTollResults, fields) => {
@@ -289,7 +315,7 @@ app.get('/api/:item/:id?', (req, res) => {
                           const filteredMarkerList = partTollResults.filter(partTollMarker => partTollMarker.id === partTollId);
                           return filteredMarkerList.length > 0 ? filteredMarkerList[0] : null;
                         });
-                        costToll['part_toll_markers'] = partTollMarkerList;
+                        costToll['part_toll_markers'] = partTollMarkerList.filter(marker => marker != null);
                       });
 
                       res.json({
@@ -368,6 +394,20 @@ fetchData = () => {
 
     console.log(allRouteChunks);
     io.emit('update-traffic', allRouteChunks);
+
+    /*****************************************
+     * สร้าง point list แล้วกำหนดลงแคช สำหรับ api route_traffic ที่จะเอาไปพ่นเส้นสีในหน้าสายทางของแอพ
+     *****************************************/
+    const allRoutePoints = resultList.reduce((total, chunks) => {
+      return total.concat(chunks.map(chunk => {
+          return chunk.points;
+        })
+      );
+    }, []).reduce((total, points) => {
+      return total.concat(points);
+    }, []);
+
+    myCache.set('traffic-data', allRoutePoints);
   });
 };
 

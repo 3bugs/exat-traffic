@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:http/http.dart';
 
 import 'incident_detail_presenter.dart';
 
 class IncidentDetailPage extends StatefulWidget {
-  int id;
+  final int id;
 
   IncidentDetailPage({
     this.id,
@@ -45,44 +46,41 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
     });
   }
 
-  String _getDummyText() {
-    return new List(1000).fold("", (previousValue, element) => previousValue + "TEST-${Random().nextInt(100).toString()} ");
+  Widget _content() {
+    return _presenter.incidentDetailModel == null
+        ? Container(
+            key: _keyDummyContainer,
+            child: DataLoading(),
+          )
+        : Stack(
+            overflow: Overflow.visible,
+            children: <Widget>[
+              Positioned(
+                top: -overlapHeight,
+                width: MediaQuery.of(context).size.width,
+                height: _mainContainerHeight + overlapHeight,
+                child: Container(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                      vertical: 0.0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _banner(),
+                        _body(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
   }
 
-  Widget _content(){
-    return _presenter.incidentDetailModel == null ? DataLoading():
-
-      Stack(
-      key: _keyDummyContainer,
-      overflow: Overflow.visible,
-      children: <Widget>[
-        Positioned(
-          top: -overlapHeight,
-          width: MediaQuery.of(context).size.width,
-          height: _mainContainerHeight + overlapHeight,
-          child: Container(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                vertical: 0.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-
-                  _banner(),
-                  _body(),
-
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _banner(){
+  Widget _banner() {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: getPlatformSize(16.0),
@@ -103,53 +101,74 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
     );
   }
 
-  Widget _body(){
-    return
-//      _presenter.aboutModel==null?Expanded(child: DataLoading()):
-    Expanded(
+  Widget _body() {
+    return Expanded(
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: getPlatformSize(10.0),
-          horizontal: 0.0,
+          vertical: getPlatformSize(0.0),
+          horizontal: getPlatformSize(0.0),
         ),
         child: SingleChildScrollView(
           child: _textData(),
         ),
       ),
     );
+//      _presenter.aboutModel==null?Expanded(child: DataLoading()):
   }
 
-  Widget _textData(){
+  Widget _textData() {
     return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: getPlatformSize(8.0),
+        vertical: getPlatformSize(10.0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(height: 10,),
-          Text(_presenter.incidentDetailModel.data.title,style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),),
-          SizedBox(height: 10,),
-          Text(_presenter.incidentDetailModel.data.detail,style: TextStyle(
-            fontSize: 16,
-          ),),
+          SizedBox(
+            height: getPlatformSize(10.0),
+          ),
+          Text(
+            _presenter.incidentDetailModel.data.title,
+            style: getTextStyle(
+              0,
+              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+              isBold: true,
+            ),
+          ),
+          SizedBox(
+            height: getPlatformSize(10.0),
+          ),
+          for (var paragraph in _getParagraphList(_presenter.incidentDetailModel.data.detail))
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
+              ),
+              child: Text(
+                paragraph,
+                style: getTextStyle(0),
+              ),
+            )
         ],
       ),
 //      child: Text(_presenter.aboutModel.data[0].content),
     );
   }
 
-
+  List<String> _getParagraphList(String details) {
+    return details
+        .split("\n")
+        .where((paragraph) => paragraph != null && paragraph.trim().isNotEmpty)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-        titleList: _titleList,
-        // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
-        child: _content()
+      titleList: _titleList,
+      // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
+      child: _content(),
     );
   }
 }
-
-
-

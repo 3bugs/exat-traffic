@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:exattraffic/models/alert_model.dart';
-import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -18,6 +16,10 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/route_bottom_sheet.dart';
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/alert_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 
 class MyRoute extends StatelessWidget {
   MyRoute({
@@ -87,7 +89,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
     _mapTarget = cameraPosition.target;
     _mapZoomLevel = cameraPosition.zoom;
   }
-  
+
   Future<void> _moveMapToCurrentPosition(BuildContext context) async {
     final Position position = await Geolocator().getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -146,14 +148,26 @@ class _MyRouteMainState extends State<MyRouteMain> {
     );
   }
 
-  Marker _createPartTollMarker(MarkerModel partTollMarker) {
+  Future<Set<Marker>> _createPartTollMarkerSet(List<MarkerModel> partTollMarkerList) async {
+    Set<Marker> markerSet = Set();
+    for (MarkerModel markerModel in partTollMarkerList) {
+      Marker marker = await _createPartTollMarker(markerModel);
+      markerSet.add(marker);
+    }
+    return markerSet;
+  }
+
+  Future<Marker> _createPartTollMarker(MarkerModel partTollMarker) async {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('part-toll-${partTollMarker.id.toString()}');
+
+    BitmapDescriptor markerIcon = await partTollMarker.category.getNetworkIcon();
 
     return Marker(
       markerId: markerId,
       position: LatLng(partTollMarker.latitude, partTollMarker.longitude),
-      icon: _tollPlazaMarkerIcon,
+      icon: markerIcon,
+      alpha: 1.0,
       infoWindow: (true)
           ? InfoWindow(
               title: partTollMarker.name + (kReleaseMode ? "" : " [${partTollMarker.categoryId}]"),
@@ -305,8 +319,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<RouteBloc>(
-          create: (context) => RouteBloc()..add(ListGateIn()),
-        )
+          create: (context) {
+            List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
+            List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
+            return RouteBloc(markerList: markerList, categoryList: categoryList)..add(ListGateIn());
+          },
+        ),
       ],
       child: Container(
         child: Stack(
@@ -345,12 +363,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   return _createCostTollMarker(context, costToll);
                 }).toSet();
 
-                Set<Marker> partTollSet = Set();
+                /*Set<Marker> partTollSet = Set();
                 if (selectedCostToll != null) {
                   partTollSet = selectedCostToll.partTollMarkerList
                       .map((partToll) => _createPartTollMarker(partToll))
                       .toSet();
-                }
+                }*/
 
                 final Set<Polyline> polyLineSet = <Polyline>{};
                 Polyline polyline;
@@ -422,26 +440,33 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   }
                 }
 
-                return GoogleMap(
-                  key: _keyGoogleMaps,
-                  padding: EdgeInsets.only(
-                    right: getPlatformSize(15.0),
-                  ),
-                  mapType: MapType.normal,
-                  initialCameraPosition: INITIAL_POSITION,
-                  myLocationEnabled: _myLocationEnabled,
-                  myLocationButtonEnabled: false,
-                  trafficEnabled: false,
-                  onMapCreated: (GoogleMapController controller) {
-                    _googleMapController.complete(controller);
-                    //_moveMapToCurrentPosition(context);
+                return FutureBuilder(
+                  future: _createPartTollMarkerSet(
+                      selectedCostToll != null ? selectedCostToll.partTollMarkerList : List()),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    return GoogleMap(
+                      key: _keyGoogleMaps,
+                      padding: EdgeInsets.only(
+                        right: getPlatformSize(15.0),
+                      ),
+                      mapType: MapType.normal,
+                      initialCameraPosition: INITIAL_POSITION,
+                      myLocationEnabled: _myLocationEnabled,
+                      myLocationButtonEnabled: false,
+                      trafficEnabled: false,
+                      mapToolbarEnabled: false,
+                      onMapCreated: (GoogleMapController controller) {
+                        _googleMapController.complete(controller);
+                        //_moveMapToCurrentPosition(context);
+                      },
+                      onCameraMove: _handleCameraMove,
+                      markers: gateInMarkerSet
+                          .union(costTollMarkerSet)
+                          .union(snapshot.hasData ? snapshot.data : Set())
+                          .union(currentLocationSet),
+                      polylines: polyLineSet,
+                    );
                   },
-                  onCameraMove: _handleCameraMove,
-                  markers: gateInMarkerSet
-                      .union(costTollMarkerSet)
-                      .union(partTollSet)
-                      .union(currentLocationSet),
-                  polylines: polyLineSet,
                 );
               },
             ),

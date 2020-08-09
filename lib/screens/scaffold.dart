@@ -235,7 +235,8 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                     rightIcon: HeaderIcon(
                       image: AssetImage('assets/images/home/ic_phone_circle.png'),
                       onClick: () {
-                        Provider.of<LanguageModel>(context, listen: false).nextLang();
+                        //Provider.of<LanguageModel>(context, listen: false).nextLang();
+                        underConstruction(context);
                       },
                     ),
                   ),

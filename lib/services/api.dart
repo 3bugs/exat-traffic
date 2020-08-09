@@ -37,8 +37,24 @@ class ResponseResult {
 
 class MyApi {
   static const String MY_API_BASED_URL = "${Constants.Api.SERVER}/api";
+  static const String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
   static const String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
   static const String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
+
+  static Future<List<TrafficPointDataModel>> fetchTrafficData() async {
+    ResponseResult responseResult = await _makeRequest(FETCH_TRAFFIC_DATA_URL);
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      List<TrafficPointDataModel> trafficPointList = dataList
+          .map((trafficPointJson) => TrafficPointDataModel.fromJson(trafficPointJson))
+          .toList();
+      print('Number of Traffic Point Data : ${trafficPointList.length}');
+
+      return trafficPointList;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
 
   static Future<List<GateInModel>> fetchGateIn() async {
     ResponseResult responseResult = await _makeRequest(FETCH_GATE_IN_URL);
@@ -130,7 +146,10 @@ class ExatApi {
     }
   }
 
-  static Future<List<ExpressWayModel>> fetchExpressWays(BuildContext context) async {
+  static Future<List<ExpressWayModel>> fetchExpressWays(
+    BuildContext context,
+    List<MarkerModel> markerList, // เอามา map point id กับ cctv
+  ) async {
     final String url = "$EXAT_API_BASED_URL/routes/list";
 
     ResponseResult responseResult = await _makeRequest(
@@ -144,7 +163,7 @@ class ExatApi {
       return dataList
           .asMap()
           .entries
-          .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key))
+          .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key, markerList))
           .toList();
     } else {
       throw Exception(responseResult.data);

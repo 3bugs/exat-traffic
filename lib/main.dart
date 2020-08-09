@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/language_model.dart';
@@ -9,12 +10,17 @@ import 'package:exattraffic/screens/splash/splash.dart';
 import 'package:exattraffic/screens/scaffold.dart';
 import 'constants.dart' as Constants;
 
-void main() => runApp(
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    runApp(
       ChangeNotifierProvider(
         create: (context) => LanguageModel(),
         child: MyApp(),
       ),
     );
+  });
+}
 
 class MyApp extends StatelessWidget {
   @override

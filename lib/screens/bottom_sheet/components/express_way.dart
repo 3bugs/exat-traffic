@@ -88,16 +88,22 @@ class ExpressWayImageView extends StatelessWidget {
   }
 }
 
-class ExpressWayTextView extends StatelessWidget {
-  ExpressWayTextView({
-    @required this.expressWay,
+class LegView extends StatelessWidget {
+  LegView({
+    @required this.legModel,
     @required this.isFirstItem,
     @required this.isLastItem,
+    @required this.selected,
+    @required this.onSelectLeg,
   });
 
-  final ExpressWayModel expressWay;
+  static const double BORDER_RADIUS = 16.0;
+
+  final LegModel legModel;
   final bool isFirstItem;
   final bool isLastItem;
+  final bool selected;
+  final Function onSelectLeg;
 
   @override
   Widget build(BuildContext context) {
@@ -106,50 +112,40 @@ class ExpressWayTextView extends StatelessWidget {
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(
-            left: getPlatformSize(isFirstItem ? 14.0 : 7.0),
-            right: getPlatformSize(isLastItem ? 14.0 : 7.0),
+            left: getPlatformSize(isFirstItem ? 14.0 : 4.0),
+            right: getPlatformSize(isLastItem ? 14.0 : 4.0),
             top: getPlatformSize(2.0),
             bottom: getPlatformSize(2.0),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () => onSelectLeg(legModel),
               borderRadius: BorderRadius.all(
-                Radius.circular(getPlatformSize(10.0)),
+                Radius.circular(getPlatformSize(BORDER_RADIUS)),
               ),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: getPlatformSize(8.0),
+                  horizontal: getPlatformSize(12.0),
                   vertical: getPlatformSize(5.0),
                 ),
                 decoration: BoxDecoration(
+                  color: selected ? Color(0xFFE8E8E8) : Colors.transparent,
                   border: Border.all(
-                    width: getPlatformSize(1.0),
-                    color: Color(0xFF707070),
+                    width: getPlatformSize(0.8),
+                    color: selected ? Color(0xFF000000) : Color(0xFF707070),
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(getPlatformSize(BORDER_RADIUS)),
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Consumer<LanguageModel>(
                       builder: (context, language, child) {
-                        String name;
-                        switch (language.lang) {
-                          case 0:
-                            name = 'ดินแดง';
-                            break;
-                          case 1:
-                            name = 'Din dang';
-                            break;
-                          case 2:
-                            name = '中文';
-                            break;
-                        }
-
                         return Text(
-                          name,
+                          legModel.origin,
                           style: getTextStyle(
                             language.lang,
                             sizeTh: Constants.Font.SMALLER_SIZE_TH,
@@ -172,21 +168,8 @@ class ExpressWayTextView extends StatelessWidget {
                     ),
                     Consumer<LanguageModel>(
                       builder: (context, language, child) {
-                        String name;
-                        switch (language.lang) {
-                          case 0:
-                            name = 'บางนา';
-                            break;
-                          case 1:
-                            name = 'Bangna';
-                            break;
-                          case 2:
-                            name = '中文';
-                            break;
-                        }
-
                         return Text(
-                          name,
+                          legModel.destination,
                           style: getTextStyle(
                             language.lang,
                             sizeTh: Constants.Font.SMALLER_SIZE_TH,

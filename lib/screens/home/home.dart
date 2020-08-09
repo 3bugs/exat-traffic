@@ -136,7 +136,7 @@ class _HomeMainState extends State<HomeMain> {
   }
 
   Future<Set<Marker>> _createMarkerSet(BuildContext context, List<MarkerModel> markerList) async {
-    Set<Marker> markerSet = {};
+    Set<Marker> markerSet = Set();
     for (MarkerModel markerModel in markerList) {
       Marker marker = await _createMarker(context, markerModel);
       markerSet.add(marker);
@@ -250,11 +250,14 @@ class _HomeMainState extends State<HomeMain> {
                         if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
                             state is MarkerLayerChange) {
                           new Future.delayed(Duration(milliseconds: 1000), () async {
-                            List<LatLng> markerLatLngList =
-                            markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
+                            List<LatLng> markerLatLngList = markerList
+                                .map((marker) => LatLng(marker.latitude, marker.longitude))
+                                .toList();
                             LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
-                            final GoogleMapController controller = await _googleMapController.future;
-                            controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
+                            final GoogleMapController controller =
+                                await _googleMapController.future;
+                            controller
+                                .animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
                           });
                         }
                       }
@@ -275,11 +278,17 @@ class _HomeMainState extends State<HomeMain> {
                           myLocationButtonEnabled: false,
                           trafficEnabled: false,
                           zoomControlsEnabled: false,
+                          mapToolbarEnabled: false,
                           onMapCreated: (GoogleMapController controller) {
                             _googleMapController.complete(controller);
                             _moveToCurrentPosition(context);
                           },
                           onTap: (LatLng latLng) {
+                            if (_showSearchOptions) {
+                              setState(() {
+                                _showSearchOptions = false;
+                              });
+                            }
                             /*_addMarker(latLng);
                               _sendToVisualization(latLng);*/
                           },
@@ -398,76 +407,96 @@ class _HomeMainState extends State<HomeMain> {
                                 Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                               ),
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: getPlatformSize(6.0),
-                                bottom: getPlatformSize(6.0),
-                                left: getPlatformSize(20.0),
-                                right: getPlatformSize(12.0),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Image(
-                                    image: AssetImage('assets/images/home/ic_search.png'),
-                                    width: getPlatformSize(16.0),
-                                    height: getPlatformSize(16.0),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _showSearchOptions = true;
+                                  });
+                                },
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    top: getPlatformSize(6.0),
+                                    bottom: getPlatformSize(6.0),
+                                    left: getPlatformSize(20.0),
+                                    right: getPlatformSize(12.0),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        left: getPlatformSize(16.0),
-                                        right: getPlatformSize(16.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Image(
+                                        image: AssetImage('assets/images/home/ic_search.png'),
+                                        width: getPlatformSize(16.0),
+                                        height: getPlatformSize(16.0),
                                       ),
-                                      child: Consumer<LanguageModel>(
-                                        builder: (context, language, child) {
-                                          return TextField(
-                                            onTap: () {
-                                              setState(() {
-                                                _showSearchOptions = true;
-                                              });
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: getPlatformSize(16.0),
+                                            right: getPlatformSize(16.0),
+                                          ),
+                                          child: Consumer<LanguageModel>(
+                                            builder: (context, language, child) {
+                                              return Text(
+                                                _searchHintList[language.lang],
+                                                style: getTextStyle(
+                                                  language.lang,
+                                                  color: Constants.Font.DIM_COLOR,
+                                                ),
+                                              );
+                                              /*return TextField(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _showSearchOptions = true;
+                                                  });
+                                                },
+                                                decoration: InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding: EdgeInsets.only(
+                                                    top: getPlatformSize(4.0),
+                                                    bottom: getPlatformSize(4.0),
+                                                  ),
+                                                  border: InputBorder.none,
+                                                  hintText: _searchHintList[language.lang],
+                                                ),
+                                                style: getTextStyle(language.lang),
+                                              );*/
                                             },
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              contentPadding: EdgeInsets.only(
-                                                top: getPlatformSize(4.0),
-                                                bottom: getPlatformSize(4.0),
-                                              ),
-                                              border: InputBorder.none,
-                                              hintText: _searchHintList[language.lang],
-                                            ),
-                                            style: getTextStyle(language.lang),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        print('close search');
-                                        setState(() {
-                                          _showSearchOptions = false;
-                                        });
-                                      },
-                                      borderRadius: BorderRadius.all(Radius.circular(18.0)),
-                                      child: Container(
-                                        width: getPlatformSize(36.0),
-                                        height: getPlatformSize(36.0),
-                                        //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                                        child: Center(
-                                          child: Image(
-                                            image: AssetImage(
-                                                'assets/images/home/ic_close_search.png'),
-                                            width: getPlatformSize(24.0),
-                                            height: getPlatformSize(24.0),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                      Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () {
+                                            print('close search');
+                                            setState(() {
+                                              _showSearchOptions = false;
+                                            });
+                                          },
+                                          borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                                          child: Container(
+                                            width: getPlatformSize(36.0),
+                                            height: getPlatformSize(36.0),
+                                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                            child: Center(
+                                              child: Image(
+                                                image: AssetImage(
+                                                    'assets/images/home/ic_close_search.png'),
+                                                width: getPlatformSize(24.0),
+                                                height: getPlatformSize(24.0),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -513,7 +542,12 @@ class _HomeMainState extends State<HomeMain> {
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  underConstruction(context);
+                                  setState(() {
+                                    _showSearchOptions = false;
+                                  });
+                                },
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(
                                       getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
@@ -577,7 +611,12 @@ class _HomeMainState extends State<HomeMain> {
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  underConstruction(context);
+                                  setState(() {
+                                    _showSearchOptions = false;
+                                  });
+                                },
                                 borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(
                                       getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
