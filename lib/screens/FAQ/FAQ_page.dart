@@ -37,61 +37,63 @@ class _FAQPageState extends State<FAQPage> {
   }
 
   Widget _datacard(int index){
-    return Card(
-      margin: EdgeInsets.only(top: 20,right: 5,left: 5),
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        padding: EdgeInsets.only(top: 10,bottom: 10,right: 10,left: 10),
-        color: open[index]?Color(0x22000000): Colors.white,
+    return InkWell(
+      onTap: (){
+        setState(() {
+          if(open[index]){
+            open[index] = false;
+          }else {
+            open[index] = true;
+          }
+        });
+      },
+      child: Card(
+        margin: EdgeInsets.only(top: 20,right: 5,left: 5),
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          padding: EdgeInsets.only(top: 10,bottom: 10,right: 10,left: 10),
+          color: open[index]?Color(0x22000000): Colors.white,
 //                height: 200,
-        width: double.infinity,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 50,
+          width: double.infinity,
+          child: Column(
+              children: <Widget>[
+                Container(
+                  height: 50,
 //                      color: Colors.red,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text("${_presenter.faqModel.data[index].name}",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        if(open[index]){
-                          open[index] = false;
-                        }else {
-                          open[index] = true;
-                        }
-                      });
-                    },
-                    child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text("${_presenter.faqModel.data[index].name}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Container(
 //                              color: Colors.red,
-                      height: 50,
-                      width: 25,
-                      child: open[index]?Icon(Icons.keyboard_arrow_up): Icon(Icons.keyboard_arrow_down),
+                          height: 50,
+                          width: 25,
+                          child: open[index]?Icon(Icons.keyboard_arrow_up): Icon(Icons.keyboard_arrow_down),
+                      ),
+
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: open[index],
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Divider(),
+                        Container(
+                          child: Text("${_presenter.faqModel.data[index].detail}"),
+                          padding: EdgeInsets.only(top: 15,bottom: 15),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            Visibility(
-              visible: open[index],
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Divider(),
-                    Container(
-                      child: Text("${_presenter.faqModel.data[index].detail}"),
-                      padding: EdgeInsets.only(top: 15,bottom: 15),
-                    ),
-                  ],
                 ),
-              ),
+              ],
             ),
-          ],
+
         ),
       ),
     );
