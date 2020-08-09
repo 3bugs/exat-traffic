@@ -104,11 +104,11 @@ class LegModel {
     // filter null ทิ้ง
     trafficPointList = trafficPointList.where((trafficPoint) => trafficPoint != null).toList();
 
-    print("++++++++++++++++++++ LEG MODEL ++++++++++++++++++++");
+    /*print("++++++++++++++++++++ LEG MODEL ++++++++++++++++++++");
     print("origin: ${json['origin']}");
     print("destination: ${json['destination']}");
     print("trafficPointList: $trafficPointList");
-    print("-------------------- LEG MODEL --------------------");
+    print("-------------------- LEG MODEL --------------------");*/
 
     return LegModel(
       origin: json['origin'],
@@ -141,6 +141,7 @@ class TrafficPointDataModel {
   static const String STATUS_ORANGE = "orange";
   static const String STATUS_RED = "red";
   static const String STATUS_DARK_RED = "dark_red";
+  static const String STATUS_UNKNOWN = "unknown";
 
   TrafficPointDataModel({
     @required this.pointId,

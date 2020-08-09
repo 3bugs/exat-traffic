@@ -36,8 +36,6 @@ class TrafficPointView extends StatelessWidget {
   }
 
   Color _getTrafficStatus() {
-    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% _getTrafficStatus(): ${Random().nextInt(10000)} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
     List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
         .where((pointData) => pointData.pointId == trafficPoint.pointId)
         .toList();
@@ -52,11 +50,13 @@ class TrafficPointView extends StatelessWidget {
           return Color(0xFFEB222C);
         case TrafficPointDataModel.STATUS_DARK_RED:
           return Color(0xFF790A11);
+        case TrafficPointDataModel.STATUS_UNKNOWN:
+          return Color(0xFFAAAAAA);
         default:
-          return Colors.black;
+          return Color(0xFFAAAAAA);
       }
     } else {
-      return Color(0xFFAAAAAA);
+      return Colors.black;
     }
   }
 
