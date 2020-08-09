@@ -7,13 +7,12 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../services/api.dart';
 
-class QuestionnairePresenter extends BasePresenter<QuestionnairePage>{
+class QuestionnairePresenter extends BasePresenter<QuestionnairePage> {
   var ListModel;
   QuestionnaireModel questionnaireModel;
   AddAnswersModel addAnswersModel;
 
   QuestionnairePresenter(State<QuestionnairePage> state) : super(state);
-
 
   getQuestionnair() async {
 //    print("getQuestionnair");
@@ -21,25 +20,24 @@ class QuestionnairePresenter extends BasePresenter<QuestionnairePage>{
     try {
       var res = await ExatApi.fetchQuestions(state.context);
 
-      setState((){
+      setState(() {
         questionnaireModel = res;
       });
 
       print(questionnaireModel.data.length);
-
     } catch (e) {
       print(e);
     }
   }
 
-  addAnswers(int id,int score) async {
+  addAnswers(int id, int score) async {
 //    print("addAnswers");
-    setState((){
+    setState(() {
       addAnswersModel = null;
     });
 
     try {
-      var res = await ExatApi.addAnswers(state.context,id.toString(),score.toString());
+      var res = await ExatApi.addAnswers(state.context, id.toString(), score.toString());
       Alert(
         context: state.context,
         type: AlertType.success,
@@ -57,18 +55,17 @@ class QuestionnairePresenter extends BasePresenter<QuestionnairePage>{
         ],
       ).show();
 
-      setState((){
+      setState(() {
         addAnswersModel = res;
       });
 
       print(addAnswersModel.data);
-
     } catch (e) {
       print(e);
       Alert(
         context: state.context,
         type: AlertType.error,
-        title: "เกิดข้องผิดพลาด",
+        title: "เกิดข้อผิดพลาด",
         desc: "$e",
         buttons: [
           DialogButton(
@@ -83,7 +80,4 @@ class QuestionnairePresenter extends BasePresenter<QuestionnairePage>{
       ).show();
     }
   }
-
-
-
-  }
+}

@@ -543,7 +543,7 @@ class _HomeMainState extends State<HomeMain> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                  alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
+                                  underConstruction(context);
                                   setState(() {
                                     _showSearchOptions = false;
                                   });
@@ -612,7 +612,7 @@ class _HomeMainState extends State<HomeMain> {
                               color: Colors.transparent,
                               child: InkWell(
                                 onTap: () {
-                                  alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
+                                  underConstruction(context);
                                   setState(() {
                                     _showSearchOptions = false;
                                   });

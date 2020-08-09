@@ -1,7 +1,10 @@
-import 'package:exattraffic/components/data_loading.dart';
-import 'package:exattraffic/screens/questionnaire/questionnaire_presenter.dart';
 import 'package:flutter/material.dart';
+
+import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/screens/questionnaire/questionnaire_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
+import 'package:exattraffic/constants.dart' as Constants;
 
 class QuestionnairePage extends StatefulWidget {
   @override
@@ -41,93 +44,122 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   Widget _question() {
     return Container(
       alignment: Alignment.topLeft,
-      margin: EdgeInsets.only(top: 20),
-      padding: EdgeInsets.all(20),
+      //margin: EdgeInsets.only(top: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+        vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             "${_presenter.questionnaireModel.data[myIndex].name}",
-            style: TextStyle(fontSize: 20),
+            style: getTextStyle(
+              0,
+              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Radio(
-                value: 1,
-                groupValue: group,
-                onChanged: (T) {
-                  setState(() {
-                    group = T;
-                    print(T);
-                  });
-                },
-              ),
-              Text("1 (Minimum)"),
-            ],
+          SizedBox(
+            height: getPlatformSize(5.0),
           ),
-          Row(
-            children: <Widget>[
-              Radio(
-                value: 2,
-                groupValue: group,
-                onChanged: (T) {
-                  setState(() {
-                    group = T;
-                    print(T);
-                  });
-                },
-              ),
-              Text("2"),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Radio(
-                value: 3,
-                groupValue: group,
-                onChanged: (T) {
-                  setState(() {
-                    group = T;
-                    print(T);
-                  });
-                },
-              ),
-              Text("3"),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Radio(
-                value: 4,
-                groupValue: group,
-                onChanged: (T) {
-                  setState(() {
-                    group = T;
-                    print(T);
-                  });
-                },
-              ),
-              Text("4"),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Radio(
-                value: 5,
-                groupValue: group,
-                onChanged: (T) {
-                  setState(() {
-                    group = T;
-                    print(T);
-                  });
-                },
-              ),
-              Text("5 (Maximum)"),
-            ],
-          ),
+          Padding(
+              padding: EdgeInsets.only(left: getPlatformSize(10.0)),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 1,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "1 (ต่ำสุด)",
+                        style: getTextStyle(0),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 2,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "2",
+                        style: getTextStyle(0),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 3,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "3",
+                        style: getTextStyle(0),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 4,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "4",
+                        style: getTextStyle(0),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 5,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "5 (สูงสุด)",
+                        style: getTextStyle(0),
+                      ),
+                    ],
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -135,20 +167,32 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
 
   Widget _sendbutton() {
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+        vertical: getPlatformSize(0.0),
+      ),
       child: RaisedButton(
+        padding: EdgeInsets.symmetric(
+          horizontal: getPlatformSize(0.0),
+          vertical: getPlatformSize(6.0),
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-//                    side: BorderSide(color: Colors.red)
+          borderRadius: BorderRadius.circular(getPlatformSize(30.0)),
+//          side: BorderSide(color: Colors.red),
         ),
         onPressed: () {
           print("send");
           _presenter.addAnswers(_presenter.questionnaireModel.data[0].id, group);
         },
-        color: Colors.blue,
+        color: Constants.App.PRIMARY_COLOR,
         child: Text(
           "ส่งคำตอบ",
-          style: TextStyle(color: Colors.white),
+          style: getTextStyle(
+            0,
+            color: Colors.white,
+            sizeTh: Constants.Font.BIGGER_SIZE_TH,
+            sizeEn: Constants.Font.BIGGER_SIZE_EN,
+          ),
         ),
       ),
     );
@@ -191,18 +235,15 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                   alignment: Alignment.center,
                   height: 60,
                   width: 100,
-                  child: Text(
-                      "${myIndex + 1} / ${_presenter.questionnaireModel.data.length}"),
+                  child: Text("${myIndex + 1} / ${_presenter.questionnaireModel.data.length}"),
                 ),
                 InkWell(
                   onTap: () {
                     setState(() {
                       myIndex++;
-                      if (myIndex ==
-                          _presenter.questionnaireModel.data.length - 1) {
+                      if (myIndex == _presenter.questionnaireModel.data.length - 1) {
                         showArrorRight = false;
-                      } else if (myIndex >
-                          _presenter.questionnaireModel.data.length - 1) {
+                      } else if (myIndex > _presenter.questionnaireModel.data.length - 1) {
                         myIndex = _presenter.questionnaireModel.data.length - 1;
                       } else {
                         showArrorLeft = true;

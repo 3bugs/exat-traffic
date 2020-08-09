@@ -111,6 +111,10 @@ Future<void> alert(BuildContext context, String title, String content) {
   );
 }
 
+void underConstruction(BuildContext context) {
+  alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
+}
+
 LatLngBounds boundsFromLatLngList(List<LatLng> latLngList) {
   double x0, x1, y0, y1;
   for (LatLng latLng in latLngList) {

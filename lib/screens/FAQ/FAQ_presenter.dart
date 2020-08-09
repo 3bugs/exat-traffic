@@ -5,25 +5,29 @@ import 'package:flutter/material.dart';
 import '../../services/api.dart';
 import 'FAQ_page.dart';
 
-class FAQPresenter extends BasePresenter<FAQPage>{
+class FAQPresenter extends BasePresenter<FAQPage> {
   var ListModel;
   FAQModel faqModel;
 
   FAQPresenter(State<FAQPage> state) : super(state);
-
 
   getFAQ() async {
 //    print("getFAQ");
 
     try {
       var res = await ExatApi.fetchFAQ(state.context);
-      setState((){
+      setState(() {
         faqModel = res;
       });
       print(faqModel.data.length);
-
     } catch (e) {
       print(e);
     }
+  }
+
+  clearFAQ() {
+    setState(() {
+      faqModel = null;
+    });
   }
 }

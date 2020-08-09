@@ -51,7 +51,7 @@ class MyDrawer extends StatelessWidget {
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
         //Navigator.pop(context);
-        alert(context, "EXAT Traffic", "Under construction, coming soon!");
+        underConstruction(context);
       },
     ),
     DrawerItemModel(
@@ -85,7 +85,7 @@ class MyDrawer extends StatelessWidget {
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
         //Navigator.pop(context);
-        alert(context, "EXAT Traffic", "Under construction, coming soon!");
+        underConstruction(context);
       },
     ),
 
