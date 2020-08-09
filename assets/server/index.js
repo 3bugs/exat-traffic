@@ -8,6 +8,9 @@ const mysql = require('mysql');
 const cronJob = require("cron").CronJob;
 const fetch = require('node-fetch');
 
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache();
+
 const CODE_FAILED = 1;
 const CODE_SUCCESS = 0;
 
@@ -91,6 +94,26 @@ io.on('connection', function (socket) {
 });
 
 app.get('/api/route_traffic', (req, res) => {
+  const allRoutePoints = myCache.get('traffic-data');
+  if (allRoutePoints == null) {
+    res.json({
+      error: {
+        code: CODE_FAILED,
+        message: 'Cache not found',
+      },
+      data_list: [],
+    });
+  } else {
+    res.json({
+      error: {
+        code: CODE_SUCCESS,
+        message: 'ok',
+      },
+      data_list: allRoutePoints,
+    });
+  }
+  return; //////////////////////////////////////////////////////////////////////////
+
   const promiseList = [];
 
   // เอาเฉพาะสายทางของ exat
@@ -106,24 +129,23 @@ app.get('/api/route_traffic', (req, res) => {
   })
 
   Promise.all(promiseList).then(resultList => {
-    const allRouteChunks = resultList.reduce((total, chunks) => {
+    const allRoutePoints = resultList.reduce((total, chunks) => {
       return total.concat(chunks.map(chunk => {
-          return {
-            id: chunk.chunk_id,
-            idx: chunk.traffic_index
-          };
+          return chunk.points;
         })
       );
+    }, []).reduce((total, points) => {
+      return total.concat(points);
     }, []);
 
-    console.log(allRouteChunks);
-    //io.emit('update-traffic', allRouteChunks);
+    //console.log(allRoutePoints);
+
     res.json({
       error: {
         code: CODE_SUCCESS,
         message: 'ok',
       },
-      data_list: allRouteChunks,
+      data_list: allRoutePoints,
     });
   });
 });
@@ -372,6 +394,20 @@ fetchData = () => {
 
     console.log(allRouteChunks);
     io.emit('update-traffic', allRouteChunks);
+
+    /*****************************************
+     * สร้าง point list แล้วกำหนดลงแคช สำหรับ api route_traffic ที่จะเอาไปพ่นเส้นสีในหน้าสายทางของแอพ
+     *****************************************/
+    const allRoutePoints = resultList.reduce((total, chunks) => {
+      return total.concat(chunks.map(chunk => {
+          return chunk.points;
+        })
+      );
+    }, []).reduce((total, points) => {
+      return total.concat(points);
+    }, []);
+
+    myCache.set('traffic-data', allRoutePoints);
   });
 };
 

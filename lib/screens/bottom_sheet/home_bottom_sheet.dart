@@ -290,6 +290,7 @@ class _ExpressWayListState extends State<ExpressWayList> {
 
     Future.delayed(Duration.zero, () {
       List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+      // ถ้าเอา fetch api ไปใส่ใน future builder โดยตรง จะทำให้ fetch ใหม่ทุกครั้งที่กลับมา list express way
       _futureExpressWayList = ExatApi.fetchExpressWays(context, markerList);
     });
   }
