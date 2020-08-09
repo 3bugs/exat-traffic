@@ -10,12 +10,14 @@ class ListItem extends StatelessWidget {
     @required this.marginTop,
     @required this.marginBottom,
     @required this.padding,
+    @required this.onClick,
   });
 
   final Widget child;
   final double marginTop;
   final double marginBottom;
   final EdgeInsets padding;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class ListItem extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {},
+                onTap: onClick,
                 borderRadius: BorderRadius.all(
                   Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                 ),

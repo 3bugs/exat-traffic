@@ -40,12 +40,8 @@ class _AboutPageState extends State<AboutPage> {
     });
   }
 
-  String _getDummyText() {
-    return new List(1000).fold("", (previousValue, element) => previousValue + "TEST-${Random().nextInt(100).toString()} ");
-  }
-
-  Widget _content(){
-    return  Stack(
+  Widget _content() {
+    return Stack(
       key: _keyDummyContainer,
       overflow: Overflow.visible,
       children: <Widget>[
@@ -62,10 +58,8 @@ class _AboutPageState extends State<AboutPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-
                   _banner(),
                   _body(),
-
                 ],
               ),
             ),
@@ -75,7 +69,7 @@ class _AboutPageState extends State<AboutPage> {
     );
   }
 
-  Widget _banner(){
+  Widget _banner() {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: getPlatformSize(16.0),
@@ -96,89 +90,118 @@ class _AboutPageState extends State<AboutPage> {
     );
   }
 
-  Widget _body(){
-    return _presenter.aboutModel==null?Expanded(child: DataLoading()):
-    Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: getPlatformSize(10.0),
-          horizontal: 0.0,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: getPlatformSize(10.0),
+  Widget _body() {
+    return _presenter.aboutModel == null
+        ? Expanded(child: DataLoading())
+        : Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                vertical: getPlatformSize(0.0),
+                horizontal: getPlatformSize(0.0),
               ),
-              _textData(),
-              SizedBox(
-                height: getPlatformSize(15.0),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: getPlatformSize(8.0),
+                    vertical: getPlatformSize(10.0),
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: getPlatformSize(10.0),
+                      ),
+                      for (var paragraph
+                          in _getParagraphList(_presenter.aboutModel.data[0].content))
+                        Padding(
+                          padding: EdgeInsets.only(
+                            bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
+                          ),
+                          child: Text(
+                            paragraph,
+                            style: getTextStyle(0),
+                          ),
+                        ),
+                      SizedBox(
+                        height: getPlatformSize(15.0),
+                      ),
+                      _iconLink(),
+                    ],
+                  ),
+                ),
               ),
-              _iconLink(),
-            ],
-          ),
-
-        ),
-      ),
-    );
+            ),
+          );
   }
 
-  Widget _textData(){
+  Widget _textData() {
     return Container(
-        child: Text(_presenter.aboutModel.data[0].content),
+      child: Text(_presenter.aboutModel.data[0].content),
     );
   }
 
-  Widget _iconLink(){
+  List<String> _getParagraphList(String details) {
+    return details
+        .split("\n")
+        .where((paragraph) => paragraph != null && paragraph.trim().isNotEmpty)
+        .toList();
+  }
+
+  Widget _iconLink() {
     return Row(
       children: <Widget>[
-
-        Platform.isIOS? InkWell(
-          onTap: (){
-            StoreRedirect.redirect(androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
-          },
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: 70,
-                height: 70,
+        Platform.isIOS
+            ? InkWell(
+                onTap: () {
+                  StoreRedirect.redirect(
+                      androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
+                },
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: 70,
+                      height: 70,
 //          color: Colors.red,
-                child: Image.network(_presenter.aboutModel.data[0].reference[0].cover),
-              ),
-
-              Container(
-                alignment: Alignment.center,
+                      child: Image.network(_presenter.aboutModel.data[0].reference[0].cover),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
 //              color: Colors.red,
-                width: 70,
-                height: 30,
-                child: Text(_presenter.aboutModel.data[0].reference[0].title,style: TextStyle(fontSize: 9),),
-              ),
-            ],
-          ),
-        ):
-        InkWell(
-          onTap: (){
-            StoreRedirect.redirect(androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
-          },
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: 70,
-                height: 70,
+                      width: 70,
+                      height: 30,
+                      child: Text(
+                        _presenter.aboutModel.data[0].reference[0].title,
+                        style: TextStyle(fontSize: 9),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : InkWell(
+                onTap: () {
+                  StoreRedirect.redirect(
+                      androidAppId: "th.co.exat.android.exatportal", iOSAppId: "1295736283");
+                },
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: 70,
+                      height: 70,
 //          color: Colors.green,
-                child: Image.network(_presenter.aboutModel.data[0].reference[1].cover),
-              ),
-              Container(
-                alignment: Alignment.center,
+                      child: Image.network(_presenter.aboutModel.data[0].reference[1].cover),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
 //              color: Colors.green,
-                width: 70,
-                height: 30,
-                child: Text(_presenter.aboutModel.data[0].reference[1].title,style: TextStyle(fontSize: 9),),
+                      width: 70,
+                      height: 30,
+                      child: Text(
+                        _presenter.aboutModel.data[0].reference[1].title,
+                        style: TextStyle(fontSize: 9),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-
         SizedBox(
           width: 15,
         ),
@@ -189,9 +212,8 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
-      // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
-      child: _content()
-    );
+        titleList: _titleList,
+        // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
+        child: _content());
   }
 }

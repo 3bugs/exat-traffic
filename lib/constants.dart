@@ -19,7 +19,7 @@ class NavBar {
 
 class BottomSheet {
   static const Color DARK_BACKGROUND_COLOR = Color(0xFF2A2E43);
-  static const double HEIGHT_INITIAL = 180.0;
+  static const double HEIGHT_INITIAL = 184.0;
   static const double HEIGHT_LAYER = 145.0;
   static const double HEIGHT_ROUTE_COLLAPSED = 102.0;
   static const double HEIGHT_ROUTE_EXPANDED = 335.0;
@@ -58,6 +58,7 @@ class Font {
   static const double LIST_DATE_SIZE = 11.0;
   static const Color DEFAULT_COLOR = Color(0xFF585858);
   static const Color DIM_COLOR = Color(0xFFB2B2B2);
+  static const SPACE_BETWEEN_TEXT_PARAGRAPH = 10.0;
 }
 
 class Api {

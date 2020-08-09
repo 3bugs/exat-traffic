@@ -130,7 +130,10 @@ class ExatApi {
     }
   }
 
-  static Future<List<ExpressWayModel>> fetchExpressWays(BuildContext context) async {
+  static Future<List<ExpressWayModel>> fetchExpressWays(
+    BuildContext context,
+    List<MarkerModel> markerList, // เอามา map point id กับ cctv
+  ) async {
     final String url = "$EXAT_API_BASED_URL/routes/list";
 
     ResponseResult responseResult = await _makeRequest(
@@ -144,7 +147,7 @@ class ExatApi {
       return dataList
           .asMap()
           .entries
-          .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key))
+          .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key, markerList))
           .toList();
     } else {
       throw Exception(responseResult.data);

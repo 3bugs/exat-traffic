@@ -3,23 +3,36 @@ import 'dart:math';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/express_way_model.dart';
 
-class CctvItemView extends StatelessWidget {
-  CctvItemView({
-    @required this.cctvModel,
+class TrafficPointView extends StatelessWidget {
+  TrafficPointView({
+    @required this.trafficPoint,
     @required this.isFirstItem,
     @required this.isLastItem,
     @required this.onClick,
   });
 
-  final CctvModel cctvModel;
+  final TrafficPointModel trafficPoint;
   final bool isFirstItem;
   final bool isLastItem;
   final Function onClick;
 
   final Random _rnd = Random();
+
+  String _validateUrl(String url) {
+    String newUrl = url;
+
+    if (url != null && url.length > 0) {
+      int beginIndex = url.indexOf("http://", 1);
+      if (beginIndex != -1) {
+        newUrl = url.substring(beginIndex);
+      }
+    }
+
+    return newUrl;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +54,8 @@ class CctvItemView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: _rnd.nextInt(2) == 0 ? Color(0xFFEB222C) : Color(0xFF22B573),
+                      color: Color(0xFFAAAAAA),
+                      //_rnd.nextInt(2) == 0 ? Color(0xFFEB222C) : Color(0xFF22B573),
                       width: getPlatformSize(11.0),
                     ),
                     bottom: isLastItem
@@ -73,7 +87,7 @@ class CctvItemView extends StatelessWidget {
                                   String name;
                                   switch (language.lang) {
                                     case 0:
-                                      name = cctvModel.name;
+                                      name = trafficPoint.cctvMarkerModel.name;
                                       break;
                                     case 1:
                                       name = 'Expressway';
@@ -94,12 +108,13 @@ class CctvItemView extends StatelessWidget {
                             borderRadius: BorderRadius.all(
                               Radius.circular(getPlatformSize(9.0)),
                             ),
-                            child: Image(
-                              image: AssetImage('assets/images/home/toll_plaza_dummy_${Random().nextInt(2) + 1}.jpg'),
-                              //cctvModel.image,
+                            child: SizedBox(
                               width: getPlatformSize(100.0),
                               height: getPlatformSize(65.0),
-                              fit: BoxFit.cover,
+                              child: Image.network(
+                                _validateUrl(trafficPoint.cctvMarkerModel.imagePath),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ],

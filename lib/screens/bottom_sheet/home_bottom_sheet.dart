@@ -1,5 +1,5 @@
-import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 /*import 'package:flutter_socket_io/socket_io_manager.dart';
@@ -14,10 +14,14 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/components/my_progress_indicator.dart';
+import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/components/lazy_indexed_stack.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
-import 'components/cctv_item.dart';
+import 'components/traffic_point_item.dart';
 
 List<String> expressWayHeaderList = [
   'ทางพิเศษ',
@@ -117,13 +121,12 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     });
   }
 
-  void _handleClickCctv(BuildContext context, CctvModel cctvModel) {
-    //alert(context, 'TEST', chunkModel.name);
-    Navigator.push(
+  void _handleClickTrafficPoint(BuildContext context, TrafficPointModel trafficPoint) {
+    /*Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CctvDetails(cctvModel)),
+      MaterialPageRoute(builder: (context) => CctvDetails(trafficPoint.cctvMarkerModel)),
       //MaterialPageRoute(builder: (context) => RestAreaDetails(cctvModel)),
-    );
+    );*/
   }
 
   @override
@@ -139,7 +142,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
           padding: EdgeInsets.only(
             left: getPlatformSize(0.0),
             right: getPlatformSize(0.0),
-            top: getPlatformSize(6.0),
+            top: getPlatformSize(8.0),
             bottom: getPlatformSize(0.0),
           ),
           child: Column(
@@ -239,13 +242,27 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                 ],
               ),
               Expanded(
-                child: IndexedStack(
-                  children: <Widget>[
-                    ExpressWayList(_handleClickExpressWay),
-                    CctvList(_handleClickCctv)
-                  ],
+                child: LazyIndexedStack(
+                  reuse: false,
+                  itemBuilder: (context, index) {
+                    return index == 0
+                        ? ExpressWayList(_handleClickExpressWay)
+                        : ExpressWayDetails(
+                            Key(_selectedExpressWay.name),
+                            _selectedExpressWay,
+                            _handleClickTrafficPoint,
+                          );
+                  },
+                  itemCount: 2,
                   index: _selectedExpressWay == null ? 0 : 1,
                 ),
+                /*child: IndexedStack(
+                  children: <Widget>[
+                    ExpressWayList(_handleClickExpressWay),
+                    ExpressWayDetails(_selectedExpressWay, _handleClickTrafficPoint)
+                  ],
+                  index: _selectedExpressWay == null ? 0 : 1,
+                ),*/
               ),
             ],
           ),
@@ -265,169 +282,149 @@ class ExpressWayList extends StatefulWidget {
 }
 
 class _ExpressWayListState extends State<ExpressWayList> {
-  final List<ExpressWayModel> _expressWayList = <ExpressWayModel>[
-    ExpressWayModel(
-      name: 'ทางพิเศษศรีรัช',
-      image: AssetImage('assets/images/home/express_way_srirach.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษฉลองรัช',
-      image: AssetImage('assets/images/home/express_way_chalong.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษบูรพาวิถี',
-      image: AssetImage('assets/images/home/express_way_burapa.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษเฉลิมมหานคร',
-      image: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษอุดรรัถยา',
-      image: AssetImage('assets/images/home/express_way_udorn.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษสายบางนา',
-      image: AssetImage('assets/images/home/express_way_bangna.jpg'),
-    ),
-    ExpressWayModel(
-      name: 'ทางพิเศษกาญจนาภิเษก',
-      image: AssetImage('assets/images/home/express_way_kanchana.jpg'),
-    ),
-  ];
-
-  //List<ExpressWayModel> _expressWayList;
+  Future<List<ExpressWayModel>> _futureExpressWayList;
 
   @override
   void initState() {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      _fetchExpressWayData(context);
+      List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+      _futureExpressWayList = ExatApi.fetchExpressWays(context, markerList);
     });
-  }
-
-  void _fetchExpressWayData(BuildContext context) async {
-    List<ExpressWayModel> expressWayList = await ExatApi.fetchExpressWays(context);
-    print('************* EXPRESS WAY LIST ***************');
-    print(expressWayList.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: getPlatformSize(120.0),
-      child: _expressWayList == null
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.separated(
-              itemCount: _expressWayList.length,
-              scrollDirection: Axis.horizontal,
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                ExpressWayModel selectedExpressWay = _expressWayList[index];
+      child: FutureBuilder(
+        future: _futureExpressWayList,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return snapshot.hasData
+              ? ListView.separated(
+                  itemCount: snapshot.data.length,
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    ExpressWayModel selectedExpressWay = snapshot.data[index];
 
-                return ExpressWayImageView(
-                  expressWay: selectedExpressWay,
-                  isFirstItem: index == 0,
-                  isLastItem: index == _expressWayList.length - 1,
-                  onClick: () {
-                    widget._onSelectExpressWay(context, selectedExpressWay);
+                    return ExpressWayImageView(
+                      expressWay: selectedExpressWay,
+                      isFirstItem: index == 0,
+                      isLastItem: index == snapshot.data.length - 1,
+                      onClick: () {
+                        widget._onSelectExpressWay(context, selectedExpressWay);
+                      },
+                    );
                   },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      width: getPlatformSize(0.0),
+                    );
+                  },
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  width: getPlatformSize(0.0),
-                );
-              },
-            ),
+        },
+      ),
     );
   }
 }
 
-class CctvList extends StatefulWidget {
-  CctvList(this._onSelectCctv);
+class ExpressWayDetails extends StatefulWidget {
+  ExpressWayDetails(Key key, this._expressWay, this._onSelectTrafficPoint) : super(key: key);
 
-  final List<CctvModel> _cctvList = <CctvModel>[
-    CctvModel(
-      name: 'ทางลงลาดพร้าว',
-      //image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
-    ),
-    CctvModel(
-      name: 'รามอินทรา',
-      //image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
-    ),
-    CctvModel(
-      name: 'สุขาภิบาล 5',
-      //image: AssetImage('assets/images/home/toll_plaza_dummy_1.jpg'),
-    ),
-    CctvModel(
-      name: 'โยธิน',
-      //image: AssetImage('assets/images/home/toll_plaza_dummy_2.jpg'),
-    ),
-  ];
-
-  final Function _onSelectCctv;
+  final ExpressWayModel _expressWay;
+  final Function _onSelectTrafficPoint;
 
   @override
-  _CctvListState createState() => _CctvListState();
+  _ExpressWayDetailsState createState() => _ExpressWayDetailsState();
 }
 
-class _CctvListState extends State<CctvList> {
+class _ExpressWayDetailsState extends State<ExpressWayDetails> {
+  LegModel _selectedLeg;
+
+  @override
+  void initState() {
+    super.initState();
+    _initLeg();
+  }
+
+  void _initLeg() {
+    if ((widget._expressWay != null) && (widget._expressWay.legList.length > 0)) {
+      _selectedLeg = widget._expressWay.legList[0];
+    } else {
+      _selectedLeg = null;
+    }
+  }
+
+  void _handleClickLeg(LegModel legModel) {
+    setState(() {
+      _selectedLeg = legModel;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
-        Container(
-          height: getPlatformSize(44.0),
-          child: ListView.separated(
-            itemCount: 5,
-            scrollDirection: Axis.horizontal,
-            physics: BouncingScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return ExpressWayTextView(
-                expressWay: ExpressWayModel(
-                  name: 'ทางพิเศษศรีรัช',
-                  image: AssetImage('assets/images/home/express_way_srirach.jpg'),
-                ),
-                isFirstItem: index == 0,
-                isLastItem: index == 4,
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return SizedBox.shrink();
-            },
-          ),
-        ),
-        // list ด่านทางขึ้น-ลง
-        Expanded(
-          child: Container(
-            child: ListView.separated(
-              itemCount: widget._cctvList.length,
-              scrollDirection: Axis.vertical,
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                CctvModel selectedCctv = widget._cctvList[index];
+    return widget._expressWay != null
+        ? Column(
+            children: <Widget>[
+              // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
+              Container(
+                height: getPlatformSize(44.0),
+                child: ListView.separated(
+                  itemCount: widget._expressWay.legList.length,
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    LegModel leg = widget._expressWay.legList[index];
 
-                return CctvItemView(
-                  cctvModel: selectedCctv,
-                  isFirstItem: index == 0,
-                  isLastItem: index == widget._cctvList.length - 1,
-                  onClick: () {
-                    widget._onSelectCctv(context, selectedCctv);
+                    return LegView(
+                      legModel: leg,
+                      isFirstItem: index == 0,
+                      isLastItem: index == widget._expressWay.legList.length - 1,
+                      selected: leg == _selectedLeg,
+                      onSelectLeg: _handleClickLeg,
+                    );
                   },
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return SizedBox.shrink();
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox.shrink();
+                  },
+                ),
+              ),
+
+              _selectedLeg != null
+                  ?
+                  // traffic point list
+                  Expanded(
+                      child: Container(
+                        child: ListView.separated(
+                          itemCount: _selectedLeg.trafficPointList.length,
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            TrafficPointModel trafficPoint = _selectedLeg.trafficPointList[index];
+
+                            return TrafficPointView(
+                              trafficPoint: trafficPoint,
+                              isFirstItem: index == 0,
+                              isLastItem: index == _selectedLeg.trafficPointList.length - 1,
+                              onClick: () {
+                                widget._onSelectTrafficPoint(context, trafficPoint);
+                              },
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ],
+          )
+        : SizedBox.shrink();
   }
 }

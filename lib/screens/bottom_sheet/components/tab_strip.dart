@@ -8,7 +8,7 @@ class TabStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: getPlatformSize(8.0),
+      height: getPlatformSize(7.0),
       child: Row(
         children: <Widget>[
           Expanded(
