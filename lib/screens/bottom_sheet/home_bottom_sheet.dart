@@ -120,6 +120,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
   }
 
   void _handleClickTrafficPoint(BuildContext context, TrafficPointModel trafficPoint) {
+    trafficPoint.cctvMarkerModel.showDetailsScreen(context);
     /*Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CctvDetails(trafficPoint.cctvMarkerModel)),

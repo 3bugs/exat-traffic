@@ -390,7 +390,7 @@ class ExatApi {
 
     Map data = {
       "deviceToken": "testToken",
-      "deviceType": Platform.isAndroid ? "a" : "i",
+      "deviceType": Platform.isAndroid ? "android" : "ios",
       "screenWidth": MediaQuery.of(context).size.width,
       "screenHeight": MediaQuery.of(context).size.height,
       "lang": "TH",
