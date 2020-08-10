@@ -1,15 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_categories/cctv_model.dart';
+import 'package:exattraffic/models/core_configs_model.dart';
+import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/models/marker_categories/police_station_model.dart';
 import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/screens/marker_details/police_station_details.dart';
 import 'package:exattraffic/screens/marker_details/rest_area_details.dart';
-import 'package:flutter/material.dart';
-
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
-import 'package:exattraffic/models/core_configs_model.dart';
-import 'package:exattraffic/screens/marker_details/cctv_details.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:exattraffic/models/marker_categories/uturn_model.dart';
+import 'package:exattraffic/screens/marker_details/uturn_details.dart';
+import 'package:exattraffic/services/api.dart';
 
 class MarkerModel {
   final int id;
@@ -26,6 +30,7 @@ class MarkerModel {
   /*final String imageType;
   final String imageSize;*/
   final String imagePath;
+  final String godImageUrl;
   final String direction;
   final String phone;
   final int groupId;
@@ -72,6 +77,7 @@ class MarkerModel {
     /*@required this.imageType,
     @required this.imageSize,*/
     @required this.imagePath,
+    @required this.godImageUrl,
     @required this.direction,
     @required this.phone,
     @required this.groupId,
@@ -85,6 +91,30 @@ class MarkerModel {
   factory MarkerModel.fromJson(Map<String, dynamic> json) {
     var coreConfigJson = json['core_configs'] ?? List();
 
+    // stream_web = ภาพจากระบบอื่นๆ
+    // image_path = ภาพจากระบบหลังบ้าน
+
+    final String internalImageUrl = json['image_path'];
+    final String externalImageUrl = json['stream_web'];
+    String godImageUrl;
+
+    if (internalImageUrl != null && internalImageUrl.trim().length > 7) {
+      godImageUrl = internalImageUrl.trim();
+    } else if (externalImageUrl != null && externalImageUrl.trim().length > 7) {
+      godImageUrl = externalImageUrl.trim();
+    }
+
+    if (godImageUrl != null && godImageUrl.substring(0, 4) != "http") {
+      godImageUrl = Constants.Api.SERVER + godImageUrl;
+    }
+
+    if (godImageUrl != null) {
+      int beginIndex = godImageUrl.indexOf("http://", 1);
+      if (beginIndex != -1) {
+        godImageUrl = godImageUrl.substring(beginIndex);
+      }
+    }
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
@@ -96,6 +126,7 @@ class MarkerModel {
       streamMobile: json['stream_mobile'],
       streamWeb: json['stream_web'],
       imagePath: json['image_path'],
+      godImageUrl: godImageUrl,
       direction: json['direction'],
       phone: json['tel'],
       groupId: json['group_id'],
@@ -121,7 +152,7 @@ class MarkerModel {
             builder: (context) => CctvDetails(CctvModel(
               name: this.name,
               streamUrl: this.streamMobile,
-              imageUrl: this.imagePath,
+              imageUrl: this.godImageUrl,
             )),
           ),
         );
@@ -132,7 +163,7 @@ class MarkerModel {
           MaterialPageRoute(
             builder: (context) => RestAreaDetails(RestAreaModel(
               name: this.name,
-              imageUrl: this.imagePath,
+              imageUrl: this.godImageUrl,
               hasParkingLot: this
                   .coreConfigList
                   .where((coreConfig) => coreConfig.code == "parking")
@@ -168,8 +199,19 @@ class MarkerModel {
           MaterialPageRoute(
             builder: (context) => PoliceStationDetails(PoliceStationModel(
               name: this.name,
-              imageUrl: this.imagePath,
+              imageUrl: this.godImageUrl,
               phone: this.phone,
+            )),
+          ),
+        );
+        break;
+      case CategoryType.U_TURN:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UTurnDetails(UTurnModel(
+              name: this.name,
+              imageUrl: this.godImageUrl,
             )),
           ),
         );

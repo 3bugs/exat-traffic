@@ -184,10 +184,10 @@ class ExatApi {
           dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
       print('***** MARKER COUNT: ${markerList.length}');
-      markerList.forEach((marker) {
+      /*markerList.forEach((marker) {
         print(
-            "***** MARKER [${marker.name}] - lat: ${marker.latitude}, lng: ${marker.longitude}, category id: ${marker.categoryId}");
-      });
+            "***** MARKER [${marker.name}] - lat: ${marker.latitude}, lng: ${marker.longitude}, category id: ${marker.categoryId}, image path: ${marker.imagePath}");
+      });*/
 
       return markerList;
     } else {
@@ -213,10 +213,10 @@ class ExatApi {
           dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
 
       print('***** CATEGORY COUNT: ${categoryList.length}');
-      categoryList.forEach((category) {
+      /*categoryList.forEach((category) {
         print(
             "***** CATEGORY [${category.name}] - category id: ${category.id}, category code: ${category.code}");
-      });
+      });*/
 
       return categoryList;
     } else {
@@ -335,7 +335,7 @@ class ExatApi {
     ResponseResult responseResult = await _makeRequest(
       context,
       url,
-      {"altitude": null, "status": "1", "limit": 2},
+      {"altitude": null, "status": "1", "limit": 10},
     );
     if (responseResult.success) {
       IncidentListModel _model = IncidentListModel.fromJson(responseResult.decode);

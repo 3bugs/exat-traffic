@@ -62,7 +62,7 @@ class _IncidentMainState extends State<IncidentMain> {
                       name: '${_presenter.incidentListModel.data[index].title}',
                       description: '${_presenter.incidentListModel.data[index].detail}',
                       date: '${_presenter.incidentListModel.data[index].timeopen}',
-                      image: NetworkImage("${_presenter.incidentListModel.data[index].cover}"),
+                      imageUrl: '${_presenter.incidentListModel.data[index].cover}',
                     ),
                     isFirstItem: index == 0,
                     isLastItem: index == _presenter.incidentListModel.data.length - 1,

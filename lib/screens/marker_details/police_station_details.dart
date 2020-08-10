@@ -1,7 +1,4 @@
 import 'dart:async';
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
-import 'package:exattraffic/models/marker_categories/police_station_model.dart';
-import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +7,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/components/tool_item.dart';
+import 'package:exattraffic/models/marker_categories/police_station_model.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 
 class PoliceStationDetails extends StatelessWidget {
   PoliceStationDetails(this._policeStationModel);
@@ -133,29 +132,22 @@ class _PoliceStationDetailsMainState extends State<PoliceStationDetailsMain> {
                   height: getPlatformSize(25.0),
                 ),
                 Container(
-                  height: getPlatformSize(240.0),
                   margin: EdgeInsets.symmetric(
                     horizontal: getPlatformSize(Constants.CctvPlayerScreen.HORIZONTAL_MARGIN),
                     vertical: getPlatformSize(0.0),
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
-                    border: Border.all(
-                      color: Colors.yellowAccent,
-                      width: 2.0,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(getPlatformSize(10.0)),
+                  child: AspectRatio(
+                    aspectRatio: 1.5,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(getPlatformSize(10.0)),
+                      ),
+                      child: MyCachedImage(
+                        imageUrl: widget._policeStationModel.imageUrl,
+                        progressIndicatorSize: ProgressIndicatorSize.large,
+                      ),
                     ),
                   ),
-                  /*child: Center(
-                    child: Image(
-                      image: AssetImage('assets/images/cctv_details/ic_playback.png'),
-                      width: getPlatformSize(89.0),
-                      height: getPlatformSize(89.0),
-                      fit: BoxFit.contain,
-                    ),
-                  ),*/
                 ),
                 SizedBox(
                   height: getPlatformSize(28.0),

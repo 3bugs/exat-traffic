@@ -8,6 +8,7 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/incident_model.dart';
 import 'package:exattraffic/components/list_item.dart';
 import 'package:exattraffic/screens/incident/incident_detail.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 
 class IncidentView extends StatelessWidget {
   IncidentView({
@@ -46,12 +47,22 @@ class IncidentView extends StatelessWidget {
             borderRadius: BorderRadius.all(
               Radius.circular(getPlatformSize(9.0)),
             ),
-            child: Image(
+
+            child: SizedBox(
+              width: getPlatformSize(97.0),
+              height: getPlatformSize(69.0),
+              child: MyCachedImage(
+                imageUrl: incident.imageUrl,
+                progressIndicatorSize: ProgressIndicatorSize.small,
+              ),
+            ),
+            
+            /*child: Image(
               image: incident.image,
               width: getPlatformSize(97.0),
               height: getPlatformSize(69.0),
               fit: BoxFit.cover,
-            ),
+            ),*/
           ),
           SizedBox(
             width: getPlatformSize(10.0),

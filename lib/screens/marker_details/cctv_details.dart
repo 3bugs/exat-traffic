@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -221,8 +223,9 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                     _isValidUrl(imageUrl)
                         ? AspectRatio(
                             aspectRatio: 4 / 3,
-                            child: Image.network(
-                              imageUrl,
+                            child: MyCachedImage(
+                              imageUrl: imageUrl,
+                              progressIndicatorSize: ProgressIndicatorSize.large,
                             ),
                           )
                         : SizedBox.shrink(),

@@ -1,11 +1,13 @@
-import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/express_way_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 
 class TrafficPointView extends StatelessWidget {
   TrafficPointView({
@@ -21,19 +23,6 @@ class TrafficPointView extends StatelessWidget {
   final Function onClick;
 
   final Random _rnd = Random();
-
-  String _validateUrl(String url) {
-    String newUrl = url;
-
-    if (url != null && url.length > 0) {
-      int beginIndex = url.indexOf("http://", 1);
-      if (beginIndex != -1) {
-        newUrl = url.substring(beginIndex);
-      }
-    }
-
-    return newUrl;
-  }
 
   Color _getTrafficStatus() {
     List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
@@ -130,19 +119,23 @@ class TrafficPointView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          ClipRRect(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(getPlatformSize(9.0)),
-                            ),
-                            child: SizedBox(
-                              width: getPlatformSize(100.0),
-                              height: getPlatformSize(65.0),
-                              child: Image.network(
-                                _validateUrl(trafficPoint.cctvMarkerModel.imagePath),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                          trafficPoint.cctvMarkerModel.godImageUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(getPlatformSize(9.0)),
+                                  ),
+                                  child: SizedBox(
+                                    width: getPlatformSize(100.0),
+                                    height: getPlatformSize(65.0),
+                                    child: MyCachedImage(
+                                      imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
+                                      progressIndicatorSize: ProgressIndicatorSize.small,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: getPlatformSize(65.0),
+                                ),
                         ],
                       ),
                     ),

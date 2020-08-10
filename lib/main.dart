@@ -32,12 +32,17 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        builder: (context, child) {
+          return MediaQuery(
+            child: child,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          );
+        },
         title: 'EXAT Traffic',
         theme: ThemeData(
           //fontFamily: 'DBHeavent',
           /*textTheme: TextTheme(
               bodyText1: TextStyle(
-
               ),
             ),*/
           primaryColor: Constants.App.PRIMARY_COLOR,
