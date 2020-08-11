@@ -15,9 +15,23 @@ class MyFcm {
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
+
+        //onMessage: {notification: {title: EXAT TRAFFIC, body: อุบัติเหตุทางด่วน}, data: {title_en: Incident, title_th: อุบัติเหตุทางด่วน, lat: 13.8469852, lng: 100.5802715, route_id: 9, id_en: 33, id_th: 32, cate_id: 193, markers_id: 416}}
+
         print("onMessage: $message");
         //_showItemDialog(message);
-        alert(context, "Firebase Cloud Messaging", message.toString());
+        //alert(context, "Firebase Cloud Messaging", message.toString());
+
+        if (message.containsKey('data')) {
+          print('***** MESSAGE CONTAINS DATA *****');
+
+          final Map<String, dynamic> dataMap = message['data'];
+          final String titleTh = dataMap['title_th'];
+          final String titleEn = dataMap['title_en'];
+          alert(context, "แจ้งเตือน", titleTh);
+        } else {
+          print('***** MESSAGE DOES NOT CONTAIN DATA *****');
+        }
       },
       onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {

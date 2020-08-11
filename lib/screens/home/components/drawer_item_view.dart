@@ -16,7 +16,7 @@ class DrawerItemView extends StatelessWidget {
     @required this.paddingLeft,
   });
 
-  final double ITEM_HEIGHT = getPlatformSize(53.0);
+  final double ITEM_HEIGHT = getPlatformSize(60.0);
   final DrawerItemModel drawerItemModel;
   final bool isFirstItem;
   final bool isLastItem;

@@ -6,23 +6,21 @@ import 'package:flutter/material.dart';
 import '../../services/api.dart';
 import 'about_page.dart';
 
-class AboutPresenter extends BasePresenter<AboutPage>{
+class AboutPresenter extends BasePresenter<AboutPage> {
   var ListModel;
   AboutModel aboutModel;
 
   AboutPresenter(State<AboutPage> state) : super(state);
-
 
   getAbout() async {
 //    print("getAbout");
 
     try {
       var res = await ExatApi.fetchAbout(state.context);
-      setState((){
+      setState(() {
         aboutModel = res;
       });
       print(aboutModel.data.length);
-
     } catch (e) {
       print(e);
     }

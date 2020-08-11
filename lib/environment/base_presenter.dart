@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-abstract class BasePre{
-
-}
+abstract class BasePre {}
 
 class BasePresenter<T extends StatefulWidget> {
   State<T> state;
@@ -10,12 +8,12 @@ class BasePresenter<T extends StatefulWidget> {
 
   BasePresenter(this.state);
 
-  setState(Function v){
+  setState(Function v) {
     state.setState(v);
   }
 
-  loading(){
-    setState((){
+  loading() {
+    setState(() {
       loader = true;
     });
   }
@@ -24,8 +22,8 @@ class BasePresenter<T extends StatefulWidget> {
     state = null;
   }
 
-  loaded(){
-    setState((){
+  loaded() {
+    setState(() {
       loader = false;
     });
   }

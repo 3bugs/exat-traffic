@@ -1,5 +1,3 @@
-import 'package:exattraffic/main.dart';
-import 'package:exattraffic/services/fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +18,8 @@ import 'package:exattraffic/models/screen_props.dart';
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/components/lazy_indexed_stack.dart';
 import 'package:exattraffic/components/header.dart';
+import 'package:exattraffic/components/search_box.dart';
+import 'package:exattraffic/services/fcm.dart';
 
 //import 'package:exattraffic/components/fade_indexed_stack.dart';
 //import 'package:exattraffic/components/animated_indexed_stack.dart';
@@ -42,7 +42,7 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // home
     id: 0,
-    showDate: false,
+    showSearch: true,
     titleList: [
       'หน้าหลัก',
       'Home',
@@ -57,7 +57,6 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // favorite
     id: 1,
-    showDate: false,
     titleList: [
       'รายการโปรด',
       'Favorite',
@@ -72,7 +71,6 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // route
     id: 2,
-    showDate: false,
     titleList: [
       'เส้นทาง',
       'Route',
@@ -82,7 +80,6 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // incident
     id: 3,
-    showDate: false,
     titleList: [
       'เหตุการณ์',
       'Incident',
@@ -97,7 +94,6 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // notification
     id: 4,
-    showDate: false,
     titleList: [
       'การแจ้งเตือน',
       'Notification',
@@ -131,19 +127,19 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   static const List<double> BG_GRADIENT_STOPS = [0.0, 1.0];
 
   List<Widget> _fragmentList;
-
-  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
-  double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   int _currentTabIndex = 0;
   ScreenProps _currentScreenProps = screenPropsList[0];
+  bool _showSearchOptions = false;
 
   initState() {
-    new Future.delayed(Duration.zero,() {
+    new Future.delayed(Duration.zero, () {
       MyFcm(context).configFcm();
     });
 
     _fragmentList = [
-      Home(),
+      Home(
+        onClickMap: _handleClickHomeMap,
+      ),
       Favorite(),
       MyRoute(
         onUpdateBottomSheet: null,
@@ -160,11 +156,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     super.initState();
   }
 
-  _afterLayout(_) {
-    final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
+  void _handleClickHomeMap() {
     setState(() {
-      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
-      _mainContainerHeight = mainContainerRenderBox.size.height;
+      _showSearchOptions = false;
     });
   }
 
@@ -174,7 +168,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       _currentScreenProps = screenPropsList[index];
 
       if (index != 0) {
-        //_showSearchOptions = false;
+        _showSearchOptions = false;
       }
     });
   }
@@ -264,6 +258,197 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                               },
                               itemCount: 5,
                               index: _currentTabIndex,
+                            ),
+                          ),
+                        ),
+
+                        // ช่อง search
+                        Visibility(
+                          visible: _currentScreenProps.showSearch,
+                          child: SearchBox(
+                            onClickBox: () {
+                              setState(() {
+                                _showSearchOptions = !_showSearchOptions;
+                              });
+                            },
+                            onClickCloseButton: () {
+                              setState(() {
+                                _showSearchOptions = false;
+                              });
+                            },
+                            child: Consumer<LanguageModel>(
+                              builder: (context, language, child) {
+                                return Text(
+                                  _currentScreenProps.searchHintList[language.lang],
+                                  style: getTextStyle(
+                                    language.lang,
+                                    color: Constants.Font.DIM_COLOR,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+
+                        // ตัวเลือกการค้นหา (บริการผู้ใช้ทาง/เส้นทาง)
+                        Visibility(
+                          visible: _showSearchOptions,
+                          child: Positioned(
+                            width: MediaQuery.of(context).size.width,
+                            top: getPlatformSize(66.0),
+                            left: 0.0,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                                right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0x22777777),
+                                      blurRadius: getPlatformSize(10.0),
+                                      spreadRadius: getPlatformSize(5.0),
+                                      offset: Offset(
+                                        getPlatformSize(2.0), // move right
+                                        getPlatformSize(2.0), // move down
+                                      ),
+                                    ),
+                                  ],
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                        getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: <Widget>[
+                                    // ค้นหาบริการผู้ใช้ทาง
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          underConstruction(context);
+                                          setState(() {
+                                            _showSearchOptions = false;
+                                          });
+                                        },
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(
+                                              getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                          topRight: Radius.circular(
+                                              getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: getPlatformSize(18.0),
+                                            horizontal: getPlatformSize(20.0),
+                                          ),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Container(
+                                                width: getPlatformSize(10.0),
+                                                height: getPlatformSize(10.0),
+                                                margin: EdgeInsets.only(
+                                                  right: getPlatformSize(16.0),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xFF3497FD),
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(getPlatformSize(3.0)),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Text(
+                                                      'ค้นหาบริการ',
+                                                      style: getTextStyle(
+                                                        language.lang,
+                                                        color: Color(0xFF454F63),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // เส้นคั่น
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        left: getPlatformSize(20.0),
+                                        right: getPlatformSize(20.0),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Color(0xFFF4F4F4),
+                                            width: getPlatformSize(1.0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // ค้นหาเส้นทาง
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          underConstruction(context);
+                                          setState(() {
+                                            _showSearchOptions = false;
+                                          });
+                                        },
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(
+                                              getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                          bottomRight: Radius.circular(
+                                              getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: getPlatformSize(18.0),
+                                            horizontal: getPlatformSize(20.0),
+                                          ),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Container(
+                                                width: getPlatformSize(10.0),
+                                                height: getPlatformSize(10.0),
+                                                margin: EdgeInsets.only(
+                                                  right: getPlatformSize(16.0),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xFF3ACCE1),
+                                                  borderRadius: BorderRadius.all(
+                                                    Radius.circular(getPlatformSize(3.0)),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Text(
+                                                      'ค้นหาเส้นทาง',
+                                                      style: getTextStyle(
+                                                        language.lang,
+                                                        color: Color(0xFF454F63),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),

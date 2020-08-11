@@ -1,16 +1,23 @@
-import 'package:exattraffic/components/header.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/components/header.dart';
+import 'package:exattraffic/components/search_box.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class YourScaffold extends StatefulWidget {
   final List<String> titleList;
   final Widget child;
+  final bool showSearch;
+  final Function onClickSearchCloseButton;
 
   YourScaffold({
     @required this.titleList,
     @required this.child,
+    this.showSearch = false,
+    this.onClickSearchCloseButton,
   });
 
   @override
@@ -68,6 +75,31 @@ class _YourScaffoldState extends State<YourScaffold> {
                         ),
                         // main container
                         child: widget.child,
+                      ),
+
+                      // ช่อง search
+                      Visibility(
+                        visible: widget.showSearch,
+                        child: SearchBox(
+                          onClickCloseButton: widget.onClickSearchCloseButton,
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return TextField(
+                                onChanged: null,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.only(
+                                    top: getPlatformSize(4.0),
+                                    bottom: getPlatformSize(4.0),
+                                  ),
+                                  border: InputBorder.none,
+                                  hintText: "ค้นหา", //_searchHintList[language.lang],
+                                ),
+                                style: getTextStyle(language.lang),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ],
                   ),
