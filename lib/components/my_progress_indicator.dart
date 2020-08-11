@@ -17,9 +17,9 @@ class MyProgressIndicator extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Color(0x22777777),
-            blurRadius: getPlatformSize(15.0),
-            spreadRadius: getPlatformSize(5.0),
+            color: Color(0x33777777),
+            blurRadius: getPlatformSize(4.0),
+            spreadRadius: getPlatformSize(1.0),
             offset: Offset(
               getPlatformSize(0.0), // move right
               getPlatformSize(0.0), // move down

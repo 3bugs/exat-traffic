@@ -11,13 +11,15 @@ class YourScaffold extends StatefulWidget {
   final List<String> titleList;
   final Widget child;
   final bool showSearch;
-  final Function onClickSearchCloseButton;
+  //final Function onClickSearchCloseButton;
+  final Function onSearchTextChanged;
 
   YourScaffold({
     @required this.titleList,
     @required this.child,
     this.showSearch = false,
-    this.onClickSearchCloseButton,
+    //this.onClickSearchCloseButton,
+    this.onSearchTextChanged,
   });
 
   @override
@@ -30,6 +32,22 @@ class _YourScaffoldState extends State<YourScaffold> {
     Constants.App.HEADER_GRADIENT_COLOR_END,
   ];
   static const List<double> BG_GRADIENT_STOPS = [0.0, 1.0];
+
+  final _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      widget.onSearchTextChanged(_textEditingController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,11 +99,17 @@ class _YourScaffoldState extends State<YourScaffold> {
                       Visibility(
                         visible: widget.showSearch,
                         child: SearchBox(
-                          onClickCloseButton: widget.onClickSearchCloseButton,
+                          onClickCloseButton: () {
+                            _textEditingController.text = "";
+                            //widget.onClickSearchCloseButton();
+                            widget.onSearchTextChanged("");
+                            FocusScope.of(context).unfocus();
+                            _textEditingController.clear();
+                          },
                           child: Consumer<LanguageModel>(
                             builder: (context, language, child) {
                               return TextField(
-                                onChanged: null,
+                                controller: _textEditingController,
                                 decoration: InputDecoration(
                                   isDense: true,
                                   contentPadding: EdgeInsets.only(

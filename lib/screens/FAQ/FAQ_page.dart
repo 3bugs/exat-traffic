@@ -89,6 +89,7 @@ class _FAQPageState extends State<FAQPage> {
                       "${_presenter.faqModel.data[index].name}",
                       style: getTextStyle(
                         0,
+                        color: Constants.App.ACCENT_COLOR,
                         isBold: true,
                       ),
                     ),

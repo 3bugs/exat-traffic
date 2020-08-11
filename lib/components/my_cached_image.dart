@@ -9,11 +9,13 @@ class MyCachedImage extends StatelessWidget {
   final String imageUrl;
   final ProgressIndicatorSize progressIndicatorSize;
   final Color errorIconColor;
+  final BoxFit boxFit;
 
   MyCachedImage({
     @required this.imageUrl,
     @required this.progressIndicatorSize,
     this.errorIconColor = Colors.redAccent,
+    this.boxFit = BoxFit.cover,
   });
 
   @override
@@ -26,7 +28,7 @@ class MyCachedImage extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: this.imageUrl,
-      fit: BoxFit.cover,
+      fit: this.boxFit,
       placeholder: (context, url) => Center(
         child: SizedBox(
           width: getPlatformSize(boxSize),

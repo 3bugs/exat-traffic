@@ -1,3 +1,4 @@
+import 'package:exattraffic/screens/search/search_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -328,7 +329,15 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
-                                          underConstruction(context);
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              transitionDuration: Duration.zero,
+                                              pageBuilder: (context, anim1, anim2) => SearchService(
+                                                context.bloc<AppBloc>().markerList,
+                                              ),
+                                            ),
+                                          );
                                           setState(() {
                                             _showSearchOptions = false;
                                           });
@@ -397,6 +406,14 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
+                                          /*Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => SearchService(
+                                                context.bloc<AppBloc>().markerList,
+                                              ),
+                                            ),
+                                          );*/
                                           underConstruction(context);
                                           setState(() {
                                             _showSearchOptions = false;

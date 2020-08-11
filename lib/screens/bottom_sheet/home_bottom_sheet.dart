@@ -260,7 +260,13 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                             index: _selectedExpressWay == null ? 0 : 1,
                           )
                         : Center(
-                            child: CircularProgressIndicator(),
+                            child: SizedBox(
+                              width: getPlatformSize(25.0),
+                              height: getPlatformSize(25.0),
+                              child: CircularProgressIndicator(
+                                strokeWidth: getPlatformSize(3.0),
+                              ),
+                            ),
                           );
                   },
                 ),
