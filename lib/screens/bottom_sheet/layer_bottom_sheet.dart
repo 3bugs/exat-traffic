@@ -1,13 +1,11 @@
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/models/marker_model.dart';
-import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/layer_item_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/screens/home/bloc/bloc.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/layer_item.dart';
@@ -16,10 +14,12 @@ class LayerBottomSheet extends StatefulWidget {
   LayerBottomSheet({
     @required this.expandPosition,
     @required this.collapsePosition,
+    this.child,
   });
 
   final double expandPosition;
   final double collapsePosition;
+  final Widget child;
 
   @override
   _LayerBottomSheetState createState() => _LayerBottomSheetState();
@@ -34,10 +34,6 @@ class _LayerBottomSheetState extends State<LayerBottomSheet> {
   }
 
   void _handleChangeSize(bool sheetExpanded) {}
-
-  void _handleSelectLayerItem(BuildContext context, LayerItemModel layerItemModel) {
-    //alert(context, 'Layer Item isChecked', layerItemModel.isChecked ? 'TRUE' : 'FALSE');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +56,7 @@ class _LayerBottomSheetState extends State<LayerBottomSheet> {
             //crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Expanded(
-                child: LayerItemList(_handleSelectLayerItem),
+                child: widget.child ?? LayerItemList(),
               ),
             ],
           ),
@@ -71,82 +67,7 @@ class _LayerBottomSheetState extends State<LayerBottomSheet> {
 }
 
 class LayerItemList extends StatefulWidget {
-  LayerItemList(this._onSelectLayerItem);
-
-  final List<LayerItemModel> _layerItemModelList = <LayerItemModel>[
-    LayerItemModel(
-      text: 'ด่านเก็บเงิน',
-      textEn: 'Toll Plaza',
-      iconOn: AssetImage('assets/images/layers/ic_layer_toll_plaza_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_toll_plaza_off.png'),
-      iconWidth: getPlatformSize(29.51),
-      iconHeight: getPlatformSize(29.51),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'กล้อง CCTV',
-      textEn: 'CCTV',
-      iconOn: AssetImage('assets/images/layers/ic_layer_cctv_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_cctv_off.png'),
-      iconWidth: getPlatformSize(36.23),
-      iconHeight: getPlatformSize(30.01),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'จุดพักรถ',
-      textEn: 'Rest Area',
-      iconOn: AssetImage('assets/images/layers/ic_layer_rest_area_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_rest_area_off.png'),
-      iconWidth: getPlatformSize(42.15),
-      iconHeight: getPlatformSize(40.25),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'สถานีตำรวจ',
-      textEn: 'Police Station',
-      iconOn: AssetImage('assets/images/layers/ic_layer_police_station_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_police_station_off.png'),
-      iconWidth: getPlatformSize(35.32),
-      iconHeight: getPlatformSize(27.64),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'จุดกลับรถ',
-      textEn: 'U-Turn',
-      iconOn: AssetImage('assets/images/layers/ic_layer_uturn_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_uturn_off.png'),
-      iconWidth: getPlatformSize(27.91),
-      iconHeight: getPlatformSize(34.59),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'Easy Pass',
-      textEn: 'Easy Pass',
-      iconOn: AssetImage('assets/images/layers/ic_layer_easy_pass_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_easy_pass_off.png'),
-      iconWidth: getPlatformSize(42.78),
-      iconHeight: getPlatformSize(37.91),
-      isChecked: false,
-      onClick: null,
-    ),
-    LayerItemModel(
-      text: 'ทางขึ้น',
-      textEn: 'In',
-      iconOn: AssetImage('assets/images/layers/ic_layer_entrance_on.png'),
-      iconOff: AssetImage('assets/images/layers/ic_layer_entrance_off.png'),
-      iconWidth: getPlatformSize(36.44),
-      iconHeight: getPlatformSize(27.11),
-      isChecked: false,
-      onClick: null,
-    ),
-  ];
-
-  final Function _onSelectLayerItem;
+  LayerItemList();
 
   @override
   _LayerItemListState createState() => _LayerItemListState();
@@ -160,9 +81,6 @@ class _LayerItemListState extends State<LayerItemList> {
         return true;
       },
       builder: (context, state) {
-
-        print('--------------------------------------- LAYER LIST BUILDER');
-
         List<CategoryModel> categoryList = state.categoryList;
         //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 

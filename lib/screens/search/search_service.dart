@@ -1,5 +1,5 @@
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/screens/search/components/search_service_view.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -7,6 +7,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/screens/search/components/search_service_view.dart';
 import 'search_service_presenter.dart';
 
 class SearchService extends StatefulWidget {
@@ -23,6 +25,7 @@ class _SearchServiceState extends State<SearchService> {
 
   SearchServicePresenter _presenter;
   String _searchText = "";
+  final _scrollController = ScrollController();
 
   void _handleClickSearchResultItem(MarkerModel marker) {
     if (marker.category.code == CategoryType.TOLL_PLAZA) {
@@ -49,11 +52,23 @@ class _SearchServiceState extends State<SearchService> {
       });
     }
 
+    if (filteredMarkerList != null) {
+      Timer(
+        Duration(milliseconds: 100),
+        () => _scrollController.animateTo(
+          0.0,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.fastOutSlowIn,
+        ),
+      );
+    }
+
     return filteredMarkerList == null
         ? DataLoading()
         : Container(
             color: Color(0x09000000),
             child: ListView.builder(
+              controller: _scrollController,
               padding: EdgeInsets.symmetric(
                 horizontal: getPlatformSize(0.0),
                 vertical: getPlatformSize(16.0),

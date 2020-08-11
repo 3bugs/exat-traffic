@@ -337,6 +337,7 @@ class ExpressWayDetails extends StatefulWidget {
 
 class _ExpressWayDetailsState extends State<ExpressWayDetails> {
   LegModel _selectedLeg;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -356,6 +357,14 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
     setState(() {
       _selectedLeg = legModel;
     });
+    Timer(
+      Duration(milliseconds: 100),
+          () => _scrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.fastOutSlowIn,
+      ),
+    );
   }
 
   @override
@@ -393,6 +402,7 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
                   Expanded(
                       child: Container(
                         child: ListView.separated(
+                          controller: _scrollController,
                           itemCount: _selectedLeg.trafficPointList.length,
                           scrollDirection: Axis.vertical,
                           physics: BouncingScrollPhysics(),
