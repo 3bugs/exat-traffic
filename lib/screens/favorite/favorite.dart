@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -6,19 +5,14 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/favorite_model.dart';
 import 'package:exattraffic/screens/favorite/components/favorite_view.dart';
 
-class Favorite extends StatelessWidget {
+class Favorite extends StatefulWidget {
+  const Favorite();
+
   @override
-  Widget build(BuildContext context) {
-    return FavoriteMain();
-  }
+  _FavoriteState createState() => _FavoriteState();
 }
 
-class FavoriteMain extends StatefulWidget {
-  @override
-  _FavoriteMainState createState() => _FavoriteMainState();
-}
-
-class _FavoriteMainState extends State<FavoriteMain> {
+class _FavoriteState extends State<Favorite> {
   List<FavoriteModel> _favoriteList = <FavoriteModel>[
     FavoriteModel(
       name: 'กระทรวงพาณิชย์',
@@ -71,6 +65,9 @@ class _FavoriteMainState extends State<FavoriteMain> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.only(
+        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+      ),
       decoration: BoxDecoration(
         color: Constants.App.BACKGROUND_COLOR,
       ),
@@ -79,7 +76,7 @@ class _FavoriteMainState extends State<FavoriteMain> {
         scrollDirection: Axis.vertical,
         physics: BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          final favorite = _favoriteList[index];
+          //final favorite = _favoriteList[index];
 
           return Dismissible(
             key: UniqueKey(),

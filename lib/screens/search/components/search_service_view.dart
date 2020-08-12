@@ -1,14 +1,13 @@
-import 'package:exattraffic/components/my_cached_image.dart';
-import 'package:exattraffic/models/category_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/components/list_item.dart';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 
 class SearchServiceView extends StatelessWidget {
   SearchServiceView({
@@ -36,9 +35,98 @@ class SearchServiceView extends StatelessWidget {
         bottom: getPlatformSize(18.0),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    String name;
+                    switch (language.lang) {
+                      case 0:
+                        name = marker.name;
+                        break;
+                      case 1:
+                        name = 'Expressway';
+                        break;
+                      case 2:
+                        name = '高速公路';
+                        break;
+                    }
+                    return Text(
+                      name,
+                      style: getTextStyle(
+                        language.lang,
+                        color: Constants.App.ACCENT_COLOR,
+                        isBold: true,
+                        heightEn: 1.6,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
+                ),
+                Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: getPlatformSize(20.0),
+                      height: getPlatformSize(20.0 * 348 / 267),
+                      child: MyCachedImage(
+                        imageUrl: marker.category.markerIconUrl,
+                        progressIndicatorSize: ProgressIndicatorSize.small,
+                        boxFit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: getPlatformSize(8.0)),
+                    Consumer<LanguageModel>(
+                      builder: (context, language, child) {
+                        String description;
+                        switch (language.lang) {
+                          case 0:
+                            description = marker.category.name;
+                            break;
+                          case 1:
+                            description = 'Expressway';
+                            break;
+                          case 2:
+                            description = '高速公路';
+                            break;
+                        }
+                        return Text(
+                          description,
+                          style: getTextStyle(
+                            language.lang,
+                            color: Constants.Font.DIM_COLOR,
+                            heightEn: 1.6,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          marker.godImageUrl != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(getPlatformSize(9.0)),
+                  ),
+                  child: SizedBox(
+                    width: getPlatformSize(75.0),
+                    height: getPlatformSize(58.0),
+                    child: MyCachedImage(
+                      imageUrl: marker.godImageUrl,
+                      progressIndicatorSize: ProgressIndicatorSize.small,
+                    ),
+                  ),
+                )
+              : SizedBox.shrink(),
+
+          /*SizedBox(
             width: getPlatformSize(25.0),
             height: getPlatformSize(25.0 * 348 / 267),
             child: MyCachedImage(
@@ -126,7 +214,7 @@ class SearchServiceView extends StatelessWidget {
                 ),
               ),
             ),
-          ),
+          ),*/
         ],
       ),
     );

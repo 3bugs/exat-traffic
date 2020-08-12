@@ -1,10 +1,5 @@
 import 'dart:async';
 
-import 'package:exattraffic/app/bloc.dart';
-import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
-import 'package:exattraffic/screens/bottom_sheet/components/layer_item.dart';
-import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
-import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -14,7 +9,11 @@ import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/screens/search/components/search_service_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/components/layer_item.dart';
+import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
+import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
+
 import 'search_service_presenter.dart';
 
 class SearchService extends StatefulWidget {
@@ -75,7 +74,7 @@ class _SearchServiceState extends State<SearchService> {
   void _scrollListToTop() {
     Timer(
       Duration(milliseconds: 200),
-          () {
+      () {
         try {
           _scrollController.animateTo(
             0.0,
@@ -135,7 +134,7 @@ class _SearchServiceState extends State<SearchService> {
                   ? Container(
                       alignment: Alignment.center,
                       padding: EdgeInsets.only(
-                        top: getPlatformSize(16.0),
+                        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
                         bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
                       ),
                       child: Text(
@@ -163,7 +162,6 @@ class _SearchServiceState extends State<SearchService> {
                         },
                       ),
                     ),
-
               LayerBottomSheet(
                 collapsePosition:
                     containerHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
@@ -197,7 +195,6 @@ class _SearchServiceState extends State<SearchService> {
                   },
                 ),
               ),
-
               TollPlazaBottomSheet(
                 key: _keyTollPlazaBottomSheet,
                 collapsePosition: containerHeight,

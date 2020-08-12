@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -56,6 +55,9 @@ class _MyNotificationMainState extends State<MyNotificationMain> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.only(
+        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+      ),
       decoration: BoxDecoration(
         color: Constants.App.BACKGROUND_COLOR,
       ),

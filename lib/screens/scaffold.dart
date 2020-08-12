@@ -1,4 +1,3 @@
-import 'package:exattraffic/screens/search/search_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -21,9 +20,7 @@ import 'package:exattraffic/components/lazy_indexed_stack.dart';
 import 'package:exattraffic/components/header.dart';
 import 'package:exattraffic/components/search_box.dart';
 import 'package:exattraffic/services/fcm.dart';
-
-//import 'package:exattraffic/components/fade_indexed_stack.dart';
-//import 'package:exattraffic/components/animated_indexed_stack.dart';
+import 'package:exattraffic/screens/search/search_service.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -58,15 +55,19 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // favorite
     id: 1,
+    showSearch: true,
     titleList: [
       'รายการโปรด',
       'Favorite',
       '喜爱',
     ],
     searchHintList: [
-      'ค้นหารายการโปรด',
+      'ค้นหา',
+      'Search',
+      '搜索',
+      /*'ค้นหารายการโปรด',
       'Search favorite',
-      '搜索收藏',
+      '搜索收藏',*/
     ],
   ),
   ScreenProps(
@@ -81,29 +82,37 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // incident
     id: 3,
+    showSearch: true,
     titleList: [
       'เหตุการณ์',
       'Incident',
       '事件',
     ],
     searchHintList: [
-      'ค้นหาเหตุการณ์',
+      'ค้นหา',
+      'Search',
+      '搜索',
+      /*'ค้นหาเหตุการณ์',
       'Search incident',
-      '搜索事件',
+      '搜索事件',*/
     ],
   ),
   ScreenProps(
     // notification
     id: 4,
+    showSearch: true,
     titleList: [
       'การแจ้งเตือน',
       'Notification',
       '通知',
     ],
     searchHintList: [
-      'ค้นหาการแจ้งเตือน',
+      'ค้นหา',
+      'Search',
+      '搜索',
+      /*'ค้นหาการแจ้งเตือน',
       'Search notification',
-      '搜索通知',
+      '搜索通知',*/
     ],
   ),
 ];
@@ -138,9 +147,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     });
 
     _fragmentList = [
-      Home(
-        onClickMap: _handleClickHomeMap,
-      ),
+      Home(),
       Favorite(),
       MyRoute(
         onUpdateBottomSheet: null,
@@ -157,7 +164,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     super.initState();
   }
 
-  void _handleClickHomeMap() {
+  void hideSearchOptions() {
     setState(() {
       _showSearchOptions = false;
     });
@@ -165,12 +172,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
   void _handleClickTab(int index) {
     setState(() {
-      _currentTabIndex = index;
-      _currentScreenProps = screenPropsList[index];
-
-      if (index != 0) {
+      if (index != _currentTabIndex) {
         _showSearchOptions = false;
       }
+      _currentTabIndex = index;
+      _currentScreenProps = screenPropsList[index];
     });
   }
 

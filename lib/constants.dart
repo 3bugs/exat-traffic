@@ -32,6 +32,7 @@ class HomeScreen {
   static const double MAPS_VERTICAL_POSITION = 38.0;
   static const double SEARCH_BOX_VERTICAL_POSITION = 13.0;
   static const double MAP_TOOL_TOP_POSITION = 42.0;
+  static const double SPACE_BEFORE_LIST = 16.0;
 }
 
 class LoginScreen {

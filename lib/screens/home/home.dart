@@ -1,21 +1,14 @@
 import 'dart:async';
 
-import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:uuid/uuid.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
-import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-
-//import 'package:exattraffic/screens/home/map_test.dart';
 import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 import 'package:exattraffic/app/app_bloc.dart';
@@ -23,57 +16,33 @@ import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
-import 'package:exattraffic/screens/marker_details/cctv_details.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 
-class Home extends StatelessWidget {
-  final Function onClickMap;
-
-  const Home({this.onClickMap});
-
-  @override
-  Widget build(BuildContext context) {
-    return HomeMain(
-      onClickMap: this.onClickMap,
-    );
-  }
-}
-
-class HomeMain extends StatefulWidget {
-  final Function onClickMap;
-
-  const HomeMain({this.onClickMap});
+class Home extends StatefulWidget {
+  const Home();
 
   @override
-  _HomeMainState createState() => _HomeMainState();
+  _HomeState createState() => _HomeState();
 }
 
-class _HomeMainState extends State<HomeMain> {
+class _HomeState extends State<Home> {
   final GlobalKey _keyMainContainer = GlobalKey();
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
 
   final Completer<GoogleMapController> _googleMapController = Completer();
-  final Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
 
   //final Uuid uuid = Uuid();
   Timer _timer;
-  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
     zoom: 8,
   );
-  static const double SEARCH_BOX_TOP_POSITION = -24.0;
-
-  List<String> _searchHintList = [
-    'ค้นหา',
-    'Search',
-    '搜索',
-  ];
 
   Future<void> _moveToCurrentPosition(BuildContext context) async {
     final Position position =
@@ -86,7 +55,7 @@ class _HomeMainState extends State<HomeMain> {
     controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
   }
 
-  void _addMarker(LatLng latLng) {
+  /*void _addMarker(LatLng latLng) {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId((new DateTime.now().millisecondsSinceEpoch).toString());
 
@@ -102,9 +71,9 @@ class _HomeMainState extends State<HomeMain> {
       // adding a new marker to map
       _markers[markerId] = marker;
     });
-  }
+  }*/
 
-  Future<void> _sendToVisualization(LatLng latLng) async {
+  /*Future<void> _sendToVisualization(LatLng latLng) async {
     Map<String, String> params = {
       'lat': latLng.latitude.toString(),
       'lng': latLng.longitude.toString(),
@@ -115,11 +84,11 @@ class _HomeMainState extends State<HomeMain> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-    /*var url = 'http://163.47.9.26/location?lat=20&lng=20';
+    *//*var url = 'http://163.47.9.26/location?lat=20&lng=20';
     var response = await http.post(url, body: {'name': 'doodle', 'color': 'blue'});
     print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');*/
-  }
+    print('Response body: ${response.body}');*//*
+  }*/
 
   @override
   void initState() {
@@ -138,7 +107,7 @@ class _HomeMainState extends State<HomeMain> {
   _afterLayout(_) {
     final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
     setState(() {
-      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      //_mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
   }
@@ -220,7 +189,7 @@ class _HomeMainState extends State<HomeMain> {
 
           MapTool selectedMapTool = state.selectedMapTool;
           List<MarkerModel> markerList = state.markerList;
-          List<CategoryModel> categoryList = state.categoryList;
+          //List<CategoryModel> categoryList = state.categoryList;
           //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 
           /*Set<Marker> markerSet = markerList.map((MarkerModel marker) {
@@ -290,9 +259,6 @@ class _HomeMainState extends State<HomeMain> {
                           _moveToCurrentPosition(context);
                         },
                         onTap: (LatLng latLng) {
-                          if (widget.onClickMap != null) {
-                            widget.onClickMap();
-                          }
                           /*_addMarker(latLng);
                               _sendToVisualization(latLng);*/
                         },

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -10,19 +9,12 @@ import 'package:exattraffic/screens/incident/components/incident_view.dart';
 
 import 'incident_presenter.dart';
 
-class Incident extends StatelessWidget {
+class Incident extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return IncidentMain();
-  }
+  _IncidentState createState() => _IncidentState();
 }
 
-class IncidentMain extends StatefulWidget {
-  @override
-  _IncidentMainState createState() => _IncidentMainState();
-}
-
-class _IncidentMainState extends State<IncidentMain> {
+class _IncidentState extends State<Incident> {
   IncidentMainPresenter _presenter;
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
@@ -45,6 +37,9 @@ class _IncidentMainState extends State<IncidentMain> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.only(
+        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+      ),
       color: Constants.App.BACKGROUND_COLOR,
       child: _presenter.incidentListModel == null
           ? DataLoading()

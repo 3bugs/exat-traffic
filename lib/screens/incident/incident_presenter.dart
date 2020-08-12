@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'incident.dart';
 import '../../services/api.dart';
 
-class IncidentMainPresenter extends BasePresenter<IncidentMain> {
+class IncidentMainPresenter extends BasePresenter<Incident> {
   var ListModel;
   IncidentListModel incidentListModel;
 
-  IncidentMainPresenter(State<IncidentMain> state) : super(state);
+  IncidentMainPresenter(State<Incident> state) : super(state);
 
   getIncidentList() async {
 //    print("getIncidentList");
