@@ -7,18 +7,20 @@ import 'package:exattraffic/components/header.dart';
 import 'package:exattraffic/components/search_box.dart';
 import 'package:exattraffic/models/language_model.dart';
 
+//https://medium.com/flutter-community/simple-ways-to-pass-to-and-share-data-with-widgets-pages-f8988534bd5b
+
 class YourScaffold extends StatefulWidget {
   final List<String> titleList;
   final Widget child;
+  final Function builder;
   final bool showSearch;
-  //final Function onClickSearchCloseButton;
   final Function onSearchTextChanged;
 
   YourScaffold({
     @required this.titleList,
-    @required this.child,
+    this.child,
+    this.builder,
     this.showSearch = false,
-    //this.onClickSearchCloseButton,
     this.onSearchTextChanged,
   });
 
@@ -33,11 +35,23 @@ class _YourScaffoldState extends State<YourScaffold> {
   ];
   static const List<double> BG_GRADIENT_STOPS = [0.0, 1.0];
 
+  final GlobalKey _keyMainContainer = GlobalKey();
   final _textEditingController = TextEditingController();
+  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+
+  _afterLayout(_) {
+    final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
+    setState(() {
+      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      _mainContainerHeight = mainContainerRenderBox.size.height;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     _textEditingController.addListener(() {
       widget.onSearchTextChanged(_textEditingController.text);
     });
@@ -55,7 +69,8 @@ class _YourScaffoldState extends State<YourScaffold> {
 
     return wrapSystemUiOverlayStyle(
       child: Scaffold(
-        appBar: null,
+        resizeToAvoidBottomInset: false,
+        appBar: null, // prevent keyboard from pushing layout up
         body: DecoratedBox(
           position: DecorationPosition.background,
           decoration: BoxDecoration(
@@ -82,6 +97,7 @@ class _YourScaffoldState extends State<YourScaffold> {
 
                 Expanded(
                   child: Stack(
+                    key: _keyMainContainer,
                     children: <Widget>[
                       // main container wrapper
                       Container(
@@ -92,7 +108,19 @@ class _YourScaffoldState extends State<YourScaffold> {
                           color: Colors.white,
                         ),
                         // main container
-                        child: widget.child,
+
+                        child: widget.builder != null
+                            ? widget.builder(
+                                context,
+                                _mainContainerHeight -
+                                    getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION),
+                              )
+                            : widget.child,
+                        //child: widget.child,
+                        /*child: InheritedDataProvider(
+                          containerHeight: _mainContainerHeight,
+                          child: widget.child,
+                        ),*/
                       ),
 
                       // ช่อง search
@@ -101,7 +129,6 @@ class _YourScaffoldState extends State<YourScaffold> {
                         child: SearchBox(
                           onClickCloseButton: () {
                             _textEditingController.text = "";
-                            //widget.onClickSearchCloseButton();
                             widget.onSearchTextChanged("");
                             FocusScope.of(context).unfocus();
                             _textEditingController.clear();
@@ -135,4 +162,20 @@ class _YourScaffoldState extends State<YourScaffold> {
       ),
     );
   }
+}
+
+class InheritedDataProvider extends InheritedWidget {
+  final double containerHeight;
+
+  InheritedDataProvider({
+    Widget child,
+    this.containerHeight,
+  }) : super(child: child);
+
+  @override
+  bool updateShouldNotify(InheritedDataProvider oldWidget) =>
+      containerHeight != oldWidget.containerHeight;
+
+  static InheritedDataProvider of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<InheritedDataProvider>();
 }

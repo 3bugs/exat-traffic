@@ -58,9 +58,9 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
   void initState() {
     super.initState();
 
-    if (widget._cctvModel.streamUrl != null) {
+    if (_isValidUrl(widget._cctvModel.streamUrl)) {
       _checkedToolItemIndex = 0;
-    } else if (widget._cctvModel.imageUrl != null) {
+    } else if (_isValidUrl(widget._cctvModel.imageUrl)) {
       _checkedToolItemIndex = 1;
     } else {
       _checkedToolItemIndex = 2;

@@ -192,6 +192,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         }
         return Scaffold(
           key: _keyDrawer,
+          resizeToAvoidBottomInset: false, // prevent keyboard from pushing layout up
           appBar: null,
           /*AppBar(
           title: Text('Home'),
@@ -334,7 +335,8 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                             PageRouteBuilder(
                                               transitionDuration: Duration.zero,
                                               pageBuilder: (context, anim1, anim2) => SearchService(
-                                                context.bloc<AppBloc>().markerList,
+                                                categoryList: context.bloc<AppBloc>().categoryList,
+                                                markerList: context.bloc<AppBloc>().markerList,
                                               ),
                                             ),
                                           );

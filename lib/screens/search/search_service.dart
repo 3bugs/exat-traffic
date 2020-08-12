@@ -1,5 +1,10 @@
 import 'dart:async';
 
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/components/layer_item.dart';
+import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
+import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -9,12 +14,17 @@ import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/screens/search/components/search_service_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'search_service_presenter.dart';
 
 class SearchService extends StatefulWidget {
+  final List<CategoryModel> categoryList;
   final List<MarkerModel> markerList;
 
-  SearchService(this.markerList);
+  SearchService({
+    @required this.categoryList,
+    @required this.markerList,
+  });
 
   @override
   _SearchServiceState createState() => _SearchServiceState();
@@ -23,14 +33,33 @@ class SearchService extends StatefulWidget {
 class _SearchServiceState extends State<SearchService> {
   List<String> _titleList = ["ค้นหาบริการ", "Search", "搜索"];
 
+  //final GlobalKey _keyMainContainer = GlobalKey();
+  //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  //double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+
+  Map<CategoryModel, bool> _categorySelectedStatusMap = Map();
+
   SearchServicePresenter _presenter;
   String _searchText = "";
   final _scrollController = ScrollController();
+  final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
+  TollPlazaModel _tollPlaza;
+
+  /*_afterLayout(_) {
+    final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
+    setState(() {
+      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      _mainContainerHeight = mainContainerRenderBox.size.height;
+    });
+  }*/
 
   void _handleClickSearchResultItem(MarkerModel marker) {
     if (marker.category.code == CategoryType.TOLL_PLAZA) {
       // bottom sheet
-      underConstruction(this.context);
+      setState(() {
+        _tollPlaza = TollPlazaModel.fromMarkerModel(marker);
+        _keyTollPlazaBottomSheet.currentState.toggleSheet();
+      });
     } else {
       marker.showDetailsScreen(this.context);
     }
@@ -40,57 +69,155 @@ class _SearchServiceState extends State<SearchService> {
     setState(() {
       _searchText = text;
     });
+    _scrollListToTop();
   }
 
-  Widget _buildRootContent() {
+  void _scrollListToTop() {
+    Timer(
+      Duration(milliseconds: 200),
+          () {
+        try {
+          _scrollController.animateTo(
+            0.0,
+            duration: Duration(milliseconds: 200),
+            curve: Curves.fastOutSlowIn,
+          );
+        } catch (_) {}
+      },
+    );
+  }
+
+  Widget _buildRootContent(double containerHeight) {
+    /*double containerHeight = InheritedDataProvider.of(context) != null
+        ? InheritedDataProvider.of(context).containerHeight
+        : 123.456;*/
+
     List<MarkerModel> filteredMarkerList = _presenter.markerList;
     if (filteredMarkerList != null) {
+      // filter by category
+      filteredMarkerList = filteredMarkerList.where((marker) {
+        return widget.categoryList
+            .where((category) =>
+                _categorySelectedStatusMap[category] && category.code == marker.category.code)
+            .toList()
+            .isNotEmpty;
+      }).toList();
+
+      // filter by search term
       List<String> searchWordList = _searchText.split(RegExp('\\s+'));
       searchWordList.forEach((word) {
-        filteredMarkerList =
-            filteredMarkerList.where((marker) => marker.name.contains(word)).toList();
+        filteredMarkerList = filteredMarkerList
+            .where((marker) => marker.name.toLowerCase().contains(word.toLowerCase()))
+            .toList();
       });
     }
 
-    if (filteredMarkerList != null) {
-      Timer(
+    if (filteredMarkerList != null && filteredMarkerList.isNotEmpty) {
+      /*Timer(
         Duration(milliseconds: 100),
-        () => _scrollController.animateTo(
-          0.0,
-          duration: Duration(milliseconds: 200),
-          curve: Curves.fastOutSlowIn,
-        ),
-      );
+        () {
+          try {
+            _scrollController.animateTo(
+              0.0,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.fastOutSlowIn,
+            );
+          } catch (_) {}
+        },
+      );*/
     }
 
     return filteredMarkerList == null
         ? DataLoading()
-        : Container(
-            color: Color(0x09000000),
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: EdgeInsets.symmetric(
-                horizontal: getPlatformSize(0.0),
-                vertical: getPlatformSize(16.0),
+        : Stack(
+            children: <Widget>[
+              filteredMarkerList.isEmpty
+                  ? Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.only(
+                        top: getPlatformSize(16.0),
+                        bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
+                      ),
+                      child: Text(
+                        "ไม่มีข้อมูล",
+                        style: getTextStyle(0),
+                      ),
+                    )
+                  : Container(
+                      color: Constants.App.BACKGROUND_COLOR,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: EdgeInsets.only(
+                          top: getPlatformSize(16.0),
+                          bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
+                        ),
+                        itemCount: filteredMarkerList.length,
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return SearchServiceView(
+                            onClick: () => _handleClickSearchResultItem(filteredMarkerList[index]),
+                            marker: filteredMarkerList[index],
+                            isFirstItem: index == 0,
+                            isLastItem: index == filteredMarkerList.length - 1,
+                          );
+                        },
+                      ),
+                    ),
+
+              LayerBottomSheet(
+                collapsePosition:
+                    containerHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                expandPosition: getPlatformSize(0.0),
+                child: ListView.separated(
+                  itemCount: widget.categoryList.length,
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    CategoryModel category = widget.categoryList[index];
+
+                    return LayerItemView(
+                      layerItem: category,
+                      isFirstItem: index == 0,
+                      isLastItem: index == widget.categoryList.length - 1,
+                      selected: _categorySelectedStatusMap[category],
+                      onClick: () {
+                        setState(() {
+                          _categorySelectedStatusMap[category] =
+                              !_categorySelectedStatusMap[category];
+                        });
+                        _scrollListToTop();
+                      },
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      width: getPlatformSize(0.0),
+                    );
+                  },
+                ),
               ),
-              itemCount: filteredMarkerList.length,
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return SearchServiceView(
-                  onClick: () => _handleClickSearchResultItem(filteredMarkerList[index]),
-                  marker: filteredMarkerList[index],
-                  isFirstItem: index == 0,
-                  isLastItem: index == filteredMarkerList.length - 1,
-                );
-              },
-            ),
+
+              TollPlazaBottomSheet(
+                key: _keyTollPlazaBottomSheet,
+                collapsePosition: containerHeight,
+                expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                tollPlazaModel: _tollPlaza,
+              )
+            ],
           );
   }
 
   @override
   void initState() {
+    //_categoryList = BlocProvider.of<AppBloc>(context).categoryList;
+    widget.categoryList.forEach((category) {
+      _categorySelectedStatusMap[category] = true;
+    });
+
     widget.markerList.sort((a, b) => a.category.code.compareTo(b.category.code));
     _presenter = SearchServicePresenter(this, widget.markerList);
+    //WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     super.initState();
   }
 
@@ -99,9 +226,10 @@ class _SearchServiceState extends State<SearchService> {
     return YourScaffold(
       titleList: _titleList,
       showSearch: true,
-      //onClickSearchCloseButton: _handleClickSearchCloseButton,
       onSearchTextChanged: _handleSearchTextChange,
-      child: _buildRootContent(),
+      builder: (BuildContext context, double containerHeight) {
+        return _buildRootContent(containerHeight);
+      },
     );
   }
 }

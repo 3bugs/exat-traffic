@@ -82,10 +82,13 @@ class _AboutPageState extends State<AboutPage> {
           width: 0.0, // hairline width
         ),
       ),
-      child: Image(
-        image: AssetImage('assets/images/login/exat_logo.png'),
-        width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-        height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+      child: AspectRatio(
+        aspectRatio: 1.6,
+        child: Image(
+          image: AssetImage('assets/images/login/exat_logo.png'),
+          width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+          height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+        ),
       ),
     );
   }

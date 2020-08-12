@@ -72,7 +72,7 @@ class _FavoriteMainState extends State<FavoriteMain> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-
+        color: Constants.App.BACKGROUND_COLOR,
       ),
       child: ListView.separated(
         itemCount: _favoriteList.length,

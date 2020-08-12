@@ -57,7 +57,7 @@ class _MyNotificationMainState extends State<MyNotificationMain> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-
+        color: Constants.App.BACKGROUND_COLOR,
       ),
       child: ListView.separated(
         itemCount: _notificationList.length,

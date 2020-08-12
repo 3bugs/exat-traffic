@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:http/http.dart';
+import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 
 import 'incident_detail_presenter.dart';
 
@@ -83,8 +83,8 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
   Widget _banner() {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: getPlatformSize(16.0),
-        horizontal: 0.0,
+        vertical: getPlatformSize(0.0),
+        horizontal: getPlatformSize(0.0),
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -93,10 +93,17 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           width: 0.0, // hairline width
         ),
       ),
-      child: Image(
+      /*child: Image(
         image: NetworkImage("${_presenter.incidentDetailModel.data.cover}"),
         width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
         height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+      ),*/
+      child: AspectRatio(
+        aspectRatio: 1.6,
+        child: MyCachedImage(
+          imageUrl: _presenter.incidentDetailModel.data.cover,
+          progressIndicatorSize: ProgressIndicatorSize.large,
+        ),
       ),
     );
   }

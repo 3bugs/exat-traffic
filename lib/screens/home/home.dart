@@ -35,7 +35,9 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeMain(onClickMap: this.onClickMap,);
+    return HomeMain(
+      onClickMap: this.onClickMap,
+    );
   }
 }
 
@@ -66,7 +68,6 @@ class _HomeMainState extends State<HomeMain> {
     zoom: 8,
   );
   static const double SEARCH_BOX_TOP_POSITION = -24.0;
-  static const double MAP_TOOL_TOP_POSITION = 42.0;
 
   List<String> _searchHintList = [
     'ค้นหา',
@@ -304,7 +305,7 @@ class _HomeMainState extends State<HomeMain> {
                 // Map tools
                 Container(
                   padding: EdgeInsets.only(
-                    top: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                    top: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                     left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                     right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                   ),
@@ -384,13 +385,13 @@ class _HomeMainState extends State<HomeMain> {
                       HomeBottomSheet(
                         collapsePosition: _mainContainerHeight -
                             getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
-                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                       ),
                       LayerBottomSheet(
                         collapsePosition: _mainContainerHeight -
                             getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
                         // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                       ),
                     ],
                   ),
@@ -412,7 +413,7 @@ class _HomeMainState extends State<HomeMain> {
                       return TollPlazaBottomSheet(
                         key: _keyTollPlazaBottomSheet,
                         collapsePosition: _mainContainerHeight,
-                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                         tollPlazaModel: tollPlaza,
                       );
                     },

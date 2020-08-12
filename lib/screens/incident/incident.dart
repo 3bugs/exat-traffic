@@ -45,7 +45,7 @@ class _IncidentMainState extends State<IncidentMain> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(),
+      color: Constants.App.BACKGROUND_COLOR,
       child: _presenter.incidentListModel == null
           ? DataLoading()
           : SmartRefresher(

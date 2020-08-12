@@ -7,6 +7,7 @@ class App {
   static const Color ACCENT_COLOR = Color(0xFF446E9D);
   static const Color HEADER_GRADIENT_COLOR_START = Color(0xFF5574F7);
   static const Color HEADER_GRADIENT_COLOR_END = Color(0xFF60C3FF);
+  static const Color BACKGROUND_COLOR = Color(0x04000000);
   static const double HORIZONTAL_MARGIN = 24.0;
   static const double BOX_BORDER_RADIUS = 12.0;
 }
@@ -30,6 +31,7 @@ class BottomSheet {
 class HomeScreen {
   static const double MAPS_VERTICAL_POSITION = 38.0;
   static const double SEARCH_BOX_VERTICAL_POSITION = 13.0;
+  static const double MAP_TOOL_TOP_POSITION = 42.0;
 }
 
 class LoginScreen {
