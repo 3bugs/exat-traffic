@@ -88,119 +88,125 @@ class _MyNavBarState extends State<MyNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: getPlatformSize(Constants.NavBar.HEIGHT),
-      child: Stack(
-        overflow: Overflow.visible,
-        children: <Widget>[
-          SizedBox(
-            height: getPlatformSize(Constants.NavBar.HEIGHT),
-            child: BottomNavigationBar(
-              currentIndex: _currentTabIndex,
-              onTap: _handlePressTab,
-              type: BottomNavigationBarType.fixed,
-              elevation: getPlatformSize(50.0),
-              backgroundColor: Colors.white,
-              items: [
-                _getNavBarItem(
-                  icon: _currentTabIndex == 0
-                      ? AssetImage('assets/images/nav_bar/ic_nav_home_on.png')
-                      : AssetImage('assets/images/nav_bar/ic_nav_home_off.png'),
-                  iconWidth: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(25.5)),
-                  iconHeight: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(21.0)),
-                  labelList: homeLabelList,
-                ),
-                _getNavBarItem(
-                  icon: _currentTabIndex == 1
-                      ? AssetImage('assets/images/nav_bar/ic_nav_favorite_on.png')
-                      : AssetImage('assets/images/nav_bar/ic_nav_favorite_off.png'),
-                  iconWidth: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(22.0)),
-                  iconHeight: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(21.0)),
-                  labelList: favoriteLabelList,
-                ),
-                BottomNavigationBarItem(
-                  icon: Opacity(
-                    opacity: 0.0,
-                    child: Icon(Icons.home),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: 0.0, //MediaQuery.of(context).padding.bottom,
+      ),
+      child: SizedBox(
+        height: getPlatformSize(Constants.NavBar.HEIGHT),
+        child: Stack(
+          overflow: Overflow.visible,
+          children: <Widget>[
+            SizedBox(
+              height: getPlatformSize(Constants.NavBar.HEIGHT),
+              child: BottomNavigationBar(
+                currentIndex: _currentTabIndex,
+                onTap: _handlePressTab,
+                type: BottomNavigationBarType.fixed,
+                elevation: getPlatformSize(50.0),
+                backgroundColor: Colors.white,
+                items: [
+                  _getNavBarItem(
+                    icon: _currentTabIndex == 0
+                        ? AssetImage('assets/images/nav_bar/ic_nav_home_on.png')
+                        : AssetImage('assets/images/nav_bar/ic_nav_home_off.png'),
+                    iconWidth: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(25.5)),
+                    iconHeight: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(21.0)),
+                    labelList: homeLabelList,
                   ),
-                  title: Text(''),
-                ),
-                _getNavBarItem(
-                  icon: _currentTabIndex == 3
-                      ? AssetImage('assets/images/nav_bar/ic_nav_incident_on.png')
-                      : AssetImage('assets/images/nav_bar/ic_nav_incident_off.png'),
-                  iconWidth: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(17.0)),
-                  iconHeight: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(21.0)),
-                  labelList: incidentLabelList,
-                ),
-                _getNavBarItem(
-                  icon: _currentTabIndex == 4
-                      ? AssetImage('assets/images/nav_bar/ic_nav_notification_on.png')
-                      : AssetImage('assets/images/nav_bar/ic_nav_notification_off.png'),
-                  iconWidth: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
-                  iconHeight: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
-                  labelList: notificationLabelList,
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: getPlatformSize(Constants.NavBar.HEIGHT) -
-                getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
-            left: (MediaQuery.of(context).size.width -
-                    getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE)) /
-                2,
-            child: Container(
-              width: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
-              height: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: FractionalOffset.topCenter,
-                  end: FractionalOffset.bottomCenter,
-                  colors: _bgNavCenterItemColors,
-                  stops: _bgNavCenterItemStops,
-                ),
-                //color: Colors.pinkAccent.shade100,
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE / 2)),
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
-                  height: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x50000000),
-                        blurRadius: getPlatformSize(5.0),
-                        spreadRadius: getPlatformSize(1.0),
-                        offset: Offset(
-                          getPlatformSize(0.0),
-                          getPlatformSize(4.0),
-                        ),
-                      )
-                    ],
-                    color: Constants.App.PRIMARY_COLOR,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2)),
+                  _getNavBarItem(
+                    icon: _currentTabIndex == 1
+                        ? AssetImage('assets/images/nav_bar/ic_nav_favorite_on.png')
+                        : AssetImage('assets/images/nav_bar/ic_nav_favorite_off.png'),
+                    iconWidth: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(22.0)),
+                    iconHeight: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(21.0)),
+                    labelList: favoriteLabelList,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Opacity(
+                      opacity: 0.0,
+                      child: Icon(Icons.home),
                     ),
+                    title: Text(''),
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        _handlePressTab(2);
-                      },
-                      //highlightColor: Constants.App.PRIMARY_COLOR,
-                      borderRadius: BorderRadius.all(Radius.circular(
-                          getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),
-                      child: Center(
-                        child: Image(
-                          image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),
-                          width: getPlatformSize(26.0),
-                          height: getPlatformSize(26.0),
+                  _getNavBarItem(
+                    icon: _currentTabIndex == 3
+                        ? AssetImage('assets/images/nav_bar/ic_nav_incident_on.png')
+                        : AssetImage('assets/images/nav_bar/ic_nav_incident_off.png'),
+                    iconWidth: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(17.0)),
+                    iconHeight: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(21.0)),
+                    labelList: incidentLabelList,
+                  ),
+                  _getNavBarItem(
+                    icon: _currentTabIndex == 4
+                        ? AssetImage('assets/images/nav_bar/ic_nav_notification_on.png')
+                        : AssetImage('assets/images/nav_bar/ic_nav_notification_off.png'),
+                    iconWidth: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
+                    iconHeight: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
+                    labelList: notificationLabelList,
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: getPlatformSize(Constants.NavBar.HEIGHT) -
+                  getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+              left: (MediaQuery.of(context).size.width -
+                      getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE)) /
+                  2,
+              child: Container(
+                width: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+                height: getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: FractionalOffset.topCenter,
+                    end: FractionalOffset.bottomCenter,
+                    colors: _bgNavCenterItemColors,
+                    stops: _bgNavCenterItemStops,
+                  ),
+                  //color: Colors.pinkAccent.shade100,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(getPlatformSize(Constants.NavBar.CENTER_ITEM_OUTER_SIZE / 2)),
+                  ),
+                ),
+                child: Center(
+                  child: Container(
+                    width: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
+                    height: getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x50000000),
+                          blurRadius: getPlatformSize(5.0),
+                          spreadRadius: getPlatformSize(1.0),
+                          offset: Offset(
+                            getPlatformSize(0.0),
+                            getPlatformSize(4.0),
+                          ),
+                        )
+                      ],
+                      color: Constants.App.PRIMARY_COLOR,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(
+                            getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE / 2)),
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          _handlePressTab(2);
+                        },
+                        //highlightColor: Constants.App.PRIMARY_COLOR,
+                        borderRadius: BorderRadius.all(Radius.circular(
+                            getPlatformSize(Constants.NavBar.CENTER_ITEM_INNER_SIZE) / 2)),
+                        child: Center(
+                          child: Image(
+                            image: AssetImage('assets/images/nav_bar/ic_nav_marker.png'),
+                            width: getPlatformSize(26.0),
+                            height: getPlatformSize(26.0),
+                          ),
                         ),
                       ),
                     ),
@@ -208,8 +214,8 @@ class _MyNavBarState extends State<MyNavBar> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

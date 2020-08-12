@@ -514,6 +514,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                 ),
                 child: Container(
+                  height: getPlatformSize(112.0),
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -539,12 +540,13 @@ class _MyRouteMainState extends State<MyRouteMain> {
                       right: getPlatformSize(19.0),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(
                           width: getPlatformSize(19.5),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               /*Container(
@@ -577,7 +579,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                               ),
                               Container(
                                 width: 0.0,
-                                height: getPlatformSize(30.0),
+                                height: getPlatformSize(26.0),
                                 margin: EdgeInsets.symmetric(
                                   horizontal: getPlatformSize(0.0),
                                   vertical: getPlatformSize(5.0),
@@ -605,6 +607,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                         ),
                         Expanded(
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               // ข้อความ Pickup Location
