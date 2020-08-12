@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:exattraffic/screens/route/bloc/bloc.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -56,17 +59,16 @@ class _MyRouteMainState extends State<MyRouteMain> {
   );
   static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 20; // km per hour
 
-  double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  //double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
-  BitmapDescriptor _originMarkerIcon, _originMarkerIconLarge;
-  BitmapDescriptor _destinationMarkerIcon, _destinationMarkerIconLarge;
-  BitmapDescriptor _tollPlazaMarkerIcon;
-  BitmapDescriptor _carMarkerIcon;
+  Uint8List _originMarkerIcon, _originMarkerIconLarge;
+  Uint8List _destinationMarkerIcon, _destinationMarkerIconLarge;
+  Uint8List _carMarkerIcon;
 
   Timer _locationTimer;
   bool _myLocationEnabled = false;
-  LatLng _mapTarget;
+  //LatLng _mapTarget;
   double _mapZoomLevel;
 
   void _handleClickMyLocation(BuildContext context) {
@@ -86,7 +88,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   }
 
   void _handleCameraMove(CameraPosition cameraPosition) {
-    _mapTarget = cameraPosition.target;
+    //_mapTarget = cameraPosition.target;
     _mapZoomLevel = cameraPosition.zoom;
   }
 
@@ -113,7 +115,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return Marker(
       markerId: markerId,
       position: LatLng(gateIn.latitude, gateIn.longitude),
-      icon: gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon,
+      icon:
+          BitmapDescriptor.fromBytes(gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon),
       alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
@@ -134,7 +137,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return Marker(
       markerId: markerId,
       position: LatLng(costToll.latitude, costToll.longitude),
-      icon: costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon,
+      icon: BitmapDescriptor.fromBytes(
+          costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon),
       alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
@@ -185,14 +189,35 @@ class _MyRouteMainState extends State<MyRouteMain> {
     return Marker(
       markerId: markerId,
       position: LatLng(currentLocation.latitude, currentLocation.longitude),
-      icon: _carMarkerIcon,
+      icon: BitmapDescriptor.fromBytes(_carMarkerIcon),
       rotation: currentLocation.heading,
       anchor: const Offset(0.5, 0.5),
     );
   }
 
   void _setupCustomMarker() async {
-    _originMarkerIcon = await BitmapDescriptor.fromAssetImage(
+    _originMarkerIcon = await getBytesFromAsset(
+      'assets/images/route/ic_marker_origin-xxhdpi.png',
+      getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_SMALL).round(),
+    );
+    _originMarkerIconLarge = await getBytesFromAsset(
+      'assets/images/route/ic_marker_origin-xxhdpi.png',
+      getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_LARGE).round(),
+    );
+    _destinationMarkerIcon = await getBytesFromAsset(
+      'assets/images/route/ic_marker_destination-xxhdpi.png',
+      getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_SMALL).round(),
+    );
+    _destinationMarkerIconLarge = await getBytesFromAsset(
+      'assets/images/route/ic_marker_destination-xxhdpi.png',
+      getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_LARGE).round(),
+    );
+    _carMarkerIcon = await getBytesFromAsset(
+      'assets/images/map_markers/ic_marker_car-w60.png',
+      getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_CAR).round(),
+    );
+
+    /*_originMarkerIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
       'assets/images/route/ic_marker_origin-xhdpi.png',
     );
@@ -217,7 +242,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
     _carMarkerIcon = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 2.5),
       'assets/images/map_markers/ic_marker_car-w60.png',
-    );
+    );*/
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
   }
 
   void _selectGateInMarker(BuildContext context, GateInModel selectedGateIn) {
@@ -304,7 +336,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
   _afterLayout(_) {
     final RenderBox mainContainerRenderBox = _keyGoogleMaps.currentContext.findRenderObject();
     setState(() {
-      _googleMapsTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      //_googleMapsTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _googleMapsHeight = mainContainerRenderBox.size.height;
     });
   }

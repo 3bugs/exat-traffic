@@ -47,6 +47,9 @@ class CctvPlayerScreen {
 
 class RouteScreen {
   static const double INITIAL_MARKER_OPACITY = 0.5;
+  static const double MARKER_ICON_WIDTH_SMALL = 56.0;
+  static const double MARKER_ICON_WIDTH_LARGE = 78.0;
+  static const double MARKER_ICON_WIDTH_CAR = 70.0;
 }
 
 class Font {
