@@ -88,11 +88,11 @@ class _MyNavBarState extends State<MyNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+    return SafeArea(
+      /*color: Colors.white,
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom,
-      ),
+        bottom: 0.0, //MediaQuery.of(context).padding.bottom,
+      ),*/
       child: SizedBox(
         height: getPlatformSize(Constants.NavBar.HEIGHT),
         child: Stack(
