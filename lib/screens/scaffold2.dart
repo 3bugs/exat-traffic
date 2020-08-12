@@ -17,18 +17,19 @@ class YourScaffold extends StatefulWidget {
   final Function onSearchTextChanged;
 
   YourScaffold({
+    Key key,
     @required this.titleList,
     this.child,
     this.builder,
     this.showSearch = false,
     this.onSearchTextChanged,
-  });
+  }) : super(key: key);
 
   @override
-  _YourScaffoldState createState() => _YourScaffoldState();
+  YourScaffoldState createState() => YourScaffoldState();
 }
 
-class _YourScaffoldState extends State<YourScaffold> {
+class YourScaffoldState extends State<YourScaffold> {
   static const List<Color> BG_GRADIENT_COLORS = [
     Constants.App.HEADER_GRADIENT_COLOR_START,
     Constants.App.HEADER_GRADIENT_COLOR_END,
@@ -37,13 +38,13 @@ class _YourScaffoldState extends State<YourScaffold> {
 
   final GlobalKey _keyMainContainer = GlobalKey();
   final _textEditingController = TextEditingController();
-  double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
+  //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
   _afterLayout(_) {
     final RenderBox mainContainerRenderBox = _keyMainContainer.currentContext.findRenderObject();
     setState(() {
-      _mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
+      //_mainContainerTop = mainContainerRenderBox.localToGlobal(Offset.zero).dy;
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
   }
@@ -61,6 +62,10 @@ class _YourScaffoldState extends State<YourScaffold> {
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
+  }
+
+  void hideKeyboard() {
+    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -128,10 +133,9 @@ class _YourScaffoldState extends State<YourScaffold> {
                         visible: widget.showSearch,
                         child: SearchBox(
                           onClickCloseButton: () {
-                            _textEditingController.text = "";
                             widget.onSearchTextChanged("");
-                            FocusScope.of(context).unfocus();
                             _textEditingController.clear();
+                            FocusScope.of(context).unfocus();
                           },
                           child: Consumer<LanguageModel>(
                             builder: (context, language, child) {

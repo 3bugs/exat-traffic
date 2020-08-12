@@ -42,6 +42,7 @@ class _SearchServiceState extends State<SearchService> {
   String _searchText = "";
   final _scrollController = ScrollController();
   final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
+  final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
   TollPlazaModel _tollPlaza;
 
   /*_afterLayout(_) {
@@ -62,6 +63,8 @@ class _SearchServiceState extends State<SearchService> {
     } else {
       marker.showDetailsScreen(this.context);
     }
+
+    _keyScaffold.currentState.hideKeyboard();
   }
 
   void _handleSearchTextChange(String text) {
@@ -221,6 +224,7 @@ class _SearchServiceState extends State<SearchService> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
+      key: _keyScaffold,
       titleList: _titleList,
       showSearch: true,
       onSearchTextChanged: _handleSearchTextChange,
