@@ -38,6 +38,7 @@ class YourScaffoldState extends State<YourScaffold> {
 
   final GlobalKey _keyMainContainer = GlobalKey();
   final _textEditingController = TextEditingController();
+
   //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
@@ -74,8 +75,11 @@ class YourScaffoldState extends State<YourScaffold> {
 
     return wrapSystemUiOverlayStyle(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: null, // prevent keyboard from pushing layout up
+        resizeToAvoidBottomInset: false, // prevent keyboard from pushing layout up
+        appBar: null,
+        bottomNavigationBar: SafeArea(
+          child: SizedBox.shrink(),
+        ),
         body: DecoratedBox(
           position: DecorationPosition.background,
           decoration: BoxDecoration(

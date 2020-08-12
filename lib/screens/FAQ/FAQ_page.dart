@@ -43,6 +43,7 @@ class _FAQPageState extends State<FAQPage> {
                   horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                   vertical: getPlatformSize(16.0),
                 ),
+                physics: BouncingScrollPhysics(),
                 itemCount: _presenter.faqModel.data.length,
                 itemBuilder: (context, index) {
                   open.add(false);
@@ -75,7 +76,7 @@ class _FAQPageState extends State<FAQPage> {
             left: getPlatformSize(16.0),
           ),
           color: open[index] ? Colors.white : Colors.white,
-//                height: 200,
+//          height: 200,
           width: double.infinity,
           child: Column(
             children: <Widget>[

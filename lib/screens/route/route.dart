@@ -515,7 +515,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                 ),
                 child: Container(
-                  height: getPlatformSize(Platform.isAndroid ? 115.0 : 120.0),
+                  height: getPlatformSize(Platform.isAndroid ? 115.0 : 118.0),
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
