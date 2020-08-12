@@ -68,6 +68,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
   Timer _locationTimer;
   bool _myLocationEnabled = false;
+
   //LatLng _mapTarget;
   double _mapZoomLevel;
 
@@ -617,8 +618,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                   style: getTextStyle(
                                     1,
                                     color: Color(0xFFB2B2B2),
-                                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                    sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
+                                    sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
                                   ),
                                 ),
                               ),
@@ -698,6 +699,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                             return Container(
                                               padding: EdgeInsets.only(
                                                 left: getPlatformSize(6.0),
+                                                top: getPlatformSize(4.0),
+                                                bottom: getPlatformSize(4.0),
                                               ),
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -707,8 +710,10 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                                     style: getTextStyle(
                                                       language.lang,
                                                       color: Color(0xFFB2B2B2),
-                                                      sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                                      sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                                      sizeTh: getPlatformSize(
+                                                          Constants.Font.SMALLER_SIZE_TH),
+                                                      sizeEn: getPlatformSize(
+                                                          Constants.Font.SMALLER_SIZE_EN),
                                                     ),
                                                   ),
                                                   Text(
@@ -757,8 +762,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                   style: getTextStyle(
                                     1,
                                     color: Color(0xFFB2B2B2),
-                                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                    sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
+                                    sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
                                   ),
                                 ),
                               ),
@@ -837,6 +842,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                           return Container(
                                             padding: EdgeInsets.only(
                                               left: getPlatformSize(6.0),
+                                              top: getPlatformSize(4.0),
+                                              bottom: getPlatformSize(4.0),
                                             ),
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -846,8 +853,10 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                                   style: getTextStyle(
                                                     language.lang,
                                                     color: Color(0xFFB2B2B2),
-                                                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                                    sizeTh: getPlatformSize(
+                                                        Constants.Font.SMALLER_SIZE_TH),
+                                                    sizeEn: getPlatformSize(
+                                                        Constants.Font.SMALLER_SIZE_EN),
                                                   ),
                                                 ),
                                                 Text(
