@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -514,7 +515,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                 ),
                 child: Container(
-                  height: getPlatformSize(112.0),
+                  height: getPlatformSize(Platform.isAndroid ? 115.0 : 120.0),
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
