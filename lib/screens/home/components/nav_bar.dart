@@ -88,9 +88,10 @@ class _MyNavBarState extends State<MyNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: Colors.white,
       padding: EdgeInsets.only(
-        bottom: 0.0, //MediaQuery.of(context).padding.bottom,
+        bottom: MediaQuery.of(context).padding.bottom,
       ),
       child: SizedBox(
         height: getPlatformSize(Constants.NavBar.HEIGHT),
@@ -103,7 +104,7 @@ class _MyNavBarState extends State<MyNavBar> {
                 currentIndex: _currentTabIndex,
                 onTap: _handlePressTab,
                 type: BottomNavigationBarType.fixed,
-                elevation: getPlatformSize(50.0),
+                elevation: getPlatformSize(0.0),
                 backgroundColor: Colors.white,
                 items: [
                   _getNavBarItem(

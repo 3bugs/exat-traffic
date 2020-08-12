@@ -506,7 +506,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
             // ช่องเลือกทางเข้า/ทางออก
             Positioned(
-              top: getPlatformSize(-32.0),
+              top: getPlatformSize(-28.0),
               width: MediaQuery.of(context).size.width,
               child: Container(
                 padding: EdgeInsets.only(
