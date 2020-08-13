@@ -1,25 +1,38 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:package_info/package_info.dart';
 
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/api.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
+  static String appName, packageName, version, buildNumber;
+
   List<MarkerModel> _markerList;
   List<CategoryModel> _categoryList;
   Map<int, BitmapDescriptor> _markerIconMap = Map();
 
   AppBloc() : super(FetchMarkerInitial()) {
+    _getPackageInfo();
     _loadMarkerIcons();
   }
 
   List<MarkerModel> get markerList => _markerList;
 
   List<CategoryModel> get categoryList => _categoryList;
+
+  void _getPackageInfo() {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      appName = packageInfo.appName;
+      packageName = packageInfo.packageName;
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+    });
+  }
 
   void _loadMarkerIcons() {
     String basedPath = "assets/images/map_markers";

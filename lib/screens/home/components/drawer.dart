@@ -1,9 +1,11 @@
+import 'package:exattraffic/app/app_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
+
 //import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
@@ -117,138 +119,163 @@ class MyDrawer extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color(0xFF2D4F80),
       ),
-      child: ListView(
-        // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            //height: mainContainerTop,
-            padding: EdgeInsets.only(
-              left: getPlatformSize(MARGIN_LEFT),
-              right: getPlatformSize(16.0),
-              top: getPlatformSize(25.0),
-              bottom: getPlatformSize(25.0),
-            ),
-            decoration: BoxDecoration(
-              color: Color(0xFF01345F),
-            ),
-            child: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(getPlatformSize(12.0)),
-                        ),
-                        child: Image(
-                          image: AssetImage('assets/images/drawer/ic_launcher.png'),
-                          width: getPlatformSize(64.0),
-                          height: getPlatformSize(64.0),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          hoverColor: Color(0xFF2D4F80),
-                          splashColor: Color(0xFF2D4F80),
-                          highlightColor: Color(0xFF2D4F80),
-                          focusColor: Color(0xFF2D4F80),
-                          onTap: () => Navigator.pop(context),
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          child: Container(
-                            width: getPlatformSize(40.0),
-                            height: getPlatformSize(40.0),
-                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                            child: Center(
+          Expanded(
+            child: ListView(
+              // Important: Remove any padding from the ListView.
+              padding: EdgeInsets.zero,
+              physics: BouncingScrollPhysics(),
+              children: <Widget>[
+                Container(
+                  //height: mainContainerTop,
+                  padding: EdgeInsets.only(
+                    left: getPlatformSize(MARGIN_LEFT),
+                    right: getPlatformSize(16.0),
+                    top: getPlatformSize(25.0),
+                    bottom: getPlatformSize(25.0),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF01345F),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(getPlatformSize(12.0)),
+                              ),
                               child: Image(
-                                image: AssetImage('assets/images/drawer/ic_close_drawer.png'),
-                                width: getPlatformSize(18.19),
-                                height: getPlatformSize(18.19),
-                                fit: BoxFit.contain,
+                                image: AssetImage('assets/images/drawer/ic_launcher.png'),
+                                width: getPlatformSize(64.0),
+                                height: getPlatformSize(64.0),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                hoverColor: Color(0xFF2D4F80),
+                                splashColor: Color(0xFF2D4F80),
+                                highlightColor: Color(0xFF2D4F80),
+                                focusColor: Color(0xFF2D4F80),
+                                onTap: () => Navigator.pop(context),
+                                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                child: Container(
+                                  width: getPlatformSize(40.0),
+                                  height: getPlatformSize(40.0),
+                                  //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                  child: Center(
+                                    child: Image(
+                                      image: AssetImage('assets/images/drawer/ic_close_drawer.png'),
+                                      width: getPlatformSize(18.19),
+                                      height: getPlatformSize(18.19),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: getPlatformSize(15.0),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'EXAT Traffic',
+                              //'Promlert Lovichit',
+                              style: getTextStyle(
+                                1,
+                                sizeEn: Constants.Font.BIGGEST_SIZE_EN,
+                                color: Colors.white,
+                              ),
+                            ),
+                            /*Image(
+                              image: AssetImage('assets/images/drawer/ic_logout.png'),
+                              width: getPlatformSize(14.19),
+                              height: getPlatformSize(14.51),
+                              fit: BoxFit.contain,
+                            ),*/
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(
-                    height: getPlatformSize(15.0),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+                SizedBox(
+                  height: getPlatformSize(8.0),
+                  child: Row(
                     children: <Widget>[
-                      Text(
-                        'EXAT Traffic',
-                        //'Promlert Lovichit',
-                        style: getTextStyle(
-                          1,
-                          sizeEn: Constants.Font.BIGGEST_SIZE_EN,
-                          color: Colors.white,
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Color(0xFF665EFF),
                         ),
                       ),
-                      /*Image(
-                        image: AssetImage('assets/images/drawer/ic_logout.png'),
-                        width: getPlatformSize(14.19),
-                        height: getPlatformSize(14.51),
-                        fit: BoxFit.contain,
-                      ),*/
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Color(0xFF5773FF),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Color(0xFF3497FD),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Color(0xFF3ACCE1),
+                        ),
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: getPlatformSize(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Color(0xFF665EFF),
-                  ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Color(0xFF5773FF),
-                  ),
+                SizedBox(
+                  height: getPlatformSize(14.0),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Color(0xFF3497FD),
+                for (var drawerItem in _drawerItemList)
+                  DrawerItemView(
+                    drawerItemModel: drawerItem,
+                    isFirstItem: false,
+                    isLastItem: false,
+                    paddingLeft: MARGIN_LEFT,
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Color(0xFF3ACCE1),
-                  ),
+                SizedBox(
+                  height: getPlatformSize(14.0),
                 ),
               ],
             ),
           ),
-          SizedBox(
-            height: getPlatformSize(14.0),
-          ),
-          for (var drawerItem in _drawerItemList)
-            DrawerItemView(
-              drawerItemModel: drawerItem,
-              isFirstItem: false,
-              isLastItem: false,
-              paddingLeft: MARGIN_LEFT,
+          Container(
+            padding: EdgeInsets.only(
+              left: getPlatformSize(MARGIN_LEFT),
+              top: getPlatformSize(12.0),
+              bottom: getPlatformSize(12.0),
             ),
-          SizedBox(
-            height: getPlatformSize(14.0),
+            child: Text(
+              "v${AppBloc.version}",
+              style: getTextStyle(
+                0,
+                sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                color: Colors.white.withOpacity(0.7),
+                isBold: true,
+              ),
+            ),
           ),
         ],
       ),

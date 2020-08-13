@@ -21,11 +21,15 @@ import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 
 class Home extends StatefulWidget {
-  const Home();
+  final Function hideSearchOptions;
+
+  const Home(this.hideSearchOptions);
 
   @override
   _HomeState createState() => _HomeState();
 }
+
+//enum MapTool {schematicMaps, aroundMe, dataLayer, currentLocation}
 
 class _HomeState extends State<Home> {
   final GlobalKey _keyMainContainer = GlobalKey();
@@ -144,17 +148,41 @@ class _HomeState extends State<Home> {
               snippet: marker.category.name,
             )
           : InfoWindow.noText,
-      onTap: () {
-        // ใส่ delay เพื่อรอให้ marker pan ไปอยู่กลาง map
-        Future.delayed(Duration(milliseconds: 600), () {
-          _handleClickMarker(context, marker);
-        });
-      },
+      onTap: () => _handleClickMarker(context, marker),
     );
   }
 
   void _handleClickMarker(BuildContext context, MarkerModel marker) {
-    marker.showDetailsScreen(context);
+    widget.hideSearchOptions();
+
+    // ใส่ delay เพื่อรอให้ marker pan ไปอยู่กลาง map
+    Future.delayed(Duration(milliseconds: 500), () {
+      marker.showDetailsScreen(context);
+    });
+  }
+
+  void _handleClickMapTool(BuildContext context, MapTool mapTool) {
+    widget.hideSearchOptions();
+
+    switch (mapTool) {
+      case MapTool.schematicMaps:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SchematicMaps()),
+        );
+        break;
+      case MapTool.aroundMe:
+        context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
+        break;
+      case MapTool.layer:
+        context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
+        break;
+      case MapTool.currentLocation:
+        _moveToCurrentPosition(context);
+        break;
+      case MapTool.none:
+        break;
+    }
   }
 
   @override
@@ -259,6 +287,7 @@ class _HomeState extends State<Home> {
                           _moveToCurrentPosition(context);
                         },
                         onTap: (LatLng latLng) {
+                          widget.hideSearchOptions();
                           /*_addMarker(latLng);
                               _sendToVisualization(latLng);*/
                         },
@@ -286,12 +315,7 @@ class _HomeState extends State<Home> {
                           marginTop: getPlatformSize(0.0),
                           isChecked: false,
                           showProgress: false,
-                          onClick: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SchematicMaps()),
-                            );
-                          },
+                          onClick: () => _handleClickMapTool(context, MapTool.schematicMaps),
                         ),
 
                         // around me
@@ -302,14 +326,7 @@ class _HomeState extends State<Home> {
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.aroundMe,
                           showProgress: state.showProgress,
-                          onClick: () {
-                            context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
-
-                            /*Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => MapTest()),
-                                );*/
-                          },
+                          onClick: () => _handleClickMapTool(context, MapTool.aroundMe),
                         ),
 
                         // layer
@@ -320,9 +337,7 @@ class _HomeState extends State<Home> {
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.layer,
                           showProgress: false,
-                          onClick: () {
-                            context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
-                          },
+                          onClick: () => _handleClickMapTool(context, MapTool.layer),
                         ),
 
                         // current location
@@ -333,9 +348,7 @@ class _HomeState extends State<Home> {
                           marginTop: getPlatformSize(10.0),
                           isChecked: false,
                           showProgress: false,
-                          onClick: () {
-                            _moveToCurrentPosition(context);
-                          },
+                          onClick: () => _handleClickMapTool(context, MapTool.currentLocation),
                         ),
                       ],
                     ),

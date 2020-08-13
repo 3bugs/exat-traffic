@@ -5,7 +5,7 @@ import 'package:exattraffic/screens/home/home.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
-enum MapTool { none, layer, aroundMe }
+enum MapTool { none, layer, aroundMe, schematicMaps, currentLocation }
 
 abstract class HomeState extends Equatable {
   final MapTool selectedMapTool;
