@@ -141,7 +141,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
           padding: EdgeInsets.only(
             left: getPlatformSize(0.0),
             right: getPlatformSize(0.0),
-            top: getPlatformSize(8.0),
+            top: getPlatformSize(10.0),
             bottom: getPlatformSize(0.0),
           ),
           child: Column(
@@ -240,6 +240,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                   ),
                 ],
               ),
+              SizedBox(height: getPlatformSize(4.0)),
               Expanded(
                 child: FutureBuilder(
                   future: _futureExpressWayList,
@@ -359,7 +360,7 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
     });
     Timer(
       Duration(milliseconds: 100),
-          () => _scrollController.animateTo(
+      () => _scrollController.animateTo(
         0.0,
         duration: Duration(milliseconds: 200),
         curve: Curves.fastOutSlowIn,

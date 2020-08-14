@@ -119,7 +119,8 @@ class TrafficPointView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          trafficPoint.cctvMarkerModel.godImageUrl != null
+                          (trafficPoint.cctvMarkerModel.streamMobile != null) ||
+                                  (trafficPoint.cctvMarkerModel.godImageUrl != null)
                               ? ClipRRect(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(getPlatformSize(9.0)),
@@ -127,10 +128,7 @@ class TrafficPointView extends StatelessWidget {
                                   child: SizedBox(
                                     width: getPlatformSize(100.0),
                                     height: getPlatformSize(65.0),
-                                    child: MyCachedImage(
-                                      imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
-                                      progressIndicatorSize: ProgressIndicatorSize.small,
-                                    ),
+                                    child: _getThumbImage(),
                                   ),
                                 )
                               : SizedBox(
@@ -159,5 +157,42 @@ class TrafficPointView extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _getThumbImage() {
+    if (trafficPoint.cctvMarkerModel.streamMobile != null) {
+      return Stack(
+        children: <Widget>[
+          SizedBox(
+            width: getPlatformSize(100.0),
+            height: getPlatformSize(65.0),
+            child: false/*trafficPoint.cctvMarkerModel.godImageUrl != null*/
+                ? MyCachedImage(
+                    imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
+                    progressIndicatorSize: ProgressIndicatorSize.small,
+                  )
+                : Image(
+                    image: AssetImage('assets/images/cctv_details/video_preview_mock.png'),
+                    fit: BoxFit.cover,
+                  ),
+          ),
+          Center(
+            child: Image(
+              image: AssetImage('assets/images/cctv_details/ic_playback.png'),
+              width: getPlatformSize(30.0),
+              height: getPlatformSize(30.0),
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      );
+    } else if (trafficPoint.cctvMarkerModel.godImageUrl != null) {
+      return MyCachedImage(
+        imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
+        progressIndicatorSize: ProgressIndicatorSize.small,
+      );
+    }
+
+    return SizedBox.shrink();
   }
 }

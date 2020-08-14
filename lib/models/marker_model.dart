@@ -115,6 +115,11 @@ class MarkerModel {
       }
     }
 
+    String streamMobile = json['stream_mobile'];
+    if (streamMobile == null || streamMobile.trim().length <= 7) {
+      streamMobile = null;
+    }
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
@@ -123,7 +128,7 @@ class MarkerModel {
       latitude: json['lat'],
       longitude: json['lng'],
       categoryId: json['cate_id'],
-      streamMobile: json['stream_mobile'],
+      streamMobile: streamMobile,
       streamWeb: json['stream_web'],
       imagePath: json['image_path'],
       godImageUrl: godImageUrl,

@@ -386,8 +386,9 @@ class ExatApi {
   }
 
   static Future<ResponseResult> _makeRequest(
-      BuildContext context, String url, Map<String, dynamic> paramMap) async {
-    Position currentLocation = await getCurrentLocation();
+      BuildContext context, String url, Map<String, dynamic> paramMap,
+      {bool sendLocation = true}) async {
+    Position currentLocation = sendLocation ? await getCurrentLocation() : null;
 
     Map data = {
       "deviceToken": "testToken",
