@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
@@ -110,21 +111,7 @@ class SearchServiceView extends StatelessWidget {
               ],
             ),
           ),
-          marker.godImageUrl != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(getPlatformSize(9.0)),
-                  ),
-                  child: SizedBox(
-                    width: getPlatformSize(75.0),
-                    height: getPlatformSize(58.0),
-                    child: MyCachedImage(
-                      imageUrl: marker.godImageUrl,
-                      progressIndicatorSize: ProgressIndicatorSize.small,
-                    ),
-                  ),
-                )
-              : SizedBox.shrink(),
+          _getThumbImage(),
 
           /*SizedBox(
             width: getPlatformSize(25.0),
@@ -218,5 +205,54 @@ class SearchServiceView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _getThumbImage() {
+    if (marker.category.code == CategoryType.CCTV && marker.streamMobile != null) {
+      return ClipRRect(
+          borderRadius: BorderRadius.all(
+            Radius.circular(getPlatformSize(9.0)),
+          ),
+          child: SizedBox(
+            width: getPlatformSize(75.0),
+            height: getPlatformSize(58.0),
+            child: Stack(
+              children: <Widget>[
+                SizedBox(
+                  width: getPlatformSize(75.0),
+                  height: getPlatformSize(58.0),
+                  child: Image(
+                    image: AssetImage('assets/images/cctv_details/video_preview_mock.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Center(
+                  child: Image(
+                    image: AssetImage('assets/images/cctv_details/ic_playback.png'),
+                    width: getPlatformSize(30.0),
+                    height: getPlatformSize(30.0),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          ));
+    } else if (marker.godImageUrl != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.all(
+          Radius.circular(getPlatformSize(9.0)),
+        ),
+        child: SizedBox(
+          width: getPlatformSize(75.0),
+          height: getPlatformSize(58.0),
+          child: MyCachedImage(
+            imageUrl: marker.godImageUrl,
+            progressIndicatorSize: ProgressIndicatorSize.small,
+          ),
+        ),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
   }
 }

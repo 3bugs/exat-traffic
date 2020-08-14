@@ -146,7 +146,7 @@ class _SearchServiceState extends State<SearchService> {
                       ),
                     )
                   : Container(
-                      color: Constants.App.BACKGROUND_COLOR,
+                      //color: Constants.App.BACKGROUND_COLOR,
                       child: ListView.builder(
                         controller: _scrollController,
                         padding: EdgeInsets.only(
@@ -229,7 +229,10 @@ class _SearchServiceState extends State<SearchService> {
       showSearch: true,
       onSearchTextChanged: _handleSearchTextChange,
       builder: (BuildContext context, double containerHeight) {
-        return _buildRootContent(containerHeight);
+        return Container(
+          color: Constants.App.BACKGROUND_COLOR,
+          child: _buildRootContent(containerHeight),
+        );
       },
     );
   }
