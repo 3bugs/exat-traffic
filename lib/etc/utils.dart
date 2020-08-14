@@ -1,15 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/error_model.dart';
 
 Widget wrapSystemUiOverlayStyle({@required Widget child}) {
   return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -26,6 +24,13 @@ double getPlatformSize(double size) {
     iPhone 7 Plus (5.5" @ 1920x1080) = 360 x 640 logical pixel @ 3.0 pixel ratio
   */
   return Platform.isAndroid ? 0.9 * size : size;
+}
+
+Future<Position> getCurrentLocation() async {
+  final Position position = await Geolocator().getLastKnownPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
 }
 
 const double DEFAULT_LINE_HEIGHT = -1;

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +9,8 @@ const apiKey = 'AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak';
 
 class GoogleMapsServices {
   // https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&waypoints=via:13.8133553%2C100.55055219999997%7Cvia:13.660109%2C100.66368499999999%7C&origin=13.7998143,100.4187235&destination=13.56686331,100.937025
-  Future<Map<String, dynamic>> getRoute(LatLng origin, LatLng destination, List<LatLng> wayPointList) async {
+  Future<Map<String, dynamic>> getRoute(
+      LatLng origin, LatLng destination, List<LatLng> wayPointList) async {
     // &waypoints=via:-37.81223 %2C 144.96254 %7C via:-34.92788 %2C 138.60008
 
     String wayPoints = wayPointList.fold("", (String previousValue, LatLng wayPoint) {
@@ -36,14 +38,16 @@ class GoogleMapsServices {
   }
 
   // https://maps.googleapis.com/maps/api/place/autocomplete/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&origin=13.7563,100.5018&input=%E0%B8%9A%E0%B8%B2%E0%B8%87
-  Future<Map<String, dynamic>> getPlaceAutocomplete(String searchTerm, LatLng latLng) async {
+  Future<List<PredictionModel>> getPlaceAutocomplete(String searchTerm, LatLng latLng) async {
     Map<String, dynamic> params = Map();
     params["input"] = searchTerm;
     params["origin"] = "${latLng.latitude},${latLng.longitude}";
 
-    final ResponseResult result = await _makeRequest("directions", params);
+    final ResponseResult result = await _makeRequest("place/autocomplete", params);
     if (result.success) {
-      return result.data["predictions"];
+      return result.data["predictions"]
+          .map<PredictionModel>((json) => PredictionModel.fromJson(json))
+          .toList();
     } else {
       throw Exception(result.data);
     }
@@ -54,7 +58,8 @@ class GoogleMapsServices {
     params.forEach((key, value) {
       queryParams += "&$key=$value";
     });
-    final String url = "https://maps.googleapis.com/maps/api/$endPoint/json?key=$apiKey&language=th$queryParams";
+    final String url =
+        "https://maps.googleapis.com/maps/api/$endPoint/json?key=$apiKey&language=th$queryParams";
     http.Response response = await http.get(url);
 
     print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -66,7 +71,7 @@ class GoogleMapsServices {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> dataMap = json.decode(response.body);
-      if (dataMap['status'] == 'OK') {
+      if (dataMap['status'] == 'OK' || dataMap['status'] == 'ZERO_RESULTS') {
         return ResponseResult(success: true, data: dataMap);
       } else {
         return ResponseResult(success: false, data: dataMap['error_message']);
@@ -75,5 +80,30 @@ class GoogleMapsServices {
       String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server";
       return ResponseResult(success: false, data: msg);
     }
+  }
+}
+
+class PredictionModel {
+  final String description;
+  final int distanceMeters;
+  final String placeId;
+
+  PredictionModel({
+    @required this.description,
+    @required this.distanceMeters,
+    @required this.placeId,
+  });
+
+  factory PredictionModel.fromJson(Map<String, dynamic> json) {
+    return PredictionModel(
+      description: json['description'],
+      distanceMeters: json['distance_meters'],
+      placeId: json['place_id'],
+    );
+  }
+
+  @override
+  String toString() {
+    return "PredictionModel(description: ${this.description}, distanceMeters: ${this.distanceMeters}, placeId: ${this.placeId})";
   }
 }

@@ -1,5 +1,6 @@
 import 'package:exattraffic/components/dialog_button.dart';
 import 'package:exattraffic/screens/login/login.dart';
+import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -128,6 +129,7 @@ class MyScaffoldMain extends StatefulWidget {
 
 class _MyScaffoldMainState extends State<MyScaffoldMain> {
   final GlobalKey _keyMainContainer = GlobalKey();
+  final GlobalKey<MyHomeState> _keyHome = GlobalKey();
   final GlobalKey<ScaffoldState> _keyDrawer = GlobalKey();
 
   final String formattedDate = new DateFormat.yMMMMd().format(new DateTime.now()).toUpperCase();
@@ -149,7 +151,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     });
 
     _fragmentList = [
-      Home(hideSearchOptions),
+      Home(_keyHome, hideSearchOptions),
       Favorite(),
       MyRoute(
         onUpdateBottomSheet: null,
@@ -173,12 +175,43 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 
   void _handleClickTab(int index) {
+    if (index == 0 && _currentTabIndex == 0) {
+      _keyHome.currentState.goHome();
+    }
+
     setState(() {
       if (index != _currentTabIndex) {
         _showSearchOptions = false;
       }
       _currentTabIndex = index;
       _currentScreenProps = screenPropsList[index];
+    });
+  }
+
+  void _handleClickSearchOption(int index) {
+    Widget destination;
+
+    switch (index) {
+      case 0:
+        destination = SearchService(
+          categoryList: context.bloc<AppBloc>().categoryList,
+          markerList: context.bloc<AppBloc>().markerList,
+        );
+        break;
+      case 1:
+        destination = SearchPlace();
+        break;
+    }
+
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration.zero,
+        pageBuilder: (context, anim1, anim2) => destination,
+      ),
+    );
+    setState(() {
+      _showSearchOptions = false;
     });
   }
 
@@ -404,23 +437,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                       Material(
                                         color: Colors.transparent,
                                         child: InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                transitionDuration: Duration.zero,
-                                                pageBuilder: (context, anim1, anim2) =>
-                                                    SearchService(
-                                                  categoryList:
-                                                      context.bloc<AppBloc>().categoryList,
-                                                  markerList: context.bloc<AppBloc>().markerList,
-                                                ),
-                                              ),
-                                            );
-                                            setState(() {
-                                              _showSearchOptions = false;
-                                            });
-                                          },
+                                          onTap: () => _handleClickSearchOption(0),
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(
                                                 getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
@@ -484,20 +501,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                       Material(
                                         color: Colors.transparent,
                                         child: InkWell(
-                                          onTap: () {
-                                            /*Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => SearchService(
-                                                  context.bloc<AppBloc>().markerList,
-                                                ),
-                                              ),
-                                            );*/
-                                            underConstruction(context);
-                                            setState(() {
-                                              _showSearchOptions = false;
-                                            });
-                                          },
+                                          onTap: () => _handleClickSearchOption(1),
                                           borderRadius: BorderRadius.only(
                                             bottomLeft: Radius.circular(
                                                 getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),

@@ -1,3 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:io' show Platform;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/gate_in_model.dart';
+import 'package:exattraffic/models/cost_toll_model.dart';
+import 'package:exattraffic/models/error_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
 import 'package:exattraffic/models/add_answers_model.dart';
@@ -7,18 +20,6 @@ import 'package:exattraffic/models/help_model.dart';
 import 'package:exattraffic/models/incident_detail_model.dart';
 import 'package:exattraffic/models/incident_list_model.dart';
 import 'package:exattraffic/models/questionnair_model.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:geolocator/geolocator.dart';
-import 'dart:io' show Platform;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/gate_in_model.dart';
-import 'package:exattraffic/models/cost_toll_model.dart';
-import 'package:exattraffic/models/error_model.dart';
-import 'package:exattraffic/models/category_model.dart';
-import 'package:exattraffic/models/marker_model.dart';
 
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
@@ -386,7 +387,7 @@ class ExatApi {
 
   static Future<ResponseResult> _makeRequest(
       BuildContext context, String url, Map<String, dynamic> paramMap) async {
-    Position currentLocation = await _getCurrentPosition();
+    Position currentLocation = await getCurrentLocation();
 
     Map data = {
       "deviceToken": "testToken",
@@ -433,12 +434,5 @@ class ExatApi {
       print(msg);
       return ResponseResult(success: false, data: msg);
     }
-  }
-
-  static Future<Position> _getCurrentPosition() async {
-    final Position position = await Geolocator().getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    return position;
   }
 }

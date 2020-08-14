@@ -23,15 +23,15 @@ import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 class Home extends StatefulWidget {
   final Function hideSearchOptions;
 
-  const Home(this.hideSearchOptions);
+  const Home(Key key, this.hideSearchOptions) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  MyHomeState createState() => MyHomeState();
 }
 
 //enum MapTool {schematicMaps, aroundMe, dataLayer, currentLocation}
 
-class _HomeState extends State<Home> {
+class MyHomeState extends State<Home> {
   final GlobalKey _keyMainContainer = GlobalKey();
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
@@ -161,6 +161,12 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void goHome() {
+    if (_homeBlocContext != null) {
+      _homeBlocContext.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.none));
+    }
+  }
+
   void _handleClickMapTool(BuildContext context, MapTool mapTool) {
     widget.hideSearchOptions();
 
@@ -191,6 +197,8 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+  BuildContext _homeBlocContext;
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -214,6 +222,8 @@ class _HomeState extends State<Home> {
         },
         builder: (context, state) {
           print('--------------------------------------- HOME BUILDER');
+
+          _homeBlocContext = context;
 
           MapTool selectedMapTool = state.selectedMapTool;
           List<MarkerModel> markerList = state.markerList;

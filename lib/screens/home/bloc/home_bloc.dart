@@ -21,12 +21,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     @required this.markerList,
     @required this.categoryList,
   }) : super(Initial(
-    selectedMapTool: MapTool.none,
-    markerList: List<MarkerModel>(),
-    categoryList: categoryList,
-    showProgress: false,
-    //categorySelectedMap: _getInitialMap(categoryList),
-  ));
+          selectedMapTool: MapTool.none,
+          markerList: List<MarkerModel>(),
+          categoryList: categoryList,
+          showProgress: false,
+          //categorySelectedMap: _getInitialMap(categoryList),
+        ));
 
   static Map<int, bool> _getInitialMap(List<CategoryModel> categoryList) {
     Map<int, bool> tempMap = Map();
@@ -49,7 +49,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }) async {
     // filter by layer (category)
     List<MarkerModel> tempMarkerList =
-    markerList.where((marker) => marker.category.selected).toList();
+        markerList.where((marker) => marker.category.selected).toList();
 
     // filter by nearby
     if (nearbyMode) {
@@ -77,6 +77,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final currentState = state;
     final currentShowProgress = currentState.showProgress;
     //final categorySelectedMap = currentState.categorySelectedMap;
+
+    if (event is ClickMapTool &&
+        event.mapTool == MapTool.none &&
+        currentState.selectedMapTool != MapTool.none) {
+
+      yield MapToolChange(
+        selectedMapTool: MapTool.none,
+        markerList: List<MarkerModel>(),
+        categoryList: categoryList,
+        showProgress: currentShowProgress,
+      );
+
+      return;
+    }
 
     if (event is ClickMapTool &&
         event.mapTool == MapTool.aroundMe &&
@@ -123,12 +137,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             markerList: event.mapTool == MapTool.layer
                 ? List<MarkerModel>() // กด layer ซ้ำ
                 : await _getFilterMarkerList(
-              // กด around me
-              markerList: markerList,
-              //categorySelectedMap: categorySelectedMap,
-              nearbyMode: true,
-              userPosition: userPosition,
-            ),
+                    // กด around me
+                    markerList: markerList,
+                    //categorySelectedMap: categorySelectedMap,
+                    nearbyMode: true,
+                    userPosition: userPosition,
+                  ),
             categoryList: categoryList,
             showProgress: currentShowProgress,
             //categorySelectedMap: categorySelectedMap,
@@ -140,12 +154,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             markerList: event.mapTool == MapTool.aroundMe
                 ? List<MarkerModel>() // กด around me ซ้ำ
                 : await _getFilterMarkerList(
-              // กด layer
-              markerList: markerList,
-              //categorySelectedMap: categorySelectedMap,
-              nearbyMode: false,
-              userPosition: userPosition,
-            ),
+                    // กด layer
+                    markerList: markerList,
+                    //categorySelectedMap: categorySelectedMap,
+                    nearbyMode: false,
+                    userPosition: userPosition,
+                  ),
             categoryList: categoryList,
             showProgress: currentShowProgress,
             //categorySelectedMap: categorySelectedMap,
