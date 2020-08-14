@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 import 'search_place_presenter.dart';
 
@@ -17,6 +20,8 @@ class SearchPlace extends StatefulWidget {
 }
 
 class _SearchPlaceState extends State<SearchPlace> {
+  static const String DUMMY_PLACE_ID = "place-id";
+  
   List<String> _titleList = ["ค้นหาเส้นทาง", "Search", "搜索"];
 
   final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
@@ -31,41 +36,107 @@ class _SearchPlaceState extends State<SearchPlace> {
   }
 
   Widget _buildRootContent(double containerHeight) {
-    return _presenter.predictionList == null
-        ? DataLoading()
-        : Stack(
-            children: <Widget>[
-              _presenter.predictionList.isEmpty
-                  ? Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.only(
-                        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
-                        bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
-                      ),
-                      child: Text(
-                        "ไม่มีข้อมูล",
-                        style: getTextStyle(0),
-                      ),
-                    )
-                  : Container(
-                      color: Colors.blue.withOpacity(0.5), //Constants.App.BACKGROUND_COLOR,
-                      child: ListView.builder(
-                        //controller: _scrollController,
-                        padding: EdgeInsets.only(
-                          top: getPlatformSize(16.0),
-                          bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
-                        ),
-                        itemCount: _presenter.predictionList.length,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            child: Text(_presenter.predictionList[index].description),
-                          );
-                        },
-                      ),
+    return Stack(
+      children: <Widget>[
+        false
+            ? Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.only(
+                  top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+                  bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
+                ),
+                child: Text(
+                  "ไม่มีข้อมูล",
+                  style: getTextStyle(0),
+                ),
+              )
+            : Container(
+                color: Constants.App.BACKGROUND_COLOR,
+                child: ListView.builder(
+                  //controller: _scrollController,
+                  padding: EdgeInsets.only(
+                    top: getPlatformSize(16.0),
+                    bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
+                  ),
+                  itemCount: 10,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      child: Text("TEST"),
+                    );
+                  },
+                ),
+              ),
+        _buildAutoSuggest(),
+      ],
+    );
+  }
+  
+  Widget _buildAutoSuggest() {
+    if (_presenter.searchTerm != null && _presenter.searchTerm.trim().isNotEmpty) {
+      List<PredictionModel> predictionListFromApi = _presenter.predictionList ?? List<PredictionModel>();
+
+      List<PredictionModel> predictionList = [
+        PredictionModel(
+          description: "ค้นหา '${_presenter.searchTerm}'",
+          distanceMeters: 0,
+          placeId: DUMMY_PLACE_ID,
+        ),
+        ...predictionListFromApi
+      ];
+
+      return Positioned(
+        width: MediaQuery.of(context).size.width,
+        top: getPlatformSize(28.0),
+        left: 0.0,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+            right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x22777777),
+                  blurRadius: getPlatformSize(6.0),
+                  spreadRadius: getPlatformSize(3.0),
+                  offset: Offset(
+                    getPlatformSize(1.0), // move right
+                    getPlatformSize(1.0), // move down
+                  ),
+                ),
+              ],
+              color: Colors.white,
+              borderRadius: BorderRadius.all(
+                Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
+              ),
+            ),
+            child: Column(
+              children: predictionList
+                  .asMap()
+                  .entries
+                  .map<PredictionItemView>(
+                    (entry) => PredictionItemView(
+                      text: entry.value.description,
+                      isFirstItem: entry.key == 0,
+                      isLastItem: entry.key == _presenter.predictionList.length - 1,
+                      onClick: () => _handleClickPredictionItem(entry.value),
                     ),
-            ],
-          );
+                  )
+                  .toList(),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
+  }
+
+  void _handleClickPredictionItem(PredictionModel prediction) {
+    _hideKeyboard();
+    alert(context, "EXAT Traffic", prediction.description);
   }
 
   @override
@@ -86,5 +157,98 @@ class _SearchPlaceState extends State<SearchPlace> {
         return _buildRootContent(containerHeight);
       },
     );
+  }
+}
+
+class PredictionItemView extends StatelessWidget {
+  final String text;
+  final bool isFirstItem;
+  final bool isLastItem;
+  final Function onClick;
+
+  PredictionItemView({
+    @required this.text,
+    @required this.isFirstItem,
+    @required this.isLastItem,
+    @required this.onClick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onClick,
+        borderRadius: BorderRadius.only(
+          topLeft: this.isFirstItem
+              ? Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))
+              : Radius.zero,
+          topRight: this.isFirstItem
+              ? Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))
+              : Radius.zero,
+          bottomLeft: this.isLastItem
+              ? Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))
+              : Radius.zero,
+          bottomRight: this.isLastItem
+              ? Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS))
+              : Radius.zero,
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: getPlatformSize(isFirstItem ? 10.0 : 5.0),
+            bottom: getPlatformSize(isFirstItem || isLastItem ? 10.0 : 5.0),
+            left: getPlatformSize(20.0),
+            right: getPlatformSize(20.0),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: getPlatformSize(10.0),
+                height: getPlatformSize(10.0),
+                margin: EdgeInsets.only(
+                  top: getPlatformSize(10.0),
+                  right: getPlatformSize(16.0),
+                ),
+                decoration: BoxDecoration(
+                  color: Color(isFirstItem ? 0xFF3497FD : 0xFF3ACCE1),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(getPlatformSize(3.0)),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    return Text(
+                      this.text,
+                      style: getTextStyle(
+                        language.lang,
+                        color: Color(0xFF454F63),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    /*Container(
+      margin: EdgeInsets.only(
+        left: getPlatformSize(20.0),
+        right: getPlatformSize(20.0),
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xFFF4F4F4),
+            width: getPlatformSize(1.0),
+          ),
+        ),
+      ),
+    ),*/
   }
 }

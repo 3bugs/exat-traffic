@@ -417,11 +417,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color(0x22777777),
-                                        blurRadius: getPlatformSize(10.0),
-                                        spreadRadius: getPlatformSize(5.0),
+                                        blurRadius: getPlatformSize(6.0),
+                                        spreadRadius: getPlatformSize(3.0),
                                         offset: Offset(
-                                          getPlatformSize(2.0), // move right
-                                          getPlatformSize(2.0), // move down
+                                          getPlatformSize(1.0), // move right
+                                          getPlatformSize(1.0), // move down
                                         ),
                                       ),
                                     ],

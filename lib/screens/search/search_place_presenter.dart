@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SearchPlacePresenter extends BasePresenter<SearchPlace> {
   final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
+  String searchTerm;
   List<PredictionModel> predictionList;
 
   SearchPlacePresenter(
@@ -21,7 +22,9 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
       text,
       LatLng(currentLocation.latitude, currentLocation.longitude),
     );
+
     setState(() {
+      searchTerm = text;
       predictionList = dataList;
     });
   }
