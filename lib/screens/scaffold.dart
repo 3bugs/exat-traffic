@@ -255,20 +255,24 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                     sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
                   ),
                 ),
-                SizedBox(height: getPlatformSize(28.0)),
+                SizedBox(height: getPlatformSize(36.0)),
                 Row(
                   mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    DialogButton(
-                      text: "ไม่ใช่",
-                      onClickButton: () => Navigator.of(context).pop(false),
+                    Expanded(
+                      child: DialogButton(
+                        text: "ไม่ใช่",
+                        onClickButton: () => Navigator.of(context).pop(false),
+                      ),
                     ),
-                    SizedBox(width: getPlatformSize(24.0)),
-                    DialogButton(
-                      text: "ใช่",
-                      onClickButton: () => Navigator.of(context).pop(true),
+                    SizedBox(width: getPlatformSize(12.0)),
+                    Expanded(
+                      child: DialogButton(
+                        text: "ใช่",
+                        onClickButton: () => Navigator.of(context).pop(true),
+                      ),
                     ),
                   ],
                 ),

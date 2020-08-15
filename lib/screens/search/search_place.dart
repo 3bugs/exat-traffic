@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:exattraffic/screens/search/components/search_place_view.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,7 @@ class SearchPlace extends StatefulWidget {
 
 class _SearchPlaceState extends State<SearchPlace> {
   static const String DUMMY_PLACE_ID = "place-id";
-  
+
   List<String> _titleList = ["ค้นหาเส้นทาง", "Search", "搜索"];
 
   final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
@@ -38,43 +39,52 @@ class _SearchPlaceState extends State<SearchPlace> {
   Widget _buildRootContent(double containerHeight) {
     return Stack(
       children: <Widget>[
-        false
-            ? Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.only(
-                  top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
-                  bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
-                ),
-                child: Text(
-                  "ไม่มีข้อมูล",
-                  style: getTextStyle(0),
-                ),
-              )
-            : Container(
-                color: Constants.App.BACKGROUND_COLOR,
-                child: ListView.builder(
-                  //controller: _scrollController,
-                  padding: EdgeInsets.only(
-                    top: getPlatformSize(16.0),
-                    bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
-                  ),
-                  itemCount: 10,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      child: Text("TEST"),
-                    );
-                  },
-                ),
-              ),
-        _buildAutoSuggest(),
+        Container(
+          alignment: Alignment.center,
+          color: Constants.App.BACKGROUND_COLOR,
+          child: _presenter.searchResultList != null ? _buildSearchResult() : SizedBox.shrink(),
+        ),
+        //_presenter.searchResultList != null ? _buildSearchResult() : SizedBox.shrink(),
+        _presenter.showPredictionList ? _buildAutoSuggest() : SizedBox.shrink(),
+        _presenter.isLoading ? DataLoading() : SizedBox.shrink(),
       ],
     );
   }
-  
+
+  Widget _buildSearchResult() {
+    if (_presenter.searchResultList.isEmpty) {
+      return Center(
+        child: Text(
+          "ไม่มีข้อมูล",
+          style: getTextStyle(0),
+        ),
+      );
+    } else {
+      return ListView.builder(
+        //controller: _scrollController,
+        padding: EdgeInsets.only(
+          top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+          bottom: getPlatformSize(8.0),
+        ),
+        itemCount: _presenter.searchResultList.length,
+        physics: BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          List<SearchResultModel> searchResultList = _presenter.searchResultList;
+          return SearchPlaceView(
+            searchResult: searchResultList[index],
+            isFirstItem: index == 0,
+            isLastItem: index == searchResultList.length - 1,
+            onClick: () => _presenter.handleClickSearchResultItem(context, searchResultList[index]),
+          );
+        },
+      );
+    }
+  }
+
   Widget _buildAutoSuggest() {
     if (_presenter.searchTerm != null && _presenter.searchTerm.trim().isNotEmpty) {
-      List<PredictionModel> predictionListFromApi = _presenter.predictionList ?? List<PredictionModel>();
+      List<PredictionModel> predictionListFromApi =
+          _presenter.predictionList ?? List<PredictionModel>();
 
       List<PredictionModel> predictionList = [
         PredictionModel(
@@ -120,8 +130,11 @@ class _SearchPlaceState extends State<SearchPlace> {
                     (entry) => PredictionItemView(
                       text: entry.value.description,
                       isFirstItem: entry.key == 0,
-                      isLastItem: entry.key == _presenter.predictionList.length - 1,
-                      onClick: () => _handleClickPredictionItem(entry.value),
+                      isLastItem: entry.key == _presenter.predictionList.length,
+                      onClick: () {
+                        _hideKeyboard();
+                        _presenter.handleClickPredictionItem(context, entry.value, DUMMY_PLACE_ID);
+                      },
                     ),
                   )
                   .toList(),
@@ -132,11 +145,6 @@ class _SearchPlaceState extends State<SearchPlace> {
     } else {
       return SizedBox.shrink();
     }
-  }
-
-  void _handleClickPredictionItem(PredictionModel prediction) {
-    _hideKeyboard();
-    alert(context, "EXAT Traffic", prediction.description);
   }
 
   @override

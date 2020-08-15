@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +42,7 @@ class MyHomeState extends State<Home> {
 
   //final Uuid uuid = Uuid();
   Timer _timer;
+
   //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
@@ -88,10 +91,10 @@ class MyHomeState extends State<Home> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-    *//*var url = 'http://163.47.9.26/location?lat=20&lng=20';
+    */ /*var url = 'http://163.47.9.26/location?lat=20&lng=20';
     var response = await http.post(url, body: {'name': 'doodle', 'color': 'blue'});
     print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');*//*
+    print('Response body: ${response.body}');*/ /*
   }*/
 
   @override
@@ -121,6 +124,8 @@ class MyHomeState extends State<Home> {
     for (MarkerModel markerModel in markerList) {
       Marker marker = await _createMarker(context, markerModel);
       markerSet.add(marker);
+      /*marker = await _createTextMarker(context, markerModel);
+      markerSet.add(marker);*/
     }
     return markerSet;
 
@@ -134,6 +139,7 @@ class MyHomeState extends State<Home> {
     final MarkerId markerId = MarkerId('marker-${marker.id.toString()}');
 
     BitmapDescriptor markerIcon = await marker.category.getNetworkIcon();
+    //BitmapDescriptor markerIcon = BitmapDescriptor.fromBytes(await getBytesFromCanvas(300, 100));
 
     return Marker(
       markerId: markerId,
@@ -150,6 +156,66 @@ class MyHomeState extends State<Home> {
           : InfoWindow.noText,
       onTap: () => _handleClickMarker(context, marker),
     );
+  }
+
+  Future<Marker> _createTextMarker(BuildContext context, MarkerModel marker) async {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('marker-label-${marker.id.toString()}');
+
+    BitmapDescriptor markerIcon =
+        BitmapDescriptor.fromBytes(await getBytesFromCanvas(marker.name, 500, 60));
+
+    return Marker(
+      markerId: markerId,
+      position: LatLng(marker.latitude, marker.longitude),
+      //icon: marker.category.markerIconBitmap, // local icon
+      icon: markerIcon,
+      anchor: const Offset(0.5, 0.0),
+      // network icon
+      alpha: 1.0,
+      infoWindow: (false)
+          ? InfoWindow(
+              title: marker.name + (kReleaseMode ? "" : " [${marker.category.code}-${marker.id}]"),
+              snippet: marker.category.name,
+            )
+          : InfoWindow.noText,
+      onTap: null,
+    );
+  }
+
+  Future<Uint8List> getBytesFromCanvas(String label, int width, int height) async {
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint()..color = Colors.transparent;
+    final Radius radius = Radius.circular(20.0);
+    canvas.drawRRect(
+      RRect.fromRectAndCorners(
+        Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+        topLeft: radius,
+        topRight: radius,
+        bottomLeft: radius,
+        bottomRight: radius,
+      ),
+      paint,
+    );
+    TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+    painter.text = TextSpan(
+      text: label,
+      style: getTextStyle(
+        0,
+        sizeTh: 50.0,
+        sizeEn: 50.0,
+        isBold: true,
+      ),
+    );
+    painter.layout();
+    painter.paint(
+      canvas,
+      Offset((width * 0.5) - painter.width * 0.5, (height * 0.5) - painter.height * 0.5),
+    );
+    final img = await pictureRecorder.endRecording().toImage(width, height);
+    final data = await img.toByteData(format: ui.ImageByteFormat.png);
+    return data.buffer.asUint8List();
   }
 
   void _handleClickMarker(BuildContext context, MarkerModel marker) {

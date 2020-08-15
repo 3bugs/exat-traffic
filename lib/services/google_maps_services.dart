@@ -9,8 +9,8 @@ const apiKey = 'AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak';
 
 class GoogleMapsServices {
   // https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&waypoints=via:13.8133553%2C100.55055219999997%7Cvia:13.660109%2C100.66368499999999%7C&origin=13.7998143,100.4187235&destination=13.56686331,100.937025
-  Future<Map<String, dynamic>> getRoute(
-      LatLng origin, LatLng destination, List<LatLng> wayPointList) async {
+  Future<Map<String, dynamic>> getRoute(LatLng origin, LatLng destination,
+      List<LatLng> wayPointList) async {
     // &waypoints=via:-37.81223 %2C 144.96254 %7C via:-34.92788 %2C 138.60008
 
     String wayPoints = wayPointList.fold("", (String previousValue, LatLng wayPoint) {
@@ -47,6 +47,21 @@ class GoogleMapsServices {
     if (result.success) {
       return result.data["predictions"]
           .map<PredictionModel>((json) => PredictionModel.fromJson(json))
+          .toList();
+    } else {
+      throw Exception(result.data);
+    }
+  }
+
+  // https://maps.googleapis.com/maps/api/place/textsearch/json?key=AIzaSyCrBhuovlx9Wk2v7mQNvCg4JIL_affg0ks&language=th&query=%E0%B8%95.%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B9%80%E0%B8%A5%E0%B8%99%20%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%9B%E0%B8%90%E0%B8%A1
+  Future<List<SearchResultModel>> getPlaceTextSearch(String searchTerm) async {
+    Map<String, dynamic> params = Map();
+    params["query"] = searchTerm;
+
+    final ResponseResult result = await _makeRequest("place/textsearch", params);
+    if (result.success) {
+      return result.data["results"]
+          .map<SearchResultModel>((json) => SearchResultModel.fromJson(json))
           .toList();
     } else {
       throw Exception(result.data);
@@ -104,6 +119,50 @@ class PredictionModel {
 
   @override
   String toString() {
-    return "PredictionModel(description: ${this.description}, distanceMeters: ${this.distanceMeters}, placeId: ${this.placeId})";
+    return "PredictionModel(description: ${this.description}, distanceMeters: ${this
+        .distanceMeters}, placeId: ${this.placeId})";
+  }
+}
+
+class SearchResultModel {
+  final PlaceDetailsModel placeDetails;
+  final String icon;
+  final String placeId;
+
+  SearchResultModel({
+    @required this.placeDetails,
+    @required this.icon,
+    @required this.placeId,
+  });
+
+  factory SearchResultModel.fromJson(Map<String, dynamic> json) {
+    return SearchResultModel(
+        placeDetails: PlaceDetailsModel.fromJson(json),
+        icon: json['icon'],
+        placeId: json['place_id'],
+    );
+  }
+}
+
+class PlaceDetailsModel {
+  final String name;
+  final String formattedAddress;
+  final double latitude;
+  final double longitude;
+
+  PlaceDetailsModel({
+    @required this.name,
+    @required this.formattedAddress,
+    @required this.latitude,
+    @required this.longitude,
+  });
+
+  factory PlaceDetailsModel.fromJson(Map<String, dynamic> json) {
+    return PlaceDetailsModel(
+      name: json['name'],
+      formattedAddress: json['formatted_address'],
+      latitude: json['geometry']['location']['lat'],
+      longitude: json['geometry']['location']['lng'],
+    );
   }
 }

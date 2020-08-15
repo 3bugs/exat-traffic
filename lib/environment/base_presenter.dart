@@ -4,7 +4,7 @@ abstract class BasePre {}
 
 class BasePresenter<T extends StatefulWidget> {
   State<T> state;
-  bool loader = true;
+  bool isLoading = false;
 
   BasePresenter(this.state);
 
@@ -14,7 +14,7 @@ class BasePresenter<T extends StatefulWidget> {
 
   loading() {
     setState(() {
-      loader = true;
+      isLoading = true;
     });
   }
 
@@ -24,7 +24,7 @@ class BasePresenter<T extends StatefulWidget> {
 
   loaded() {
     setState(() {
-      loader = false;
+      isLoading = false;
     });
   }
 }
