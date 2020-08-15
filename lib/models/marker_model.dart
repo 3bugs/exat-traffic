@@ -13,7 +13,6 @@ import 'package:exattraffic/screens/marker_details/police_station_details.dart';
 import 'package:exattraffic/screens/marker_details/rest_area_details.dart';
 import 'package:exattraffic/models/marker_categories/uturn_model.dart';
 import 'package:exattraffic/screens/marker_details/uturn_details.dart';
-import 'package:exattraffic/services/api.dart';
 
 class MarkerModel {
   final int id;

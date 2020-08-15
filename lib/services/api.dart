@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
@@ -380,6 +381,25 @@ class ExatApi {
       ConsentModel _model = ConsentModel.fromJson(responseResult.decode);
 
       return _model;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<List<NotificationModel>> fetchNotifications(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/message-event/list";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"limit": 100},
+    );
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      List<NotificationModel> notificationList =
+          dataList.map((markerJson) => NotificationModel.fromJson(markerJson)).toList();
+
+      return notificationList;
     } else {
       throw Exception(responseResult.data);
     }

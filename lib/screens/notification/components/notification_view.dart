@@ -13,15 +13,18 @@ class NotificationView extends StatelessWidget {
     @required this.notification,
     @required this.isFirstItem,
     @required this.isLastItem,
+    @required this.onClick,
   });
 
   final NotificationModel notification;
   final bool isFirstItem;
   final bool isLastItem;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
     return ListItem(
+      onClick: onClick,
       marginTop: getPlatformSize(isFirstItem ? 21.0 : 7.0),
       marginBottom: getPlatformSize(isLastItem ? 21.0 : 7.0),
       padding: EdgeInsets.only(
@@ -55,7 +58,7 @@ class NotificationView extends StatelessWidget {
                   String name;
                   switch (language.lang) {
                     case 0:
-                      name = notification.name;
+                      name = notification.detail;
                       break;
                     case 1:
                       name = 'Expressway';
@@ -82,7 +85,7 @@ class NotificationView extends StatelessWidget {
               String description;
               switch (language.lang) {
                 case 0:
-                  description = notification.description;
+                  description = notification.detail;
                   break;
                 case 1:
                   description = 'Expressway';

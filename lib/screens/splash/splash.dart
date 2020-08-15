@@ -54,7 +54,8 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     Future.delayed(const Duration(milliseconds: 200), () async {
       var connectivityResult = await (Connectivity().checkConnectivity());
       if (connectivityResult == ConnectivityResult.none) {
-        alert(context, "ไม่มีการเชื่อมต่อ", "EXAT Traffic ไม่สามารถทำงานได้หากไม่มีการเชื่อมต่อเครือข่าย");
+        alert(context, "ไม่มีการเชื่อมต่อ",
+            "EXAT Traffic ไม่สามารถทำงานได้หากไม่มีการเชื่อมต่อเครือข่าย");
       } else {
         _fetchSplashData(context);
       }
@@ -164,6 +165,9 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                               image: NetworkImage(_splashImageUrl),
                               fit: BoxFit.contain,
                             ),
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(),
                           ),
                         ),
                       )

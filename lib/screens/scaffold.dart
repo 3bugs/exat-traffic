@@ -216,9 +216,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 
   Future<bool> _handleBackPressed() {
+    if (_keyDrawer.currentState.isDrawerOpen) {
+      Navigator.pop(context);
+      return Future.value(false);
+    }
     if (_showSearchOptions) {
       hideSearchOptions();
-      return Future.delayed(Duration.zero, () => false);
+      return Future.value(false);
     }
     /*if (_currentTabIndex != 0) {
       setState(() {

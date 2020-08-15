@@ -36,7 +36,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     if (callApiTimer != null) {
       callApiTimer.cancel();
     }
-    callApiTimer = Timer(Duration(milliseconds: 1500), () async {
+    callApiTimer = Timer(Duration(milliseconds: 1000), () async {
       List<PredictionModel> dataList;
 
       if (newText.isNotEmpty) {
