@@ -190,6 +190,19 @@ app.get('/api/:item/:id?', (req, res) => {
         const {origin, destination} = req.query;
         console.log(`Origin: ${origin}`);
         console.log(`Destination: ${destination}`);
+
+        res.json({
+          error: {
+            code: CODE_SUCCESS,
+            message: 'ok',
+          },
+          data_list: [
+            {
+              origin, destination
+            }
+          ],
+        });
+        connection.end();
         break;
 
       case 'gate_in':
