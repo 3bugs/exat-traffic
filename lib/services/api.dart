@@ -96,6 +96,10 @@ class MyApi {
     }
   }
 
+  static void findBestRoute(Position origin, Position destination) {
+
+  }
+
   static Future<ResponseResult> _makeRequest(url) async {
     final response = await http.get(url);
 
@@ -416,8 +420,8 @@ class ExatApi {
       "screenWidth": MediaQuery.of(context).size.width,
       "screenHeight": MediaQuery.of(context).size.height,
       "lang": "TH",
-      "lat": currentLocation != null ? currentLocation.latitude : null,
-      "lng": currentLocation != null ? currentLocation.longitude : null,
+      "lat": currentLocation != null ? currentLocation.latitude : 13, //null,
+      "lng": currentLocation != null ? currentLocation.longitude : 100, //null,
       "altitude": currentLocation != null ? currentLocation.altitude : null,
       "status": "1",
     };

@@ -16,6 +16,7 @@ import 'package:exattraffic/models/category_model.dart';
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
   final List<MarkerModel> markerList;
   final List<CategoryModel> categoryList;
+  List<GateInModel> _gateInList;
 
   RouteBloc({
     @required this.markerList,
@@ -26,10 +27,16 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   Stream<RouteState> mapEventToState(RouteEvent event) async* {
     final currentState = state;
 
+    if (event is ShowSearchResultRoute) {
+      yield ShowSearchResultRouteState(searchResult: event.searchResult);
+    }
+
     if (event is ListGateIn) {
       try {
-        final gateInList = await MyApi.fetchGateIn();
-        yield FetchGateInSuccess(gateInList: gateInList);
+        if (_gateInList == null) {
+          _gateInList = await MyApi.fetchGateIn();
+        }
+        yield FetchGateInSuccess(gateInList: _gateInList);
       } catch (_) {
         yield FetchGateInFailure();
       }

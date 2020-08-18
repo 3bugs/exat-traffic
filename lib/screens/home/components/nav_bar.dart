@@ -28,9 +28,11 @@ List<String> notificationLabelList = [
 
 class MyNavBar extends StatefulWidget {
   MyNavBar({
+    @required this.currentTabIndex,
     @required this.onClickTab,
   });
 
+  final int currentTabIndex;
   final Function onClickTab;
 
   @override
@@ -41,12 +43,12 @@ class _MyNavBarState extends State<MyNavBar> {
   List<Color> _bgNavCenterItemColors = const [Color(0xFFFFFFFF), Color(0x00FFFFFF)];
   List<double> _bgNavCenterItemStops = const [0.3, 0.4];
 
-  int _currentTabIndex = 0;
+  //int _currentTabIndex = 0;
 
   void _handlePressTab(int index) {
-    setState(() {
+    /*setState(() {
       _currentTabIndex = index;
-    });
+    });*/
     widget.onClickTab(index);
   }
 
@@ -101,26 +103,26 @@ class _MyNavBarState extends State<MyNavBar> {
             SizedBox(
               height: getPlatformSize(Constants.NavBar.HEIGHT),
               child: BottomNavigationBar(
-                currentIndex: _currentTabIndex,
+                currentIndex: widget.currentTabIndex,
                 onTap: _handlePressTab,
                 type: BottomNavigationBarType.fixed,
                 elevation: getPlatformSize(0.0),
                 backgroundColor: Colors.white,
                 items: [
                   _getNavBarItem(
-                    icon: _currentTabIndex == 0
+                    icon: widget.currentTabIndex == 0
                         ? AssetImage('assets/images/nav_bar/ic_nav_home_on.png')
                         : AssetImage('assets/images/nav_bar/ic_nav_home_off.png'),
-                    iconWidth: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(25.5)),
-                    iconHeight: getIconSizeByState(_currentTabIndex == 0, getPlatformSize(21.0)),
+                    iconWidth: getIconSizeByState(widget.currentTabIndex == 0, getPlatformSize(25.5)),
+                    iconHeight: getIconSizeByState(widget.currentTabIndex == 0, getPlatformSize(21.0)),
                     labelList: homeLabelList,
                   ),
                   _getNavBarItem(
-                    icon: _currentTabIndex == 1
+                    icon: widget.currentTabIndex == 1
                         ? AssetImage('assets/images/nav_bar/ic_nav_favorite_on.png')
                         : AssetImage('assets/images/nav_bar/ic_nav_favorite_off.png'),
-                    iconWidth: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(22.0)),
-                    iconHeight: getIconSizeByState(_currentTabIndex == 1, getPlatformSize(21.0)),
+                    iconWidth: getIconSizeByState(widget.currentTabIndex == 1, getPlatformSize(22.0)),
+                    iconHeight: getIconSizeByState(widget.currentTabIndex == 1, getPlatformSize(21.0)),
                     labelList: favoriteLabelList,
                   ),
                   BottomNavigationBarItem(
@@ -131,19 +133,19 @@ class _MyNavBarState extends State<MyNavBar> {
                     title: Text(''),
                   ),
                   _getNavBarItem(
-                    icon: _currentTabIndex == 3
+                    icon: widget.currentTabIndex == 3
                         ? AssetImage('assets/images/nav_bar/ic_nav_incident_on.png')
                         : AssetImage('assets/images/nav_bar/ic_nav_incident_off.png'),
-                    iconWidth: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(17.0)),
-                    iconHeight: getIconSizeByState(_currentTabIndex == 3, getPlatformSize(21.0)),
+                    iconWidth: getIconSizeByState(widget.currentTabIndex == 3, getPlatformSize(17.0)),
+                    iconHeight: getIconSizeByState(widget.currentTabIndex == 3, getPlatformSize(21.0)),
                     labelList: incidentLabelList,
                   ),
                   _getNavBarItem(
-                    icon: _currentTabIndex == 4
+                    icon: widget.currentTabIndex == 4
                         ? AssetImage('assets/images/nav_bar/ic_nav_notification_on.png')
                         : AssetImage('assets/images/nav_bar/ic_nav_notification_off.png'),
-                    iconWidth: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
-                    iconHeight: getIconSizeByState(_currentTabIndex == 4, getPlatformSize(21.0)),
+                    iconWidth: getIconSizeByState(widget.currentTabIndex == 4, getPlatformSize(21.0)),
+                    iconHeight: getIconSizeByState(widget.currentTabIndex == 4, getPlatformSize(21.0)),
                     labelList: notificationLabelList,
                   ),
                 ],

@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:equatable/equatable.dart';
+
 import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
-import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 
 abstract class RouteState extends Equatable {
   final List<GateInModel> gateInList;
@@ -166,4 +168,13 @@ class LocationTrackingUpdated extends RouteState {
           currentLocation: currentLocation,
           notification: notification,
         );
+}
+
+class ShowSearchResultRouteState extends RouteState {
+  final SearchResultModel searchResult;
+
+  ShowSearchResultRouteState({@required this.searchResult});
+
+  @override
+  List<Object> get props => [searchResult];
 }

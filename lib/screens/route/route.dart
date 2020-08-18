@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
+import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,31 +26,14 @@ import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 
-class MyRoute extends StatelessWidget {
-  MyRoute({
-    @required this.onUpdateBottomSheet,
-  });
-
-  final Function onUpdateBottomSheet;
+class MyRoute extends StatefulWidget {
+  const MyRoute(Key key) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MyRouteMain(onUpdateBottomSheet: onUpdateBottomSheet);
-  }
+  MyRouteState createState() => MyRouteState();
 }
 
-class MyRouteMain extends StatefulWidget {
-  MyRouteMain({
-    @required this.onUpdateBottomSheet,
-  });
-
-  final Function onUpdateBottomSheet;
-
-  @override
-  _MyRouteMainState createState() => _MyRouteMainState();
-}
-
-class _MyRouteMainState extends State<MyRouteMain> {
+class MyRouteState extends State<MyRoute> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
   StreamSubscription<Position> _positionStreamSubscription;
@@ -72,6 +56,7 @@ class _MyRouteMainState extends State<MyRouteMain> {
 
   //LatLng _mapTarget;
   double _mapZoomLevel;
+  RouteBloc _routeBloc;
 
   void _handleClickMyLocation(BuildContext context) {
     _moveMapToCurrentPosition(context);
@@ -197,6 +182,20 @@ class _MyRouteMainState extends State<MyRouteMain> {
     );
   }
 
+  Marker _createSearchDestinationMarker(SearchResultModel searchResult) {
+    final MarkerId markerId = MarkerId('search-destination');
+
+    return Marker(
+      markerId: markerId,
+      position: LatLng(searchResult.placeDetails.latitude, searchResult.placeDetails.longitude),
+      icon: BitmapDescriptor.fromBytes(_destinationMarkerIconLarge),
+      infoWindow: InfoWindow(
+        title: searchResult.placeDetails.name,
+        snippet: searchResult.placeDetails.formattedAddress,
+      ),
+    );
+  }
+
   void _setupCustomMarker() async {
     _originMarkerIcon = await getBytesFromAsset(
       'assets/images/route/ic_marker_origin-xxhdpi.png',
@@ -218,33 +217,6 @@ class _MyRouteMainState extends State<MyRouteMain> {
       'assets/images/map_markers/ic_marker_car-w60.png',
       getPlatformSize(Constants.RouteScreen.MARKER_ICON_WIDTH_CAR).round(),
     );
-
-    /*_originMarkerIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_origin-xhdpi.png',
-    );
-    _originMarkerIconLarge = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_origin-xxhdpi.png',
-    );
-    _destinationMarkerIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_destination-xhdpi.png',
-    );
-    _destinationMarkerIconLarge = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/route/ic_marker_destination-xxhdpi.png',
-    );
-
-    _tollPlazaMarkerIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/map_markers/ic_marker_toll_plaza_small.png',
-    );
-
-    _carMarkerIcon = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'assets/images/map_markers/ic_marker_car-w60.png',
-    );*/
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -319,7 +291,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     _setupCustomMarker();
 
-    //_fetchGateIn();
+    List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
+    List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
+    _routeBloc = RouteBloc(markerList: markerList, categoryList: categoryList);
+    //return routeBloc;
+  }
+
+  void initFindRoute(SearchResultModel searchResult) {
+    _routeBloc.add(ShowSearchResultRoute(searchResult: searchResult));
   }
 
   void _setupLocationUpdate(BuildContext context) {
@@ -354,11 +333,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
       providers: [
         BlocProvider<RouteBloc>(
           create: (context) {
-            List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
-            List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
-            return RouteBloc(markerList: markerList, categoryList: categoryList)..add(ListGateIn());
+            return _routeBloc..add(ListGateIn());
           },
         ),
+        /*BlocProvider<FindRouteBloc>(
+          create: (context) {
+            return FindRouteBloc();
+          }
+        ),*/
       ],
       child: Container(
         child: Stack(
@@ -474,6 +456,11 @@ class _MyRouteMainState extends State<MyRouteMain> {
                   }
                 }
 
+                Set<Marker> searchDestinationSet = Set();
+                if (state is ShowSearchResultRouteState) {
+                  searchDestinationSet.add(_createSearchDestinationMarker(state.searchResult));
+                }
+
                 return FutureBuilder(
                   future: _createPartTollMarkerSet(
                       selectedCostToll != null ? selectedCostToll.partTollMarkerList : List()),
@@ -497,7 +484,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                       markers: gateInMarkerSet
                           .union(costTollMarkerSet)
                           .union(snapshot.hasData ? snapshot.data : Set())
-                          .union(currentLocationSet),
+                          .union(currentLocationSet)
+                          .union(searchDestinationSet),
                       polylines: polyLineSet,
                     );
                   },
@@ -634,6 +622,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                   final gateInList = state.gateInList ?? List();
                                   final selectedGateIn = state.selectedGateIn;
 
+                                  bool isSearchMode = (state is ShowSearchResultRouteState);
+
                                   return DropdownButton<GateInModel>(
                                     value: selectedGateIn,
                                     hint: Consumer<LanguageModel>(
@@ -643,10 +633,12 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                             left: getPlatformSize(6.0),
                                           ),
                                           child: Text(
-                                            'เลือกต้นทาง',
+                                            isSearchMode ? 'ตำแหน่งปัจจุบันของคุณ' : 'เลือกต้นทาง',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: getTextStyle(
                                               language.lang,
-                                              color: Color(0xFFB2B2B2),
+                                              color: isSearchMode ? null : Color(0xFFB2B2B2),
                                               heightTh: 0.8,
                                               heightEn: 1.15,
                                             ),
@@ -654,11 +646,14 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                         );
                                       },
                                     ),
-                                    icon: Image(
-                                      image: AssetImage('assets/images/route/ic_down_arrow.png'),
-                                      width: getPlatformSize(12.0),
-                                      height: getPlatformSize(7.4),
-                                    ),
+                                    icon: isSearchMode
+                                        ? SizedBox.shrink()
+                                        : Image(
+                                            image:
+                                                AssetImage('assets/images/route/ic_down_arrow.png'),
+                                            width: getPlatformSize(12.0),
+                                            height: getPlatformSize(7.4),
+                                          ),
                                     iconSize: getPlatformSize(24.0),
                                     elevation: 2,
                                     //style: getTextStyle(1),
@@ -684,6 +679,8 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                               ),
                                               child: Text(
                                                 gateIn.toString(),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: getTextStyle(
                                                   language.lang,
                                                   heightTh: 0.8,
@@ -755,131 +752,191 @@ class _MyRouteMainState extends State<MyRouteMain> {
                                 ),
                               ),
 
-                              // ช้อความ Destination Location
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: getPlatformSize(6.0),
-                                  top: getPlatformSize(2.0),
-                                ),
-                                child: Text(
-                                  'Destination Location',
-                                  style: getTextStyle(
-                                    1,
-                                    color: Color(0xFFB2B2B2),
-                                    sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
-                                    sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
-                                  ),
-                                ),
-                              ),
-
-                              // dropdown เลือกปลายทาง
-                              BlocBuilder<RouteBloc, RouteState>(builder: (context, state) {
-                                final costTollList = state.costTollList ?? List();
-                                final selectedCostToll = state.selectedCostToll;
-
-                                return DropdownButton<CostTollModel>(
-                                  value: selectedCostToll,
-                                  hint: Consumer<LanguageModel>(
-                                    builder: (context, language, child) {
-                                      return Container(
-                                        padding: EdgeInsets.only(
-                                          left: getPlatformSize(6.0),
-                                        ),
-                                        child: Text(
-                                          'เลือกปลายทาง',
-                                          style: getTextStyle(
-                                            language.lang,
-                                            color: Color(0xFFB2B2B2),
-                                            heightTh: 0.8,
-                                            heightEn: 1.15,
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: <Widget>[
+                                        // ช้อความ Destination Location
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            left: getPlatformSize(6.0),
+                                            top: getPlatformSize(2.0),
+                                          ),
+                                          child: Text(
+                                            'Destination Location',
+                                            style: getTextStyle(
+                                              1,
+                                              color: Color(0xFFB2B2B2),
+                                              sizeEn:
+                                                  getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
+                                              sizeTh:
+                                                  getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
+                                            ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                                  icon: Image(
-                                    image: AssetImage('assets/images/route/ic_down_arrow.png'),
-                                    width: getPlatformSize(12.0),
-                                    height: getPlatformSize(7.4),
-                                  ),
-                                  iconSize: getPlatformSize(24.0),
-                                  elevation: 2,
-                                  //style: getTextStyle(1),
-                                  underline: SizedBox.shrink(),
-                                  isDense: true,
-                                  isExpanded: true,
-                                  onChanged: (CostTollModel costToll) {
-                                    _selectCostTollMarker(context, costToll);
 
-                                    final CameraPosition position = CameraPosition(
-                                      target: LatLng(costToll.latitude, costToll.longitude),
-                                      zoom: 12,
-                                    );
-                                    _moveMapToPosition(context, position);
-                                  },
-                                  selectedItemBuilder: (BuildContext context) {
-                                    return costTollList.map<Widget>((CostTollModel costToll) {
-                                      return Consumer<LanguageModel>(
-                                        builder: (context, language, child) {
-                                          return Container(
-                                            padding: EdgeInsets.only(
-                                              left: getPlatformSize(6.0),
+                                        // dropdown เลือกปลายทาง
+                                        BlocBuilder<RouteBloc, RouteState>(
+                                            builder: (context, state) {
+                                          final costTollList = state.costTollList ?? List();
+                                          final selectedCostToll = state.selectedCostToll;
+
+                                          bool isSearchMode = (state is ShowSearchResultRouteState);
+
+                                          return DropdownButton<CostTollModel>(
+                                            value: selectedCostToll,
+                                            hint: Consumer<LanguageModel>(
+                                              builder: (context, language, child) {
+                                                return Container(
+                                                  padding: EdgeInsets.only(
+                                                    left: getPlatformSize(6.0),
+                                                  ),
+                                                  child: Text(
+                                                    isSearchMode
+                                                        ? (state as ShowSearchResultRouteState)
+                                                            .searchResult
+                                                            .placeDetails
+                                                            .name
+                                                        : 'เลือกปลายทาง',
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: getTextStyle(
+                                                      language.lang,
+                                                      color:
+                                                          isSearchMode ? null : Color(0xFFB2B2B2),
+                                                      heightTh: 0.8,
+                                                      heightEn: 1.15,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                            child: Text(
-                                              costToll.toString(),
-                                              style: getTextStyle(
-                                                language.lang,
-                                                heightTh: 0.8,
-                                                heightEn: 1.15,
+                                            icon: isSearchMode
+                                                ? SizedBox.shrink()
+                                                : Image(
+                                                    image: AssetImage(
+                                                        'assets/images/route/ic_down_arrow.png'),
+                                                    width: getPlatformSize(12.0),
+                                                    height: getPlatformSize(7.4),
+                                                  ),
+                                            iconSize: getPlatformSize(24.0),
+                                            elevation: 2,
+                                            //style: getTextStyle(1),
+                                            underline: SizedBox.shrink(),
+                                            isDense: true,
+                                            isExpanded: true,
+                                            onChanged: (CostTollModel costToll) {
+                                              _selectCostTollMarker(context, costToll);
+
+                                              final CameraPosition position = CameraPosition(
+                                                target:
+                                                    LatLng(costToll.latitude, costToll.longitude),
+                                                zoom: 12,
+                                              );
+                                              _moveMapToPosition(context, position);
+                                            },
+                                            selectedItemBuilder: (BuildContext context) {
+                                              return costTollList
+                                                  .map<Widget>((CostTollModel costToll) {
+                                                return Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Container(
+                                                      padding: EdgeInsets.only(
+                                                        left: getPlatformSize(6.0),
+                                                      ),
+                                                      child: Text(
+                                                        costToll.toString(),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: getTextStyle(
+                                                          language.lang,
+                                                          heightTh: 0.8,
+                                                          heightEn: 1.15,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              }).toList();
+                                            },
+                                            items: costTollList.map((CostTollModel costToll) {
+                                              return DropdownMenuItem<CostTollModel>(
+                                                value: costToll,
+                                                child: Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Container(
+                                                      padding: EdgeInsets.only(
+                                                        left: getPlatformSize(6.0),
+                                                        top: getPlatformSize(4.0),
+                                                        bottom: getPlatformSize(4.0),
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            costToll.routeName,
+                                                            style: getTextStyle(
+                                                              language.lang,
+                                                              color: Color(0xFFB2B2B2),
+                                                              sizeTh: getPlatformSize(
+                                                                  Constants.Font.SMALLER_SIZE_TH),
+                                                              sizeEn: getPlatformSize(
+                                                                  Constants.Font.SMALLER_SIZE_EN),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            costToll.toString().trim(),
+                                                            style: getTextStyle(
+                                                              language.lang,
+                                                              heightTh: 0.8,
+                                                              heightEn: 1.15,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            }).toList(),
+                                          );
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                  BlocBuilder<RouteBloc, RouteState>(builder: (context, state) {
+                                    bool isSearchMode = (state is ShowSearchResultRouteState);
+
+                                    return isSearchMode
+                                        ? Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              onTap: () {
+                                                _routeBloc.add(ListGateIn());
+                                              },
+                                              borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                                              child: Container(
+                                                width: getPlatformSize(36.0),
+                                                height: getPlatformSize(36.0),
+                                                //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                                child: Center(
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                        'assets/images/home/ic_close_search.png'),
+                                                    width: getPlatformSize(24.0),
+                                                    height: getPlatformSize(24.0),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          );
-                                        },
-                                      );
-                                    }).toList();
-                                  },
-                                  items: costTollList.map((CostTollModel costToll) {
-                                    return DropdownMenuItem<CostTollModel>(
-                                      value: costToll,
-                                      child: Consumer<LanguageModel>(
-                                        builder: (context, language, child) {
-                                          return Container(
-                                            padding: EdgeInsets.only(
-                                              left: getPlatformSize(6.0),
-                                              top: getPlatformSize(4.0),
-                                              bottom: getPlatformSize(4.0),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  costToll.routeName,
-                                                  style: getTextStyle(
-                                                    language.lang,
-                                                    color: Color(0xFFB2B2B2),
-                                                    sizeTh: getPlatformSize(
-                                                        Constants.Font.SMALLER_SIZE_TH),
-                                                    sizeEn: getPlatformSize(
-                                                        Constants.Font.SMALLER_SIZE_EN),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  costToll.toString().trim(),
-                                                  style: getTextStyle(
-                                                    language.lang,
-                                                    heightTh: 0.8,
-                                                    heightEn: 1.15,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  }).toList(),
-                                );
-                              }),
+                                          )
+                                        : SizedBox.shrink();
+                                  })
+                                ],
+                              )
                             ],
                           ),
                         ),

@@ -55,13 +55,13 @@ TextStyle getTextStyle(
           fontFamily: fontFamily,
           fontWeight: fontWeight,
           fontSize: fontSize,
-          color: color,
+          color: color ?? Constants.Font.DEFAULT_COLOR,
         )
       : TextStyle(
           fontFamily: fontFamily,
           fontWeight: fontWeight,
           fontSize: fontSize,
-          color: color,
+          color: color ?? Constants.Font.DEFAULT_COLOR,
           height: height,
         );
 }

@@ -10,6 +10,8 @@ import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SearchPlacePresenter extends BasePresenter<SearchPlace> {
+  static const DELAY_SEARCH_MS = 750;
+
   final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
   String searchTerm;
   List<PredictionModel> predictionList = List();
@@ -36,7 +38,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     if (callApiTimer != null) {
       callApiTimer.cancel();
     }
-    callApiTimer = Timer(Duration(milliseconds: 1000), () async {
+    callApiTimer = Timer(Duration(milliseconds: DELAY_SEARCH_MS), () async {
       List<PredictionModel> dataList;
 
       if (newText.isNotEmpty) {
@@ -82,6 +84,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
 
   void handleClickSearchResultItem(BuildContext context, SearchResultModel searchResult) {
     //alert(context, "EXAT Traffic", searchResult.placeDetails.name);
-    underConstruction(context);
+    //underConstruction(context);
+    Navigator.pop(context, searchResult);
   }
 }

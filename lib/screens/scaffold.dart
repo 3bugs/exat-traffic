@@ -1,6 +1,9 @@
 import 'package:exattraffic/components/dialog_button.dart';
 import 'package:exattraffic/screens/login/login.dart';
+import 'package:exattraffic/screens/route/bloc/bloc.dart';
+import 'package:exattraffic/screens/route/bloc/find_route_bloc.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -129,7 +132,8 @@ class MyScaffoldMain extends StatefulWidget {
 
 class _MyScaffoldMainState extends State<MyScaffoldMain> {
   final GlobalKey _keyMainContainer = GlobalKey();
-  final GlobalKey<MyHomeState> _keyHome = GlobalKey();
+  final GlobalKey<MyHomeState> _keyHomePage = GlobalKey();
+  final GlobalKey<MyRouteState> _keyRoutePage = GlobalKey();
   final GlobalKey<ScaffoldState> _keyDrawer = GlobalKey();
 
   final String formattedDate = new DateFormat.yMMMMd().format(new DateTime.now()).toUpperCase();
@@ -151,11 +155,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     });
 
     _fragmentList = [
-      Home(_keyHome, hideSearchOptions),
+      Home(_keyHomePage, hideSearchOptions),
       Favorite(),
-      MyRoute(
-        onUpdateBottomSheet: null,
-      ),
+      MyRoute(_keyRoutePage),
       Incident(),
       MyNotification(),
     ];
@@ -175,8 +177,22 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   }
 
   void _handleClickTab(int index) {
+    _showFragment(index);
+
+    /*if (index == 2) {
+      if (_keyRoutePage.currentState != null) {
+        _keyRoutePage.currentState.initRoute();
+      } else {
+        Future.delayed(Duration(milliseconds: 500), () {
+          _keyRoutePage.currentState.initRoute();
+        });
+      }
+    }*/
+  }
+
+  void _showFragment(int index) {
     if (index == 0 && _currentTabIndex == 0) {
-      _keyHome.currentState.goHome();
+      _keyHomePage.currentState.goHome();
     }
 
     setState(() {
@@ -190,6 +206,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
   void _handleClickSearchOption(int index) {
     Widget destination;
+
+    setState(() {
+      _showSearchOptions = false;
+    });
 
     switch (index) {
       case 0:
@@ -209,9 +229,17 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         transitionDuration: Duration.zero,
         pageBuilder: (context, anim1, anim2) => destination,
       ),
-    );
-    setState(() {
-      _showSearchOptions = false;
+    ).then((result) {
+      if (index == 1 && result != null) {
+        _showFragment(2);
+        if (_keyRoutePage.currentState != null) {
+          _keyRoutePage.currentState.initFindRoute(result);
+        } else {
+          Future.delayed(Duration(milliseconds: 500), () {
+            _keyRoutePage.currentState.initFindRoute(result);
+          });
+        }
+      }
     });
   }
 
@@ -224,12 +252,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       hideSearchOptions();
       return Future.value(false);
     }
-    /*if (_currentTabIndex != 0) {
-      setState(() {
-        _currentTabIndex = 0;
-      });
-      return Future.delayed(Duration.zero, () => false);
-    }*/
+    if (_currentTabIndex != 0) {
+      _handleClickTab(0);
+      return Future.value(false);
+    }
 
     return showDialog(
           context: context,
@@ -317,6 +343,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
               child: MyDrawer(),
             ),
             bottomNavigationBar: MyNavBar(
+              currentTabIndex: _currentTabIndex,
               onClickTab: _handleClickTab,
             ),
             /*floatingActionButton: FloatingActionButton(
