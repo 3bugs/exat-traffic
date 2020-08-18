@@ -8,7 +8,7 @@ const mysql = require('mysql');
 const cronJob = require("cron").CronJob;
 const fetch = require('node-fetch');
 
-const NodeCache = require( "node-cache" );
+const NodeCache = require("node-cache");
 const myCache = new NodeCache();
 
 const CODE_FAILED = 1;
@@ -173,7 +173,6 @@ app.get('/api/:item/:id?', (req, res) => {
       console.log('connected as id ' + db.threadId);
     });*/
 
-    let whereClause;
     switch (req.params.item) {
       case 'user_tracking':
         res.json({
@@ -193,7 +192,38 @@ app.get('/api/:item/:id?', (req, res) => {
         const destinationPart = destination.split(',');
         const destinationLatLng = {lat: destinationPart[0], lng: destinationPart[1]};
 
-        res.json({
+        getGateInList(db, req.params.id, (success, data) => {
+          if (!success) {
+            res.json({
+              error: {
+                code: CODE_FAILED,
+                message: data,
+              },
+              data_list: null,
+            });
+            db.end();
+          } else {
+            const gateInList = data;
+            gateInList.forEach(gateIn => {
+              gateIn.distanceMeters = getDistance(gateIn.lat, gateIn.lng, originLatLng.lat, originLatLng.lng);
+            });
+            const sortedGateInList = gateInList.sort((gateIn1, gateIn2) => {
+              return getDistance(gateIn1.lat, gateIn1.lng, originLatLng.lat, originLatLng.lng)
+                - getDistance(gateIn2.lat, gateIn2.lng, originLatLng.lat, originLatLng.lng);
+            });
+
+            res.json({
+              error: {
+                code: CODE_SUCCESS,
+                message: 'ok',
+              },
+              data_list: sortedGateInList,
+            });
+            db.end();
+          }
+        });
+
+        /*res.json({
           error: {
             code: CODE_SUCCESS,
             message: 'ok',
@@ -204,7 +234,7 @@ app.get('/api/:item/:id?', (req, res) => {
             }
           ],
         });
-        db.end();
+        db.end();*/
         break;
 
       case 'gate_in':
