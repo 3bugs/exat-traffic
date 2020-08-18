@@ -14,6 +14,7 @@ import 'package:exattraffic/models/language_model.dart';
 import 'search_place_presenter.dart';
 
 class SearchPlace extends StatefulWidget {
+  static const String DUMMY_PLACE_ID = "place-id";
   const SearchPlace();
 
   @override
@@ -21,8 +22,6 @@ class SearchPlace extends StatefulWidget {
 }
 
 class _SearchPlaceState extends State<SearchPlace> {
-  static const String DUMMY_PLACE_ID = "place-id";
-
   List<String> _titleList = ["ค้นหาเส้นทาง", "Search", "搜索"];
 
   final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
@@ -90,7 +89,7 @@ class _SearchPlaceState extends State<SearchPlace> {
         PredictionModel(
           description: "ค้นหา '${_presenter.searchTerm}'",
           distanceMeters: 0,
-          placeId: DUMMY_PLACE_ID,
+          placeId: SearchPlace.DUMMY_PLACE_ID,
         ),
         ...predictionListFromApi
       ];
@@ -133,7 +132,7 @@ class _SearchPlaceState extends State<SearchPlace> {
                       isLastItem: entry.key == _presenter.predictionList.length,
                       onClick: () {
                         _hideKeyboard();
-                        _presenter.handleClickPredictionItem(context, entry.value, DUMMY_PLACE_ID);
+                        _presenter.handleClickPredictionItem(context, entry.value);
                       },
                     ),
                   )

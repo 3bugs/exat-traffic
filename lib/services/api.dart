@@ -42,6 +42,7 @@ class MyApi {
   static const String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
   static const String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
   static const String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
+  static const String FIND_BEST_ROUTE_URL = "$MY_API_BASED_URL/best_route";
 
   static Future<List<TrafficPointDataModel>> fetchTrafficData() async {
     ResponseResult responseResult = await _makeRequest(FETCH_TRAFFIC_DATA_URL);
@@ -96,8 +97,16 @@ class MyApi {
     }
   }
 
-  static void findBestRoute(Position origin, Position destination) {
-
+  static Future<Map<String, dynamic>> findBestRoute(Position origin, Position destination) async {
+    ResponseResult responseResult = await _makeRequest(
+      '$FIND_BEST_ROUTE_URL?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}',
+    );
+    if (responseResult.success) {
+      Map<String, dynamic> dataMap = responseResult.data;
+      return dataMap;
+    } else {
+      throw Exception(responseResult.data);
+    }
   }
 
   static Future<ResponseResult> _makeRequest(url) async {

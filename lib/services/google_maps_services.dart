@@ -68,6 +68,20 @@ class GoogleMapsServices {
     }
   }
 
+  // https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCrBhuovlx9Wk2v7mQNvCg4JIL_affg0ks&language=th&fields=name,formatted_address,geometry,photo&place_id=ChIJPfQYsgug4jARcFDiXbIAAQM
+  Future<PlaceDetailsModel> getPlaceDetails(String placeId) async {
+    Map<String, dynamic> params = Map();
+    params["place_id"] = placeId;
+    params["fields"] = "name,formatted_address,geometry,photo";
+
+    final ResponseResult result = await _makeRequest("place/details", params);
+    if (result.success) {
+      return PlaceDetailsModel.fromJson(result.data["result"]);
+    } else {
+      throw Exception(result.data);
+    }
+  }
+
   Future<ResponseResult> _makeRequest(String endPoint, Map<String, dynamic> params) async {
     String queryParams = "";
     params.forEach((key, value) {

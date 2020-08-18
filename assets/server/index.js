@@ -233,6 +233,9 @@ app.get('/api/:item/:id?', (req, res) => {
                 db.end();
               } else {
                 const costTollList = data;
+                costTollList.forEach(costToll => {
+                  costToll.distanceMeters = getDistance(costToll.lat, costToll.lng, destinationLatLng.lat, destinationLatLng.lng);
+                });
                 const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
                   return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
                     - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);
@@ -252,6 +255,9 @@ app.get('/api/:item/:id?', (req, res) => {
                     db.end();
                   } else {
                     const costTollList = data;
+                    costTollList.forEach(costToll => {
+                      costToll.distanceMeters = getDistance(costToll.lat, costToll.lng, destinationLatLng.lat, destinationLatLng.lng);
+                    });
                     const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
                       return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
                         - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);

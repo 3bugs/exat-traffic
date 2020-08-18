@@ -301,6 +301,10 @@ class MyRouteState extends State<MyRoute> {
     _routeBloc.add(ShowSearchResultRoute(searchResult: searchResult));
   }
 
+  void _handleClickClose() {
+    _routeBloc.add(ListGateIn());
+  }
+
   void _setupLocationUpdate(BuildContext context) {
     const LocationOptions locationOptions = LocationOptions(
       accuracy: LocationAccuracy.best,
@@ -914,9 +918,7 @@ class MyRouteState extends State<MyRoute> {
                                         ? Material(
                                             color: Colors.transparent,
                                             child: InkWell(
-                                              onTap: () {
-                                                _routeBloc.add(ListGateIn());
-                                              },
+                                              onTap: _handleClickClose,
                                               borderRadius: BorderRadius.all(Radius.circular(18.0)),
                                               child: Container(
                                                 width: getPlatformSize(36.0),

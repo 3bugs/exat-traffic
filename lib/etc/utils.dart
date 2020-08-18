@@ -33,6 +33,13 @@ Future<Position> getCurrentLocation() async {
   return position;
 }
 
+Future<Position> getCurrentLocationNotNull() async {
+  final Position position = await Geolocator().getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
+}
+
 const double DEFAULT_LINE_HEIGHT = -1;
 
 TextStyle getTextStyle(

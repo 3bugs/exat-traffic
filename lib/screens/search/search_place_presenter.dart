@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -53,38 +54,54 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         setState(() {
           predictionList = dataList ?? List<PredictionModel>();
         });
-      } catch (_) {
-      }
+      } catch (_) {}
     });
   }
 
   void handleClickPredictionItem(
     BuildContext context,
     PredictionModel prediction,
-    String dummyPlaceId,
   ) async {
     //alert(context, "EXAT Traffic", prediction.description);
     setState(() {
       showPredictionList = false;
     });
 
-    if (prediction.placeId == dummyPlaceId) {
+    if (prediction.placeId == SearchPlace.DUMMY_PLACE_ID) {
       // user เลือกค้นหา
       loading();
-      List<SearchResultModel> dataList = await _googleMapsServices.getPlaceTextSearch(searchTerm);
-      setState(() {
-        searchResultList = dataList;
-      });
+      try {
+        List<SearchResultModel> dataList = await _googleMapsServices.getPlaceTextSearch(searchTerm);
+        setState(() {
+          searchResultList = dataList;
+        });
+      } catch (error) {
+        alert(context, "Error", error);
+      }
       loaded();
     } else {
       // user เลือก prediction
-      underConstruction(context);
+      loading();
+      try {
+        PlaceDetailsModel placeDetails =
+        await _googleMapsServices.getPlaceDetails(prediction.placeId);
+
+        Position destination = Position(
+            latitude: placeDetails.latitude, longitude: placeDetails.longitude);
+        Position origin = await getCurrentLocationNotNull();
+        Map<String, dynamic> routeMap = await MyApi.findBestRoute(origin, destination);
+      } catch (error) {
+        alert(context, "Error", error);
+      }
+      loaded();
+
+      /*alert(context, "Place Details",
+          "name: ${placeDetails.name}\nformatted address: ${placeDetails.formattedAddress}\nlatitude: ${placeDetails.latitude}\nlongitude: ${placeDetails.longitude}");*/
     }
   }
 
   void handleClickSearchResultItem(BuildContext context, SearchResultModel searchResult) {
-    //alert(context, "EXAT Traffic", searchResult.placeDetails.name);
-    //underConstruction(context);
-    Navigator.pop(context, searchResult);
+
+    //Navigator.pop(context, searchResult);
   }
 }
