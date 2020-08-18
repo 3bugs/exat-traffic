@@ -221,7 +221,7 @@ app.get('/api/:item/:id?', (req, res) => {
               });
               db.end();*/
 
-            const NUM_GATE_IN_TO_USE = 2;
+            const NUM_GATE_IN_TO_USE = 3;
             let numGateIn = 0;
             for (let i = 0; i < NUM_GATE_IN_TO_USE; i++) {
               getCostTollListByGateIn(db, sortedGateInList[i].gate_in_id, (success, data) => {
