@@ -186,6 +186,12 @@ app.get('/api/:item/:id?', (req, res) => {
         connection.end();
         break;
 
+      case 'best_route':
+        const {origin, destination} = req.query;
+        console.log(`Origin: ${origin}`);
+        console.log(`Destination: ${destination}`);
+        break;
+
       case 'gate_in':
         whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
         connection.query(
