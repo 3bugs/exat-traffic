@@ -151,15 +151,15 @@ app.get('/api/route_traffic', (req, res) => {
 });
 
 app.get('/api/:item/:id?', (req, res) => {
-    const connection = mysql.createConnection({
+    const db = mysql.createConnection({
       host: 'localhost',
       user: 'root',
       password: 'Exf@2020ch5U$m#2kh&Mc[XY',
       database: 'itsexat2020'
     });
-    connection.connect();
+    db.connect();
 
-    /*connection.connect(function(err) {
+    /*db.connect(function(err) {
       if (err) {
         res.json({
           error: {
@@ -170,7 +170,7 @@ app.get('/api/:item/:id?', (req, res) => {
         });
         return;
       }
-      console.log('connected as id ' + connection.threadId);
+      console.log('connected as id ' + db.threadId);
     });*/
 
     let whereClause;
@@ -183,13 +183,15 @@ app.get('/api/:item/:id?', (req, res) => {
           },
           data_list: null,
         });
-        connection.end();
+        db.end();
         break;
 
       case 'best_route':
         const {origin, destination} = req.query;
-        console.log(`Origin: ${origin}`);
-        console.log(`Destination: ${destination}`);
+        const originPart = origin.split(',');
+        const originLatLng = {lat: originPart[0], lng: originPart[1]};
+        const destinationPart = destination.split(',');
+        const destinationLatLng = {lat: destinationPart[0], lng: destinationPart[1]};
 
         res.json({
           error: {
@@ -202,59 +204,35 @@ app.get('/api/:item/:id?', (req, res) => {
             }
           ],
         });
-        connection.end();
+        db.end();
         break;
 
       case 'gate_in':
-        whereClause = req.params.id == null ? 'true' : `gi.route_id = ${req.params.id}`;
-        connection.query(
-          `SELECT temp.route_name, 
-                    temp.route_id AS gate_in_route_id, 
-                    temp.gate_in_id,
-                    temp.name AS gate_in_name,
-                    temp.marker_id,
-                    m.route_id as marker_route_id,
-                    m.name AS marker_name,
-                    m.cate_id,
-                    m.lat,
-                    m.lng,
-                    m.enable,
-                    temp.cost_tolls_count
-             FROM (
-                 SELECT gi.route_id, r.name AS route_name, ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
-                   FROM cost_tolls ct
-                            INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
-                            INNER JOIN routes r ON gi.route_id = r.id
-                   WHERE ${whereClause} AND gi.enable = 1 AND ct.enable = 1
-                   GROUP BY ct.gate_in_id) AS temp
-                      INNER JOIN markers m ON temp.marker_id = m.id
-                   WHERE m.enable = 1
-             ORDER BY temp.route_id, temp.gate_in_id`,
-          (error, results, fields) => {
-            if (error) {
-              res.json({
-                error: {
-                  code: CODE_FAILED,
-                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                },
-                data_list: null,
-              });
-            } else {
-              res.json({
-                error: {
-                  code: CODE_SUCCESS,
-                  message: 'ok',
-                },
-                data_list: results,
-              });
-            }
-          });
-        connection.end();
+        getGateInList(db, req.params.id, (success, data) => {
+          if (success) {
+            res.json({
+              error: {
+                code: CODE_SUCCESS,
+                message: 'ok',
+              },
+              data_list: data,
+            });
+          } else {
+            res.json({
+              error: {
+                code: CODE_FAILED,
+                message: data,
+              },
+              data_list: null,
+            });
+          }
+          db.end();
+        });
         break;
 
       case 'cost_toll_by_gate_in':
         whereClause = req.params.id == null ? 'true' : `ct.gate_in_id = ${req.params.id}`;
-        connection.query(
+        db.query(
           `SELECT ct.id,
                     m.name,
                     m.lat,
@@ -283,7 +261,7 @@ app.get('/api/:item/:id?', (req, res) => {
                 },
                 data_list: null,
               });
-              connection.end();
+              db.end();
             } else {
               //results['part_toll_list'] = [];
               const allPartTollIdList = [];
@@ -315,7 +293,7 @@ app.get('/api/:item/:id?', (req, res) => {
                              FROM markers m 
                                  INNER JOIN routes r ON m.route_id = r.id 
                              WHERE m.id IN (${partTollIdListCsv}) AND m.enable = 1`;
-                connection.query(
+                db.query(
                   sql,
                   (error, partTollResults, fields) => {
                     if (error) {
@@ -327,7 +305,7 @@ app.get('/api/:item/:id?', (req, res) => {
                         all_part_toll_id: allPartTollIdList,
                         data_list: null,
                       });
-                      connection.end();
+                      db.end();
                     } else {
                       results.forEach(costToll => {
                         const partTollMarkerList = costToll['part_toll_id'].map(partTollId => {
@@ -346,7 +324,7 @@ app.get('/api/:item/:id?', (req, res) => {
                         all_part_toll_markers: partTollResults,
                         data_list: results,
                       });
-                      connection.end();
+                      db.end();
                     }
                   }
                 );
@@ -363,11 +341,11 @@ app.get('/api/:item/:id?', (req, res) => {
                   all_part_toll_markers: [],
                   data_list: results,
                 });
-                connection.end();
+                db.end();
               }
             }
           });
-        //connection.end();
+        //db.end();
         break;
     }
   }
@@ -428,6 +406,54 @@ fetchData = () => {
 
     myCache.set('traffic-data', allRoutePoints);
   });
+};
+
+getDistance = function (lat1, lng1, lat2, lng2) {
+  const R = 6371e3; // metres
+
+  const t1 = lat1 * Math.PI / 180; // φ, λ in radians
+  const t2 = lat2 * Math.PI / 180;
+  const dt = (lat2 - lat1) * Math.PI / 180;
+  const dl = (lng2 - lng1) * Math.PI / 180;
+
+  const a = Math.sin(dt / 2) * Math.sin(dt / 2) + Math.cos(t1) * Math.cos(t2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // in metres
+};
+
+getGateInList = function (db, gateInId, callback) {
+  let whereClause = gateInId == null ? 'true' : `gi.route_id = ${gateInId}`;
+  db.query(
+    `SELECT temp.route_name, 
+                    temp.route_id AS gate_in_route_id, 
+                    temp.gate_in_id,
+                    temp.name AS gate_in_name,
+                    temp.marker_id,
+                    m.route_id as marker_route_id,
+                    m.name AS marker_name,
+                    m.cate_id,
+                    m.lat,
+                    m.lng,
+                    m.enable,
+                    temp.cost_tolls_count
+             FROM (
+                 SELECT gi.route_id, r.name AS route_name, ct.gate_in_id, gi.name, gi.marker_id, COUNT(ct.gate_in_id) AS cost_tolls_count
+                   FROM cost_tolls ct
+                            INNER JOIN gate_in gi ON ct.gate_in_id = gi.id 
+                            INNER JOIN routes r ON gi.route_id = r.id
+                   WHERE ${whereClause} AND gi.enable = 1 AND ct.enable = 1
+                   GROUP BY ct.gate_in_id) AS temp
+                      INNER JOIN markers m ON temp.marker_id = m.id
+                   WHERE m.enable = 1
+             ORDER BY temp.route_id, temp.gate_in_id`,
+    (error, results, fields) => {
+      if (error) {
+        callback(false, 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+      } else {
+        callback(true, results);
+      }
+    });
 };
 
 http.listen(3000, function () {
