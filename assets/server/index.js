@@ -192,6 +192,7 @@ app.get('/api/:item/:id?', (req, res) => {
         const destinationPart = destination.split(',');
         const destinationLatLng = {lat: destinationPart[0], lng: destinationPart[1]};
 
+        const dataList = [];
         getGateInList(db, req.params.id, (success, data) => {
           if (!success) {
             res.json({
@@ -211,15 +212,65 @@ app.get('/api/:item/:id?', (req, res) => {
               return getDistance(gateIn1.lat, gateIn1.lng, originLatLng.lat, originLatLng.lng)
                 - getDistance(gateIn2.lat, gateIn2.lng, originLatLng.lat, originLatLng.lng);
             });
+            /*res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'ok',
+                },
+                data_list: sortedGateInList,
+              });
+              db.end();*/
 
-            res.json({
-              error: {
-                code: CODE_SUCCESS,
-                message: 'ok',
-              },
-              data_list: sortedGateInList,
+            getCostTollListByGateIn(db, sortedGateInList[0].gate_in_id, (success, data) => {
+              if (!success) {
+                res.json({
+                  error: {
+                    code: CODE_FAILED,
+                    message: data,
+                  },
+                  data_list: null,
+                });
+                db.end();
+              } else {
+                const costTollList = data;
+                const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
+                  return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
+                    - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);
+                });
+                dataList.push({gate_in: sortedGateInList[0], cost_toll: sortedCostTollList[0]});
+                dataList.push({gate_in: sortedGateInList[0], cost_toll: sortedCostTollList[1]});
+
+                getCostTollListByGateIn(db, sortedGateInList[1].gate_in_id, (success, data) => {
+                  if (!success) {
+                    res.json({
+                      error: {
+                        code: CODE_FAILED,
+                        message: data,
+                      },
+                      data_list: null,
+                    });
+                    db.end();
+                  } else {
+                    const costTollList = data;
+                    const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
+                      return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
+                        - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);
+                    });
+                    dataList.push({gate_in: sortedGateInList[1], cost_toll: sortedCostTollList[0]});
+                    dataList.push({gate_in: sortedGateInList[1], cost_toll: sortedCostTollList[1]});
+
+                    res.json({
+                      error: {
+                        code: CODE_SUCCESS,
+                        message: 'ok',
+                      },
+                      data_list: dataList,
+                    });
+                    db.end();
+                  }
+                });
+              }
             });
-            db.end();
           }
         });
 
