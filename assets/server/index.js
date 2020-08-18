@@ -221,7 +221,37 @@ app.get('/api/:item/:id?', (req, res) => {
               });
               db.end();*/
 
-            getCostTollListByGateIn(db, sortedGateInList[0].gate_in_id, (success, data) => {
+            const NUM_GATE_IN_TO_USE = 2;
+            let numGateIn = 0;
+            for (let i = 0; i < NUM_GATE_IN_TO_USE; i++) {
+              getCostTollListByGateIn(db, sortedGateInList[i].gate_in_id, (success, data) => {
+                if (success) {
+                  const costTollList = data;
+                  costTollList.forEach(costToll => {
+                    costToll.distanceMeters = getDistance(costToll.lat, costToll.lng, destinationLatLng.lat, destinationLatLng.lng);
+                  });
+                  const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
+                    return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
+                      - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);
+                  });
+                  dataList.push({gate_in: sortedGateInList[i], cost_toll: sortedCostTollList[0]});
+                  dataList.push({gate_in: sortedGateInList[i], cost_toll: sortedCostTollList[1]});
+                }
+
+                if (++numGateIn === NUM_GATE_IN_TO_USE) {
+                  res.json({
+                    error: {
+                      code: CODE_SUCCESS,
+                      message: 'ok',
+                    },
+                    data_list: dataList,
+                  });
+                  db.end();
+                }
+              });
+            }
+
+            /*getCostTollListByGateIn(db, sortedGateInList[0].gate_in_id, (success, data) => {
               if (!success) {
                 res.json({
                   error: {
@@ -276,22 +306,10 @@ app.get('/api/:item/:id?', (req, res) => {
                   }
                 });
               }
-            });
+            });*/
           }
         });
 
-        /*res.json({
-          error: {
-            code: CODE_SUCCESS,
-            message: 'ok',
-          },
-          data_list: [
-            {
-              origin, destination
-            }
-          ],
-        });
-        db.end();*/
         break;
 
       case 'gate_in':
