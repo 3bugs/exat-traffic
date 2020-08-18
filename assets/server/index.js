@@ -231,121 +231,26 @@ app.get('/api/:item/:id?', (req, res) => {
         break;
 
       case 'cost_toll_by_gate_in':
-        whereClause = req.params.id == null ? 'true' : `ct.gate_in_id = ${req.params.id}`;
-        db.query(
-          `SELECT ct.id,
-                    m.name,
-                    m.lat,
-                    m.lng,
-                    m.cate_id,
-                    m.route_id,
-                    r.name AS route_name,
-                    ct.part_toll,
-                    ct.cost_less4,
-                    ct.cost_4to10,
-                    ct.cost_over10,
-                    ct.enable AS cost_toll_enable,
-                    m.enable AS marker_enable,
-                    m.id AS marker_id
-             FROM cost_tolls ct
-                      INNER JOIN markers m ON ct.marker_id = m.id
-                      INNER JOIN routes r ON m.route_id = r.id 
-             WHERE ${whereClause} AND ct.enable = 1
-             ORDER BY route_id`,
-          (error, results, fields) => {
-            if (error) {
-              res.json({
-                error: {
-                  code: CODE_FAILED,
-                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                },
-                data_list: null,
-              });
-              db.end();
-            } else {
-              //results['part_toll_list'] = [];
-              const allPartTollIdList = [];
-
-              results.forEach(costToll => {
-                costToll['part_toll_id'] = [];
-
-                if (costToll['part_toll'] != null) {
-                  const partTollList = costToll['part_toll'].split('-');
-
-                  partTollList.forEach(partToll => {
-                    const partTollId = parseInt(partToll);
-                    costToll['part_toll_id'].push(partTollId);
-
-                    if (!allPartTollIdList.includes(partTollId)) {
-                      allPartTollIdList.push(partTollId);
-                    }
-                  });
-                }
-              });
-
-              if (allPartTollIdList.length > 0) {
-                const partTollIdListCsv = allPartTollIdList.reduce(
-                  (total, partTollId) => total == null ? partTollId : `${total}, ${partTollId}`,
-                  null
-                );
-
-                const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, m.enable, r.name AS route_name
-                             FROM markers m 
-                                 INNER JOIN routes r ON m.route_id = r.id 
-                             WHERE m.id IN (${partTollIdListCsv}) AND m.enable = 1`;
-                db.query(
-                  sql,
-                  (error, partTollResults, fields) => {
-                    if (error) {
-                      res.json({
-                        error: {
-                          code: CODE_FAILED,
-                          message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                        },
-                        all_part_toll_id: allPartTollIdList,
-                        data_list: null,
-                      });
-                      db.end();
-                    } else {
-                      results.forEach(costToll => {
-                        const partTollMarkerList = costToll['part_toll_id'].map(partTollId => {
-                          const filteredMarkerList = partTollResults.filter(partTollMarker => partTollMarker.id === partTollId);
-                          return filteredMarkerList.length > 0 ? filteredMarkerList[0] : null;
-                        });
-                        costToll['part_toll_markers'] = partTollMarkerList.filter(marker => marker != null);
-                      });
-
-                      res.json({
-                        error: {
-                          code: CODE_SUCCESS,
-                          message: 'ok',
-                        },
-                        all_part_toll_id: allPartTollIdList,
-                        all_part_toll_markers: partTollResults,
-                        data_list: results,
-                      });
-                      db.end();
-                    }
-                  }
-                );
-              } else {
-                results.forEach(costToll => {
-                  costToll['part_toll_markers'] = [];
-                });
-                res.json({
-                  error: {
-                    code: CODE_SUCCESS,
-                    message: 'ok',
-                  },
-                  all_part_toll_id: [],
-                  all_part_toll_markers: [],
-                  data_list: results,
-                });
-                db.end();
-              }
-            }
-          });
-        //db.end();
+        getCostTollListByGateIn(db, req.params.id, (success, data) => {
+          if (success) {
+            res.json({
+              error: {
+                code: CODE_SUCCESS,
+                message: 'ok',
+              },
+              data_list: data,
+            });
+          } else {
+            res.json({
+              error: {
+                code: CODE_FAILED,
+                message: data,
+              },
+              data_list: null,
+            });
+          }
+          db.end();
+        });
         break;
     }
   }
@@ -455,6 +360,123 @@ getGateInList = function (db, gateInId, callback) {
       }
     });
 };
+
+getCostTollListByGateIn = function (db, gateInId, callback) {
+  let whereClause = gateInId == null ? 'true' : `ct.gate_in_id = ${gateInId}`;
+  db.query(
+    `SELECT ct.id,
+                    m.name,
+                    m.lat,
+                    m.lng,
+                    m.cate_id,
+                    m.route_id,
+                    r.name AS route_name,
+                    ct.part_toll,
+                    ct.cost_less4,
+                    ct.cost_4to10,
+                    ct.cost_over10,
+                    ct.enable AS cost_toll_enable,
+                    m.enable AS marker_enable,
+                    m.id AS marker_id
+             FROM cost_tolls ct
+                      INNER JOIN markers m ON ct.marker_id = m.id
+                      INNER JOIN routes r ON m.route_id = r.id 
+             WHERE ${whereClause} AND ct.enable = 1
+             ORDER BY route_id`,
+    (error, results, fields) => {
+      if (error) {
+        callback(false, 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+      } else {
+        //results['part_toll_list'] = [];
+        const allPartTollIdList = [];
+
+        results.forEach(costToll => {
+          costToll['part_toll_id'] = [];
+
+          if (costToll['part_toll'] != null) {
+            const partTollList = costToll['part_toll'].split('-');
+
+            partTollList.forEach(partToll => {
+              const partTollId = parseInt(partToll);
+              costToll['part_toll_id'].push(partTollId);
+
+              if (!allPartTollIdList.includes(partTollId)) {
+                allPartTollIdList.push(partTollId);
+              }
+            });
+          }
+        });
+
+        if (allPartTollIdList.length > 0) {
+          const partTollIdListCsv = allPartTollIdList.reduce(
+            (total, partTollId) => total == null ? partTollId : `${total}, ${partTollId}`,
+            null
+          );
+
+          const sql = `SELECT m.id, m.name, m.lat, m.lng, m.cate_id, m.route_id, m.enable, r.name AS route_name
+                             FROM markers m 
+                                 INNER JOIN routes r ON m.route_id = r.id 
+                             WHERE m.id IN (${partTollIdListCsv}) AND m.enable = 1`;
+          db.query(
+            sql,
+            (error, partTollResults, fields) => {
+              if (error) {
+                callback(false, 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+
+                /*res.json({
+                  error: {
+                    code: CODE_FAILED,
+                    message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                  },
+                  all_part_toll_id: allPartTollIdList,
+                  data_list: null,
+                });
+                db.end();*/
+              } else {
+                results.forEach(costToll => {
+                  const partTollMarkerList = costToll['part_toll_id'].map(partTollId => {
+                    const filteredMarkerList = partTollResults.filter(partTollMarker => partTollMarker.id === partTollId);
+                    return filteredMarkerList.length > 0 ? filteredMarkerList[0] : null;
+                  });
+                  costToll['part_toll_markers'] = partTollMarkerList.filter(marker => marker != null);
+                });
+
+                callback(true, results);
+
+                /*res.json({
+                  error: {
+                    code: CODE_SUCCESS,
+                    message: 'ok',
+                  },
+                  all_part_toll_id: allPartTollIdList,
+                  all_part_toll_markers: partTollResults,
+                  data_list: results,
+                });
+                db.end();*/
+              }
+            }
+          );
+        } else {
+          results.forEach(costToll => {
+            costToll['part_toll_markers'] = [];
+          });
+
+          callback(true, results);
+
+          /*res.json({
+            error: {
+              code: CODE_SUCCESS,
+              message: 'ok',
+            },
+            all_part_toll_id: [],
+            all_part_toll_markers: [],
+            data_list: results,
+          });
+          db.end();*/
+        }
+      }
+    });
+}
 
 http.listen(3000, function () {
   console.log('listening on *:3000');
