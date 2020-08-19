@@ -1,3 +1,4 @@
+/*
 import 'package:equatable/equatable.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
@@ -10,4 +11,4 @@ class RouteModel extends Equatable {
 
   @override
   List<Object> get props => [gateInList, costTollList];
-}
+}*/

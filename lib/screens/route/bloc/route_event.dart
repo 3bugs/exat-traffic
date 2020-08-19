@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/services/api.dart';
 
 abstract class RouteEvent extends Equatable {
   RouteEvent();
@@ -34,7 +34,7 @@ class UpdateCurrentLocation extends RouteEvent {
 }
 
 class ShowSearchResultRoute extends RouteEvent {
-  final SearchResultModel searchResult;
+  final RouteModel bestRoute;
 
-  ShowSearchResultRoute({@required this.searchResult});
+  ShowSearchResultRoute({@required this.bestRoute});
 }

@@ -43,6 +43,7 @@ class SearchPlaceView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SizedBox(
                       width: getPlatformSize(20.0),
@@ -54,32 +55,32 @@ class SearchPlaceView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: getPlatformSize(8.0)),
-                    Consumer<LanguageModel>(
-                      builder: (context, language, child) {
-                        String name;
-                        switch (language.lang) {
-                          case 0:
-                            name = searchResult.placeDetails.name;
-                            break;
-                          case 1:
-                            name = 'Expressway';
-                            break;
-                          case 2:
-                            name = '高速公路';
-                            break;
-                        }
-                        return Text(
-                          name,
-                          style: getTextStyle(
-                            language.lang,
-                            color: Constants.App.ACCENT_COLOR,
-                            isBold: true,
-                            //heightEn: 1.6,
-                          ),
-                          /*maxLines: 1,
-                          overflow: TextOverflow.ellipsis,*/
-                        );
-                      },
+                    Expanded(
+                      child: Consumer<LanguageModel>(
+                        builder: (context, language, child) {
+                          String name;
+                          switch (language.lang) {
+                            case 0:
+                              name = searchResult.placeDetails.name;
+                              break;
+                            case 1:
+                              name = 'Expressway';
+                              break;
+                            case 2:
+                              name = '高速公路';
+                              break;
+                          }
+                          return Text(
+                            name,
+                            style: getTextStyle(
+                              language.lang,
+                              color: Constants.App.ACCENT_COLOR,
+                              isBold: true,
+                              //heightEn: 1.6,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

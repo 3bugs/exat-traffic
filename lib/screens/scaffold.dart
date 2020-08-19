@@ -1,9 +1,3 @@
-import 'package:exattraffic/components/dialog_button.dart';
-import 'package:exattraffic/screens/login/login.dart';
-import 'package:exattraffic/screens/route/bloc/bloc.dart';
-import 'package:exattraffic/screens/route/bloc/find_route_bloc.dart';
-import 'package:exattraffic/screens/search/search_place.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +21,8 @@ import 'package:exattraffic/components/header.dart';
 import 'package:exattraffic/components/search_box.dart';
 import 'package:exattraffic/services/fcm.dart';
 import 'package:exattraffic/screens/search/search_service.dart';
+import 'package:exattraffic/components/dialog_button.dart';
+import 'package:exattraffic/screens/search/search_place.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -229,14 +225,14 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         transitionDuration: Duration.zero,
         pageBuilder: (context, anim1, anim2) => destination,
       ),
-    ).then((result) {
-      if (index == 1 && result != null) {
+    ).then((bestRoute) {
+      if (index == 1 && bestRoute != null) {
         _showFragment(2);
         if (_keyRoutePage.currentState != null) {
-          _keyRoutePage.currentState.initFindRoute(result);
+          _keyRoutePage.currentState.initFindRoute(bestRoute);
         } else {
           Future.delayed(Duration(milliseconds: 500), () {
-            _keyRoutePage.currentState.initFindRoute(result);
+            _keyRoutePage.currentState.initFindRoute(bestRoute);
           });
         }
       }

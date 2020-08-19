@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,6 +24,7 @@ import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/services/api.dart';
 
 class MyRoute extends StatefulWidget {
   const MyRoute(Key key) : super(key: key);
@@ -182,18 +182,72 @@ class MyRouteState extends State<MyRoute> {
     );
   }
 
-  Marker _createSearchDestinationMarker(SearchResultModel searchResult) {
-    final MarkerId markerId = MarkerId('search-destination');
+  List<Marker> _createSearchRouteMarkers(RouteModel bestRoute) {
+    List<Marker> markerList = List();
 
-    return Marker(
-      markerId: markerId,
-      position: LatLng(searchResult.placeDetails.latitude, searchResult.placeDetails.longitude),
-      icon: BitmapDescriptor.fromBytes(_destinationMarkerIconLarge),
-      infoWindow: InfoWindow(
-        title: searchResult.placeDetails.name,
-        snippet: searchResult.placeDetails.formattedAddress,
+    final MarkerId destinationMarkerId = MarkerId('search-route-destination');
+    markerList.add(
+      Marker(
+        markerId: destinationMarkerId,
+        position: LatLng(bestRoute.destination.latitude, bestRoute.destination.longitude),
+        icon: BitmapDescriptor.fromBytes(_destinationMarkerIconLarge),
+        infoWindow: InfoWindow
+            .noText /*InfoWindow(
+          title: bestRoute.placeDetails.name,
+          snippet: bestRoute.placeDetails.formattedAddress,
+        )*/
+        ,
       ),
     );
+
+    final MarkerId originMarkerId = MarkerId('search-route-origin');
+    markerList.add(
+      Marker(
+        markerId: originMarkerId,
+        position: LatLng(bestRoute.origin.latitude, bestRoute.origin.longitude),
+        icon: BitmapDescriptor.fromBytes(_originMarkerIconLarge),
+        infoWindow: InfoWindow
+            .noText /*InfoWindow(
+          title: bestRoute.placeDetails.name,
+          snippet: bestRoute.placeDetails.formattedAddress,
+        )*/
+        ,
+      ),
+    );
+
+    final MarkerId entranceMarkerId = MarkerId('search-route-entrance');
+    markerList.add(
+      Marker(
+        markerId: entranceMarkerId,
+        position: LatLng(
+          bestRoute.gateInCostTollList[0].gateIn.latitude,
+          bestRoute.gateInCostTollList[0].gateIn.longitude,
+        ),
+        //icon: BitmapDescriptor.fromBytes(_originMarkerIconLarge),
+        infoWindow: InfoWindow(
+          title: bestRoute.gateInCostTollList[0].gateIn.name,
+          snippet: bestRoute.gateInCostTollList[0].gateIn.name,
+        ),
+      ),
+    );
+
+    final MarkerId exitMarkerId = MarkerId('search-route-exit');
+    markerList.add(
+      Marker(
+        markerId: exitMarkerId,
+        position: LatLng(
+          bestRoute.gateInCostTollList[0].costToll.latitude,
+          bestRoute.gateInCostTollList[0].costToll.longitude,
+        ),
+        //icon: BitmapDescriptor.fromBytes(_originMarkerIconLarge),
+        infoWindow: InfoWindow(
+          title: bestRoute.gateInCostTollList[0].costToll.name,
+          snippet: bestRoute.gateInCostTollList[0].costToll.name,
+        ),
+      ),
+    );
+
+    return markerList;
   }
 
   void _setupCustomMarker() async {
@@ -297,8 +351,8 @@ class MyRouteState extends State<MyRoute> {
     //return routeBloc;
   }
 
-  void initFindRoute(SearchResultModel searchResult) {
-    _routeBloc.add(ShowSearchResultRoute(searchResult: searchResult));
+  void initFindRoute(RouteModel route) {
+    _routeBloc.add(ShowSearchResultRoute(bestRoute: route));
   }
 
   void _handleClickClose() {
@@ -460,9 +514,12 @@ class MyRouteState extends State<MyRoute> {
                   }
                 }
 
-                Set<Marker> searchDestinationSet = Set();
+                Set<Marker> searchRouteMarkerSet = Set();
                 if (state is ShowSearchResultRouteState) {
-                  searchDestinationSet.add(_createSearchDestinationMarker(state.searchResult));
+                  searchRouteMarkerSet.addAll(_createSearchRouteMarkers(state.bestRoute));
+                  polyline = createRoutePolyline(state
+                      .bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points']);
+                  polyLineSet.add(polyline);
                 }
 
                 return FutureBuilder(
@@ -489,7 +546,7 @@ class MyRouteState extends State<MyRoute> {
                           .union(costTollMarkerSet)
                           .union(snapshot.hasData ? snapshot.data : Set())
                           .union(currentLocationSet)
-                          .union(searchDestinationSet),
+                          .union(searchRouteMarkerSet),
                       polylines: polyLineSet,
                     );
                   },
@@ -637,7 +694,12 @@ class MyRouteState extends State<MyRoute> {
                                             left: getPlatformSize(6.0),
                                           ),
                                           child: Text(
-                                            isSearchMode ? 'ตำแหน่งปัจจุบันของคุณ' : 'เลือกต้นทาง',
+                                            isSearchMode
+                                                ? (state as ShowSearchResultRouteState)
+                                                    .bestRoute
+                                                    .origin
+                                                    .name
+                                                : 'เลือกต้นทาง',
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: getTextStyle(
@@ -800,8 +862,8 @@ class MyRouteState extends State<MyRoute> {
                                                   child: Text(
                                                     isSearchMode
                                                         ? (state as ShowSearchResultRouteState)
-                                                            .searchResult
-                                                            .placeDetails
+                                                            .bestRoute
+                                                            .destination
                                                             .name
                                                         : 'เลือกปลายทาง',
                                                     maxLines: 1,

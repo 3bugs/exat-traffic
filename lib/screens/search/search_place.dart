@@ -1,7 +1,3 @@
-import 'dart:async';
-
-import 'package:exattraffic/screens/search/components/search_place_view.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +6,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/screens/search/components/search_place_view.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 
 import 'search_place_presenter.dart';
 

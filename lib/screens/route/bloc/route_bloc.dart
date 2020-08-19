@@ -28,7 +28,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     final currentState = state;
 
     if (event is ShowSearchResultRoute) {
-      yield ShowSearchResultRouteState(searchResult: event.searchResult);
+      yield ShowSearchResultRouteState(bestRoute: event.bestRoute);
     }
 
     if (event is ListGateIn) {

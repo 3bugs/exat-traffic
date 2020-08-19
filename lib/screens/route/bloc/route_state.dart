@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/services/api.dart';
 
 abstract class RouteState extends Equatable {
   final List<GateInModel> gateInList;
@@ -171,10 +171,10 @@ class LocationTrackingUpdated extends RouteState {
 }
 
 class ShowSearchResultRouteState extends RouteState {
-  final SearchResultModel searchResult;
+  final RouteModel bestRoute;
 
-  ShowSearchResultRouteState({@required this.searchResult});
+  ShowSearchResultRouteState({@required this.bestRoute});
 
   @override
-  List<Object> get props => [searchResult];
+  List<Object> get props => [bestRoute];
 }
