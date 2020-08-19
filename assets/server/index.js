@@ -209,28 +209,38 @@ app.get('/api/:item/:id?', (req, res) => {
               gateIn.distanceMeters = getDistance(gateIn.lat, gateIn.lng, originLatLng.lat, originLatLng.lng);
             });
             const sortedGateInList = gateInList.sort((gateIn1, gateIn2) => {
-              return getDistance(gateIn1.lat, gateIn1.lng, originLatLng.lat, originLatLng.lng)
-                - getDistance(gateIn2.lat, gateIn2.lng, originLatLng.lat, originLatLng.lng);
+              return gateIn1.distanceMeters - gateIn2.distanceMeters;
+              /*return getDistance(gateIn1.lat, gateIn1.lng, originLatLng.lat, originLatLng.lng)
+                - getDistance(gateIn2.lat, gateIn2.lng, originLatLng.lat, originLatLng.lng);*/
             });
 
             const NUM_GATE_IN_TO_USE = 3;
             let numGateIn = 0;
             for (let i = 0; i < NUM_GATE_IN_TO_USE; i++) {
-              getCostTollListByGateIn(db, sortedGateInList[i].gate_in_id, (success, data) => {
+              const gateIn = sortedGateInList[i];
+
+              getCostTollListByGateIn(db, gateIn.gate_in_id, (success, data) => {
                 if (success) {
                   const costTollList = data;
                   costTollList.forEach(costToll => {
                     costToll.distanceMeters = getDistance(costToll.lat, costToll.lng, destinationLatLng.lat, destinationLatLng.lng);
                   });
                   const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
-                    return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
-                      - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);
+                    return costToll1.distanceMeters - costToll2.distanceMeters;
+                    /*return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
+                      - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);*/
                   });
-                  dataList.push({gate_in: sortedGateInList[i], cost_toll: sortedCostTollList[0]});
-                  dataList.push({gate_in: sortedGateInList[i], cost_toll: sortedCostTollList[1]});
+
+                  const gateInDestinationDistance = getDistance(gateIn.lat, gateIn.lng, destinationLatLng.lat, destinationLatLng.lng);
+                  if ((sortedCostTollList[0].distanceMeters < gateInDestinationDistance)
+                    && (sortedCostTollList[1].distanceMeters < gateInDestinationDistance)) {
+                    dataList.push({gate_in: gateIn, cost_toll: sortedCostTollList[0]});
+                    dataList.push({gate_in: gateIn, cost_toll: sortedCostTollList[1]});
+                  }
                 }
 
-                if (++numGateIn === NUM_GATE_IN_TO_USE) {
+                numGateIn++;
+                if (numGateIn === NUM_GATE_IN_TO_USE) {
                   res.json({
                     error: {
                       code: CODE_SUCCESS,
