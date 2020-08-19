@@ -251,7 +251,8 @@ class MyRouteState extends State<MyRoute> {
   }
 
   Future<Set<Marker>> _createSearchRouteFutureMarkerSet(RouteModel bestRoute) async {
-    print('OKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOK');
+    print(
+        'OKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOK');
     GateInCostTollModel gateInCostToll = bestRoute.gateInCostTollList[0];
 
     print('111111111111111111111111111111111111111111111111111111111111111111111111111');
@@ -262,12 +263,41 @@ class MyRouteState extends State<MyRoute> {
       markerSet.add(marker);
     }
 
+    print('222222222222222222222222222222222222222222222222222222222222222222222222222');
+
+    List<MarkerModel> gateInMarkerList = _routeBloc.markerList
+        .where((marker) => (marker.latitude == gateInCostToll.gateIn.latitude &&
+            marker.longitude == gateInCostToll.gateIn.longitude))
+        .toList();
+
+    print('333333333333333333333333333333333333333333333333333333333333333333333333333');
+
+    assert(gateInMarkerList.isNotEmpty);
+
+    print(
+        '========================================================MARKER LIST COUNT: ${gateInMarkerList.length}');
+
+    for (MarkerModel markerModel in gateInMarkerList) {
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print(
+          'name: ${markerModel.name}, lat: ${markerModel.latitude}, lng: ${markerModel.longitude}, category: ${markerModel.category.code}');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+
+      Marker marker = await _createFutureMarker(markerModel);
+      markerSet.add(marker);
+    }
+
     List<MarkerModel> costTollMarkerList = _routeBloc.markerList
         .where((marker) => (marker.latitude == gateInCostToll.costToll.latitude &&
-        marker.longitude == gateInCostToll.costToll.longitude))
+            marker.longitude == gateInCostToll.costToll.longitude))
         .toList();
     if (costTollMarkerList.isEmpty) {
-      List<CategoryModel> filteredCategoryList = _routeBloc.categoryList.where((category) => category.code == CategoryType.EXIT).toList();
+      List<CategoryModel> filteredCategoryList =
+          _routeBloc.categoryList.where((category) => category.code == CategoryType.EXIT).toList();
       BitmapDescriptor markerIcon = await filteredCategoryList[0].getNetworkIcon();
 
       Marker marker = Marker(
@@ -277,9 +307,9 @@ class MyRouteState extends State<MyRoute> {
         alpha: 1.0,
         infoWindow: (true)
             ? InfoWindow(
-          title: gateInCostToll.costToll.name,
-          snippet: gateInCostToll.costToll.routeName,
-        )
+                title: gateInCostToll.costToll.name,
+                snippet: gateInCostToll.costToll.routeName,
+              )
             : InfoWindow.noText,
         onTap: () {},
       );
@@ -288,33 +318,6 @@ class MyRouteState extends State<MyRoute> {
       Marker marker = await _createFutureMarker(costTollMarkerList[0]);
       markerSet.add(marker);
     }
-
-    print('222222222222222222222222222222222222222222222222222222222222222222222222222');
-
-    /*List<MarkerModel> gateInMarkerList = _routeBloc.markerList
-        .where((marker) => (marker.latitude == gateInCostToll.gateIn.latitude &&
-            marker.longitude == gateInCostToll.gateIn.longitude))
-        .toList();
-
-    print('333333333333333333333333333333333333333333333333333333333333333333333333333');
-
-    assert(gateInMarkerList.isNotEmpty);
-
-    print('========================================================MARKER LIST COUNT: ${gateInMarkerList.length}');
-
-    for (MarkerModel markerModel in gateInMarkerList) {
-
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('name: ${markerModel.name}, lat: ${markerModel.latitude}, lng: ${markerModel.longitude}, category: ${markerModel.category.code}');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-
-      Marker marker = await _createFutureMarker(markerModel);
-      markerSet.add(marker);
-    }*/
 
     return markerSet;
   }
@@ -591,9 +594,37 @@ class MyRouteState extends State<MyRoute> {
                   polyLineSet.add(polyline);
 
                   new Future.delayed(Duration(milliseconds: 1000), () async {
-                    LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
                     final GoogleMapController controller = await _googleMapController.future;
+
+                    List<LatLng> latLngList = List();
+                    latLngList.add(
+                      LatLng(state.bestRoute.origin.latitude, state.bestRoute.origin.longitude),
+                    );
+                    latLngList.add(
+                      LatLng(state.bestRoute.gateInCostTollList[0].gateIn.latitude,
+                          state.bestRoute.gateInCostTollList[0].gateIn.longitude),
+                    );
+                    LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
                     controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+
+                    new Future.delayed(Duration(milliseconds: 1500), () async {
+                      List<LatLng> latLngList = List();
+                      latLngList.add(
+                        LatLng(state.bestRoute.destination.latitude,
+                            state.bestRoute.destination.longitude),
+                      );
+                      latLngList.add(
+                        LatLng(state.bestRoute.gateInCostTollList[0].costToll.latitude,
+                            state.bestRoute.gateInCostTollList[0].costToll.longitude),
+                      );
+                      LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
+                      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+
+                      new Future.delayed(Duration(milliseconds: 1500), () async {
+                        LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
+                        controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                      });
+                    });
                   });
                 }
 
@@ -1115,18 +1146,29 @@ class MyRouteState extends State<MyRoute> {
 
             BlocBuilder<RouteBloc, RouteState>(
               builder: (context, state) {
-                final CostTollModel selectedCostToll = state.selectedCostToll;
+                if (state is ShowSearchResultRouteState) {
+                  return RouteBottomSheet(
+                    collapsePosition: _googleMapsHeight -
+                        getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
+                    expandPosition: _googleMapsHeight -
+                        getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
+                    selectedCostToll: state.bestRoute.gateInCostTollList[0].costToll,
+                    googleRoute: state.bestRoute.gateInCostTollList[0].googleRoute,
+                  );
+                } else {
+                  final CostTollModel selectedCostToll = state.selectedCostToll;
 
-                return selectedCostToll == null
-                    ? SizedBox.shrink()
-                    : RouteBottomSheet(
-                        collapsePosition: _googleMapsHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
-                        expandPosition: _googleMapsHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
-                        selectedCostToll: selectedCostToll,
-                        googleRoute: state.googleRoute,
-                      );
+                  return selectedCostToll == null
+                      ? SizedBox.shrink()
+                      : RouteBottomSheet(
+                          collapsePosition: _googleMapsHeight -
+                              getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
+                          expandPosition: _googleMapsHeight -
+                              getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
+                          selectedCostToll: selectedCostToll,
+                          googleRoute: state.googleRoute,
+                        );
+                }
               },
             ),
           ],
