@@ -148,7 +148,7 @@ class CategoryModel {
     final Uint8List markerImageBytes = await markerImageFile.readAsBytes();
     return BitmapDescriptor.fromBytes(markerImageBytes);*/
 
-    return MapHelper.getMarkerImageFromUrl(this.markerIconUrl);
+    return await MapHelper.getMarkerImageFromUrl(this.markerIconUrl);
   }
 
   CategoryModel copyWith({

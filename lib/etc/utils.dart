@@ -130,10 +130,10 @@ void underConstruction(BuildContext context) {
 LatLngBounds boundsFromLatLngList(List<LatLng> latLngList) {
   double x0, x1, y0, y1;
   for (LatLng latLng in latLngList) {
-    if (latLng.latitude < 13 ||
-        latLng.longitude < 100.3 ||
-        latLng.latitude > 15 ||
-        latLng.longitude > 100.8) {
+    if (latLng.latitude < 5.3 ||
+        latLng.longitude < 96.7 ||
+        latLng.latitude > 20.7 ||
+        latLng.longitude > 106) {
       continue;
     }
 

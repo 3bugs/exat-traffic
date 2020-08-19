@@ -119,13 +119,21 @@ class MarkerModel {
       streamMobile = null;
     }
 
+    double latitude = json['lat'];
+    double longitude = json['lng'];
+    /*if (latitude > 50 && longitude < 50) {
+      double temp = latitude;
+      latitude = longitude;
+      longitude = temp;
+    }*/
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
       routeId: json['route_id'],
       routeName: json['route_name'],
-      latitude: json['lat'],
-      longitude: json['lng'],
+      latitude: latitude,
+      longitude: longitude,
       categoryId: json['cate_id'],
       streamMobile: streamMobile,
       streamWeb: json['stream_web'],

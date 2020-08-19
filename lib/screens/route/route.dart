@@ -139,30 +139,34 @@ class MyRouteState extends State<MyRoute> {
     );
   }
 
-  Future<Set<Marker>> _createPartTollMarkerSet(List<MarkerModel> partTollMarkerList) async {
+  Future<Set<Marker>> _createPartTollFutureMarkerSet(List<MarkerModel> partTollMarkerList) async {
     Set<Marker> markerSet = Set();
     for (MarkerModel markerModel in partTollMarkerList) {
-      Marker marker = await _createPartTollMarker(markerModel);
+      Marker marker = await _createFutureMarker(markerModel);
       markerSet.add(marker);
     }
     return markerSet;
   }
 
-  Future<Marker> _createPartTollMarker(MarkerModel partTollMarker) async {
+  Future<Marker> _createFutureMarker(MarkerModel markerModel) async {
     //String markerIdVal = uuid.v1();
-    final MarkerId markerId = MarkerId('part-toll-${partTollMarker.id.toString()}');
+    final MarkerId markerId = MarkerId('part-toll-${markerModel.id.toString()}');
 
-    BitmapDescriptor markerIcon = await partTollMarker.category.getNetworkIcon();
+    print('4444444444444444444444444444444444444444444444444444444444444444444444');
+
+    BitmapDescriptor markerIcon = await markerModel.category.getNetworkIcon();
+
+    print('5555555555555555555555555555555555555555555555555555555555555555555555');
 
     return Marker(
       markerId: markerId,
-      position: LatLng(partTollMarker.latitude, partTollMarker.longitude),
+      position: LatLng(markerModel.latitude, markerModel.longitude),
       icon: markerIcon,
       alpha: 1.0,
       infoWindow: (true)
           ? InfoWindow(
-              title: partTollMarker.name + (kReleaseMode ? "" : " [${partTollMarker.categoryId}]"),
-              snippet: partTollMarker.routeName,
+              title: markerModel.name + (kReleaseMode ? "" : " [${markerModel.categoryId}]"),
+              snippet: markerModel.routeName,
             )
           : InfoWindow.noText,
       onTap: () {},
@@ -191,12 +195,10 @@ class MyRouteState extends State<MyRoute> {
         markerId: destinationMarkerId,
         position: LatLng(bestRoute.destination.latitude, bestRoute.destination.longitude),
         icon: BitmapDescriptor.fromBytes(_destinationMarkerIconLarge),
-        infoWindow: InfoWindow
-            .noText /*InfoWindow(
-          title: bestRoute.placeDetails.name,
-          snippet: bestRoute.placeDetails.formattedAddress,
-        )*/
-        ,
+        infoWindow: InfoWindow(
+          title: bestRoute.destination.name,
+          snippet: bestRoute.destination.formattedAddress,
+        ),
       ),
     );
 
@@ -206,16 +208,14 @@ class MyRouteState extends State<MyRoute> {
         markerId: originMarkerId,
         position: LatLng(bestRoute.origin.latitude, bestRoute.origin.longitude),
         icon: BitmapDescriptor.fromBytes(_originMarkerIconLarge),
-        infoWindow: InfoWindow
-            .noText /*InfoWindow(
-          title: bestRoute.placeDetails.name,
-          snippet: bestRoute.placeDetails.formattedAddress,
-        )*/
-        ,
+        infoWindow: InfoWindow(
+          title: bestRoute.origin.name,
+          snippet: bestRoute.origin.formattedAddress,
+        ),
       ),
     );
 
-    final MarkerId entranceMarkerId = MarkerId('search-route-entrance');
+    /*final MarkerId entranceMarkerId = MarkerId('search-route-entrance');
     markerList.add(
       Marker(
         markerId: entranceMarkerId,
@@ -245,9 +245,78 @@ class MyRouteState extends State<MyRoute> {
           snippet: bestRoute.gateInCostTollList[0].costToll.name,
         ),
       ),
-    );
+    );*/
 
     return markerList;
+  }
+
+  Future<Set<Marker>> _createSearchRouteFutureMarkerSet(RouteModel bestRoute) async {
+    print('OKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOK');
+    GateInCostTollModel gateInCostToll = bestRoute.gateInCostTollList[0];
+
+    print('111111111111111111111111111111111111111111111111111111111111111111111111111');
+
+    Set<Marker> markerSet = Set();
+    for (MarkerModel markerModel in gateInCostToll.costToll.partTollMarkerList) {
+      Marker marker = await _createFutureMarker(markerModel);
+      markerSet.add(marker);
+    }
+
+    List<MarkerModel> costTollMarkerList = _routeBloc.markerList
+        .where((marker) => (marker.latitude == gateInCostToll.costToll.latitude &&
+        marker.longitude == gateInCostToll.costToll.longitude))
+        .toList();
+    if (costTollMarkerList.isEmpty) {
+      List<CategoryModel> filteredCategoryList = _routeBloc.categoryList.where((category) => category.code == CategoryType.EXIT).toList();
+      BitmapDescriptor markerIcon = await filteredCategoryList[0].getNetworkIcon();
+
+      Marker marker = Marker(
+        markerId: MarkerId("route-search-destination"),
+        position: LatLng(gateInCostToll.costToll.latitude, gateInCostToll.costToll.longitude),
+        icon: markerIcon,
+        alpha: 1.0,
+        infoWindow: (true)
+            ? InfoWindow(
+          title: gateInCostToll.costToll.name,
+          snippet: gateInCostToll.costToll.routeName,
+        )
+            : InfoWindow.noText,
+        onTap: () {},
+      );
+      markerSet.add(marker);
+    } else {
+      Marker marker = await _createFutureMarker(costTollMarkerList[0]);
+      markerSet.add(marker);
+    }
+
+    print('222222222222222222222222222222222222222222222222222222222222222222222222222');
+
+    /*List<MarkerModel> gateInMarkerList = _routeBloc.markerList
+        .where((marker) => (marker.latitude == gateInCostToll.gateIn.latitude &&
+            marker.longitude == gateInCostToll.gateIn.longitude))
+        .toList();
+
+    print('333333333333333333333333333333333333333333333333333333333333333333333333333');
+
+    assert(gateInMarkerList.isNotEmpty);
+
+    print('========================================================MARKER LIST COUNT: ${gateInMarkerList.length}');
+
+    for (MarkerModel markerModel in gateInMarkerList) {
+
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('name: ${markerModel.name}, lat: ${markerModel.latitude}, lng: ${markerModel.longitude}, category: ${markerModel.category.code}');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+
+      Marker marker = await _createFutureMarker(markerModel);
+      markerSet.add(marker);
+    }*/
+
+    return markerSet;
   }
 
   void _setupCustomMarker() async {
@@ -520,11 +589,19 @@ class MyRouteState extends State<MyRoute> {
                   polyline = createRoutePolyline(state
                       .bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points']);
                   polyLineSet.add(polyline);
+
+                  new Future.delayed(Duration(milliseconds: 1000), () async {
+                    LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
+                    final GoogleMapController controller = await _googleMapController.future;
+                    controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                  });
                 }
 
                 return FutureBuilder(
-                  future: _createPartTollMarkerSet(
-                      selectedCostToll != null ? selectedCostToll.partTollMarkerList : List()),
+                  future: (state is ShowSearchResultRouteState)
+                      ? (_createSearchRouteFutureMarkerSet(state.bestRoute))
+                      : (_createPartTollFutureMarkerSet(
+                          selectedCostToll != null ? selectedCostToll.partTollMarkerList : List())),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     return GoogleMap(
                       key: _keyGoogleMaps,

@@ -156,7 +156,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     return RouteModel(
       origin: PlaceDetailsModel(
         name: "ตำแหน่งปัจจุบันของคุณ",
-        formattedAddress: "",
+        formattedAddress: null,
         latitude: origin.latitude,
         longitude: origin.longitude,
       ),

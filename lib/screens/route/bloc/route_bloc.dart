@@ -35,6 +35,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       try {
         if (_gateInList == null) {
           _gateInList = await MyApi.fetchGateIn();
+        } else {
+          _gateInList.forEach((gateIn) => gateIn.selected = false);
         }
         yield FetchGateInSuccess(gateInList: _gateInList);
       } catch (_) {
