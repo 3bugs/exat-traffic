@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -9,6 +10,7 @@ import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/app/bloc.dart';
 
 class SearchPlacePresenter extends BasePresenter<SearchPlace> {
   static const DELAY_SEARCH_MS = 750;
@@ -59,6 +61,8 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
   }
 
   void handleClickPredictionItem(BuildContext context, PredictionModel prediction) async {
+    //alert(context, "555", BlocProvider.of<AppBloc>(context).markerList.length.toString());
+
     //alert(context, "EXAT Traffic", prediction.description);
     setState(() {
       showPredictionList = false;
@@ -72,9 +76,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         setState(() {
           searchResultList = dataList;
         });
-      } catch (error) {
-        alert(context, "Error", error);
-      }
+      } catch (error) {}
       loaded();
     } else {
       // user เลือก prediction
@@ -87,11 +89,9 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         RouteModel bestRoute = await _findBestRoute(placeDetails);
         assert(bestRoute.gateInCostTollList.isNotEmpty);
 
-        //alert(context, "Best Route", "${bestRoute.directions['legs'][0]['duration']['text']}");
+        // กลับไป _handleClickSearchOption ใน MyScaffold
         Navigator.pop(context, bestRoute);
-      } catch (error) {
-        alert(context, "Error", error);
-      }
+      } catch (error) {}
       loaded();
 
       /*alert(context, "Place Details",
@@ -109,7 +109,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
       RouteModel bestRoute = await _findBestRoute(searchResult.placeDetails);
       assert(bestRoute.gateInCostTollList.isNotEmpty);
 
-      //alert(context, "Best Route", "${bestRoute.directions['legs'][0]['duration']['text']}");
+      // กลับไป _handleClickSearchOption ใน MyScaffold
       Navigator.pop(context, bestRoute);
     } catch (error) {}
     loaded();
@@ -120,18 +120,25 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     List<GateInCostTollModel> routeList = await MyApi.findRoute(
       origin,
       Position(latitude: destination.latitude, longitude: destination.longitude),
+      BlocProvider.of<AppBloc>(state.context).markerList,
     );
 
     final GoogleMapsServices googleMapsServices = GoogleMapsServices();
 
     routeList = await Future.wait<GateInCostTollModel>(
       routeList.map((gateInCostToll) async {
-        final List<LatLng> partTollLatLngList = gateInCostToll.costToll.partTollMarkerList
-            .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
-            .toList();
+        final List<LatLng> partTollLatLngList = List();
 
+        // เพิ่มด่านทางเข้าใน way points
         partTollLatLngList
             .add(LatLng(gateInCostToll.gateIn.latitude, gateInCostToll.gateIn.longitude));
+        // เพิ่มด่านระหว่างทางใน way points
+        partTollLatLngList.addAll(
+          gateInCostToll.costToll.partTollMarkerList
+              .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
+              .toList(),
+        );
+        // เพิ่มทางออกใน way points
         partTollLatLngList
             .add(LatLng(gateInCostToll.costToll.latitude, gateInCostToll.costToll.longitude));
 

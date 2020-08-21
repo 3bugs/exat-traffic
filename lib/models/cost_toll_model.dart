@@ -1,6 +1,6 @@
-import 'package:exattraffic/models/marker_model.dart';
 import 'package:flutter/material.dart';
 
+import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 
 class CostTollModel {
@@ -17,6 +17,7 @@ class CostTollModel {
   List<MarkerModel> partTollMarkerList;
   bool selected;
   bool notified;
+  final MarkerModel marker;
 
   CostTollModel({
     @required this.id,
@@ -32,9 +33,38 @@ class CostTollModel {
     @required this.partTollMarkerList,
     @required this.selected,
     @required this.notified,
+    @required this.marker,
   });
 
-  factory CostTollModel.fromJson(Map<String, dynamic> json) {
+  factory CostTollModel.fromJson(Map<String, dynamic> json, List<MarkerModel> markerList) {
+    List<MarkerModel> partTollMarkerList = json['part_toll_markers']
+        .map<MarkerModel>((markerJson) => MarkerModel.fromJson(markerJson))
+        .toList();
+
+    List<MarkerModel> newPartTollMarkerList = partTollMarkerList.map((MarkerModel partTollMarker) {
+      List<MarkerModel> filteredMarkerList = markerList.where((MarkerModel marker) {
+        return (marker.latitude == partTollMarker.latitude) &&
+            (marker.longitude == partTollMarker.longitude);
+      }).toList();
+
+      if (filteredMarkerList.length == 0) {
+        print(
+          "MARKER name: ${partTollMarker.name}, categoryId: ${partTollMarker.categoryId}, latitude: ${partTollMarker.latitude}, longitude: ${partTollMarker.longitude}",
+        );
+      }
+      assert(filteredMarkerList.length > 0);
+      return filteredMarkerList[0];
+    }).toList();
+
+    List<MarkerModel> filteredMarkerList = markerList
+        .where((marker) => (marker.latitude == json['lat'] && marker.longitude == json['lng']))
+        .toList();
+
+    if (filteredMarkerList.isEmpty) {
+      print("COST TOLL WITH NO ASSOCIATED MARKER!!! [id: ${json['id']}, name: ${json['name']}, category_id: ${json['cate_id']}]");
+    }
+    //assert(filteredMarkerList.isNotEmpty);
+
     return CostTollModel(
       id: json['id'],
       name: json['name'],
@@ -46,11 +76,10 @@ class CostTollModel {
       cost4Wheels: json['cost_less4'],
       cost6To10Wheels: json['cost_4to10'],
       costOver10Wheels: json['cost_over10'],
-      partTollMarkerList: json['part_toll_markers']
-          .map<MarkerModel>((markerJson) => MarkerModel.fromJson(markerJson))
-          .toList(),
+      partTollMarkerList: newPartTollMarkerList,
       selected: false,
       notified: false,
+      marker: filteredMarkerList.isNotEmpty ? filteredMarkerList[0] : null,
     );
   }
 

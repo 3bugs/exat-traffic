@@ -34,7 +34,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     if (event is ListGateIn) {
       try {
         if (_gateInList == null) {
-          _gateInList = await MyApi.fetchGateIn();
+          _gateInList = await MyApi.fetchGateIn(this.markerList);
         } else {
           _gateInList.forEach((gateIn) => gateIn.selected = false);
         }
@@ -58,10 +58,10 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       );
 
       try {
-        final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn);
+        final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn, this.markerList);
 
         // replace part toll marker ด้วย marker ที่โหลดมาตอนเข้าแอพ
-        costTollList.forEach((CostTollModel costTollModel) {
+        /*costTollList.forEach((CostTollModel costTollModel) {
           assert(this.markerList != null);
           assert(costTollModel.partTollMarkerList != null);
 
@@ -82,7 +82,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           }).toList();
 
           costTollModel.partTollMarkerList = newPartTollMarkerList;
-        });
+        });*/
 
         yield FetchCostTollSuccess(
           gateInList: currentState.gateInList,

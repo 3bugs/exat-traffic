@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/marker_model.dart';
+//import 'package:exattraffic/constants.dart' as Constants;
 
 class GateInModel {
   final int id;
@@ -15,6 +16,7 @@ class GateInModel {
   final int costTollCount;
   bool selected;
   bool notified;
+  final MarkerModel marker;
 
   GateInModel({
     @required this.id,
@@ -29,9 +31,20 @@ class GateInModel {
     @required this.costTollCount,
     @required this.selected,
     @required this.notified,
+    @required this.marker,
   });
 
-  factory GateInModel.fromJson(Map<String, dynamic> json) {
+  factory GateInModel.fromJson(Map<String, dynamic> json, List<MarkerModel> markerList) {
+    List<MarkerModel> filteredMarkerList = markerList
+        .where((marker) =>
+            (marker.latitude == json['lat'] && marker.longitude == json['lng']))
+        .toList();
+
+    if (filteredMarkerList.isEmpty) {
+      print("GATE IN WITH NO ASSOCIATED MARKER!!! [gate_in_id: ${json['gate_in_id']}, name: ${json['gate_in_name']}, marker_id: ${json['marker_id']}]");
+    }
+    assert(filteredMarkerList.isNotEmpty);
+
     return GateInModel(
       id: json['gate_in_id'],
       name: json['gate_in_name'],
@@ -45,6 +58,7 @@ class GateInModel {
       costTollCount: json['cost_tolls_count'],
       selected: false,
       notified: false,
+      marker: filteredMarkerList.isNotEmpty ? filteredMarkerList[0] : null,
     );
   }
 

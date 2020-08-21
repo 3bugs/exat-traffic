@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -60,12 +61,14 @@ class MyApi {
     }
   }
 
-  static Future<List<GateInModel>> fetchGateIn() async {
+  static Future<List<GateInModel>> fetchGateIn(
+    List<MarkerModel> markerList,
+  ) async {
     ResponseResult responseResult = await _makeRequest(FETCH_GATE_IN_URL);
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<GateInModel> gateInList =
-      dataList.map((gateInJson) => GateInModel.fromJson(gateInJson)).toList();
+          dataList.map((gateInJson) => GateInModel.fromJson(gateInJson, markerList)).toList();
       print('Number of Gate In : ${gateInList.length}');
 
       return gateInList;
@@ -74,20 +77,22 @@ class MyApi {
     }
   }
 
-  static Future<List<CostTollModel>> fetchCostTollByGateIn(GateInModel gateIn) async {
+  static Future<List<CostTollModel>> fetchCostTollByGateIn(
+    GateInModel gateIn,
+    List<MarkerModel> markerList,
+  ) async {
     ResponseResult responseResult = await _makeRequest(
       '$FETCH_COST_TOLL_BY_GATE_IN_URL/${gateIn.id}',
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<CostTollModel> costTollList =
-      dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson)).toList();
+          dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson, markerList)).toList();
 
       print('Number of Cost Toll : ${costTollList.length}');
       costTollList.forEach((costToll) {
         print(
-            'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList
-                .length}');
+            'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList.length}');
         costToll.partTollMarkerList
             .map((partTollMarker) => print('--- ${partTollMarker.name}'))
             .toList();
@@ -99,15 +104,18 @@ class MyApi {
     }
   }
 
-  static Future<List<GateInCostTollModel>> findRoute(Position origin, Position destination) async {
+  static Future<List<GateInCostTollModel>> findRoute(
+    Position origin,
+    Position destination,
+    List<MarkerModel> markerList,
+  ) async {
     ResponseResult responseResult = await _makeRequest(
-      '$FIND_BEST_ROUTE_URL?origin=${origin.latitude},${origin.longitude}&destination=${destination
-          .latitude},${destination.longitude}',
+      '$FIND_BEST_ROUTE_URL?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}',
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<GateInCostTollModel> gateInCostTollList = dataList
-          .map((gateInCostTollJson) => GateInCostTollModel.fromJson(gateInCostTollJson))
+          .map((gateInCostTollJson) => GateInCostTollModel.fromJson(gateInCostTollJson, markerList))
           .toList();
       return gateInCostTollList;
 
@@ -155,10 +163,10 @@ class GateInCostTollModel {
 
   GateInCostTollModel({@required this.gateIn, @required this.costToll});
 
-  factory GateInCostTollModel.fromJson(Map<String, dynamic> json) {
+  factory GateInCostTollModel.fromJson(Map<String, dynamic> json, List<MarkerModel> markerList) {
     return GateInCostTollModel(
-      gateIn: GateInModel.fromJson(json['gate_in']),
-      costToll: CostTollModel.fromJson(json['cost_toll']),
+      gateIn: GateInModel.fromJson(json['gate_in'], markerList),
+      costToll: CostTollModel.fromJson(json['cost_toll'], markerList),
     );
   }
 
@@ -167,8 +175,7 @@ class GateInCostTollModel {
     return "++++++++++++++++++++\n[Gate In] - " +
         "name: ${gateIn.name}, latitude: ${gateIn.latitude}, longitude: ${gateIn.longitude}\n" +
         "[Cost Toll] - " +
-        "name: ${costToll.name}, latitude: ${costToll.latitude}, longitude: ${costToll
-            .longitude}\n" +
+        "name: ${costToll.name}, latitude: ${costToll.latitude}, longitude: ${costToll.longitude}\n" +
         "[directions] - ${googleRoute.toString()}\n--------------------\n\n";
   }
 }
@@ -204,17 +211,17 @@ class ExatApi {
       if (responseResult.data is List) {
         return responseResult.data;
       } else {
-        return new List()
-          ..add(responseResult.data);
+        return new List()..add(responseResult.data);
       }
     } else {
       throw Exception(responseResult.data);
     }
   }
 
-  static Future<List<ExpressWayModel>> fetchExpressWays(BuildContext context,
-      List<MarkerModel> markerList, // เอามา map point id กับ cctv
-      ) async {
+  static Future<List<ExpressWayModel>> fetchExpressWays(
+    BuildContext context,
+    List<MarkerModel> markerList, // เอามา map point id กับ cctv
+  ) async {
     final String url = "$EXAT_API_BASED_URL/routes/list";
 
     ResponseResult responseResult = await _makeRequest(
@@ -246,7 +253,7 @@ class ExatApi {
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<MarkerModel> markerList =
-      dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
+          dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
       print('***** MARKER COUNT: ${markerList.length}');
       /*markerList.forEach((marker) {
@@ -275,7 +282,7 @@ class ExatApi {
       //List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
 
       List<CategoryModel> categoryList =
-      dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+          dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
 
       print('***** CATEGORY COUNT: ${categoryList.length}');
       /*categoryList.forEach((category) {
@@ -460,7 +467,7 @@ class ExatApi {
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<NotificationModel> notificationList =
-      dataList.map((markerJson) => NotificationModel.fromJson(markerJson)).toList();
+          dataList.map((markerJson) => NotificationModel.fromJson(markerJson)).toList();
 
       return notificationList;
     } else {
@@ -468,22 +475,16 @@ class ExatApi {
     }
   }
 
-  static Future<ResponseResult> _makeRequest(BuildContext context, String url,
-      Map<String, dynamic> paramMap,
+  static Future<ResponseResult> _makeRequest(
+      BuildContext context, String url, Map<String, dynamic> paramMap,
       {bool sendLocation = true}) async {
     Position currentLocation = sendLocation ? await getCurrentLocation() : null;
 
     Map data = {
       "deviceToken": "testToken",
       "deviceType": Platform.isAndroid ? "android" : "ios",
-      "screenWidth": MediaQuery
-          .of(context)
-          .size
-          .width,
-      "screenHeight": MediaQuery
-          .of(context)
-          .size
-          .height,
+      "screenWidth": MediaQuery.of(context).size.width,
+      "screenHeight": MediaQuery.of(context).size.height,
       "lang": "TH",
       "lat": currentLocation != null ? currentLocation.latitude : 13, //null,
       "lng": currentLocation != null ? currentLocation.longitude : 100, //null,

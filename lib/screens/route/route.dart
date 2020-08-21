@@ -149,28 +149,27 @@ class MyRouteState extends State<MyRoute> {
   }
 
   Future<Marker> _createFutureMarker(MarkerModel markerModel) async {
-    //String markerIdVal = uuid.v1();
-    final MarkerId markerId = MarkerId('part-toll-${markerModel.id.toString()}');
+    if (markerModel != null) {
+      //String markerIdVal = uuid.v1();
+      final MarkerId markerId = MarkerId('part-toll-${markerModel.id.toString()}');
+      BitmapDescriptor markerIcon = await markerModel.category.getNetworkIcon();
 
-    print('4444444444444444444444444444444444444444444444444444444444444444444444');
-
-    BitmapDescriptor markerIcon = await markerModel.category.getNetworkIcon();
-
-    print('5555555555555555555555555555555555555555555555555555555555555555555555');
-
-    return Marker(
-      markerId: markerId,
-      position: LatLng(markerModel.latitude, markerModel.longitude),
-      icon: markerIcon,
-      alpha: 1.0,
-      infoWindow: (true)
-          ? InfoWindow(
-              title: markerModel.name + (kReleaseMode ? "" : " [${markerModel.categoryId}]"),
-              snippet: markerModel.routeName,
-            )
-          : InfoWindow.noText,
-      onTap: () {},
-    );
+      return Marker(
+        markerId: markerId,
+        position: LatLng(markerModel.latitude, markerModel.longitude),
+        icon: markerIcon,
+        alpha: 1.0,
+        infoWindow: (true)
+            ? InfoWindow(
+                title: markerModel.name + (kReleaseMode ? "" : " [${markerModel.categoryId}]"),
+                snippet: markerModel.routeName,
+              )
+            : InfoWindow.noText,
+        onTap: () {},
+      );
+    } else {
+      return Future.value(null);
+    }
   }
 
   Marker _createCurrentLocationMarker(Position currentLocation) {
@@ -251,47 +250,57 @@ class MyRouteState extends State<MyRoute> {
   }
 
   Future<Set<Marker>> _createSearchRouteFutureMarkerSet(RouteModel bestRoute) async {
-    print(
-        'OKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOKOK');
     GateInCostTollModel gateInCostToll = bestRoute.gateInCostTollList[0];
 
-    print('111111111111111111111111111111111111111111111111111111111111111111111111111');
-
+    // สร้าง marker ของ part toll list
     Set<Marker> markerSet = Set();
     for (MarkerModel markerModel in gateInCostToll.costToll.partTollMarkerList) {
       Marker marker = await _createFutureMarker(markerModel);
       markerSet.add(marker);
     }
 
-    print('222222222222222222222222222222222222222222222222222222222222222222222222222');
+    // สร้าง marker ของ gate in
+    Marker marker = await _createFutureMarker(gateInCostToll.gateIn.marker);
+    markerSet.add(marker);
 
-    List<MarkerModel> gateInMarkerList = _routeBloc.markerList
+    /*List<MarkerModel> gateInMarkerList = _routeBloc.markerList
         .where((marker) => (marker.latitude == gateInCostToll.gateIn.latitude &&
             marker.longitude == gateInCostToll.gateIn.longitude))
         .toList();
 
-    print('333333333333333333333333333333333333333333333333333333333333333333333333333');
-
     assert(gateInMarkerList.isNotEmpty);
 
-    print(
-        '========================================================MARKER LIST COUNT: ${gateInMarkerList.length}');
-
     for (MarkerModel markerModel in gateInMarkerList) {
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print(
-          'name: ${markerModel.name}, lat: ${markerModel.latitude}, lng: ${markerModel.longitude}, category: ${markerModel.category.code}');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-      print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MARKER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
-
       Marker marker = await _createFutureMarker(markerModel);
+      markerSet.add(marker);
+    }*/
+
+    // สร้าง marker ของ cost toll
+    if (gateInCostToll.costToll.marker != null) {
+      Marker marker = await _createFutureMarker(gateInCostToll.costToll.marker);
+      markerSet.add(marker);
+    } else {
+      List<CategoryModel> filteredCategoryList =
+          _routeBloc.categoryList.where((category) => category.code == CategoryType.EXIT).toList();
+      BitmapDescriptor markerIcon = await filteredCategoryList[0].getNetworkIcon();
+
+      Marker marker = Marker(
+        markerId: MarkerId("route-search-destination"),
+        position: LatLng(gateInCostToll.costToll.latitude, gateInCostToll.costToll.longitude),
+        icon: markerIcon,
+        alpha: 1.0,
+        infoWindow: (true)
+            ? InfoWindow(
+                title: gateInCostToll.costToll.name,
+                snippet: gateInCostToll.costToll.routeName,
+              )
+            : InfoWindow.noText,
+        onTap: () {},
+      );
       markerSet.add(marker);
     }
 
-    List<MarkerModel> costTollMarkerList = _routeBloc.markerList
+    /*List<MarkerModel> costTollMarkerList = _routeBloc.markerList
         .where((marker) => (marker.latitude == gateInCostToll.costToll.latitude &&
             marker.longitude == gateInCostToll.costToll.longitude))
         .toList();
@@ -317,7 +326,7 @@ class MyRouteState extends State<MyRoute> {
     } else {
       Marker marker = await _createFutureMarker(costTollMarkerList[0]);
       markerSet.add(marker);
-    }
+    }*/
 
     return markerSet;
   }
@@ -531,6 +540,11 @@ class MyRouteState extends State<MyRoute> {
                 if (state is FetchGateInSuccess) {
                   print("STATE: FetchGateInSuccess");
 
+                  if (_positionStreamSubscription != null &&
+                      !_positionStreamSubscription.isPaused) {
+                    _positionStreamSubscription.pause();
+                  }
+
                   // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
                   new Future.delayed(Duration(milliseconds: 1000), () async {
                     List<LatLng> gateInLatLngList = gateInList
@@ -565,7 +579,7 @@ class MyRouteState extends State<MyRoute> {
                   });
 
                   // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                  Geolocator().getCurrentPosition().then((Position position) {
+                  Geolocator().getLastKnownPosition().then((Position position) {
                     context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
                   });
 
@@ -588,6 +602,10 @@ class MyRouteState extends State<MyRoute> {
 
                 Set<Marker> searchRouteMarkerSet = Set();
                 if (state is ShowSearchResultRouteState) {
+                  /*if (_positionStreamSubscription != null && !_positionStreamSubscription.isPaused) {
+                    _positionStreamSubscription.pause();
+                  }*/
+
                   searchRouteMarkerSet.addAll(_createSearchRouteMarkers(state.bestRoute));
                   polyline = createRoutePolyline(state
                       .bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points']);
