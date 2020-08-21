@@ -1,11 +1,15 @@
-import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+
+//import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/cost_toll_model.dart';
+import 'package:exattraffic/models/gate_in_model.dart';
+import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/marker_model.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 
@@ -13,14 +17,18 @@ class RouteBottomSheet extends StatefulWidget {
   RouteBottomSheet({
     @required this.expandPosition,
     @required this.collapsePosition,
-    @required this.selectedCostToll,
+    @required this.gateIn,
+    @required this.costToll,
     @required this.googleRoute,
+    @required this.showArrivalTime,
   });
 
   final double expandPosition;
   final double collapsePosition;
-  final CostTollModel selectedCostToll;
+  final GateInModel gateIn;
+  final CostTollModel costToll;
   final Map<String, dynamic> googleRoute;
+  final bool showArrivalTime;
 
   @override
   _RouteBottomSheetState createState() => _RouteBottomSheetState();
@@ -147,14 +155,33 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
   }
 
   String _getArrivalTimeText() {
-    int routeDurationSeconds = widget.googleRoute == null
-        ? 0
-        : widget.googleRoute['legs'][0]['duration']['value'];
+    int routeDurationSeconds =
+    widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration']['value'];
 
     DateTime arrivalDate = new DateTime.now().add(Duration(seconds: routeDurationSeconds));
     String hourText = (arrivalDate.hour < 10 ? "0" : "") + arrivalDate.hour.toString();
     String minuteText = (arrivalDate.minute < 10 ? "0" : "") + arrivalDate.minute.toString();
     return '$hourText.$minuteText';
+  }
+
+  int _getNumTollPlaza() {
+    int tollPlazaCount = 0;
+
+    if (widget.gateIn.marker != null &&
+        widget.gateIn.marker.category.code == CategoryType.TOLL_PLAZA) {
+      tollPlazaCount++;
+    }
+    if (widget.costToll.marker != null &&
+        widget.costToll.marker.category.code == CategoryType.TOLL_PLAZA) {
+      tollPlazaCount++;
+    }
+    for (MarkerModel marker in widget.costToll.partTollMarkerList) {
+      if (marker.category.code == CategoryType.TOLL_PLAZA) {
+        tollPlazaCount++;
+      }
+    }
+
+    return tollPlazaCount;
   }
 
   @override
@@ -261,7 +288,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       children: <Widget>[
                         Expanded(
                           child: Text(
-                            'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
+                            'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
                             style: getTextStyle(
                               language.lang,
                               color: Colors.white,
@@ -270,16 +297,17 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                             ),
                           ),
                         ),
-                        Text(
-                          '',
-                          /*'ผ่านทั้งหมด 3 ด่าน',*/
+                        widget.showArrivalTime
+                            ? Text(
+                          'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
                           style: getTextStyle(
                             language.lang,
                             color: Colors.white,
                             sizeTh: Constants.Font.SMALLER_SIZE_TH,
                             sizeEn: Constants.Font.SMALLER_SIZE_EN,
                           ),
-                        ),
+                        )
+                            : SizedBox.shrink(),
                       ],
                     ),
                   ),
@@ -347,24 +375,12 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                     ),
                     child: Row(
                       children: <Widget>[
-                        _getFeeItem(
-                            language.lang,
-                            6,
-                            widget.selectedCostToll == null
-                                ? 0
-                                : widget.selectedCostToll.cost4Wheels),
-                        _getFeeItem(
-                            language.lang,
-                            6,
-                            widget.selectedCostToll == null
-                                ? 0
-                                : widget.selectedCostToll.cost6To10Wheels),
-                        _getFeeItem(
-                            language.lang,
-                            6,
-                            widget.selectedCostToll == null
-                                ? 0
-                                : widget.selectedCostToll.costOver10Wheels),
+                        _getFeeItem(language.lang, 6,
+                            widget.costToll == null ? 0 : widget.costToll.cost4Wheels),
+                        _getFeeItem(language.lang, 6,
+                            widget.costToll == null ? 0 : widget.costToll.cost6To10Wheels),
+                        _getFeeItem(language.lang, 6,
+                            widget.costToll == null ? 0 : widget.costToll.costOver10Wheels),
                       ],
                     ),
                   ),

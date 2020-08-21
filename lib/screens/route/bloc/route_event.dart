@@ -38,3 +38,9 @@ class ShowSearchResultRoute extends RouteEvent {
 
   ShowSearchResultRoute({@required this.bestRoute});
 }
+
+class UpdateCurrentLocationSearch extends RouteEvent {
+  final Position currentLocation;
+
+  UpdateCurrentLocationSearch({@required this.currentLocation});
+}

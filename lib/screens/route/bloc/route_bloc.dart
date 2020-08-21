@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,6 +18,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   final List<MarkerModel> markerList;
   final List<CategoryModel> categoryList;
   List<GateInModel> _gateInList;
+  RouteModel _bestRoute;
 
   RouteBloc({
     @required this.markerList,
@@ -28,7 +30,55 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     final currentState = state;
 
     if (event is ShowSearchResultRoute) {
-      yield ShowSearchResultRouteState(bestRoute: event.bestRoute);
+      // ให้ clear marker และ pause location tracking
+      yield FetchGateInSuccess(gateInList: List<GateInModel>());
+
+      _bestRoute = event.bestRoute;
+
+      yield ShowSearchResultRouteState(
+        bestRoute: event.bestRoute,
+        currentLocation: null,
+        notification: null,
+      );
+    } else if (event is UpdateCurrentLocationSearch) {
+      AlertModel notification;
+      GateInCostTollModel gateInCostToll = _bestRoute.gateInCostTollList[0];
+
+      if (gateInCostToll.gateIn.marker.category.code == CategoryType.TOLL_PLAZA &&
+          !gateInCostToll.gateIn.notified) {
+        notification = await _getTollPlazaNotification(
+          gateInCostToll.gateIn.marker,
+          event.currentLocation,
+        );
+        gateInCostToll.gateIn.notified = notification != null;
+      }
+
+      if (gateInCostToll.costToll.marker != null &&
+          gateInCostToll.costToll.marker.category.code == CategoryType.TOLL_PLAZA &&
+          !gateInCostToll.costToll.notified) {
+        notification = await _getTollPlazaNotification(
+          gateInCostToll.costToll.marker,
+          event.currentLocation,
+        );
+        gateInCostToll.costToll.notified = notification != null;
+      }
+
+      for (int i = 0; i < gateInCostToll.costToll.partTollMarkerList.length; i++) {
+        MarkerModel partToll = gateInCostToll.costToll.partTollMarkerList[i];
+        if (partToll.category.code == CategoryType.TOLL_PLAZA && !partToll.notified) {
+          notification = await _getTollPlazaNotification(
+            partToll,
+            event.currentLocation,
+          );
+          partToll.notified = notification != null;
+        }
+      }
+
+      yield ShowSearchLocationTrackingUpdated(
+        bestRoute: _bestRoute,
+        currentLocation: event.currentLocation,
+        notification: notification,
+      );
     }
 
     if (event is ListGateIn) {
@@ -151,37 +201,27 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
       AlertModel notification;
 
-      if (!selectedGateIn.notified) {
+      if (selectedGateIn.marker.category.code == CategoryType.TOLL_PLAZA &&
+          !selectedGateIn.notified) {
         notification = await _getTollPlazaNotification(
-          selectedGateIn.name,
-          selectedGateIn.latitude,
-          selectedGateIn.longitude,
-          currentLocation.latitude,
-          currentLocation.longitude,
+          selectedGateIn.marker,
+          currentLocation,
         );
         selectedGateIn.notified = notification != null;
       }
 
-      if (!selectedCostToll.notified) {
-        notification = await _getTollPlazaNotification(
-          selectedCostToll.name,
-          selectedCostToll.latitude,
-          selectedCostToll.longitude,
-          currentLocation.latitude,
-          currentLocation.longitude,
-        );
+      if (selectedCostToll.marker.category.code == CategoryType.TOLL_PLAZA &&
+          !selectedCostToll.notified) {
+        notification = await _getTollPlazaNotification(selectedCostToll.marker, currentLocation);
         selectedCostToll.notified = notification != null;
       }
 
       for (int i = 0; i < partTollList.length; i++) {
         MarkerModel partToll = partTollList[i];
-        if (!partToll.notified) {
+        if (partToll.category.code == CategoryType.TOLL_PLAZA && !partToll.notified) {
           notification = await _getTollPlazaNotification(
-            partToll.name,
-            partToll.latitude,
-            partToll.longitude,
-            currentLocation.latitude,
-            currentLocation.longitude,
+            partToll,
+            currentLocation,
           );
           partToll.notified = notification != null;
         }
@@ -200,23 +240,27 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   }
 
   Future<AlertModel> _getTollPlazaNotification(
-    String name,
-    double lat1,
-    double lng1,
-    double lat2,
-    double lng2,
+    MarkerModel marker,
+    Position currentLocation,
   ) async {
     const int DISTANCE_THRESHOLD_METER = 1000;
     AlertModel notification;
 
-    double distanceInMeters = await Geolocator().distanceBetween(lat1, lng1, lat2, lng2);
+    double distanceInMeters = await Geolocator().distanceBetween(
+      marker.latitude,
+      marker.longitude,
+      currentLocation.latitude,
+      currentLocation.longitude,
+    );
     if (distanceInMeters < DISTANCE_THRESHOLD_METER) {
+      TollPlazaModel tollPlaza = TollPlazaModel.fromMarkerModel(marker);
+
       String tollFee =
-          "▶ รถ 4 ล้อ:  ${'xxx'} บาท\n▶ รถ 6-10 ล้อ:  ${'xxx'} บาท\n▶ รถเกิน 10 ล้อ:  ${'xxx'} บาท";
+          "▶ รถ 4 ล้อ:  ${tollPlaza.cost4Wheels} บาท\n▶ รถ 6-10 ล้อ:  ${tollPlaza.cost6To10Wheels} บาท\n▶ รถเกิน 10 ล้อ:  ${tollPlaza.costOver10Wheels} บาท";
       notification = AlertModel(
         title: "เตรียมจ่ายค่าผ่านทาง",
         message:
-            "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง$name กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
+            "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง${marker.name} กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
       );
     }
     return notification;

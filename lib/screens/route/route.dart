@@ -440,7 +440,7 @@ class MyRouteState extends State<MyRoute> {
     _routeBloc.add(ListGateIn());
   }
 
-  void _setupLocationUpdate(BuildContext context) {
+  void _setupLocationUpdate(Function positionChangeListener) {
     const LocationOptions locationOptions = LocationOptions(
       accuracy: LocationAccuracy.best,
       distanceFilter: 10,
@@ -448,8 +448,7 @@ class MyRouteState extends State<MyRoute> {
 
     final Stream<Position> positionStream = Geolocator().getPositionStream(locationOptions);
     _positionStreamSubscription = positionStream.listen((Position position) {
-      print("Current location: ${position.latitude}, ${position.longitude}");
-      context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
+      positionChangeListener(position);
     });
   }
 
@@ -544,6 +543,7 @@ class MyRouteState extends State<MyRoute> {
                       !_positionStreamSubscription.isPaused) {
                     _positionStreamSubscription.pause();
                   }
+                  _positionStreamSubscription = null;
 
                   // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
                   new Future.delayed(Duration(milliseconds: 1000), () async {
@@ -584,7 +584,12 @@ class MyRouteState extends State<MyRoute> {
                   });
 
                   if (_positionStreamSubscription == null) {
-                    _setupLocationUpdate(context);
+                    _setupLocationUpdate((Position position) {
+                      print("Current location: ${position.latitude}, ${position.longitude}");
+                      context
+                          .bloc<RouteBloc>()
+                          .add(UpdateCurrentLocation(currentLocation: position));
+                    });
                     _positionStreamSubscription.pause();
                   }
                   if (_positionStreamSubscription.isPaused) {
@@ -611,39 +616,69 @@ class MyRouteState extends State<MyRoute> {
                       .bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points']);
                   polyLineSet.add(polyline);
 
-                  new Future.delayed(Duration(milliseconds: 1000), () async {
-                    final GoogleMapController controller = await _googleMapController.future;
+                  if (!(state is ShowSearchLocationTrackingUpdated)) {
+                    // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+                    Geolocator().getLastKnownPosition().then((Position position) {
+                      context
+                          .bloc<RouteBloc>()
+                          .add(UpdateCurrentLocationSearch(currentLocation: position));
+                    });
 
-                    List<LatLng> latLngList = List();
-                    latLngList.add(
-                      LatLng(state.bestRoute.origin.latitude, state.bestRoute.origin.longitude),
-                    );
-                    latLngList.add(
-                      LatLng(state.bestRoute.gateInCostTollList[0].gateIn.latitude,
-                          state.bestRoute.gateInCostTollList[0].gateIn.longitude),
-                    );
-                    LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
-                    controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                    if (_positionStreamSubscription == null) {
+                      _setupLocationUpdate((Position position) {
+                        print("Current location: ${position.latitude}, ${position.longitude}");
+                        context
+                            .bloc<RouteBloc>()
+                            .add(UpdateCurrentLocationSearch(currentLocation: position));
+                      });
+                      _positionStreamSubscription.pause();
+                    }
+                    if (_positionStreamSubscription.isPaused) {
+                      _positionStreamSubscription.resume();
+                    }
 
-                    new Future.delayed(Duration(milliseconds: 1500), () async {
+                    new Future.delayed(Duration(milliseconds: 1000), () async {
+                      final GoogleMapController controller = await _googleMapController.future;
+
                       List<LatLng> latLngList = List();
                       latLngList.add(
-                        LatLng(state.bestRoute.destination.latitude,
-                            state.bestRoute.destination.longitude),
+                        LatLng(state.bestRoute.origin.latitude, state.bestRoute.origin.longitude),
                       );
                       latLngList.add(
-                        LatLng(state.bestRoute.gateInCostTollList[0].costToll.latitude,
-                            state.bestRoute.gateInCostTollList[0].costToll.longitude),
+                        LatLng(state.bestRoute.gateInCostTollList[0].gateIn.latitude,
+                            state.bestRoute.gateInCostTollList[0].gateIn.longitude),
                       );
                       LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
                       controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
 
                       new Future.delayed(Duration(milliseconds: 1500), () async {
-                        LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
+                        List<LatLng> latLngList = List();
+                        latLngList.add(
+                          LatLng(state.bestRoute.destination.latitude,
+                              state.bestRoute.destination.longitude),
+                        );
+                        latLngList.add(
+                          LatLng(state.bestRoute.gateInCostTollList[0].costToll.latitude,
+                              state.bestRoute.gateInCostTollList[0].costToll.longitude),
+                        );
+                        LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
                         controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+
+                        new Future.delayed(Duration(milliseconds: 1500), () async {
+                          LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
+                          controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                        });
                       });
                     });
-                  });
+                  }
+                } else if (state is ShowSearchLocationTrackingUpdated) {
+                  //if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
+                  final CameraPosition position = CameraPosition(
+                    target: LatLng(currentLocation.latitude, currentLocation.longitude),
+                    zoom: _mapZoomLevel ?? 15,
+                  );
+                  _moveMapToPosition(context, position);
+                  //}
                 }
 
                 return FutureBuilder(
@@ -1170,10 +1205,13 @@ class MyRouteState extends State<MyRoute> {
                         getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
                     expandPosition: _googleMapsHeight -
                         getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
-                    selectedCostToll: state.bestRoute.gateInCostTollList[0].costToll,
+                    gateIn: state.bestRoute.gateInCostTollList[0].gateIn,
+                    costToll: state.bestRoute.gateInCostTollList[0].costToll,
                     googleRoute: state.bestRoute.gateInCostTollList[0].googleRoute,
+                    showArrivalTime: true,
                   );
                 } else {
+                  final GateInModel selectedGateIn = state.selectedGateIn;
                   final CostTollModel selectedCostToll = state.selectedCostToll;
 
                   return selectedCostToll == null
@@ -1183,8 +1221,10 @@ class MyRouteState extends State<MyRoute> {
                               getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),
                           expandPosition: _googleMapsHeight -
                               getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_EXPANDED),
-                          selectedCostToll: selectedCostToll,
+                          gateIn: selectedGateIn,
+                          costToll: selectedCostToll,
                           googleRoute: state.googleRoute,
+                          showArrivalTime: false,
                         );
                 }
               },

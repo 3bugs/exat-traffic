@@ -173,8 +173,31 @@ class LocationTrackingUpdated extends RouteState {
 class ShowSearchResultRouteState extends RouteState {
   final RouteModel bestRoute;
 
-  ShowSearchResultRouteState({@required this.bestRoute});
+  ShowSearchResultRouteState({
+    @required this.bestRoute,
+    @required currentLocation,
+    @required notification,
+  }) : super(currentLocation: currentLocation, notification: notification);
 
   @override
   List<Object> get props => [bestRoute];
+}
+
+class ShowSearchLocationTrackingUpdated extends ShowSearchResultRouteState {
+  //final RouteModel bestRoute;
+  //final Position currentLocation;
+  //final AlertModel notification;
+
+  ShowSearchLocationTrackingUpdated({
+    @required bestRoute,
+    @required currentLocation,
+    @required notification,
+  }) : super(
+          bestRoute: bestRoute,
+          currentLocation: currentLocation,
+          notification: notification,
+        );
+
+  @override
+  List<Object> get props => [bestRoute, currentLocation];
 }
