@@ -210,7 +210,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         selectedGateIn.notified = notification != null;
       }
 
-      if (selectedCostToll.marker.category.code == CategoryType.TOLL_PLAZA &&
+      if (selectedCostToll.marker != null &&
+          selectedCostToll.marker.category.code == CategoryType.TOLL_PLAZA &&
           !selectedCostToll.notified) {
         notification = await _getTollPlazaNotification(selectedCostToll.marker, currentLocation);
         selectedCostToll.notified = notification != null;

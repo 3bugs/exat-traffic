@@ -195,7 +195,7 @@ class RouteModel {
 }
 
 class ExatApi {
-  static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8081';
+  static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8089';
 
   static Future<List> fetchSplash(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/posts/detailByName";

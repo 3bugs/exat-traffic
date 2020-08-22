@@ -64,7 +64,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
 
   void _fetchSplashData(BuildContext context) async {
     GeolocationStatus geolocationStatus = await Geolocator().checkGeolocationPermissionStatus();
-    if (geolocationStatus == GeolocationStatus.granted) {
+    if (false /*geolocationStatus == GeolocationStatus.granted*/) {
       try {
         ExatApi.fetchSplash(context).then((dataList) {
           print('SPLASH SCREEN FETCHED');
@@ -144,10 +144,25 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                         scale: _animation,
                         alignment: Alignment.center,
                         child: Image(
-                          image: AssetImage('assets/images/login/exat_logo.png'),
+                          image: AssetImage('assets/images/splash/exat_logo_new.png'),
                           width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                           height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                         ),
+                        /*child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: getPlatformSize(20.0),
+                            vertical: getPlatformSize(10.0),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent, //Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.all(Radius.circular(getPlatformSize(10.0))),
+                          ),
+                          child: Image(
+                            image: AssetImage('assets/images/splash/exat_logo_new.png'),
+                            width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+                            height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
+                          ),
+                        ),*/
                       ),
                       /*SizedBox(
                     height: getPlatformSize(28.0),

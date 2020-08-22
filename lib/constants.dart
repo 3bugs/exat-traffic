@@ -8,6 +8,8 @@ class App {
   static const Color HEADER_GRADIENT_COLOR_START = Color(0xFF5574F7);
   static const Color HEADER_GRADIENT_COLOR_END = Color(0xFF60C3FF);
   static const Color BACKGROUND_COLOR = Color(0x04000000);
+  static const Color FAVORITE_ON_COLOR = Color(0xFFEFDD0E);
+  static const Color FAVORITE_OFF_COLOR = Colors.white;
   static const double HORIZONTAL_MARGIN = 24.0;
   static const double BOX_BORDER_RADIUS = 12.0;
 }
@@ -68,5 +70,10 @@ class Font {
 }
 
 class Api {
-  static const String SERVER = "http://163.47.9.26";
+  //static const String SERVER = "http://163.47.9.26";
+  static const String SERVER = "http://202.94.76.77";
+}
+
+class SchematicMapsScreen {
+  static const String SCHEMATIC_MAPS_URL = "${Api.SERVER}/demo/schematic_map_full.html?backend=0";
 }

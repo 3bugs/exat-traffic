@@ -210,7 +210,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                       child: AspectRatio(
                         aspectRatio: 4621.4 / 5134,
                         child: WebView(
-                          initialUrl: 'http://163.47.9.26/demo/schematic_map_full.html?backend=0',
+                          initialUrl: Constants.SchematicMapsScreen.SCHEMATIC_MAPS_URL,
                           javascriptMode: JavascriptMode.unrestricted,
                           onWebViewCreated: (WebViewController webViewController) {
                             _controller.complete(webViewController);
@@ -250,7 +250,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              MapToolItem(
+                              /*MapToolItem(
                                 icon:
                                     AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
                                 iconWidth: getPlatformSize(21.0),
@@ -261,6 +261,21 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 onClick: () {
                                   alert(context, 'EXAT Traffic',
                                       'Under construction, coming soon :)');
+                                },
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(15.0),
+                              ),*/
+                              MapToolItem(
+                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
+                                iconWidth: getPlatformSize(18.52),
+                                iconHeight: getPlatformSize(18.52),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: false,
+                                showProgress: false,
+                                onClick: () async {
+                                  final WebViewController controller = await _controller.future;
+                                  controller.evaluateJavascript('schematicMap.changeZoom(-1);');
                                 },
                               ),
                               SizedBox(
@@ -276,21 +291,6 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 onClick: () async {
                                   final WebViewController controller = await _controller.future;
                                   controller.evaluateJavascript('schematicMap.changeZoom(1);');
-                                },
-                              ),
-                              SizedBox(
-                                width: getPlatformSize(15.0),
-                              ),
-                              MapToolItem(
-                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
-                                iconWidth: getPlatformSize(18.52),
-                                iconHeight: getPlatformSize(18.52),
-                                marginTop: getPlatformSize(0.0),
-                                isChecked: false,
-                                showProgress: false,
-                                onClick: () async {
-                                  final WebViewController controller = await _controller.future;
-                                  controller.evaluateJavascript('schematicMap.changeZoom(-1);');
                                 },
                               ),
                               SizedBox(

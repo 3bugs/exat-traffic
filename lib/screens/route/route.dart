@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -35,6 +37,7 @@ class MyRoute extends StatefulWidget {
 
 class MyRouteState extends State<MyRoute> {
   final GlobalKey _keyGoogleMaps = GlobalKey();
+  final GlobalKey<TollPlazaBottomSheetState> _keyTollPlazaBottomSheet = GlobalKey();
   final Completer<GoogleMapController> _googleMapController = Completer();
   StreamSubscription<Position> _positionStreamSubscription;
 
@@ -57,6 +60,8 @@ class MyRouteState extends State<MyRoute> {
   //LatLng _mapTarget;
   double _mapZoomLevel;
   RouteBloc _routeBloc;
+
+  TollPlazaModel _tollPlaza;
 
   void _handleClickMyLocation(BuildContext context) {
     _moveMapToCurrentPosition(context);
@@ -95,7 +100,7 @@ class MyRouteState extends State<MyRoute> {
     controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
-  Marker _createGateInMarker(BuildContext context, GateInModel gateIn) {
+  Marker _createGateInMarker(BuildContext context, GateInModel gateIn, bool costTollSelected) {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('gate-in-${gateIn.id.toString()}');
 
@@ -112,12 +117,21 @@ class MyRouteState extends State<MyRoute> {
             )
           : InfoWindow.noText,
       onTap: () {
+        if (costTollSelected &&
+            gateIn.marker != null &&
+            gateIn.marker.category.code == CategoryType.TOLL_PLAZA) {
+          setState(() {
+            _tollPlaza = TollPlazaModel.fromMarkerModel(gateIn.marker);
+            _keyTollPlazaBottomSheet.currentState.toggleSheet();
+          });
+        }
+
         _selectGateInMarker(context, gateIn);
       },
     );
   }
 
-  Marker _createCostTollMarker(BuildContext context, CostTollModel costToll) {
+  Marker _createCostTollMarker(BuildContext context, CostTollModel costToll, bool costTollSelected) {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('cost-toll-${costToll.id.toString()}');
 
@@ -134,6 +148,15 @@ class MyRouteState extends State<MyRoute> {
             )
           : InfoWindow.noText,
       onTap: () {
+        if (costTollSelected &&
+            costToll.marker != null &&
+            costToll.marker.category.code == CategoryType.TOLL_PLAZA) {
+          setState(() {
+            _tollPlaza = TollPlazaModel.fromMarkerModel(costToll.marker);
+            _keyTollPlazaBottomSheet.currentState.toggleSheet();
+          });
+        }
+
         _selectCostTollMarker(context, costToll);
       },
     );
@@ -165,7 +188,14 @@ class MyRouteState extends State<MyRoute> {
                 snippet: markerModel.routeName,
               )
             : InfoWindow.noText,
-        onTap: () {},
+        onTap: () {
+          if (markerModel.category.code == CategoryType.TOLL_PLAZA) {
+            setState(() {
+              _tollPlaza = TollPlazaModel.fromMarkerModel(markerModel);
+              _keyTollPlazaBottomSheet.currentState.toggleSheet();
+            });
+          }
+        },
       );
     } else {
       return Future.value(null);
@@ -506,7 +536,7 @@ class MyRouteState extends State<MyRoute> {
                   return selectedGateIn == null ? true : gateIn.selected;
                 }).toList();
                 Set<Marker> gateInMarkerSet = filteredGateInList.map((GateInModel gateIn) {
-                  return _createGateInMarker(context, gateIn);
+                  return _createGateInMarker(context, gateIn, selectedCostToll != null);
                 }).toSet();
 
                 List<CostTollModel> filteredCostTollList =
@@ -514,7 +544,7 @@ class MyRouteState extends State<MyRoute> {
                   return selectedCostToll == null ? true : costToll.selected;
                 }).toList();
                 Set<Marker> costTollMarkerSet = filteredCostTollList.map((CostTollModel costToll) {
-                  return _createCostTollMarker(context, costToll);
+                  return _createCostTollMarker(context, costToll, selectedCostToll != null);
                 }).toSet();
 
                 /*Set<Marker> partTollSet = Set();
@@ -1229,6 +1259,13 @@ class MyRouteState extends State<MyRoute> {
                 }
               },
             ),
+
+            TollPlazaBottomSheet(
+              key: _keyTollPlazaBottomSheet,
+              collapsePosition: _googleMapsHeight,
+              expandPosition: getPlatformSize(100.0),
+              tollPlazaModel: _tollPlaza,
+            )
           ],
         ),
       ),

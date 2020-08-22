@@ -250,6 +250,33 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                           ),
                         ),
                       ),
+
+                      // ปุ่ม favorite
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            _handleClickUpDownSheet();
+                          },
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(getPlatformSize(21.0)),
+                          ),
+                          child: Container(
+                            width: getPlatformSize(42.0),
+                            height: getPlatformSize(42.0),
+                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                            child: Center(
+                              child: Icon(
+                                Icons.star,
+                                color: Constants.App.FAVORITE_ON_COLOR,
+                                size: getPlatformSize(24.0),
+                                semanticLabel: 'Favorite',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
                       // ปุ่ม up/down
                       Material(
                         color: Colors.transparent,
@@ -269,8 +296,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 image: _bottomSheetExpanded
                                     ? AssetImage('assets/images/route/ic_sheet_down_white.png')
                                     : AssetImage('assets/images/route/ic_sheet_up_white.png'),
-                                width: getPlatformSize(10.0),
-                                height: getPlatformSize(9.73 * 10.0 / 5.88),
+                                width: getPlatformSize(12.0),
+                                height: getPlatformSize(9.73 * 12.0 / 5.88),
                               ),
                             ),
                           ),

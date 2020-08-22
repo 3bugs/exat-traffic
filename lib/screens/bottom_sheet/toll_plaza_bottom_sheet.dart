@@ -243,8 +243,8 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                   image: _bottomSheetExpanded
                                       ? AssetImage('assets/images/home/ic_sheet_down.png')
                                       : AssetImage('assets/images/home/ic_sheet_up.png'),
-                                  width: getPlatformSize(10.0),
-                                  height: getPlatformSize(9.73 * 10.0 / 5.88),
+                                  width: getPlatformSize(12.0),
+                                  height: getPlatformSize(9.73 * 12.0 / 5.88),
                                 ),
                               ),
                             ),
