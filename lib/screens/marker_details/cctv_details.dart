@@ -1,6 +1,5 @@
-import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:exattraffic/components/my_cached_image.dart';
+//import 'dart:async';
+//import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -13,6 +12,8 @@ import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/login/login.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
+import 'package:exattraffic/etc/preferences.dart';
 
 class CctvDetails extends StatelessWidget {
   CctvDetails(this._cctvModel);
@@ -49,6 +50,29 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
     });
   }
 
+  Future<Icon> _getFavoriteIcon() async {
+    return (await widget._cctvModel.isFavoriteOn())
+        ? Icon(
+            Icons.star,
+            color: Constants.App.FAVORITE_ON_COLOR,
+            size: getPlatformSize(24.0),
+            semanticLabel: 'Favorite',
+          )
+        : Icon(
+            Icons.star_border,
+            color: Colors.white,
+            size: getPlatformSize(24.0),
+            semanticLabel: 'Favorite',
+          );
+  }
+
+  void _handleClickFavorite(BuildContext context) {
+    widget._cctvModel.toggleFavorite().then((_) {
+      setState(() {
+      });
+    });
+  }
+
   void _handleClickClose(BuildContext context) {
     //todo: stop video, etc.
     Navigator.pop(context);
@@ -75,7 +99,10 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
           _controller.addListener(() {
             print("***** PLAYING STATE: ${_controller.playingState.toString()}");
             // rebuild ใหม่ทุกครั้งเมื่อสถานะของ video player เปลี่ยน
-            setState(() {});
+            try {
+              // เกิด error ตรงนี้ หลังจากกด back ออกจากหน้า cctv details
+              setState(() {});
+            } catch (_) {}
           });
           _controller.play();
         },
@@ -118,37 +145,69 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      right: getPlatformSize(10.0),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        hoverColor: Color(0xFF999999),
-                        splashColor: Color(0xFF999999),
-                        highlightColor: Color(0xFF999999),
-                        focusColor: Color(0xFF999999),
-                        onTap: () => _handleClickClose(context),
-                        borderRadius: BorderRadius.all(Radius.circular(18.0)),
-                        child: Container(
-                          width: getPlatformSize(36.0),
-                          height: getPlatformSize(36.0),
-                          //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                          child: Center(
-                            child: Image(
-                              image: AssetImage('assets/images/cctv_details/ic_close_cctv.png'),
-                              width: getPlatformSize(13.5),
-                              height: getPlatformSize(13.5),
-                              fit: BoxFit.contain,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: getPlatformSize(10.0),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          hoverColor: Color(0xFF999999),
+                          splashColor: Color(0xFF999999),
+                          highlightColor: Color(0xFF999999),
+                          focusColor: Color(0xFF999999),
+                          onTap: () => _handleClickFavorite(context),
+                          borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                          child: Container(
+                            width: getPlatformSize(36.0),
+                            height: getPlatformSize(36.0),
+                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                            child: Center(
+                              child: FutureBuilder(
+                                future: _getFavoriteIcon(),
+                                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                  return snapshot.hasData ? snapshot.data : SizedBox.shrink();
+                                },
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: getPlatformSize(10.0),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          hoverColor: Color(0xFF999999),
+                          splashColor: Color(0xFF999999),
+                          highlightColor: Color(0xFF999999),
+                          focusColor: Color(0xFF999999),
+                          onTap: () => _handleClickClose(context),
+                          borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                          child: Container(
+                            width: getPlatformSize(36.0),
+                            height: getPlatformSize(36.0),
+                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                            child: Center(
+                              child: Image(
+                                image: AssetImage('assets/images/cctv_details/ic_close_cctv.png'),
+                                width: getPlatformSize(13.5),
+                                height: getPlatformSize(13.5),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   height: getPlatformSize(16.0),

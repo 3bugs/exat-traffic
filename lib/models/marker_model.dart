@@ -162,6 +162,7 @@ class MarkerModel {
           context,
           MaterialPageRoute(
             builder: (context) => CctvDetails(CctvModel(
+              this.id,
               name: this.name,
               streamUrl: this.streamMobile,
               imageUrl: this.godImageUrl,
