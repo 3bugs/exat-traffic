@@ -1,6 +1,6 @@
+import 'package:exattraffic/models/emergency_number_model.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -237,6 +237,27 @@ class ExatApi {
           .entries
           .map((entry) => ExpressWayModel.fromJson(entry.value, entry.key, markerList))
           .toList();
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<List<EmergencyNumberModel>> fetchEmergencyNumbers(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/departments/list";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"cat_emer_id": "*"},
+    );
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      List<EmergencyNumberModel> emergencyNumberList =
+          dataList.map((markerJson) => EmergencyNumberModel.fromJson(markerJson)).toList();
+
+      emergencyNumberList.sort((a, b) => a.routeId.compareTo(b.routeId));
+
+      return emergencyNumberList;
     } else {
       throw Exception(responseResult.data);
     }

@@ -1,5 +1,6 @@
-import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:flutter/material.dart';
+
+import 'package:exattraffic/components/my_progress_indicator.dart';
 
 class DataLoading extends StatelessWidget {
   @override

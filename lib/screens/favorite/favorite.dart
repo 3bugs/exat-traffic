@@ -7,6 +7,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/favorite/components/favorite_view.dart';
 import 'package:exattraffic/screens/favorite/favorite_presenter.dart';
 import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/favorite_model.dart';
 
 class Favorite extends StatefulWidget {
@@ -81,12 +82,7 @@ class FavoriteState extends State<Favorite> {
                         return SizedBox.shrink();
                       },
                     )
-                  : Center(
-                      child: Text(
-                        "ไม่มีข้อมูล",
-                        style: getTextStyle(0),
-                      ),
-                    ),
+                  : NoData(),
             ),
     );
   }

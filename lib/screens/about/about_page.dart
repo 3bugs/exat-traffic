@@ -1,13 +1,11 @@
-import 'dart:io';
-import 'dart:math';
-
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:store_redirect/store_redirect.dart';
+import 'package:exattraffic/components/data_loading.dart';
 
 import 'about_presenter.dart';
 
@@ -136,11 +134,11 @@ class _AboutPageState extends State<AboutPage> {
           );
   }
 
-  Widget _textData() {
+  /*Widget _textData() {
     return Container(
       child: Text(_presenter.aboutModel.data[0].content),
     );
-  }
+  }*/
 
   List<String> _getParagraphList(String details) {
     return details
@@ -163,12 +161,12 @@ class _AboutPageState extends State<AboutPage> {
                     Container(
                       width: 70,
                       height: 70,
-//          color: Colors.red,
+//                      color: Colors.red,
                       child: Image.network(_presenter.aboutModel.data[0].reference[0].cover),
                     ),
                     Container(
                       alignment: Alignment.center,
-//              color: Colors.red,
+//                      color: Colors.red,
                       width: 70,
                       height: 30,
                       child: Text(
@@ -189,12 +187,12 @@ class _AboutPageState extends State<AboutPage> {
                     Container(
                       width: 70,
                       height: 70,
-//          color: Colors.green,
+//                      color: Colors.green,
                       child: Image.network(_presenter.aboutModel.data[0].reference[1].cover),
                     ),
                     Container(
                       alignment: Alignment.center,
-//              color: Colors.green,
+//                      color: Colors.green,
                       width: 70,
                       height: 30,
                       child: Text(

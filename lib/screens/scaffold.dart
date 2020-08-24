@@ -23,6 +23,7 @@ import 'package:exattraffic/services/fcm.dart';
 import 'package:exattraffic/screens/search/search_service.dart';
 import 'package:exattraffic/components/dialog_button.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
+import 'package:exattraffic/screens/emergency/emergency.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -376,7 +377,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                         image: AssetImage('assets/images/home/ic_phone_circle.png'),
                         onClick: () {
                           //Provider.of<LanguageModel>(context, listen: false).nextLang();
-                          underConstruction(context);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Emergency(),
+                            ),
+                          );
                         },
                       ),
                     ),

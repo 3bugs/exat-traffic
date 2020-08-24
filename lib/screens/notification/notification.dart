@@ -6,6 +6,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/notification/components/notification_view.dart';
 import 'package:exattraffic/screens/notification/notification_presenter.dart';
 import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/notification_model.dart';
 
 class MyNotification extends StatefulWidget {
@@ -67,12 +68,7 @@ class _MyNotificationState extends State<MyNotification> {
                         return SizedBox.shrink();
                       },
                     )
-                  : Center(
-                      child: Text(
-                        "ไม่มีข้อมูล",
-                        style: getTextStyle(0),
-                      ),
-                    ),
+                  : NoData(),
             ),
     );
   }

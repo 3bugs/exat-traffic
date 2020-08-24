@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+//import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/language_model.dart';
+//import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 
 class TollPlazaLaneItemView extends StatelessWidget {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class App {
   static const Color PRIMARY_COLOR = Color(0xFF47A1FD);
   static const Color ACCENT_COLOR = Color(0xFF446E9D);
+  static const Color SOS_COLOR = Color(0xFFAD0E0E);
   static const Color HEADER_GRADIENT_COLOR_START = Color(0xFF5574F7);
   static const Color HEADER_GRADIENT_COLOR_END = Color(0xFF60C3FF);
   static const Color BACKGROUND_COLOR = Color(0x04000000);

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/incident_model.dart';
 import 'package:exattraffic/screens/incident/components/incident_view.dart';
+import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/no_data.dart';
 
 import 'incident_presenter.dart';
 
@@ -69,12 +70,7 @@ class _IncidentState extends State<Incident> {
                         return SizedBox.shrink();
                       },
                     )
-                  : Center(
-                      child: Text(
-                        "ไม่มีข้อมูล",
-                        style: getTextStyle(0),
-                      ),
-                    ),
+                  : NoData(),
             ),
     );
   }
