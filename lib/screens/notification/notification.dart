@@ -27,7 +27,7 @@ class _MyNotificationState extends State<MyNotification> {
   }
 
   void _handleClickNotificationItem(NotificationModel notification) {
-    underConstruction(context);
+    //underConstruction(context);
   }
 
   @override
@@ -57,8 +57,9 @@ class _MyNotificationState extends State<MyNotification> {
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
                         return NotificationView(
-                          onClick: () =>
-                              _handleClickNotificationItem(_presenter.notificationList[index]),
+                          onClick: null,
+                          /*onClick: () =>
+                              _handleClickNotificationItem(_presenter.notificationList[index]),*/
                           notification: _presenter.notificationList[index],
                           isFirstItem: index == 0,
                           isLastItem: index == _presenter.notificationList.length - 1,

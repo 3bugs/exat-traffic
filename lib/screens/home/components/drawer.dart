@@ -48,14 +48,14 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    DrawerItemModel(
+    /*DrawerItemModel(
       text: 'การตั้งค่า',
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
         //Navigator.pop(context);
         underConstruction(context);
       },
-    ),
+    ),*/
     DrawerItemModel(
       text: 'ช่วยเหลือ',
       icon: AssetImage('assets/images/drawer/ic_help.png'),
@@ -82,14 +82,14 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    DrawerItemModel(
+    /*DrawerItemModel(
       text: 'วิดเจ็ต',
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
         //Navigator.pop(context);
         underConstruction(context);
       },
-    ),
+    ),*/
 
     /*DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',
