@@ -66,37 +66,33 @@ class _NotificationDetailsState extends State<NotificationDetails> {
   }
 
   Widget _content() {
-    return _presenter.notification == null
-        ? Container(
-            key: _keyDummyContainer,
-            child: DataLoading(),
-          )
-        : Stack(
-            overflow: Overflow.visible,
-            children: <Widget>[
-              Positioned(
-                top: -overlapHeight,
-                width: MediaQuery.of(context).size.width,
-                height: _mainContainerHeight + overlapHeight,
-                child: Container(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                      vertical: 0.0,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        _googleMaps(),
-                        _body(),
-                      ],
-                    ),
-                  ),
-                ),
+    return Stack(
+      key: _keyDummyContainer,
+      overflow: Overflow.visible,
+      children: <Widget>[
+        Positioned(
+          top: -overlapHeight,
+          width: MediaQuery.of(context).size.width,
+          height: _mainContainerHeight + overlapHeight,
+          child: Container(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                vertical: 0.0,
               ),
-            ],
-          );
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  _googleMaps(),
+                  _body(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Set<Marker> _createMarkerSet() {
