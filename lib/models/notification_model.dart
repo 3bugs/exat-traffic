@@ -9,6 +9,7 @@ class NotificationModel {
     @required this.routeName,
     @required this.latitude,
     @required this.longitude,
+    @required this.createdAt,
     @required this.read,
   });
 
@@ -19,6 +20,7 @@ class NotificationModel {
   final String routeName;
   final double latitude;
   final double longitude;
+  final String createdAt;
   bool read;
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class NotificationModel {
       routeName: routeMap != null ? routeMap['name'] : null,
       latitude: json['lat'],
       longitude: json['lng'],
+      createdAt: json['created_at'],
       read: false,
     );
   }

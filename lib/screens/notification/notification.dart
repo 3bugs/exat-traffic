@@ -1,3 +1,4 @@
+import 'package:exattraffic/screens/notification/notification_details.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -27,7 +28,13 @@ class _MyNotificationState extends State<MyNotification> {
   }
 
   void _handleClickNotificationItem(NotificationModel notification) {
-    //underConstruction(context);
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration.zero,
+        pageBuilder: (context, anim1, anim2) => NotificationDetails(notification: notification),
+      ),
+    );
   }
 
   @override
@@ -57,9 +64,8 @@ class _MyNotificationState extends State<MyNotification> {
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
                         return NotificationView(
-                          onClick: null,
-                          /*onClick: () =>
-                              _handleClickNotificationItem(_presenter.notificationList[index]),*/
+                          onClick: () =>
+                              _handleClickNotificationItem(_presenter.notificationList[index]),
                           notification: _presenter.notificationList[index],
                           isFirstItem: index == 0,
                           isLastItem: index == _presenter.notificationList.length - 1,

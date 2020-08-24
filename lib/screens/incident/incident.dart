@@ -58,7 +58,7 @@ class _IncidentState extends State<Incident> {
                           incident: IncidentModel(
                             name: '${_presenter.incidentListModel.data[index].title}',
                             description: '${_presenter.incidentListModel.data[index].detail}',
-                            date: '${_presenter.incidentListModel.data[index].timeopen}',
+                            date: '${_presenter.incidentListModel.data[index].createdAt}',
                             imageUrl: '${_presenter.incidentListModel.data[index].cover}',
                           ),
                           isFirstItem: index == 0,

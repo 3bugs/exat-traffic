@@ -30,8 +30,9 @@ class IncidentView extends StatelessWidget {
         //print(id);
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => IncidentDetailPage(
+          PageRouteBuilder(
+            transitionDuration: Duration.zero,
+            pageBuilder: (context, anim1, anim2) => IncidentDetailPage(
               id: id,
             ),
           ),

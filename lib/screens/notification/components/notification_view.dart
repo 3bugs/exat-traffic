@@ -85,7 +85,7 @@ class NotificationView extends StatelessWidget {
               String description;
               switch (language.lang) {
                 case 0:
-                  description = notification.detail;
+                  description = notification.routeName;
                   break;
                 case 1:
                   description = 'Expressway';

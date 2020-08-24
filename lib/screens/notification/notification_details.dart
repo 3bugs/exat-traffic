@@ -1,41 +1,38 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
-import 'package:exattraffic/components/my_cached_image.dart';
+import 'package:exattraffic/models/notification_model.dart';
 
-import 'incident_detail_presenter.dart';
+import 'notification_details_presenter.dart';
 
-class IncidentDetailPage extends StatefulWidget {
-  final int id;
+class NotificationDetails extends StatefulWidget {
+  final NotificationModel notification;
 
-  IncidentDetailPage({
-    this.id,
+  NotificationDetails({
+    this.notification,
   });
 
   @override
-  _IncidentDetailPageState createState() => _IncidentDetailPageState();
+  _NotificationDetailsState createState() => _NotificationDetailsState();
 }
 
-class _IncidentDetailPageState extends State<IncidentDetailPage> {
+class _NotificationDetailsState extends State<NotificationDetails> {
   final GlobalKey _keyDummyContainer = GlobalKey();
-  IncidentDetailPresenter _presenter;
+  NotificationDetailsPresenter _presenter;
 
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เหตุการณ์", "Incident", "事件"];
+  List<String> _titleList = ["การแจ้งเตือน", "Notification", "通知"];
 
   @override
   void initState() {
-//    print("IncidentDetailPage ID : ${widget.id}");
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-    _presenter = IncidentDetailPresenter(this);
-    _presenter.getIncidentDetail(widget.id);
+    _presenter = NotificationDetailsPresenter(this);
+    _presenter.getNotification(widget.notification);
     super.initState();
   }
 
@@ -47,7 +44,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
   }
 
   Widget _content() {
-    return _presenter.incidentDetailModel == null
+    return _presenter.notification == null
         ? Container(
             key: _keyDummyContainer,
             child: DataLoading(),
@@ -69,7 +66,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        _banner(),
+                        _googleMaps(),
                         _body(),
                       ],
                     ),
@@ -80,7 +77,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           );
   }
 
-  Widget _banner() {
+  Widget _googleMaps() {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: getPlatformSize(0.0),
@@ -99,10 +96,9 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
         height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
       ),*/
       child: AspectRatio(
-        aspectRatio: 1.6,
-        child: MyCachedImage(
-          imageUrl: _presenter.incidentDetailModel.data.cover,
-          progressIndicatorSize: ProgressIndicatorSize.large,
+        aspectRatio: 1,
+        child: Center(
+          child: Text("TEST 123"),
         ),
       ),
     );
@@ -120,7 +116,6 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
         ),
       ),
     );
-//      _presenter.aboutModel==null?Expanded(child: DataLoading()):
   }
 
   Widget _textData() {
@@ -130,25 +125,39 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
         vertical: getPlatformSize(10.0),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
             height: getPlatformSize(4.0),
           ),
-          Text(
-            formatDateTime(_presenter.incidentDetailModel.data.createdAt),
-            style: getTextStyle(
-              0,
-              sizeTh: Constants.Font.SMALLER_SIZE_TH,
-              sizeEn: Constants.Font.SMALLER_SIZE_EN,
-              color: Constants.Font.DIM_COLOR,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                formatDateTime(_presenter.notification.createdAt),
+                style: getTextStyle(
+                  0,
+                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                  color: Constants.Font.DIM_COLOR,
+                ),
+              ),
+              Text(
+                _presenter.notification.routeName,
+                style: getTextStyle(
+                  0,
+                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                  color: Constants.Font.DIM_COLOR,
+                ),
+              ),
+            ],
           ),
           SizedBox(
             height: getPlatformSize(10.0),
           ),
           Text(
-            _presenter.incidentDetailModel.data.title,
+            _presenter.notification.detail,
             style: getTextStyle(
               0,
               sizeTh: Constants.Font.BIGGER_SIZE_TH,
@@ -159,34 +168,16 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           SizedBox(
             height: getPlatformSize(10.0),
           ),
-          for (var paragraph in _getParagraphList(_presenter.incidentDetailModel.data.detail))
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
-              ),
-              child: Text(
-                paragraph,
-                style: getTextStyle(0),
-              ),
-            )
         ],
       ),
 //      child: Text(_presenter.aboutModel.data[0].content),
     );
   }
 
-  List<String> _getParagraphList(String details) {
-    return details
-        .split("\n")
-        .where((paragraph) => paragraph != null && paragraph.trim().isNotEmpty)
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
       titleList: _titleList,
-      // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
       child: _content(),
     );
   }

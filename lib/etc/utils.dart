@@ -238,6 +238,13 @@ class DialogButtonModel {
   });
 }
 
+String formatDateTime(String dateTime) {
+  DateTime dt = DateTime.parse(dateTime);
+  String d = "${dt.year}-${dt.month < 10 ? '0' : ''}${dt.month}-${dt.day < 10 ? '0' : ''}${dt.day}";
+  String t = "${dt.hour < 10 ? '0' : ''}${dt.hour}:${dt.minute < 10 ? '0' : ''}${dt.minute}";
+  return "$d  $t";
+}
+
 void underConstruction(BuildContext context) {
   alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
 }
