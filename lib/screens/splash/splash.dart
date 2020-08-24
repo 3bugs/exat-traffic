@@ -123,7 +123,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
           decoration: BoxDecoration(
             //color: Colors.red,
             image: DecorationImage(
-              image: AssetImage('assets/images/login/bg_login.jpg'),
+              image: AssetImage('assets/images/login/bg_login_2.jpg'),
               fit: BoxFit.cover,
             ),
           ),
