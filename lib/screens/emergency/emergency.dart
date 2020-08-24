@@ -75,7 +75,7 @@ class _EmergencyState extends State<Emergency> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Visibility(visible: SHOW_SOS, child: _sos()),
+                  SHOW_SOS ? _sos() : SizedBox.shrink(),
                   Expanded(child: _list()),
                 ],
               ),
@@ -109,24 +109,24 @@ class _EmergencyState extends State<Emergency> {
         top: getPlatformSize(0.0),
       ),
       //color: Constants.App.BACKGROUND_COLOR,
-      child: _presenter.emergencyNumberList == null
+      child: EmergencyPresenter.emergencyNumberList == null
           ? DataLoading()
           : SmartRefresher(
               enablePullDown: true,
               controller: _refreshController,
               onRefresh: _onRefresh,
-              child: _presenter.emergencyNumberList.isNotEmpty
+              child: EmergencyPresenter.emergencyNumberList.isNotEmpty
                   ? ListView.separated(
-                      itemCount: _presenter.emergencyNumberList.length,
+                      itemCount: EmergencyPresenter.emergencyNumberList.length,
                       scrollDirection: Axis.vertical,
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
                         return EmergencyView(
                           onClick: () =>
-                              _handleClickNotificationItem(_presenter.emergencyNumberList[index]),
-                          emergencyNumber: _presenter.emergencyNumberList[index],
+                              _handleClickNotificationItem(EmergencyPresenter.emergencyNumberList[index]),
+                          emergencyNumber: EmergencyPresenter.emergencyNumberList[index],
                           isFirstItem: SHOW_SOS ? false : (index == 0),
-                          isLastItem: index == _presenter.emergencyNumberList.length - 1,
+                          isLastItem: index == EmergencyPresenter.emergencyNumberList.length - 1,
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) {

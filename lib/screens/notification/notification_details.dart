@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -21,12 +24,20 @@ class NotificationDetails extends StatefulWidget {
 
 class _NotificationDetailsState extends State<NotificationDetails> {
   final GlobalKey _keyDummyContainer = GlobalKey();
+  final GlobalKey _keyGoogleMaps = GlobalKey();
   NotificationDetailsPresenter _presenter;
+
+  final Completer<GoogleMapController> _googleMapController = Completer();
 
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
   List<String> _titleList = ["การแจ้งเตือน", "Notification", "通知"];
+
+  static const CameraPosition INITIAL_POSITION = CameraPosition(
+    target: LatLng(13.7563, 100.5018), // Bangkok
+    zoom: 8,
+  );
 
   @override
   void initState() {
@@ -41,6 +52,17 @@ class _NotificationDetailsState extends State<NotificationDetails> {
     setState(() {
       _mainContainerHeight = mainContainerRenderBox.size.height;
     });
+  }
+
+  Future<void> _moveToMarkerPosition(BuildContext context) async {
+    /*final Position position =
+        await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);*/
+    final CameraPosition currentPosition = CameraPosition(
+      target: LatLng(widget.notification.latitude, widget.notification.longitude),
+      zoom: 15,
+    );
+    final GoogleMapController controller = await _googleMapController.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
   }
 
   Widget _content() {
@@ -77,6 +99,25 @@ class _NotificationDetailsState extends State<NotificationDetails> {
           );
   }
 
+  Set<Marker> _createMarkerSet() {
+    Set<Marker> markerSet = Set();
+    return markerSet..add(_createMarker());
+  }
+
+  Marker _createMarker() {
+    final MarkerId markerId = MarkerId('marker');
+
+    return Marker(
+      markerId: markerId,
+      position: LatLng(widget.notification.latitude, widget.notification.longitude),
+      infoWindow: InfoWindow(
+        title: widget.notification.detail,
+        snippet: widget.notification.routeName,
+      ),
+      onTap: () {},
+    );
+  }
+
   Widget _googleMaps() {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -90,15 +131,22 @@ class _NotificationDetailsState extends State<NotificationDetails> {
           width: 0.0, // hairline width
         ),
       ),
-      /*child: Image(
-        image: NetworkImage("${_presenter.incidentDetailModel.data.cover}"),
-        width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-        height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-      ),*/
       child: AspectRatio(
         aspectRatio: 1,
-        child: Center(
-          child: Text("TEST 123"),
+        child: GoogleMap(
+          key: _keyGoogleMaps,
+          mapType: MapType.normal,
+          initialCameraPosition: INITIAL_POSITION,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          trafficEnabled: false,
+          zoomControlsEnabled: true,
+          mapToolbarEnabled: false,
+          onMapCreated: (GoogleMapController controller) {
+            _googleMapController.complete(controller);
+            _moveToMarkerPosition(context);
+          },
+          markers: _createMarkerSet(),
         ),
       ),
     );

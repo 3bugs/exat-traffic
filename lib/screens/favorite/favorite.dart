@@ -61,7 +61,14 @@ class FavoriteState extends State<Favorite> {
                       scrollDirection: Axis.vertical,
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
-                        return Dismissible(
+                        return FavoriteView(
+                          onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
+                          favorite: _presenter.favoriteList[index],
+                          isFirstItem: index == 0,
+                          isLastItem: index == _presenter.favoriteList.length - 1,
+                        );
+
+                        /*return Dismissible(
                           key: UniqueKey(),
                           onDismissed: (direction) {
                             setState(() {
@@ -76,7 +83,7 @@ class FavoriteState extends State<Favorite> {
                             isFirstItem: index == 0,
                             isLastItem: index == _presenter.favoriteList.length - 1,
                           ),
-                        );
+                        );*/
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return SizedBox.shrink();

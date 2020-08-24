@@ -158,7 +158,7 @@ class MyHomeState extends State<Home> {
     );
   }
 
-  Future<Marker> _createTextMarker(BuildContext context, MarkerModel marker) async {
+  /*Future<Marker> _createTextMarker(BuildContext context, MarkerModel marker) async {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('marker-label-${marker.id.toString()}');
 
@@ -181,7 +181,7 @@ class MyHomeState extends State<Home> {
           : InfoWindow.noText,
       onTap: null,
     );
-  }
+  }*/
 
   Future<Uint8List> getBytesFromCanvas(String label, int width, int height) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
