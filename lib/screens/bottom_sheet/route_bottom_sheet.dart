@@ -252,7 +252,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       ),
 
                       // ปุ่ม favorite
-                      Material(
+                      /*Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () {
@@ -275,7 +275,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                             ),
                           ),
                         ),
-                      ),
+                      ),*/
 
                       // ปุ่ม up/down
                       Material(

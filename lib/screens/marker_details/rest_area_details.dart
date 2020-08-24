@@ -229,14 +229,14 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                         this._checkedToolItemIndex == 1,
                             () => this._handleClickTool(1),
                       ),*/
-                      ToolItem(
+                      /*ToolItem(
                         'เส้นทาง',
                         AssetImage('assets/images/cctv_details/ic_route.png'),
                         getPlatformSize(27.06),
                         getPlatformSize(35.21),
                         false,
                         () => this._handleClickTool(0),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

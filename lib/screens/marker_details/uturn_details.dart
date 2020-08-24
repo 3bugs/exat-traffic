@@ -169,14 +169,14 @@ class _UTurnDetailsMainState extends State<UTurnDetailsMain> {
                               () => this._handleClickTool(0),
                             )
                           : SizedBox.shrink(),
-                      ToolItem(
+                      /*ToolItem(
                         'เส้นทาง',
                         AssetImage('assets/images/cctv_details/ic_route.png'),
                         getPlatformSize(27.06),
                         getPlatformSize(35.21),
                         false,
                         () => this._handleClickTool(1),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

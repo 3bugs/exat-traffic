@@ -13,7 +13,8 @@ import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/login/login.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
-import 'package:exattraffic/etc/preferences.dart';
+import 'package:exattraffic/app/app_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CctvDetails extends StatelessWidget {
   CctvDetails(this._cctvModel);
@@ -66,11 +67,48 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
           );
   }
 
-  void _handleClickFavorite(BuildContext context) {
-    widget._cctvModel.toggleFavorite().then((_) {
-      setState(() {
+  void _handleClickFavorite(BuildContext context) async {
+    if (await widget._cctvModel.isFavoriteOn()) {
+      List<DialogButtonModel> dialogButtonList = [
+        DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
+        DialogButtonModel(text: "ใช่", value: DialogResult.yes)
+      ];
+      DialogResult result = await showMyDialog(
+        context,
+        AppBloc.appName,
+        "ยืนยันลบ '${widget._cctvModel.name}' ออกจากรายการโปรด?",
+        dialogButtonList,
+      );
+      if (result == DialogResult.yes) {
+        widget._cctvModel.toggleFavorite().then((_) {
+          setState(() {
+            Fluttertoast.showToast(
+              msg: "ลบ '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Color(0xFFDEDEDE),
+              textColor: Colors.black,
+              fontSize: 14.0,
+            );
+          });
+        });
+      }
+    } else {
+      widget._cctvModel.toggleFavorite().then((_) {
+        setState(() {
+          Fluttertoast.showToast(
+              msg: "เพิ่ม '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Color(0xFFDEDEDE),
+              textColor: Colors.black,
+              fontSize: 14.0,
+          );
+        });
       });
-    });
+    }
   }
 
   void _handleClickClose(BuildContext context) {
@@ -346,14 +384,14 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                               () => this._handleClickTool(context, 1),
                             )
                           : SizedBox.shrink(),
-                      ToolItem(
+                      /*ToolItem(
                         'เส้นทาง',
                         AssetImage('assets/images/cctv_details/ic_route.png'),
                         getPlatformSize(27.06),
                         getPlatformSize(35.21),
                         this._checkedToolItemIndex == 2,
                         () => this._handleClickTool(context, 2),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

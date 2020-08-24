@@ -123,6 +123,121 @@ Future<void> alert(BuildContext context, String title, String content) {
   );
 }
 
+Future<DialogResult> showMyDialog(
+  BuildContext context,
+  String title,
+  String message,
+  List<DialogButtonModel> dialogButtonList,
+) {
+  return showDialog(
+    context: context,
+    builder: (context) => new AlertDialog(
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Image(
+            image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
+            width: getPlatformSize(24.0 * 20.0 / 17.6),
+            height: getPlatformSize(24.0),
+            fit: BoxFit.contain,
+          ),
+          SizedBox(width: getPlatformSize(8.0)),
+          Text(title),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            message,
+            style: getTextStyle(
+              0,
+              sizeTh: getPlatformSize(Constants.Font.BIGGER_SIZE_TH),
+              sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
+            ),
+          ),
+          /*SizedBox(height: getPlatformSize(36.0)),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: DialogButton(
+                        text: "ไม่ใช่",
+                        onClickButton: () => Navigator.of(context).pop(false),
+                      ),
+                    ),
+                    SizedBox(width: getPlatformSize(12.0)),
+                    Expanded(
+                      child: DialogButton(
+                        text: "ใช่",
+                        onClickButton: () => Navigator.of(context).pop(true),
+                      ),
+                    ),
+                  ],
+                ),*/
+        ],
+      ),
+      actions: dialogButtonList.map<Widget>((dialogButton) => FlatButton(
+        child: Text(
+          dialogButton.text,
+          style: getTextStyle(
+            0,
+            sizeTh: Constants.Font.BIGGER_SIZE_TH,
+            sizeEn: Constants.Font.BIGGER_SIZE_EN,
+            color: Constants.App.PRIMARY_COLOR,
+            isBold: true,
+          ),
+        ),
+        onPressed: () => Navigator.of(context).pop(dialogButton.value),
+      )).toList(),
+      /*actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "ไม่ใช่",
+            style: getTextStyle(
+              0,
+              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+              color: Constants.App.PRIMARY_COLOR,
+              isBold: true,
+            ),
+          ),
+          onPressed: () {},
+        ),
+        FlatButton(
+          child: Text(
+            "ใช่",
+            style: getTextStyle(
+              0,
+              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+              color: Constants.App.PRIMARY_COLOR,
+              isBold: true,
+            ),
+          ),
+          onPressed: () {},
+        ),
+      ],*/
+    ),
+  );
+}
+
+enum DialogResult {yes, no, cancel}
+
+class DialogButtonModel {
+  final String text;
+  final DialogResult value;
+
+  DialogButtonModel({
+    @required this.text,
+    @required this.value,
+  });
+}
+
 void underConstruction(BuildContext context) {
   alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
 }

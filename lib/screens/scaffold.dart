@@ -245,7 +245,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     });
   }
 
-  Future<bool> _handleBackPressed() {
+  Future<bool> _handleBackPressed() async {
     if (_keyDrawer.currentState.isDrawerOpen) {
       Navigator.pop(context);
       return Future.value(false);
@@ -259,60 +259,16 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       return Future.value(false);
     }
 
-    return showDialog(
-          context: context,
-          builder: (context) => new AlertDialog(
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Image(
-                  image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
-                  width: getPlatformSize(24.0 * 20.0 / 17.6),
-                  height: getPlatformSize(24.0),
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(width: getPlatformSize(8.0)),
-                Text(AppBloc.appName),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  "ต้องการออกจาก ${AppBloc.appName}?",
-                  style: getTextStyle(
-                    0,
-                    sizeTh: getPlatformSize(Constants.Font.BIGGER_SIZE_TH),
-                    sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
-                  ),
-                ),
-                SizedBox(height: getPlatformSize(36.0)),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      child: DialogButton(
-                        text: "ไม่ใช่",
-                        onClickButton: () => Navigator.of(context).pop(false),
-                      ),
-                    ),
-                    SizedBox(width: getPlatformSize(12.0)),
-                    Expanded(
-                      child: DialogButton(
-                        text: "ใช่",
-                        onClickButton: () => Navigator.of(context).pop(true),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ) ??
-        false;
+    List<DialogButtonModel> dialogButtonList = [
+      DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
+      DialogButtonModel(text: "ใช่", value: DialogResult.yes)
+    ];
+    return await showMyDialog(
+      context,
+      AppBloc.appName,
+      "ต้องการออกจาก ${AppBloc.appName}?",
+      dialogButtonList,
+    ) == DialogResult.yes;
   }
 
   @override
