@@ -144,7 +144,9 @@ class _NotificationDetailsState extends State<NotificationDetails> {
           mapToolbarEnabled: false,
           onMapCreated: (GoogleMapController controller) {
             _googleMapController.complete(controller);
-            _moveToMarkerPosition(context);
+            Future.delayed(Duration(milliseconds: 1000), () {
+              _moveToMarkerPosition(context);
+            });
           },
           markers: _createMarkerSet(),
         ),
