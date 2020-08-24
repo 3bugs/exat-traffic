@@ -16,6 +16,16 @@ class MyPrefs {
     return await SharedPreferences.getInstance();
   }
 
+  Future<List<int>> getCctvFavoriteList() async {
+    SharedPreferences prefs = await _getSharedPrefs();
+    List<String> idList = prefs.getStringList(PREF_CCTV_FAVORITE);
+    if (idList != null) {
+      return idList.map((id) => int.parse(id)).toList();
+    } else {
+      return null;
+    }
+  }
+
   Future<bool> existCctvFavorite(CctvModel cctv) async {
     SharedPreferences prefs = await _getSharedPrefs();
     List<String> idList = prefs.getStringList(PREF_CCTV_FAVORITE);

@@ -49,22 +49,30 @@ class _MyNotificationState extends State<MyNotification> {
               enablePullDown: true,
               controller: _refreshController,
               onRefresh: _onRefresh,
-              child: ListView.separated(
-                itemCount: _presenter.notificationList.length,
-                scrollDirection: Axis.vertical,
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return NotificationView(
-                    onClick: () => _handleClickNotificationItem(_presenter.notificationList[index]),
-                    notification: _presenter.notificationList[index],
-                    isFirstItem: index == 0,
-                    isLastItem: index == _presenter.notificationList.length - 1,
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox.shrink();
-                },
-              ),
+              child: _presenter.notificationList.isNotEmpty
+                  ? ListView.separated(
+                      itemCount: _presenter.notificationList.length,
+                      scrollDirection: Axis.vertical,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return NotificationView(
+                          onClick: () =>
+                              _handleClickNotificationItem(_presenter.notificationList[index]),
+                          notification: _presenter.notificationList[index],
+                          isFirstItem: index == 0,
+                          isLastItem: index == _presenter.notificationList.length - 1,
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return SizedBox.shrink();
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        "ไม่มีข้อมูล",
+                        style: getTextStyle(0),
+                      ),
+                    ),
             ),
     );
   }

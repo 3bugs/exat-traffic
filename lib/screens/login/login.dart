@@ -2,9 +2,8 @@ import 'package:exattraffic/bloc_old/bloc_provider.dart';
 import 'package:exattraffic/bloc_old/login_bloc.dart';
 import 'package:flutter/material.dart';
 
-import 'package:exattraffic/screens/scaffold.dart';
+//import 'package:exattraffic/screens/scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 
 //use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
@@ -12,7 +11,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return MyBlocProvider(
       bloc: LoginBloc(),
       child: wrapSystemUiOverlayStyle(
         child: LoginMain(),
@@ -140,15 +139,15 @@ class _LoginMainState extends State<LoginMain> {
                       MyButton(
                         text: 'Login',
                         onClickButton: () {
-                          final loginBloc = BlocProvider.of<LoginBloc>(context);
+                          final loginBloc = MyBlocProvider.of<LoginBloc>(context);
                           loginBloc.setLoginData("promlert@gmail.com", "abc123");
                           return;
 
-                          Navigator.pop(context);
+                          /*Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => MyScaffold()),
-                          );
+                          );*/
                         },
                       ),
                       SizedBox(
@@ -243,7 +242,7 @@ class _LoginFieldState extends State<LoginField> {
                 ),
                 widget.label == 'USERNAME / EMAIL'
                     ? StreamBuilder<String>(
-                        stream: BlocProvider.of<LoginBloc>(context).emailStream,
+                        stream: MyBlocProvider.of<LoginBloc>(context).emailStream,
                         builder: (context, snapshot) {
                           String email = snapshot.data != null ? snapshot.data : widget.hint;
 
@@ -257,7 +256,7 @@ class _LoginFieldState extends State<LoginField> {
                           );
                         })
                     : StreamBuilder<String>(
-                        stream: BlocProvider.of<LoginBloc>(context).passwordStream,
+                        stream: MyBlocProvider.of<LoginBloc>(context).passwordStream,
                         builder: (context, snapshot) {
                           String password = snapshot.data != null ? snapshot.data : widget.hint;
 

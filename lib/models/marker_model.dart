@@ -152,7 +152,7 @@ class MarkerModel {
     );
   }
 
-  void showDetailsScreen(BuildContext context) {
+  void showDetailsScreen(BuildContext context, {Function callback}) {
     assert(this.category != null);
     if (this.category == null) return;
 
@@ -168,7 +168,11 @@ class MarkerModel {
               imageUrl: this.godImageUrl,
             )),
           ),
-        );
+        ).then((_) {
+          if (callback != null) {
+            callback();
+          }
+        });
         break;
       case CategoryType.REST_AREA:
         Navigator.push(

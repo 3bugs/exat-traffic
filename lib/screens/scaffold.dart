@@ -129,6 +129,7 @@ class MyScaffoldMain extends StatefulWidget {
 class _MyScaffoldMainState extends State<MyScaffoldMain> {
   final GlobalKey _keyMainContainer = GlobalKey();
   final GlobalKey<MyHomeState> _keyHomePage = GlobalKey();
+  final GlobalKey<FavoriteState> _keyFavoritePage = GlobalKey();
   final GlobalKey<MyRouteState> _keyRoutePage = GlobalKey();
   final GlobalKey<ScaffoldState> _keyDrawer = GlobalKey();
 
@@ -146,13 +147,15 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   bool _showSearchOptions = false;
 
   initState() {
+    super.initState();
+
     new Future.delayed(Duration.zero, () {
       MyFcm(context).configFcm();
     });
 
     _fragmentList = [
       Home(_keyHomePage, hideSearchOptions),
-      Favorite(),
+      Favorite(_keyFavoritePage),
       MyRoute(_keyRoutePage),
       Incident(),
       MyNotification(),
@@ -162,8 +165,6 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       int length = context.bloc<AppBloc>().markerList.length;
       alert(context, 'length', length.toString());
     });*/
-
-    super.initState();
   }
 
   void hideSearchOptions() {
@@ -189,6 +190,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   void _showFragment(int index) {
     if (index == 0 && _currentTabIndex == 0) {
       _keyHomePage.currentState.goHome();
+    } else if (index == 1) {
+      if (_keyFavoritePage.currentState != null) {
+        _keyFavoritePage.currentState.onRefresh();
+      }
     }
 
     setState(() {

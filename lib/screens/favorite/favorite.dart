@@ -1,64 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
-import 'package:exattraffic/models/favorite_model.dart';
 import 'package:exattraffic/screens/favorite/components/favorite_view.dart';
+import 'package:exattraffic/screens/favorite/favorite_presenter.dart';
+import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/models/favorite_model.dart';
 
 class Favorite extends StatefulWidget {
-  const Favorite();
+  const Favorite(Key key) : super(key: key);
 
   @override
-  _FavoriteState createState() => _FavoriteState();
+  FavoriteState createState() => FavoriteState();
 }
 
-class _FavoriteState extends State<Favorite> {
-  List<FavoriteModel> _favoriteList = <FavoriteModel>[
-    FavoriteModel(
-      name: 'กระทรวงพาณิชย์',
-      description: 'ทางพิเศษศรีรัช 130 กม.',
-    ),
-    FavoriteModel(
-      name: 'ศูนย์ราชการแจ้งวัฒนะ',
-      description: 'ทางพิเศษศรีรัช 189 กม.',
-    ),
-    FavoriteModel(
-      name: 'บ้าน',
-      description: 'ทางพิเศษศรีรัช 40 กม.',
-    ),
-    FavoriteModel(
-      name: 'พระราม 2',
-      description: 'ทางพิเศษศรีรัช 89 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-    FavoriteModel(
-      name: 'อารีย์',
-      description: 'ทางพิเศษศรีรัช 45 กม.',
-    ),
-  ];
+class FavoriteState extends State<Favorite> {
+  FavoritePresenter _presenter;
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  void onRefresh() {
+    _presenter.clearFavoriteList();
+    _presenter.getFavoriteList();
+
+    // if failed, use refreshFailed()
+    _refreshController.refreshCompleted();
+  }
+
+  void _handleClickFavoriteItem(FavoriteModel favorite) {
+    favorite.marker.showDetailsScreen(context, callback: onRefresh);
+  }
 
   @override
   void initState() {
-    print('FAVORITE SCREEN');
+    _presenter = FavoritePresenter(this);
+    _presenter.getFavoriteList();
     super.initState();
   }
 
@@ -71,35 +48,46 @@ class _FavoriteState extends State<Favorite> {
       decoration: BoxDecoration(
         color: Constants.App.BACKGROUND_COLOR,
       ),
-      child: ListView.separated(
-        itemCount: _favoriteList.length,
-        scrollDirection: Axis.vertical,
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          //final favorite = _favoriteList[index];
+      child: _presenter.favoriteList == null
+          ? DataLoading()
+          : SmartRefresher(
+              enablePullDown: true,
+              controller: _refreshController,
+              onRefresh: onRefresh,
+              child: _presenter.favoriteList.isNotEmpty
+                  ? ListView.separated(
+                      itemCount: _presenter.favoriteList.length,
+                      scrollDirection: Axis.vertical,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Dismissible(
+                          key: UniqueKey(),
+                          onDismissed: (direction) {
+                            setState(() {
+                              _presenter.favoriteList.removeAt(index);
+                            });
 
-          return Dismissible(
-            key: UniqueKey(),
-            onDismissed: (direction) {
-              setState(() {
-                _favoriteList.removeAt(index);
-              });
-
-              Scaffold
-                  .of(context)
-                  .showSnackBar(SnackBar(content: Text("dismissed")));
-            },
-            child: FavoriteView(
-              favorite: _favoriteList[index],
-              isFirstItem: index == 0,
-              isLastItem: index == _favoriteList.length - 1,
+                            Scaffold.of(context).showSnackBar(SnackBar(content: Text("dismissed")));
+                          },
+                          child: FavoriteView(
+                            onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
+                            favorite: _presenter.favoriteList[index],
+                            isFirstItem: index == 0,
+                            isLastItem: index == _presenter.favoriteList.length - 1,
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return SizedBox.shrink();
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        "ไม่มีข้อมูล",
+                        style: getTextStyle(0),
+                      ),
+                    ),
             ),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox.shrink();
-        },
-      ),
     );
   }
 }

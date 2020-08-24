@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -13,15 +14,18 @@ class FavoriteView extends StatelessWidget {
     @required this.favorite,
     @required this.isFirstItem,
     @required this.isLastItem,
+    @required this.onClick,
   });
 
   final FavoriteModel favorite;
   final bool isFirstItem;
   final bool isLastItem;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
     return ListItem(
+      onClick: onClick,
       marginTop: getPlatformSize(isFirstItem ? 21.0 : 7.0),
       marginBottom: getPlatformSize(isLastItem ? 21.0 : 7.0),
       padding: EdgeInsets.only(
@@ -33,12 +37,22 @@ class FavoriteView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Image(
-            image: AssetImage('assets/images/favorite/ic_favorite_marker.png'),
-            width: getPlatformSize(26.0),
-            height: getPlatformSize(26.2),
-            fit: BoxFit.contain,
-          ),
+          favorite.type == FavoriteType.place
+              ? Image(
+                  image: AssetImage('assets/images/favorite/ic_favorite_marker.png'),
+                  width: getPlatformSize(26.0),
+                  height: getPlatformSize(26.2),
+                  fit: BoxFit.contain,
+                )
+              : SizedBox(
+                  width: getPlatformSize(26.0),
+                  height: getPlatformSize(26.0 * 348 / 267),
+                  child: MyCachedImage(
+                    imageUrl: favorite.marker.category.markerIconUrl,
+                    progressIndicatorSize: ProgressIndicatorSize.small,
+                    boxFit: BoxFit.contain,
+                  ),
+                ),
           SizedBox(
             width: getPlatformSize(14.0),
           ),

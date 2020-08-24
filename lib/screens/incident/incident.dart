@@ -47,27 +47,34 @@ class _IncidentState extends State<Incident> {
               enablePullDown: true,
               controller: _refreshController,
               onRefresh: _onRefresh,
-              child: ListView.separated(
-                itemCount: _presenter.incidentListModel.data.length,
-                scrollDirection: Axis.vertical,
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return IncidentView(
-                    incident: IncidentModel(
-                      name: '${_presenter.incidentListModel.data[index].title}',
-                      description: '${_presenter.incidentListModel.data[index].detail}',
-                      date: '${_presenter.incidentListModel.data[index].timeopen}',
-                      imageUrl: '${_presenter.incidentListModel.data[index].cover}',
+              child: _presenter.incidentListModel.data.isNotEmpty
+                  ? ListView.separated(
+                      itemCount: _presenter.incidentListModel.data.length,
+                      scrollDirection: Axis.vertical,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return IncidentView(
+                          incident: IncidentModel(
+                            name: '${_presenter.incidentListModel.data[index].title}',
+                            description: '${_presenter.incidentListModel.data[index].detail}',
+                            date: '${_presenter.incidentListModel.data[index].timeopen}',
+                            imageUrl: '${_presenter.incidentListModel.data[index].cover}',
+                          ),
+                          isFirstItem: index == 0,
+                          isLastItem: index == _presenter.incidentListModel.data.length - 1,
+                          id: _presenter.incidentListModel.data[index].id,
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return SizedBox.shrink();
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        "ไม่มีข้อมูล",
+                        style: getTextStyle(0),
+                      ),
                     ),
-                    isFirstItem: index == 0,
-                    isLastItem: index == _presenter.incidentListModel.data.length - 1,
-                    id: _presenter.incidentListModel.data[index].id,
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox.shrink();
-                },
-              ),
             ),
     );
   }
