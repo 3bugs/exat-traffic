@@ -97,7 +97,11 @@ class _NotificationDetailsState extends State<NotificationDetails> {
 
   Set<Marker> _createMarkerSet() {
     Set<Marker> markerSet = Set();
-    return markerSet..add(_createMarker());
+    if (widget.notification.latitude != null && widget.notification.longitude != null) {
+      markerSet.add(_createMarker());
+    }
+
+    return markerSet;
   }
 
   Marker _createMarker() {
