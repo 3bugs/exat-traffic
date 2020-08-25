@@ -77,6 +77,8 @@ class FavoriteView extends StatelessWidget {
                     }
                     return Text(
                       name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.App.ACCENT_COLOR,
@@ -102,6 +104,8 @@ class FavoriteView extends StatelessWidget {
                     }
                     return Text(
                       description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.Font.DIM_COLOR,

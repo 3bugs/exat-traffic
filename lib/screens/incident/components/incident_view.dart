@@ -89,6 +89,8 @@ class IncidentView extends StatelessWidget {
                     }
                     return Text(
                       name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.App.ACCENT_COLOR,
@@ -116,6 +118,8 @@ class IncidentView extends StatelessWidget {
                     }
                     return Text(
                       description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.Font.DIM_COLOR,
@@ -123,8 +127,6 @@ class IncidentView extends StatelessWidget {
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     );
                   },
                 ),

@@ -1,6 +1,5 @@
+import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
 import 'package:flutter/material.dart';
-
-import 'package:exattraffic/etc/preferences.dart';
 
 class CctvModel {
   CctvModel(this.id, {
@@ -15,14 +14,15 @@ class CctvModel {
   final String streamUrl;
 
   Future<bool> isFavoriteOn() async {
-    return await MyPrefs().existCctvFavorite(this);
+    return await CctvFavoritePrefs().existId(this.id.toString());
   }
 
   Future<void> toggleFavorite() async {
+    CctvFavoritePrefs prefs = CctvFavoritePrefs();
     if (await isFavoriteOn()) {
-      await MyPrefs().removeCctvFavorite(this);
+      await prefs.removeId(this.id.toString());
     } else {
-      await MyPrefs().addCctvFavorite(this);
+      await prefs.addId(this.id.toString());
     }
   }
 }

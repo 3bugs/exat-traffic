@@ -59,14 +59,14 @@ class SearchServiceView extends StatelessWidget {
                     }
                     return Text(
                       name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.App.ACCENT_COLOR,
                         isBold: true,
                         heightEn: 1.6,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     );
                   },
                 ),
@@ -98,6 +98,8 @@ class SearchServiceView extends StatelessWidget {
                         }
                         return Text(
                           description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: getTextStyle(
                             language.lang,
                             color: Constants.Font.DIM_COLOR,

@@ -1,9 +1,11 @@
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:exattraffic/models/marker_categories/cctv_model.dart';
+//import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 
+/*
 class MyPrefs {
   static const String PREF_CCTV_FAVORITE = "pref_cctv_favorite";
+  static const String PREF_EMERGENCY_READ = "pref_emergency_read";
   static final MyPrefs _instance = MyPrefs._internal();
 
   factory MyPrefs() {
@@ -65,4 +67,4 @@ class MyPrefs {
     }
     print("********** CCTV ID LIST AFTER REMOVING: ${idList ?? 'NULL'}");
   }
-}
+}*/

@@ -76,14 +76,14 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       DialogResult result = await showMyDialog(
         context,
         AppBloc.appName,
-        "ยืนยันลบ '${widget._cctvModel.name}' ออกจากรายการโปรด?",
+        "ยืนยันลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรด?",
         dialogButtonList,
       );
       if (result == DialogResult.yes) {
         widget._cctvModel.toggleFavorite().then((_) {
           setState(() {
             Fluttertoast.showToast(
-              msg: "ลบ '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
+              msg: "ลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
@@ -98,7 +98,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       widget._cctvModel.toggleFavorite().then((_) {
         setState(() {
           Fluttertoast.showToast(
-              msg: "เพิ่ม '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
+              msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
