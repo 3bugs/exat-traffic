@@ -115,8 +115,11 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           vertical: getPlatformSize(0.0),
           horizontal: getPlatformSize(0.0),
         ),
-        child: SingleChildScrollView(
-          child: _textData(),
+        child: ListView(
+          physics: BouncingScrollPhysics(),
+          children: <Widget>[
+            _textData(),
+          ],
         ),
       ),
     );

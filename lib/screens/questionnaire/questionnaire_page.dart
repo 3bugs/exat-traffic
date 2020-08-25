@@ -16,8 +16,8 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   List<String> _titleList = ["แบบสอบถาม", "Questionnaire", "问卷调查"];
   int group = 1;
   int myIndex = 0;
-  bool showArrorLeft = false;
-  bool showArrorRight = true;
+  bool showArrowLeft = false;
+  bool showArrowRight = true;
 
   QuestionnairePresenter _presenter;
 
@@ -29,6 +29,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
               Expanded(
                 child: Container(
                   child: ListView(
+                    physics: BouncingScrollPhysics(),
                     children: <Widget>[
                       _question(),
                       _sendbutton(),
@@ -212,12 +213,12 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     setState(() {
                       myIndex--;
                       if (myIndex == 0) {
-                        showArrorLeft = false;
+                        showArrowLeft = false;
                       } else if (myIndex < 0) {
                         myIndex = 0;
                       } else {
-                        showArrorLeft = true;
-                        showArrorRight = true;
+                        showArrowLeft = true;
+                        showArrowRight = true;
                       }
                     });
                   },
@@ -226,7 +227,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     height: 60,
                     width: 50,
                     child: Visibility(
-                      visible: showArrorLeft,
+                      visible: showArrowLeft,
                       child: Icon(Icons.arrow_back_ios),
                     ),
                   ),
@@ -242,12 +243,12 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     setState(() {
                       myIndex++;
                       if (myIndex == _presenter.questionnaireModel.data.length - 1) {
-                        showArrorRight = false;
+                        showArrowRight = false;
                       } else if (myIndex > _presenter.questionnaireModel.data.length - 1) {
                         myIndex = _presenter.questionnaireModel.data.length - 1;
                       } else {
-                        showArrorLeft = true;
-                        showArrorRight = true;
+                        showArrowLeft = true;
+                        showArrowRight = true;
                       }
                     });
                   },
@@ -256,7 +257,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     height: 60,
                     width: 50,
                     child: Visibility(
-                      visible: showArrorRight,
+                      visible: showArrowRight,
                       child: Icon(Icons.arrow_forward_ios),
                     ),
                   ),
@@ -280,121 +281,4 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
       child: _content(),
     );
   }
-
-//  @override
-//  Widget build(BuildContext context) {
-//    return YourScaffold(
-//      titleList: _titleList,
-//
-//      // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
-//      child: Container(
-//        child: ListView.builder(
-//          padding: EdgeInsets.symmetric(
-//            horizontal: getPlatformSize(16),
-//            vertical: getPlatformSize(10),
-//          ),
-//          itemCount: 3 + 1,
-//          itemBuilder: (context, index) {
-//            return index == 3
-//                ? Container(
-//                    padding: EdgeInsets.all(10),
-//                    child: RaisedButton(
-//                      shape: RoundedRectangleBorder(
-//                        borderRadius: BorderRadius.circular(30),
-////                    side: BorderSide(color: Colors.red)
-//                      ),
-//                      onPressed: () {
-//                        print("send");
-//                      },
-//                      color: Colors.blue,
-//                      child: Text(
-//                        "ส่งแบบสอบถาม",
-//                        style: TextStyle(color: Colors.white),
-//                      ),
-//                    ),
-//                  )
-//                : Container(
-//                    alignment: Alignment.topLeft,
-//                    margin: EdgeInsets.only(top: 20),
-//                    padding: EdgeInsets.all(10),
-////              color: Colors.red,
-////              height: 300,
-//                    child: Column(
-//                      mainAxisAlignment: MainAxisAlignment.start,
-//                      crossAxisAlignment: CrossAxisAlignment.start,
-//                      children: <Widget>[
-//                        Text(
-//                          "คำถาม",
-//                          style: TextStyle(fontSize: 20),
-//                        ),
-//                        Row(
-//                          mainAxisAlignment: MainAxisAlignment.start,
-//                          children: <Widget>[
-//                            Radio(
-//                              value: 1,
-//                              groupValue: group,
-//                              onChanged: (T) {
-//                                setState(() {
-//                                  group = T;
-//                                  print(T);
-//                                });
-//                              },
-//                            ),
-//                            Text("คำตอบ 1"),
-//                          ],
-//                        ),
-//                        Row(
-//                          children: <Widget>[
-//                            Radio(
-//                              value: 2,
-//                              groupValue: group,
-//                              onChanged: (T) {
-//                                setState(() {
-//                                  group = T;
-//                                  print(T);
-//                                });
-//                              },
-//                            ),
-//                            Text("คำตอบ 2"),
-//                          ],
-//                        ),
-//                        Row(
-//                          mainAxisAlignment: MainAxisAlignment.start,
-//                          children: <Widget>[
-//                            Radio(
-//                              value: 3,
-//                              groupValue: group,
-//                              onChanged: (T) {
-//                                setState(() {
-//                                  group = T;
-//                                  print(T);
-//                                });
-//                              },
-//                            ),
-//                            Text("คำตอบ 3"),
-//                          ],
-//                        ),
-//                        Row(
-//                          children: <Widget>[
-//                            Radio(
-//                              value: 4,
-//                              groupValue: group,
-//                              onChanged: (T) {
-//                                setState(() {
-//                                  group = T;
-//                                  print(T);
-//                                });
-//                              },
-//                            ),
-//                            Text("คำตอบ 4"),
-//                          ],
-//                        ),
-//                      ],
-//                    ),
-//                  );
-//          },
-//        ),
-//      ),
-//    );
-//  }
 }

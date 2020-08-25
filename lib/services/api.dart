@@ -1,4 +1,5 @@
 import 'package:exattraffic/models/emergency_number_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
@@ -487,8 +488,9 @@ class ExatApi {
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
-      List<NotificationModel> notificationList =
-          dataList.map((markerJson) => NotificationModel.fromJson(markerJson)).toList();
+      List<NotificationModel> notificationList = await Future.wait(dataList
+          .map((markerJson) async => await NotificationModel.fromJson(markerJson))
+          .toList());
 
       return notificationList;
     } else {
@@ -502,7 +504,7 @@ class ExatApi {
     Position currentLocation = sendLocation ? await getCurrentLocation() : null;
 
     Map data = {
-      "deviceToken": "testToken",
+      "deviceToken": await FirebaseMessaging().getToken(),
       "deviceType": Platform.isAndroid ? "android" : "ios",
       "screenWidth": MediaQuery.of(context).size.width,
       "screenHeight": MediaQuery.of(context).size.height,

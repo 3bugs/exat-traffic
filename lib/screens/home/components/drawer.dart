@@ -1,20 +1,19 @@
-import 'package:exattraffic/app/app_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
-
 //import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
+import 'package:exattraffic/app/app_bloc.dart';
+import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:exattraffic/etc/utils.dart';
 
-import '../../_etc/test_overlap.dart';
-
 class MyDrawer extends StatelessWidget {
+  // ignore: non_constant_identifier_names
   static final double MARGIN_LEFT = getPlatformSize(34.0);
 
   MyDrawer();
@@ -48,14 +47,19 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    /*DrawerItemModel(
+    DrawerItemModel(
       text: 'การตั้งค่า',
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
-        //Navigator.pop(context);
-        underConstruction(context);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Settings(),
+          ),
+        );
       },
-    ),*/
+    ),
     DrawerItemModel(
       text: 'ช่วยเหลือ',
       icon: AssetImage('assets/images/drawer/ic_help.png'),

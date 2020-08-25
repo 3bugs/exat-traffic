@@ -13,6 +13,8 @@ class MyFcm {
     _firebaseMessaging.subscribeToTopic('message_incident');
     _firebaseMessaging.subscribeToTopic('message_event');
 
+    _firebaseMessaging.requestNotificationPermissions(); // จำเป็นสำหรับ ios
+
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
 

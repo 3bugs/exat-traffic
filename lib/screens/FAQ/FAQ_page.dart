@@ -41,20 +41,20 @@ class _FAQPageState extends State<FAQPage> {
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(
                   horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                  vertical: getPlatformSize(16.0),
+                  vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
                 ),
                 physics: BouncingScrollPhysics(),
                 itemCount: _presenter.faqModel.data.length,
                 itemBuilder: (context, index) {
                   open.add(false);
-                  return _datacard(index);
+                  return _dataCard(index);
                 },
               ),
             ),
           );
   }
 
-  Widget _datacard(int index) {
+  Widget _dataCard(int index) {
     return InkWell(
       onTap: () {
         setState(() {

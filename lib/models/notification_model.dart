@@ -1,3 +1,4 @@
+import 'package:exattraffic/storage/nofication_read_prefs.dart';
 import 'package:flutter/material.dart';
 
 class NotificationModel {
@@ -23,7 +24,7 @@ class NotificationModel {
   final String createdAt;
   bool read;
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+  /*factory NotificationModel.fromJson(Map<String, dynamic> json) {
     Map<String, dynamic> routeMap = json['route'];
 
     return NotificationModel(
@@ -36,5 +37,27 @@ class NotificationModel {
       createdAt: json['created_at'],
       read: false,
     );
+  }*/
+
+  static Future<NotificationModel> fromJson(Map<String, dynamic> json) async {
+    Map<String, dynamic> routeMap = json['route'];
+
+    bool read = await NotificationReadPrefs().existId(json['id'].toString());
+
+    return NotificationModel(
+      id: json['id'],
+      detail: json['detail'],
+      routeId: routeMap != null ? routeMap['id'] : null,
+      routeName: routeMap != null ? routeMap['name'] : null,
+      latitude: json['lat'],
+      longitude: json['lng'],
+      createdAt: json['created_at'],
+      read: read,
+    );
+  }
+
+  void readIt() {
+    NotificationReadPrefs().addId(this.id.toString());
+    read = true;
   }
 }

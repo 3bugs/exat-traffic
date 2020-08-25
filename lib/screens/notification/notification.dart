@@ -28,6 +28,9 @@ class _MyNotificationState extends State<MyNotification> {
   }
 
   void _handleClickNotificationItem(NotificationModel notification) {
+    setState(() {
+      notification.readIt();
+    });
     Navigator.push(
       context,
       PageRouteBuilder(

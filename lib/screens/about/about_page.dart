@@ -100,35 +100,38 @@ class _AboutPageState extends State<AboutPage> {
                 vertical: getPlatformSize(0.0),
                 horizontal: getPlatformSize(0.0),
               ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: getPlatformSize(8.0),
-                    vertical: getPlatformSize(10.0),
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: getPlatformSize(10.0),
-                      ),
-                      for (var paragraph
-                          in _getParagraphList(_presenter.aboutModel.data[0].content))
-                        Padding(
-                          padding: EdgeInsets.only(
-                            bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
-                          ),
-                          child: Text(
-                            paragraph,
-                            style: getTextStyle(0),
-                          ),
+              child: ListView(
+                physics: BouncingScrollPhysics(),
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getPlatformSize(8.0),
+                      vertical: getPlatformSize(10.0),
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: getPlatformSize(10.0),
                         ),
-                      SizedBox(
-                        height: getPlatformSize(15.0),
-                      ),
-                      _iconLink(),
-                    ],
+                        for (var paragraph
+                        in _getParagraphList(_presenter.aboutModel.data[0].content))
+                          Padding(
+                            padding: EdgeInsets.only(
+                              bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
+                            ),
+                            child: Text(
+                              paragraph,
+                              style: getTextStyle(0),
+                            ),
+                          ),
+                        SizedBox(
+                          height: getPlatformSize(15.0),
+                        ),
+                        _iconLink(),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           );
