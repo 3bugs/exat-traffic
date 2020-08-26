@@ -113,8 +113,14 @@ double screenHeightExcludingToolbar(BuildContext context, {double dividedBy = 1}
   return screenHeight(context, dividedBy: dividedBy, reducedBy: kToolbarHeight);
 }
 
-Future<void> alert(BuildContext context, String title, String content) {
-  return showDialog<void>(
+Future<DialogResult> alert(BuildContext context, String title, String content) async {
+  return await showMyDialog(
+    context,
+    content,
+    [DialogButtonModel(text: "OK", value: DialogResult.ok)],
+  );
+
+  /*return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -130,7 +136,7 @@ Future<void> alert(BuildContext context, String title, String content) {
         ],
       );
     },
-  );
+  );*/
 }
 
 Future<DialogResult> showMyDialog(
@@ -138,7 +144,7 @@ Future<DialogResult> showMyDialog(
   String message,
   List<DialogButtonModel> dialogButtonList, {
   String title = Constants.App.NAME,
-}) {
+}) async {
   return showDialog(
     context: context,
     builder: (context) => new AlertDialog(
@@ -258,7 +264,7 @@ String formatDateTime(String dateTime) {
 }
 
 void underConstruction(BuildContext context) {
-  alert(context, "EXAT Traffic", "Under construction, coming soon. :)\n\nMade with ♥ by 2fellows.");
+  alert(context, "EXAT Traffic", "Under construction, coming soon. :)\nMade with ♥ by 2fellows.");
 }
 
 LatLngBounds boundsFromLatLngList(List<LatLng> latLngList) {

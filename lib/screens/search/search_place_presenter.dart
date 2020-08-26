@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/environment/base_presenter.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -48,7 +49,9 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         Position currentLocation = await getCurrentLocation();
         dataList = await _googleMapsServices.getPlaceAutocomplete(
           newText,
-          LatLng(currentLocation.latitude, currentLocation.longitude),
+          currentLocation != null
+              ? LatLng(currentLocation.latitude, currentLocation.longitude)
+              : null,
         );
       }
 
@@ -87,10 +90,12 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
         RouteModel bestRoute = await _findBestRoute(placeDetails);
-        assert(bestRoute.gateInCostTollList.isNotEmpty);
 
-        // กลับไป _handleClickSearchOption ใน MyScaffold
-        Navigator.pop(context, bestRoute);
+        if (bestRoute != null) {
+          assert(bestRoute.gateInCostTollList.isNotEmpty);
+          // กลับไป _handleClickSearchOption ใน MyScaffold
+          Navigator.pop(context, bestRoute);
+        }
       } catch (error) {}
       loaded();
 
@@ -107,16 +112,28 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         longitude: searchResult.placeDetails.longitude,
       );*/
       RouteModel bestRoute = await _findBestRoute(searchResult.placeDetails);
-      assert(bestRoute.gateInCostTollList.isNotEmpty);
 
-      // กลับไป _handleClickSearchOption ใน MyScaffold
-      Navigator.pop(context, bestRoute);
+      if (bestRoute != null) {
+        assert(bestRoute.gateInCostTollList.isNotEmpty);
+        // กลับไป _handleClickSearchOption ใน MyScaffold
+        Navigator.pop(context, bestRoute);
+      }
     } catch (error) {}
     loaded();
   }
 
   Future<RouteModel> _findBestRoute(PlaceDetailsModel destination) async {
     Position origin = await getCurrentLocationNotNull();
+
+    if (origin == null) {
+      showMyDialog(
+        state.context,
+        Constants.Message.LOCATION_NOT_AVAILABLE,
+        [DialogButtonModel(text: "OK", value: DialogResult.yes)],
+      );
+      return Future.value(null);
+    }
+
     List<GateInCostTollModel> routeList = await MyApi.findRoute(
       origin,
       Position(latitude: destination.latitude, longitude: destination.longitude),

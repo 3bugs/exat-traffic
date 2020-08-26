@@ -78,6 +78,12 @@ class MyRouteState extends State<MyRoute> {
             _myLocationEnabled = false;
           });
         });
+      } else {
+        showMyDialog(
+          context,
+          Constants.Message.LOCATION_NOT_AVAILABLE,
+          [DialogButtonModel(text: "OK", value: DialogResult.yes)],
+        );
       }
     });
   }

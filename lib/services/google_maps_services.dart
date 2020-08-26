@@ -41,7 +41,9 @@ class GoogleMapsServices {
   Future<List<PredictionModel>> getPlaceAutocomplete(String searchTerm, LatLng latLng) async {
     Map<String, dynamic> params = Map();
     params["input"] = searchTerm;
-    params["origin"] = "${latLng.latitude},${latLng.longitude}";
+    if (latLng != null) {
+      params["origin"] = "${latLng.latitude},${latLng.longitude}";
+    }
 
     final ResponseResult result = await _makeRequest("place/autocomplete", params);
     if (result.success) {
