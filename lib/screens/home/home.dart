@@ -51,15 +51,27 @@ class MyHomeState extends State<Home> {
     zoom: 8,
   );
 
-  Future<void> _moveToCurrentPosition(BuildContext context) async {
-    final Position position =
-        await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    final CameraPosition currentPosition = CameraPosition(
-      target: LatLng(position.latitude, position.longitude),
-      zoom: 15,
-    );
-    final GoogleMapController controller = await _googleMapController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
+  Future<void> _moveToCurrentPosition(BuildContext context,
+      {bool showAlertIfLocationNotAvailable = false}) async {
+    final Position position = await getCurrentLocationNotNull();
+
+    if (position != null) {
+      final CameraPosition currentPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 15,
+      );
+      final GoogleMapController controller = await _googleMapController.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
+    } else {
+      if (showAlertIfLocationNotAvailable) {
+        //alert(context, Constants.App.NAME, Constants.Message.LOCATION_NOT_AVAILABLE);
+        showMyDialog(
+          context,
+          Constants.Message.LOCATION_NOT_AVAILABLE,
+          [DialogButtonModel(text: "OK", value: DialogResult.yes)],
+        );
+      }
+    }
   }
 
   /*void _addMarker(LatLng latLng) {
@@ -250,7 +262,7 @@ class MyHomeState extends State<Home> {
         context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
         break;
       case MapTool.currentLocation:
-        _moveToCurrentPosition(context);
+        _moveToCurrentPosition(context, showAlertIfLocationNotAvailable: true);
         break;
       case MapTool.none:
         break;
@@ -273,7 +285,7 @@ class MyHomeState extends State<Home> {
           create: (context) {
             List<MarkerModel> markerList = context.bloc<AppBloc>().markerList;
             List<CategoryModel> categoryList = context.bloc<AppBloc>().categoryList;
-            return HomeBloc(markerList: markerList, categoryList: categoryList);
+            return HomeBloc(context, markerList: markerList, categoryList: categoryList);
           },
         ),
         BlocProvider<MarkerBloc>(

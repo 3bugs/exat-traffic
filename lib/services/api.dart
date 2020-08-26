@@ -1,4 +1,3 @@
-import 'package:exattraffic/models/emergency_number_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,9 +23,17 @@ import 'package:exattraffic/models/incident_list_model.dart';
 import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:exattraffic/models/notification_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/models/emergency_number_model.dart';
 
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
+
+Future<Position> _getCurrentLocationForApi() async {
+  Position position = await Geolocator().getLastKnownPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  return position;
+}
 
 class ResponseResult {
   final bool success;
@@ -498,10 +505,23 @@ class ExatApi {
     }
   }
 
+  static bool _userDenyLocation = false;
+
   static Future<ResponseResult> _makeRequest(
-      BuildContext context, String url, Map<String, dynamic> paramMap,
-      {bool sendLocation = true}) async {
-    Position currentLocation = sendLocation ? await getCurrentLocation() : null;
+    BuildContext context,
+    String url,
+    Map<String, dynamic> paramMap, {
+    bool sendLocation = true,
+  }) async {
+    Position currentLocation;
+    if (!_userDenyLocation) {
+      try {
+        currentLocation = sendLocation ? await _getCurrentLocationForApi() : null;
+      } catch (e) {
+        print(e);
+        _userDenyLocation = true;
+      }
+    }
 
     Map data = {
       "deviceToken": await FirebaseMessaging().getToken(),
@@ -509,8 +529,8 @@ class ExatApi {
       "screenWidth": MediaQuery.of(context).size.width,
       "screenHeight": MediaQuery.of(context).size.height,
       "lang": "TH",
-      "lat": currentLocation != null ? currentLocation.latitude : 13, //null,
-      "lng": currentLocation != null ? currentLocation.longitude : 100, //null,
+      "lat": currentLocation != null ? currentLocation.latitude : null,
+      "lng": currentLocation != null ? currentLocation.longitude : null,
       "altitude": currentLocation != null ? currentLocation.altitude : null,
       "status": "1",
     };

@@ -1,23 +1,24 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bloc/bloc.dart';
 
+import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
-import 'package:exattraffic/services/api.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/etc/utils.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  final BuildContext _context;
   final List<MarkerModel> markerList;
   final List<CategoryModel> categoryList;
   Position userPosition;
 
   //Map<int, bool> categorySelectedMap = Map();
 
-  HomeBloc({
+  HomeBloc(this._context, {
     @required this.markerList,
     @required this.categoryList,
   }) : super(Initial(
@@ -41,7 +42,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return tempMap;
   }
 
-  static Future<List<MarkerModel>> _getFilterMarkerList({
+  Future<List<MarkerModel>> _getFilterMarkerList({
     @required List<MarkerModel> markerList,
     //@required Map<int, bool> categorySelectedMap,
     @required bool nearbyMode,
@@ -54,18 +55,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // filter by nearby
     if (nearbyMode) {
       List<MarkerModel> tempList = List();
-      for (int i = 0; i < tempMarkerList.length; i++) {
-        MarkerModel marker = tempMarkerList[i];
-        double distanceInMeters = await Geolocator().distanceBetween(
-          marker.latitude,
-          marker.longitude,
-          userPosition.latitude,
-          userPosition.longitude,
-        );
-        if (distanceInMeters < 5000) {
-          tempList.add(marker);
+
+      if (userPosition != null) {
+        for (int i = 0; i < tempMarkerList.length; i++) {
+          MarkerModel marker = tempMarkerList[i];
+          double distanceInMeters = await Geolocator().distanceBetween(
+            marker.latitude,
+            marker.longitude,
+            userPosition.latitude,
+            userPosition.longitude,
+          );
+          if (distanceInMeters < 5000) {
+            tempList.add(marker);
+          }
         }
+      } else {
+        showMyDialog(
+          _context,
+          Constants.Message.LOCATION_NOT_AVAILABLE,
+          [DialogButtonModel(text: "OK", value: DialogResult.yes)],
+        );
       }
+
       tempMarkerList = tempList;
     }
 
@@ -102,9 +113,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         showProgress: true,
       );
 
-      userPosition = await Geolocator().getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low,
-      );
+      userPosition = await getCurrentLocationNotNull();
 
       yield ShowProgressChange(
         selectedMapTool: currentState.selectedMapTool,

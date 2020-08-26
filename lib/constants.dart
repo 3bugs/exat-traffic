@@ -3,6 +3,7 @@ library constants;
 import 'package:flutter/material.dart';
 
 class App {
+  static const String NAME = "EXAT Traffic";
   static const Color PRIMARY_COLOR = Color(0xFF47A1FD);
   static const Color ACCENT_COLOR = Color(0xFF446E9D);
   static const Color SOS_COLOR = Color(0xFFAD0E0E);
@@ -77,4 +78,9 @@ class Api {
 
 class SchematicMapsScreen {
   static const String SCHEMATIC_MAPS_URL = "${Api.SERVER}/demo/schematic_map_full.html?backend=0";
+}
+
+class Message {
+  static const String LOCATION_NOT_AVAILABLE =
+      "ขออภัย ฟังก์ชันนี้ทำงานไม่ได้ เนื่องจาก ${App.NAME} ไม่สามารถตรวจสอบตำแหน่งปัจจุบันของคุณได้ อาจเป็นเพราะคุณไม่ได้เปิดการตั้งค่า Location หรือคุณไม่อนุญาตให้ ${App.NAME} เข้าถึงตำแหน่งปัจจุบันของคุณ";
 }

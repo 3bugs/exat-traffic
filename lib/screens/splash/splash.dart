@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:connectivity/connectivity.dart';
-import 'package:exattraffic/models/category_model.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,7 +9,7 @@ import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/screens/scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/screens/home/home.dart';
+import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 
 //use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
@@ -33,10 +30,13 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _animation;
   String _splashImageUrl;
+  bool _isError = false;
 
   @override
   void initState() {
     super.initState();
+
+
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -52,19 +52,28 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     });
 
     Future.delayed(const Duration(milliseconds: 200), () async {
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult == ConnectivityResult.none) {
-        alert(context, "ไม่มีการเชื่อมต่อ",
-            "EXAT Traffic ไม่สามารถทำงานได้หากไม่มีการเชื่อมต่อเครือข่าย");
-      } else {
-        _fetchSplashData(context);
-      }
+      _checkNetwork();
     });
+  }
+
+  void _checkNetwork() async {
+    setState(() {
+      _isError = false;
+    });
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _isError = true;
+      });
+    } else {
+      _fetchSplashData(context);
+    }
   }
 
   void _fetchSplashData(BuildContext context) async {
     GeolocationStatus geolocationStatus = await Geolocator().checkGeolocationPermissionStatus();
-    if (false /*geolocationStatus == GeolocationStatus.granted*/) {
+    if (geolocationStatus == GeolocationStatus.granted) {
       try {
         ExatApi.fetchSplash(context).then((dataList) {
           print('SPLASH SCREEN FETCHED');
@@ -148,21 +157,6 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                           width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                           height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
                         ),
-                        /*child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: getPlatformSize(20.0),
-                            vertical: getPlatformSize(10.0),
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent, //Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.all(Radius.circular(getPlatformSize(10.0))),
-                          ),
-                          child: Image(
-                            image: AssetImage('assets/images/splash/exat_logo_new.png'),
-                            width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-                            height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
-                          ),
-                        ),*/
                       ),
                       /*SizedBox(
                     height: getPlatformSize(28.0),
@@ -184,6 +178,27 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                           child: Center(
                             child: CircularProgressIndicator(),
                           ),
+                        ),
+                      )
+                    : SizedBox.shrink(),
+                _isError
+                    ? Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
+                          vertical: 0.0,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            ErrorView(
+                              title: "ไม่มีการเชื่อมต่อเครือข่าย!",
+                              text:
+                                  "${AppBloc.appName} ไม่สามารถทำงานได้ หากไม่มีการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่",
+                              buttonText: "ลองใหม่",
+                              onClick: () => _checkNetwork(),
+                            ),
+                          ],
                         ),
                       )
                     : SizedBox.shrink(),

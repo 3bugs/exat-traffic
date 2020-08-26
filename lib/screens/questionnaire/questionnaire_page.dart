@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/my_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/components/data_loading.dart';
@@ -32,7 +33,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                     physics: BouncingScrollPhysics(),
                     children: <Widget>[
                       _question(),
-                      _sendbutton(),
+                      _sendButton(),
                     ],
                   ),
                 ),
@@ -166,35 +167,18 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
     );
   }
 
-  Widget _sendbutton() {
+  Widget _sendButton() {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
         vertical: getPlatformSize(0.0),
       ),
-      child: RaisedButton(
-        padding: EdgeInsets.symmetric(
-          horizontal: getPlatformSize(0.0),
-          vertical: getPlatformSize(6.0),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(getPlatformSize(30.0)),
-//          side: BorderSide(color: Colors.red),
-        ),
-        onPressed: () {
+      child: MyButton(
+        text: "ส่งคำตอบ",
+        onClick: () {
           print("send");
           _presenter.addAnswers(_presenter.questionnaireModel.data[0].id, group);
         },
-        color: Constants.App.PRIMARY_COLOR,
-        child: Text(
-          "ส่งคำตอบ",
-          style: getTextStyle(
-            0,
-            color: Colors.white,
-            sizeTh: Constants.Font.BIGGER_SIZE_TH,
-            sizeEn: Constants.Font.BIGGER_SIZE_EN,
-          ),
-        ),
       ),
     );
   }

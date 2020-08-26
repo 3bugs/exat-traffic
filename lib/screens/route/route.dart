@@ -64,18 +64,21 @@ class MyRouteState extends State<MyRoute> {
   TollPlazaModel _tollPlaza;
 
   void _handleClickMyLocation(BuildContext context) {
-    _moveMapToCurrentPosition(context);
-    setState(() {
-      _myLocationEnabled = true;
-    });
+    _moveMapToCurrentPosition(context).then((locationEnabled) {
+      if (locationEnabled) {
+        setState(() {
+          _myLocationEnabled = true;
+        });
 
-    if (_locationTimer != null) {
-      _locationTimer.cancel();
-    }
-    _locationTimer = Timer(Duration(seconds: 10), () {
-      setState(() {
-        _myLocationEnabled = false;
-      });
+        if (_locationTimer != null) {
+          _locationTimer.cancel();
+        }
+        _locationTimer = Timer(Duration(seconds: 10), () {
+          setState(() {
+            _myLocationEnabled = false;
+          });
+        });
+      }
     });
   }
 
@@ -84,15 +87,19 @@ class MyRouteState extends State<MyRoute> {
     _mapZoomLevel = cameraPosition.zoom;
   }
 
-  Future<void> _moveMapToCurrentPosition(BuildContext context) async {
-    final Position position = await Geolocator().getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    final CameraPosition currentPosition = CameraPosition(
-      target: LatLng(position.latitude, position.longitude),
-      zoom: _mapZoomLevel ?? 15,
-    );
-    _moveMapToPosition(context, currentPosition);
+  Future<bool> _moveMapToCurrentPosition(BuildContext context) async {
+    final Position position = await getCurrentLocationNotNull();
+
+    if (position != null) {
+      final CameraPosition currentPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: _mapZoomLevel ?? 15,
+      );
+      _moveMapToPosition(context, currentPosition);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<void> _moveMapToPosition(BuildContext context, CameraPosition position) async {
@@ -131,7 +138,8 @@ class MyRouteState extends State<MyRoute> {
     );
   }
 
-  Marker _createCostTollMarker(BuildContext context, CostTollModel costToll, bool costTollSelected) {
+  Marker _createCostTollMarker(
+      BuildContext context, CostTollModel costToll, bool costTollSelected) {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('cost-toll-${costToll.id.toString()}');
 
@@ -476,10 +484,17 @@ class MyRouteState extends State<MyRoute> {
       distanceFilter: 10,
     );
 
-    final Stream<Position> positionStream = Geolocator().getPositionStream(locationOptions);
-    _positionStreamSubscription = positionStream.listen((Position position) {
-      positionChangeListener(position);
-    });
+    Stream<Position> positionStream;
+    try {
+      positionStream = Geolocator().getPositionStream(locationOptions);
+      if (positionStream != null) {
+        _positionStreamSubscription = positionStream.listen((Position position) {
+          positionChangeListener(position);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   _afterLayout(_) {
@@ -609,9 +624,15 @@ class MyRouteState extends State<MyRoute> {
                   });
 
                   // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                  Geolocator().getLastKnownPosition().then((Position position) {
-                    context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
-                  });
+                  try {
+                    getCurrentLocation().then((Position position) {
+                      context
+                          .bloc<RouteBloc>()
+                          .add(UpdateCurrentLocation(currentLocation: position));
+                    });
+                  } catch (e) {
+                    print(e);
+                  }
 
                   if (_positionStreamSubscription == null) {
                     _setupLocationUpdate((Position position) {
@@ -648,11 +669,15 @@ class MyRouteState extends State<MyRoute> {
 
                   if (!(state is ShowSearchLocationTrackingUpdated)) {
                     // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                    Geolocator().getLastKnownPosition().then((Position position) {
-                      context
-                          .bloc<RouteBloc>()
-                          .add(UpdateCurrentLocationSearch(currentLocation: position));
-                    });
+                    try {
+                      getCurrentLocation().then((Position position) {
+                        context
+                            .bloc<RouteBloc>()
+                            .add(UpdateCurrentLocationSearch(currentLocation: position));
+                      });
+                    } catch (e) {
+                      print(e);
+                    }
 
                     if (_positionStreamSubscription == null) {
                       _setupLocationUpdate((Position position) {

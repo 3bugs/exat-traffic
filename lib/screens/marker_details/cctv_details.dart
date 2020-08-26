@@ -75,7 +75,6 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       ];
       DialogResult result = await showMyDialog(
         context,
-        AppBloc.appName,
         "ยืนยันลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรด?",
         dialogButtonList,
       );

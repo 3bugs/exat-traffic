@@ -27,16 +27,26 @@ double getPlatformSize(double size) {
 }
 
 Future<Position> getCurrentLocation() async {
-  final Position position = await Geolocator().getLastKnownPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
+  Position position;
+  try {
+    position = await Geolocator().getLastKnownPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  } catch (error) {
+    print(error);
+  }
   return position;
 }
 
 Future<Position> getCurrentLocationNotNull() async {
-  final Position position = await Geolocator().getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high,
-  );
+  Position position;
+  try {
+    position = await Geolocator().getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  } catch (error) {
+    print(error);
+  }
   return position;
 }
 
@@ -125,10 +135,10 @@ Future<void> alert(BuildContext context, String title, String content) {
 
 Future<DialogResult> showMyDialog(
   BuildContext context,
-  String title,
   String message,
-  List<DialogButtonModel> dialogButtonList,
-) {
+  List<DialogButtonModel> dialogButtonList, {
+  String title = Constants.App.NAME,
+}) {
   return showDialog(
     context: context,
     builder: (context) => new AlertDialog(
@@ -181,19 +191,21 @@ Future<DialogResult> showMyDialog(
                 ),*/
         ],
       ),
-      actions: dialogButtonList.map<Widget>((dialogButton) => FlatButton(
-        child: Text(
-          dialogButton.text,
-          style: getTextStyle(
-            0,
-            sizeTh: Constants.Font.BIGGER_SIZE_TH,
-            sizeEn: Constants.Font.BIGGER_SIZE_EN,
-            color: Constants.App.PRIMARY_COLOR,
-            isBold: true,
-          ),
-        ),
-        onPressed: () => Navigator.of(context).pop(dialogButton.value),
-      )).toList(),
+      actions: dialogButtonList
+          .map<Widget>((dialogButton) => FlatButton(
+                child: Text(
+                  dialogButton.text,
+                  style: getTextStyle(
+                    0,
+                    sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                    sizeEn: Constants.Font.BIGGER_SIZE_EN,
+                    color: Constants.App.PRIMARY_COLOR,
+                    isBold: true,
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(dialogButton.value),
+              ))
+          .toList(),
       /*actions: <Widget>[
         FlatButton(
           child: Text(
@@ -226,7 +238,7 @@ Future<DialogResult> showMyDialog(
   );
 }
 
-enum DialogResult {yes, no, cancel}
+enum DialogResult { yes, no, ok, cancel }
 
 class DialogButtonModel {
   final String text;

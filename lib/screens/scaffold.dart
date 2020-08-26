@@ -265,7 +265,6 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     ];
     return await showMyDialog(
       context,
-      AppBloc.appName,
       "ต้องการออกจาก ${AppBloc.appName}?",
       dialogButtonList,
     ) == DialogResult.yes;
