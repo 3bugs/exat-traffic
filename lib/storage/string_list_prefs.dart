@@ -5,12 +5,12 @@ class StringListPrefs {
 
   StringListPrefs(this._keyPref);
 
-  Future<SharedPreferences> _getSharedPrefs() async {
+  Future<SharedPreferences> getSharedPrefs() async {
     return await SharedPreferences.getInstance();
   }
 
   Future<List<String>> getIdList() async {
-    SharedPreferences prefs = await _getSharedPrefs();
+    SharedPreferences prefs = await getSharedPrefs();
     List<String> idList = prefs.getStringList(_keyPref);
     return idList;
   }
@@ -20,7 +20,7 @@ class StringListPrefs {
       idToCheck = idToCheck.trim();
     }
 
-    SharedPreferences prefs = await _getSharedPrefs();
+    SharedPreferences prefs = await getSharedPrefs();
     List<String> idList = prefs.getStringList(_keyPref);
     print("********** [$_keyPref] ID LIST: ${idList ?? 'NULL'}");
     if (idList != null) {
@@ -39,7 +39,7 @@ class StringListPrefs {
     assert(idToAdd != null);
     idToAdd = idToAdd != null ? idToAdd.trim() : "";
 
-    SharedPreferences prefs = await _getSharedPrefs();
+    SharedPreferences prefs = await getSharedPrefs();
     List<String> idList = prefs.getStringList(_keyPref);
     print("********** [$_keyPref] ID LIST BEFORE ADDING: ${idList ?? 'NULL'}");
     if (idList == null) {
@@ -54,7 +54,7 @@ class StringListPrefs {
 
   Future<void> removeId(String idToRemove) async {
     if (idToRemove != null && idToRemove.trim().isNotEmpty) {
-      SharedPreferences prefs = await _getSharedPrefs();
+      SharedPreferences prefs = await getSharedPrefs();
       List<String> idList = prefs.getStringList(_keyPref);
       print("********** [$_keyPref] ID LIST BEFORE REMOVING: ${idList ?? 'NULL'}");
       if (idList != null) {

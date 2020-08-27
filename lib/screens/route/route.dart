@@ -1261,6 +1261,8 @@ class MyRouteState extends State<MyRoute> {
             BlocBuilder<RouteBloc, RouteState>(
               builder: (context, state) {
                 if (state is ShowSearchResultRouteState) {
+                  print("PLACE ID: ${state.bestRoute.destination.placeId}");
+
                   return RouteBottomSheet(
                     collapsePosition: _googleMapsHeight -
                         getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED),

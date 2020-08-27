@@ -179,6 +179,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     //print(bestGateInCostToll);
     return RouteModel(
       origin: PlaceDetailsModel(
+        "", // no place id for user's location
         name: "ตำแหน่งปัจจุบันของคุณ",
         formattedAddress: null,
         latitude: origin.latitude,

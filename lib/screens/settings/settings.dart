@@ -1,9 +1,12 @@
-import 'package:exattraffic/etc/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
+import 'package:exattraffic/constants.dart';
 import 'package:exattraffic/screens/settings/settings_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/etc/utils.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -11,24 +14,67 @@ class Settings extends StatefulWidget {
 }
 
 enum SettingName { language, notification, nightMode }
-enum LanguageName { thai, english, chinese }
+enum LanguageName {
+  thai,
+  english,
+  chinese,
+  japanese,
+  korean,
+  lao,
+  myanmar,
+  vietnamese,
+  khmer,
+  malay,
+  indonesian,
+  filipino
+}
 
 class _SettingsState extends State<Settings> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
   List<String> _titleList = ["การตั้งค่า", "Settings", "设定值"];
 
+  List<LanguageOptionModel> _languageOptionList = [
+    LanguageOptionModel("ไทย", LanguageName.thai, isThaiText: true),
+    LanguageOptionModel("English", LanguageName.english),
+    LanguageOptionModel("中文", LanguageName.chinese),
+    LanguageOptionModel("日本人", LanguageName.japanese),
+    LanguageOptionModel("한국어", LanguageName.korean),
+    LanguageOptionModel("Tiếng Việt", LanguageName.vietnamese),
+    LanguageOptionModel("ລາວ", LanguageName.lao),
+    LanguageOptionModel("မြန်မာ", LanguageName.myanmar),
+    LanguageOptionModel("khmer", LanguageName.khmer),
+    LanguageOptionModel("melayu", LanguageName.malay),
+    LanguageOptionModel("bahasa Indonesia", LanguageName.indonesian),
+    LanguageOptionModel("Pilipino", LanguageName.filipino),
+  ];
+
   SettingsPresenter _presenter;
-  bool _languageValue = false;
+  LanguageName _languageValue = LanguageName.thai;
   bool _notificationValue = false;
   bool _nightModeValue = false;
 
+  void _handleClickLanguage(LanguageName lang) {
+    setState(() {
+      _languageValue = lang;
+    });
+
+    Future.delayed(Duration(milliseconds: 250), () async {
+      DialogResult result = await showMyDialog(
+        context,
+        "${App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่",
+        [
+          DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
+          DialogButtonModel(text: "เริ่มใหม่เดี๋ยวนี้", value: DialogResult.yes),
+        ],
+      );
+      if (result == DialogResult.yes) {
+        Phoenix.rebirth(context);
+      }
+    });
+  }
+
   void _handleSettingChange(SettingName settingName, bool newValue) {
     switch (settingName) {
-      case SettingName.language:
-        setState(() {
-          _languageValue = !_languageValue;
-        });
-        break;
       case SettingName.notification:
         setState(() {
           _notificationValue = !_notificationValue;
@@ -38,6 +84,8 @@ class _SettingsState extends State<Settings> {
         setState(() {
           _nightModeValue = !_nightModeValue;
         });
+        break;
+      case SettingName.language:
         break;
     }
   }
@@ -56,65 +104,51 @@ class _SettingsState extends State<Settings> {
             children: <Widget>[
               SettingRow(
                 text: "ภาษา",
-                value: _languageValue,
-                onChange: (bool value) => _handleSettingChange(SettingName.language, value),
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              value: LanguageName.thai,
-                              groupValue: LanguageName.thai,
-                              onChanged: (LanguageName value) {
-                                setState(() {});
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _languageOptionList
+                          .where((item) => (_languageOptionList.indexOf(item) <
+                              _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                          .map<Widget>(
+                            (item) => OptionButton(
+                              text: item.text,
+                              value: item.value,
+                              groupValue: _languageValue,
+                              isThaiText: item.isThaiText,
+                              onClick: () {
+                                _handleClickLanguage(item.value);
                               },
                             ),
-                            Expanded(child: Text("ภาษาไทย", style: getTextStyle(0),)),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              value: LanguageName.english,
-                              groupValue: LanguageName.thai,
-                              onChanged: (LanguageName value) {
-                                setState(() {});
-                              },
-                            ),
-                            Expanded(child: Text("ภาษาอังกฤษ", style: getTextStyle(0),)),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              value: LanguageName.chinese,
-                              groupValue: LanguageName.thai,
-                              onChanged: (LanguageName value) {
-                                setState(() {});
-                              },
-                            ),
-                            Expanded(child: Text("ภาษาจีน", style: getTextStyle(0),)),
-                          ],
-                        ),
-                      ],
+                          )
+                          .toList(),
                     ),
+                  ),
+                  SizedBox(
+                    width: getPlatformSize(0.0),
                   ),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Text("123"),
-                        Text("456"),
-                        Text("789"),
-                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _languageOptionList
+                          .where((item) => (_languageOptionList.indexOf(item) >=
+                              _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                          .map<Widget>(
+                            (item) => OptionButton(
+                              text: item.text,
+                              value: item.value,
+                              groupValue: _languageValue,
+                              isThaiText: item.isThaiText,
+                              onClick: () {
+                                _handleClickLanguage(item.value);
+                              },
+                            ),
+                          )
+                          .toList(),
                     ),
                   )
                 ],
@@ -151,6 +185,57 @@ class _SettingsState extends State<Settings> {
   }
 }
 
+class LanguageOptionModel {
+  final String text;
+  final LanguageName value;
+  final bool isThaiText;
+
+  LanguageOptionModel(this.text, this.value, {this.isThaiText = false});
+}
+
+class OptionButton<T> extends StatelessWidget {
+  final String text;
+  final T value;
+  final T groupValue;
+  final Function onClick;
+  final bool isThaiText;
+
+  OptionButton({
+    @required this.text,
+    @required this.value,
+    @required this.groupValue,
+    @required this.onClick,
+    this.isThaiText = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: this.onClick,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Radio<T>(
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              value: this.value,
+              groupValue: this.groupValue,
+              onChanged: (T value) {
+                this.onClick();
+              },
+            ),
+            Text(this.text, style: getTextStyle(this.isThaiText ? 0 : 1)),
+            SizedBox(
+              width: getPlatformSize(12.0),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class SettingRow extends StatelessWidget {
   final String text;
   final bool value;
@@ -158,8 +243,8 @@ class SettingRow extends StatelessWidget {
 
   SettingRow({
     @required this.text,
-    @required this.value,
-    @required this.onChange,
+    this.value,
+    this.onChange,
   });
 
   @override
@@ -171,9 +256,12 @@ class SettingRow extends StatelessWidget {
           text,
           style: getTextStyle(0),
         ),
-        Switch(
-          value: value,
-          onChanged: onChange,
+        Visibility(
+          visible: onChange != null,
+          child: Switch(
+            value: value ?? false,
+            onChanged: onChange,
+          ),
         ),
       ],
     );

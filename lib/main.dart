@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -12,9 +13,11 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => LanguageModel(),
-        child: MyApp(),
+      Phoenix(
+        child: ChangeNotifierProvider(
+          create: (context) => LanguageModel(),
+          child: MyApp(),
+        ),
       ),
     );
   });

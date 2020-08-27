@@ -9,7 +9,7 @@ import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
 import 'package:exattraffic/app/app_bloc.dart';
-//import 'package:exattraffic/screens/settings/settings.dart';
+import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:exattraffic/etc/utils.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -47,19 +47,6 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    /*DrawerItemModel(
-      text: 'การตั้งค่า',
-      icon: AssetImage('assets/images/drawer/ic_settings.png'),
-      onClick: (BuildContext context) {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Settings(),
-          ),
-        );
-      },
-    ),*/
     DrawerItemModel(
       text: 'ช่วยเหลือ',
       icon: AssetImage('assets/images/drawer/ic_help.png'),
@@ -94,6 +81,19 @@ class MyDrawer extends StatelessWidget {
         underConstruction(context);
       },
     ),*/
+    DrawerItemModel(
+      text: 'การตั้งค่า',
+      icon: AssetImage('assets/images/drawer/ic_settings.png'),
+      onClick: (BuildContext context) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Settings(),
+          ),
+        );
+      },
+    ),
 
     /*DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',

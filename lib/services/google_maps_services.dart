@@ -78,7 +78,7 @@ class GoogleMapsServices {
 
     final ResponseResult result = await _makeRequest("place/details", params);
     if (result.success) {
-      return PlaceDetailsModel.fromJson(result.data["result"]);
+      return PlaceDetailsModel.fromJson(placeId, result.data["result"]);
     } else {
       throw Exception(result.data);
     }
@@ -153,7 +153,7 @@ class SearchResultModel {
 
   factory SearchResultModel.fromJson(Map<String, dynamic> json) {
     return SearchResultModel(
-        placeDetails: PlaceDetailsModel.fromJson(json),
+        placeDetails: PlaceDetailsModel.fromJson(json['place_id'], json),
         icon: json['icon'],
         placeId: json['place_id'],
     );
@@ -161,20 +161,22 @@ class SearchResultModel {
 }
 
 class PlaceDetailsModel {
+  final String placeId;
   final String name;
   final String formattedAddress;
   final double latitude;
   final double longitude;
 
-  PlaceDetailsModel({
+  PlaceDetailsModel(this.placeId, {
     @required this.name,
     @required this.formattedAddress,
     @required this.latitude,
     @required this.longitude,
   });
 
-  factory PlaceDetailsModel.fromJson(Map<String, dynamic> json) {
+  factory PlaceDetailsModel.fromJson(String placeId, Map<String, dynamic> json) {
     return PlaceDetailsModel(
+      placeId,
       name: json['name'],
       formattedAddress: json['formatted_address'],
       latitude: json['geometry']['location']['lat'],
