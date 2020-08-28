@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 //import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +10,8 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/gate_in_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 
@@ -20,6 +22,7 @@ class RouteBottomSheet extends StatefulWidget {
     @required this.gateIn,
     @required this.costToll,
     @required this.googleRoute,
+    this.destination,
     @required this.showArrivalTime,
   });
 
@@ -28,6 +31,7 @@ class RouteBottomSheet extends StatefulWidget {
   final GateInModel gateIn;
   final CostTollModel costToll;
   final Map<String, dynamic> googleRoute;
+  final PlaceDetailsModel destination;
   final bool showArrivalTime;
 
   @override
@@ -156,7 +160,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
 
   String _getArrivalTimeText() {
     int routeDurationSeconds =
-    widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration']['value'];
+        widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration']['value'];
 
     DateTime arrivalDate = new DateTime.now().add(Duration(seconds: routeDurationSeconds));
     String hourText = (arrivalDate.hour < 10 ? "0" : "") + arrivalDate.hour.toString();
@@ -182,6 +186,67 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     }
 
     return tollPlazaCount;
+  }
+
+  Future<Icon> _getFavoriteIcon() async {
+    return (await PlaceFavoritePrefs().existId(widget.destination.placeId))
+        ? Icon(
+            Icons.star,
+            color: Constants.App.FAVORITE_ON_COLOR,
+            size: getPlatformSize(24.0),
+            semanticLabel: 'Favorite',
+          )
+        : Icon(
+            Icons.star_border,
+            color: Colors.white,
+            size: getPlatformSize(24.0),
+            semanticLabel: 'Favorite',
+          );
+  }
+
+  void _handleClickFavorite() async {
+    PlaceFavoritePrefs prefs = PlaceFavoritePrefs();
+
+    if (await prefs.existId(widget.destination.placeId)) {
+      List<DialogButtonModel> dialogButtonList = [
+        DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
+        DialogButtonModel(text: "ใช่", value: DialogResult.yes)
+      ];
+      DialogResult result = await showMyDialog(
+        context,
+        "ยืนยันลบ '${widget.destination.name}' ออกจากรายการโปรด?",
+        dialogButtonList,
+      );
+      if (result == DialogResult.yes) {
+        prefs.removeId(widget.destination.placeId).then((_) {
+          setState(() {
+            Fluttertoast.showToast(
+              msg: "ลบ '${widget.destination.name}' ออกจากรายการโปรดแล้ว",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Color(0xFFDEDEDE),
+              textColor: Colors.black,
+              fontSize: 14.0,
+            );
+          });
+        });
+      }
+    } else {
+      prefs.addPlace(PlaceFavoriteModel(widget.destination.placeId, widget.destination.name)).then((_) {
+        setState(() {
+          Fluttertoast.showToast(
+            msg: "เพิ่ม '${widget.destination.name}' ในรายการโปรดแล้ว",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color(0xFFDEDEDE),
+            textColor: Colors.black,
+            fontSize: 14.0,
+          );
+        });
+      });
+    }
   }
 
   @override
@@ -221,8 +286,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 widget.googleRoute == null
                                     ? ''
                                     : widget.googleRoute['legs'][0]['duration']['text']
-                                    .replaceAll('hour', 'ชม.')
-                                    .replaceAll('mins', 'นาที'),
+                                        .replaceAll('hour', 'ชม.')
+                                        .replaceAll('mins', 'นาที'),
                                 style: getTextStyle(
                                   language.lang,
                                   isBold: true,
@@ -237,8 +302,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                               Text(
                                 widget.googleRoute == null
                                     ? ''
-                                    : '(${widget.googleRoute['legs'][0]['distance']['text']
-                                    .replaceAll('km', 'กม.')})',
+                                    : '(${widget.googleRoute['legs'][0]['distance']['text'].replaceAll('km', 'กม.')})',
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,
@@ -252,30 +316,31 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       ),
 
                       // ปุ่ม favorite
-                      /*Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _handleClickUpDownSheet();
-                          },
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(getPlatformSize(21.0)),
-                          ),
-                          child: Container(
-                            width: getPlatformSize(42.0),
-                            height: getPlatformSize(42.0),
-                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                            child: Center(
-                              child: Icon(
-                                Icons.star,
-                                color: Constants.App.FAVORITE_ON_COLOR,
-                                size: getPlatformSize(24.0),
-                                semanticLabel: 'Favorite',
+                      widget.destination != null
+                          ? Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _handleClickFavorite,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(getPlatformSize(21.0)),
+                                ),
+                                child: Container(
+                                  width: getPlatformSize(42.0),
+                                  height: getPlatformSize(42.0),
+                                  //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                  child: Center(
+                                    child: FutureBuilder(
+                                        future: _getFavoriteIcon(),
+                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                          return snapshot.hasData
+                                              ? snapshot.data
+                                              : SizedBox.shrink();
+                                        }),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ),*/
+                            )
+                          : SizedBox.shrink(),
 
                       // ปุ่ม up/down
                       Material(
@@ -326,14 +391,14 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                         ),
                         widget.showArrivalTime
                             ? Text(
-                          'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
-                          style: getTextStyle(
-                            language.lang,
-                            color: Colors.white,
-                            sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                            sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                          ),
-                        )
+                                'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
+                                style: getTextStyle(
+                                  language.lang,
+                                  color: Colors.white,
+                                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                ),
+                              )
                             : SizedBox.shrink(),
                       ],
                     ),

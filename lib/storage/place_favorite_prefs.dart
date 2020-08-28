@@ -18,10 +18,20 @@ class PlaceFavoritePrefs extends StringListPrefs {
     }).toList();
   }
 
-  Future<void> addPlace(PlaceFavoriteModel placeFavorite) async {
-    addId(placeFavorite.placeId);
+  Future<PlaceFavoriteModel> getPlace(String placeId) async {
+    if (await existId(placeId)) {
+      SharedPreferences prefs = await getSharedPrefs();
+      String placeName = prefs.getString(placeId);
+      return PlaceFavoriteModel(placeId, placeName);
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> addPlace(PlaceFavoriteModel placeToAdd) async {
+    addId(placeToAdd.placeId);
     SharedPreferences prefs = await getSharedPrefs();
-    prefs.setString(placeFavorite.placeId, placeFavorite.placeName);
+    prefs.setString(placeToAdd.placeId, placeToAdd.placeName);
   }
 }
 

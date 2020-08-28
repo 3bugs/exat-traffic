@@ -9,6 +9,9 @@ import 'package:exattraffic/screens/favorite/favorite_presenter.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/favorite_model.dart';
+import 'package:exattraffic/screens/search/search_place_presenter.dart';
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
 
 class Favorite extends StatefulWidget {
   const Favorite(Key key) : super(key: key);
@@ -29,8 +32,32 @@ class FavoriteState extends State<Favorite> {
     _refreshController.refreshCompleted();
   }
 
-  void _handleClickFavoriteItem(FavoriteModel favorite) {
-    favorite.marker.showDetailsScreen(context, callback: onRefresh);
+  Future<void> _handleClickFavoriteItem(FavoriteModel favorite) async {
+    switch (favorite.type) {
+      case FavoriteType.cctv:
+        favorite.marker.showDetailsScreen(context, callback: onRefresh);
+        break;
+      case FavoriteType.place:
+        return;
+
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        _presenter.loading();
+        try {
+          PlaceDetailsModel placeDetails =
+              await googleMapsServices.getPlaceDetails(favorite.placeId);
+          /*Position destination =
+            Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
+          RouteModel bestRoute = await SearchPlacePresenter.findBestRoute(context, placeDetails);
+
+          if (bestRoute != null) {
+            assert(bestRoute.gateInCostTollList.isNotEmpty);
+            // กลับไป _handleClickSearchOption ใน MyScaffold
+            Navigator.pop(context, bestRoute);
+          }
+        } catch (error) {}
+        _presenter.loaded();
+        break;
+    }
   }
 
   @override
@@ -42,55 +69,60 @@ class FavoriteState extends State<Favorite> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
-      ),
-      decoration: BoxDecoration(
-        color: Constants.App.BACKGROUND_COLOR,
-      ),
-      child: _presenter.favoriteList == null
-          ? DataLoading()
-          : SmartRefresher(
-              enablePullDown: true,
-              controller: _refreshController,
-              onRefresh: onRefresh,
-              child: _presenter.favoriteList.isNotEmpty
-                  ? ListView.separated(
-                      itemCount: _presenter.favoriteList.length,
-                      scrollDirection: Axis.vertical,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return FavoriteView(
-                          onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
-                          favorite: _presenter.favoriteList[index],
-                          isFirstItem: index == 0,
-                          isLastItem: index == _presenter.favoriteList.length - 1,
-                        );
+    return Stack(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(
+            top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
+          ),
+          decoration: BoxDecoration(
+            color: Constants.App.BACKGROUND_COLOR,
+          ),
+          child: _presenter.favoriteList == null
+              ? DataLoading()
+              : SmartRefresher(
+            enablePullDown: true,
+            controller: _refreshController,
+            onRefresh: onRefresh,
+            child: _presenter.favoriteList.isNotEmpty
+                ? ListView.separated(
+              itemCount: _presenter.favoriteList.length,
+              scrollDirection: Axis.vertical,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                return FavoriteView(
+                  onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
+                  favorite: _presenter.favoriteList[index],
+                  isFirstItem: index == 0,
+                  isLastItem: index == _presenter.favoriteList.length - 1,
+                );
 
-                        /*return Dismissible(
-                          key: UniqueKey(),
-                          onDismissed: (direction) {
-                            setState(() {
-                              _presenter.favoriteList.removeAt(index);
-                            });
+                /*return Dismissible(
+                            key: UniqueKey(),
+                            onDismissed: (direction) {
+                              setState(() {
+                                _presenter.favoriteList.removeAt(index);
+                              });
 
-                            Scaffold.of(context).showSnackBar(SnackBar(content: Text("dismissed")));
-                          },
-                          child: FavoriteView(
-                            onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
-                            favorite: _presenter.favoriteList[index],
-                            isFirstItem: index == 0,
-                            isLastItem: index == _presenter.favoriteList.length - 1,
-                          ),
-                        );*/
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return SizedBox.shrink();
-                      },
-                    )
-                  : NoData(),
-            ),
+                              Scaffold.of(context).showSnackBar(SnackBar(content: Text("dismissed")));
+                            },
+                            child: FavoriteView(
+                              onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
+                              favorite: _presenter.favoriteList[index],
+                              isFirstItem: index == 0,
+                              isLastItem: index == _presenter.favoriteList.length - 1,
+                            ),
+                          );*/
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox.shrink();
+              },
+            )
+                : NoData(),
+          ),
+        ),
+        _presenter.isLoading ? DataLoading() : SizedBox.shrink(),
+      ],
     );
   }
 }

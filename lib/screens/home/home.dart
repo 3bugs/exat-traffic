@@ -271,7 +271,9 @@ class MyHomeState extends State<Home> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    if (_timer != null) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 

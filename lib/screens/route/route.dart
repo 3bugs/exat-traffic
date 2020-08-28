@@ -1271,6 +1271,7 @@ class MyRouteState extends State<MyRoute> {
                     gateIn: state.bestRoute.gateInCostTollList[0].gateIn,
                     costToll: state.bestRoute.gateInCostTollList[0].costToll,
                     googleRoute: state.bestRoute.gateInCostTollList[0].googleRoute,
+                    destination: state.bestRoute.destination,
                     showArrivalTime: true,
                   );
                 } else {

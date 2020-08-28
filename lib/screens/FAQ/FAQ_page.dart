@@ -22,6 +22,7 @@ class _FAQPageState extends State<FAQPage> {
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   void _onRefresh() {
+    open.clear();
     _presenter.clearFAQ();
     _presenter.getFAQ();
 
@@ -33,7 +34,7 @@ class _FAQPageState extends State<FAQPage> {
     return _presenter.faqModel == null
         ? DataLoading()
         : Container(
-            color: Color(0x09000000),
+            color: Constants.App.BACKGROUND_COLOR,
             child: SmartRefresher(
               enablePullDown: true,
               controller: _refreshController,
@@ -58,11 +59,7 @@ class _FAQPageState extends State<FAQPage> {
     return InkWell(
       onTap: () {
         setState(() {
-          if (open[index]) {
-            open[index] = false;
-          } else {
-            open[index] = true;
-          }
+          open[index] = !open[index];
         });
       },
       child: Card(
@@ -77,7 +74,7 @@ class _FAQPageState extends State<FAQPage> {
             right: getPlatformSize(10.0),
             left: getPlatformSize(20.0),
           ),
-          color: open[index] ? Colors.white : Colors.white,
+          color: open[index] ? Color(0xFFF8F8F8) : Colors.white,
 //          height: 200,
 //          width: double.infinity,
           child: Column(
@@ -97,8 +94,14 @@ class _FAQPageState extends State<FAQPage> {
                         "${_presenter.faqModel.data[index].name}",
                         style: getTextStyle(
                           0,
-                          color: Constants.App.ACCENT_COLOR,
-                          isBold: true,
+                          color: open[index] ? Color(0xFF1C1C1C) : Constants.Font.DEFAULT_COLOR,
+                          sizeTh: open[index]
+                              ? Constants.Font.BIGGER_SIZE_TH
+                              : Constants.Font.DEFAULT_SIZE_TH,
+                          sizeEn: open[index]
+                              ? Constants.Font.BIGGER_SIZE_EN
+                              : Constants.Font.DEFAULT_SIZE_EN,
+                          //isBold: true,
                         ),
                       ),
                     ),
@@ -112,11 +115,11 @@ class _FAQPageState extends State<FAQPage> {
                       child: open[index]
                           ? Icon(
                               Icons.keyboard_arrow_up,
-                              color: Color(0xFFA7A7A7),
+                              color: Color(0xFF626060),
                             )
                           : Icon(
                               Icons.keyboard_arrow_down,
-                              color: Color(0xFFA7A7A7),
+                              color: Color(0xFF626060),
                             ),
                     ),
                   ],

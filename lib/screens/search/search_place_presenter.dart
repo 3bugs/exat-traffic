@@ -89,7 +89,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
             await _googleMapsServices.getPlaceDetails(prediction.placeId);
         /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
-        RouteModel bestRoute = await _findBestRoute(placeDetails);
+        RouteModel bestRoute = await findBestRoute(state.context, placeDetails);
 
         if (bestRoute != null) {
           assert(bestRoute.gateInCostTollList.isNotEmpty);
@@ -111,7 +111,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         latitude: searchResult.placeDetails.latitude,
         longitude: searchResult.placeDetails.longitude,
       );*/
-      RouteModel bestRoute = await _findBestRoute(searchResult.placeDetails);
+      RouteModel bestRoute = await findBestRoute(state.context, searchResult.placeDetails);
 
       if (bestRoute != null) {
         assert(bestRoute.gateInCostTollList.isNotEmpty);
@@ -122,12 +122,12 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     loaded();
   }
 
-  Future<RouteModel> _findBestRoute(PlaceDetailsModel destination) async {
+  static Future<RouteModel> findBestRoute(BuildContext context, PlaceDetailsModel destination) async {
     Position origin = await getCurrentLocationNotNull();
 
     if (origin == null) {
       showMyDialog(
-        state.context,
+        context,
         Constants.Message.LOCATION_NOT_AVAILABLE,
         [DialogButtonModel(text: "OK", value: DialogResult.yes)],
       );
@@ -137,7 +137,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     List<GateInCostTollModel> routeList = await MyApi.findRoute(
       origin,
       Position(latitude: destination.latitude, longitude: destination.longitude),
-      BlocProvider.of<AppBloc>(state.context).markerList,
+      BlocProvider.of<AppBloc>(context).markerList,
     );
 
     final GoogleMapsServices googleMapsServices = GoogleMapsServices();

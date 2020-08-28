@@ -12,7 +12,7 @@ class StringListPrefs {
   Future<List<String>> getIdList() async {
     SharedPreferences prefs = await getSharedPrefs();
     List<String> idList = prefs.getStringList(_keyPref);
-    return idList;
+    return idList ?? List<String>();
   }
 
   Future<bool> existId(String idToCheck) async {

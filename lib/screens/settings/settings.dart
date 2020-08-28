@@ -53,6 +53,8 @@ class _SettingsState extends State<Settings> {
   bool _nightModeValue = false;
 
   void _handleClickLanguage(LanguageName lang) {
+    if (lang == _languageValue) return;
+
     setState(() {
       _languageValue = lang;
     });
@@ -121,9 +123,7 @@ class _SettingsState extends State<Settings> {
                                 value: item.value,
                                 groupValue: _languageValue,
                                 isThaiText: item.isThaiText,
-                                onClick: () {
-                                  _handleClickLanguage(item.value);
-                                },
+                                onClick: () => _handleClickLanguage(item.value),
                               ),
                             )
                             .toList(),
@@ -144,15 +144,16 @@ class _SettingsState extends State<Settings> {
                                 value: item.value,
                                 groupValue: _languageValue,
                                 isThaiText: item.isThaiText,
-                                onClick: () {
-                                  _handleClickLanguage(item.value);
-                                },
+                                onClick: () => _handleClickLanguage(item.value),
                               ),
                             )
                             .toList(),
                       ),
                     )
                   ],
+                ),
+                SizedBox(
+                  height: getPlatformSize(8.0),
                 ),
                 SettingRow(
                   text: "การแจ้งเตือน",
