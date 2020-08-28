@@ -8,6 +8,7 @@ import 'package:exattraffic/screens/about/about_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
+import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:exattraffic/app/app_bloc.dart';
 import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -73,14 +74,19 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    /*DrawerItemModel(
+    DrawerItemModel(
       text: 'วิดเจ็ต',
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
-        //Navigator.pop(context);
-        underConstruction(context);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WidgetSetting(),
+          ),
+        );
       },
-    ),*/
+    ),
     DrawerItemModel(
       text: 'การตั้งค่า',
       icon: AssetImage('assets/images/drawer/ic_settings.png'),

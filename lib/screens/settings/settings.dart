@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-import 'package:exattraffic/constants.dart';
 import 'package:exattraffic/screens/settings/settings_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -61,7 +60,7 @@ class _SettingsState extends State<Settings> {
     Future.delayed(Duration(milliseconds: 250), () async {
       DialogResult result = await showMyDialog(
         context,
-        "${App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่",
+        "${Constants.App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่",
         [
           DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
           DialogButtonModel(text: "เริ่มใหม่เดี๋ยวนี้", value: DialogResult.yes),
@@ -91,82 +90,85 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _content() {
-    return ListView(
-      physics: BouncingScrollPhysics(),
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-            vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SettingRow(
-                text: "ภาษา",
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _languageOptionList
-                          .where((item) => (_languageOptionList.indexOf(item) <
-                              _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
-                          .map<Widget>(
-                            (item) => OptionButton(
-                              text: item.text,
-                              value: item.value,
-                              groupValue: _languageValue,
-                              isThaiText: item.isThaiText,
-                              onClick: () {
-                                _handleClickLanguage(item.value);
-                              },
-                            ),
-                          )
-                          .toList(),
+    return Container(
+      color: Constants.App.BACKGROUND_COLOR,
+      child: ListView(
+        physics: BouncingScrollPhysics(),
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+              vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SettingRow(
+                  text: "ภาษา",
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _languageOptionList
+                            .where((item) => (_languageOptionList.indexOf(item) <
+                                _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                            .map<Widget>(
+                              (item) => OptionButton(
+                                text: item.text,
+                                value: item.value,
+                                groupValue: _languageValue,
+                                isThaiText: item.isThaiText,
+                                onClick: () {
+                                  _handleClickLanguage(item.value);
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: getPlatformSize(0.0),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _languageOptionList
-                          .where((item) => (_languageOptionList.indexOf(item) >=
-                              _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
-                          .map<Widget>(
-                            (item) => OptionButton(
-                              text: item.text,
-                              value: item.value,
-                              groupValue: _languageValue,
-                              isThaiText: item.isThaiText,
-                              onClick: () {
-                                _handleClickLanguage(item.value);
-                              },
-                            ),
-                          )
-                          .toList(),
+                    SizedBox(
+                      width: getPlatformSize(0.0),
                     ),
-                  )
-                ],
-              ),
-              SettingRow(
-                text: "การแจ้งเตือน",
-                value: _notificationValue,
-                onChange: (bool value) => _handleSettingChange(SettingName.notification, value),
-              ),
-              SettingRow(
-                text: "โหมดกลางคืน (สำหรับ Schematic Map)",
-                value: _nightModeValue,
-                onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
-              ),
-            ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _languageOptionList
+                            .where((item) => (_languageOptionList.indexOf(item) >=
+                                _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                            .map<Widget>(
+                              (item) => OptionButton(
+                                text: item.text,
+                                value: item.value,
+                                groupValue: _languageValue,
+                                isThaiText: item.isThaiText,
+                                onClick: () {
+                                  _handleClickLanguage(item.value);
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    )
+                  ],
+                ),
+                SettingRow(
+                  text: "การแจ้งเตือน",
+                  value: _notificationValue,
+                  onChange: (bool value) => _handleSettingChange(SettingName.notification, value),
+                ),
+                SettingRow(
+                  text: "โหมดกลางคืน (สำหรับ Schematic Map)",
+                  value: _nightModeValue,
+                  onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

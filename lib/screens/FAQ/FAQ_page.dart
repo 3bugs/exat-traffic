@@ -66,6 +66,8 @@ class _FAQPageState extends State<FAQPage> {
         });
       },
       child: Card(
+        elevation: getPlatformSize(5.0),
+        shadowColor: Colors.black.withOpacity(0.5),
         margin: EdgeInsets.only(top: index == 0 ? 0.0 : getPlatformSize(16.0)),
         clipBehavior: Clip.antiAlias,
         child: Container(
@@ -73,30 +75,39 @@ class _FAQPageState extends State<FAQPage> {
             top: getPlatformSize(10.0),
             bottom: getPlatformSize(10.0),
             right: getPlatformSize(10.0),
-            left: getPlatformSize(16.0),
+            left: getPlatformSize(20.0),
           ),
           color: open[index] ? Colors.white : Colors.white,
 //          height: 200,
-          width: double.infinity,
+//          width: double.infinity,
           child: Column(
             children: <Widget>[
               Container(
-                height: getPlatformSize(50.0),
+//                height: getPlatformSize(50.0),
 //                color: Colors.red,
+                padding: EdgeInsets.only(
+                  top: getPlatformSize(8.0),
+                  bottom: getPlatformSize(8.0),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      "${_presenter.faqModel.data[index].name}",
-                      style: getTextStyle(
-                        0,
-                        color: Constants.App.ACCENT_COLOR,
-                        isBold: true,
+                    Expanded(
+                      child: Text(
+                        "${_presenter.faqModel.data[index].name}",
+                        style: getTextStyle(
+                          0,
+                          color: Constants.App.ACCENT_COLOR,
+                          isBold: true,
+                        ),
                       ),
+                    ),
+                    SizedBox(
+                      width: getPlatformSize(8.0),
                     ),
                     Container(
 //                      color: Colors.red,
-                      height: getPlatformSize(50.0),
+                      height: getPlatformSize(40.0),
                       width: getPlatformSize(25.0),
                       child: open[index]
                           ? Icon(
@@ -119,13 +130,13 @@ class _FAQPageState extends State<FAQPage> {
                     children: <Widget>[
                       Divider(),
                       Container(
+                        padding: EdgeInsets.only(
+                          top: getPlatformSize(8.0),
+                          bottom: getPlatformSize(8.0),
+                        ),
                         child: Text(
                           "${_presenter.faqModel.data[index].detail}",
                           style: getTextStyle(0),
-                        ),
-                        padding: EdgeInsets.only(
-                          top: getPlatformSize(15.0),
-                          bottom: getPlatformSize(15.0),
                         ),
                       ),
                     ],
