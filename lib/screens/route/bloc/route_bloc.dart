@@ -41,6 +41,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         notification: null,
       );
     } else if (event is UpdateCurrentLocationSearch) {
+      print("***** UPDATE CURRENT LOCATION [SEARCH] *****");
+
       AlertModel notification;
       GateInCostTollModel gateInCostToll = _bestRoute.gateInCostTollList[0];
 
@@ -194,49 +196,53 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         );
       }
     } else if (event is UpdateCurrentLocation) {
-      GateInModel selectedGateIn = currentState.selectedGateIn;
-      CostTollModel selectedCostToll = currentState.selectedCostToll;
-      List<MarkerModel> partTollList = selectedCostToll.partTollMarkerList;
-      Position currentLocation = event.currentLocation;
+      print("***** UPDATE CURRENT LOCATION [GATEIN/COSTTOLL] *****");
 
-      AlertModel notification;
+      try { // todo: (bug) selectedCostToll = null ?!?
+        GateInModel selectedGateIn = currentState.selectedGateIn;
+        CostTollModel selectedCostToll = currentState.selectedCostToll;
+        List<MarkerModel> partTollList = selectedCostToll.partTollMarkerList;
+        Position currentLocation = event.currentLocation;
 
-      if (selectedGateIn.marker.category.code == CategoryType.TOLL_PLAZA &&
-          !selectedGateIn.notified) {
-        notification = await _getTollPlazaNotification(
-          selectedGateIn.marker,
-          currentLocation,
-        );
-        selectedGateIn.notified = notification != null;
-      }
+        AlertModel notification;
 
-      if (selectedCostToll.marker != null &&
-          selectedCostToll.marker.category.code == CategoryType.TOLL_PLAZA &&
-          !selectedCostToll.notified) {
-        notification = await _getTollPlazaNotification(selectedCostToll.marker, currentLocation);
-        selectedCostToll.notified = notification != null;
-      }
-
-      for (int i = 0; i < partTollList.length; i++) {
-        MarkerModel partToll = partTollList[i];
-        if (partToll.category.code == CategoryType.TOLL_PLAZA && !partToll.notified) {
+        if (selectedGateIn.marker.category.code == CategoryType.TOLL_PLAZA &&
+            !selectedGateIn.notified) {
           notification = await _getTollPlazaNotification(
-            partToll,
+            selectedGateIn.marker,
             currentLocation,
           );
-          partToll.notified = notification != null;
+          selectedGateIn.notified = notification != null;
         }
-      }
 
-      yield LocationTrackingUpdated(
-        gateInList: currentState.gateInList,
-        costTollList: currentState.costTollList,
-        selectedGateIn: currentState.selectedGateIn,
-        selectedCostToll: currentState.selectedCostToll,
-        googleRoute: currentState.googleRoute,
-        currentLocation: event.currentLocation,
-        notification: notification,
-      );
+        if (selectedCostToll.marker != null &&
+            selectedCostToll.marker.category.code == CategoryType.TOLL_PLAZA &&
+            !selectedCostToll.notified) {
+          notification = await _getTollPlazaNotification(selectedCostToll.marker, currentLocation);
+          selectedCostToll.notified = notification != null;
+        }
+
+        for (int i = 0; i < partTollList.length; i++) {
+          MarkerModel partToll = partTollList[i];
+          if (partToll.category.code == CategoryType.TOLL_PLAZA && !partToll.notified) {
+            notification = await _getTollPlazaNotification(
+              partToll,
+              currentLocation,
+            );
+            partToll.notified = notification != null;
+          }
+        }
+
+        yield LocationTrackingUpdated(
+          gateInList: currentState.gateInList,
+          costTollList: currentState.costTollList,
+          selectedGateIn: currentState.selectedGateIn,
+          selectedCostToll: currentState.selectedCostToll,
+          googleRoute: currentState.googleRoute,
+          currentLocation: event.currentLocation,
+          notification: notification,
+        );
+      } catch (_) {}
     }
   }
 
