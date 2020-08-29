@@ -1,3 +1,4 @@
+import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,6 @@ import 'package:exattraffic/components/header.dart';
 import 'package:exattraffic/components/search_box.dart';
 import 'package:exattraffic/services/fcm.dart';
 import 'package:exattraffic/screens/search/search_service.dart';
-import 'package:exattraffic/components/dialog_button.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/screens/emergency/emergency.dart';
 
@@ -156,7 +156,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
     _fragmentList = [
       Home(_keyHomePage, hideSearchOptions),
-      Favorite(_keyFavoritePage),
+      Favorite(_keyFavoritePage, showBestRouteAfterSearch),
       MyRoute(_keyRoutePage),
       Incident(),
       MyNotification(),
@@ -233,16 +233,20 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       ),
     ).then((bestRoute) {
       if (index == 1 && bestRoute != null) {
-        _showFragment(2);
-        if (_keyRoutePage.currentState != null) {
-          _keyRoutePage.currentState.initFindRoute(bestRoute);
-        } else {
-          Future.delayed(Duration(milliseconds: 500), () {
-            _keyRoutePage.currentState.initFindRoute(bestRoute);
-          });
-        }
+        showBestRouteAfterSearch(bestRoute);
       }
     });
+  }
+
+  void showBestRouteAfterSearch(RouteModel bestRoute) {
+    _showFragment(2);
+    if (_keyRoutePage.currentState != null) {
+      _keyRoutePage.currentState.initFindRoute(bestRoute);
+    } else {
+      Future.delayed(Duration(milliseconds: 500), () {
+        _keyRoutePage.currentState.initFindRoute(bestRoute);
+      });
+    }
   }
 
   Future<bool> _handleBackPressed() async {

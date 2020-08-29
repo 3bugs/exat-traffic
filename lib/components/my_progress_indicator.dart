@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/constants.dart' as Constants;
+//import 'package:exattraffic/constants.dart' as Constants;
 
 class MyProgressIndicator extends StatelessWidget {
   MyProgressIndicator();

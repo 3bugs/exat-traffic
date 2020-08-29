@@ -14,7 +14,9 @@ import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 
 class Favorite extends StatefulWidget {
-  const Favorite(Key key) : super(key: key);
+  final Function showBestRouteAfterSearch;
+
+  const Favorite(Key key, this.showBestRouteAfterSearch) : super(key: key);
 
   @override
   FavoriteState createState() => FavoriteState();
@@ -38,21 +40,21 @@ class FavoriteState extends State<Favorite> {
         favorite.marker.showDetailsScreen(context, callback: onRefresh);
         break;
       case FavoriteType.place:
-        return;
-
         final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        _presenter.setLoadingMessage("ดึงข้อมูลสถานที่");
         _presenter.loading();
         try {
           PlaceDetailsModel placeDetails =
               await googleMapsServices.getPlaceDetails(favorite.placeId);
           /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
+          _presenter.setLoadingMessage("หาเส้นทางที่ใช้เวลาน้อยที่สุด");
           RouteModel bestRoute = await SearchPlacePresenter.findBestRoute(context, placeDetails);
 
           if (bestRoute != null) {
-            assert(bestRoute.gateInCostTollList.isNotEmpty);
+            //assert(bestRoute.gateInCostTollList.isNotEmpty);
             // กลับไป _handleClickSearchOption ใน MyScaffold
-            Navigator.pop(context, bestRoute);
+            widget.showBestRouteAfterSearch(bestRoute);
           }
         } catch (error) {}
         _presenter.loaded();
@@ -81,23 +83,24 @@ class FavoriteState extends State<Favorite> {
           child: _presenter.favoriteList == null
               ? DataLoading()
               : SmartRefresher(
-            enablePullDown: true,
-            controller: _refreshController,
-            onRefresh: onRefresh,
-            child: _presenter.favoriteList.isNotEmpty
-                ? ListView.separated(
-              itemCount: _presenter.favoriteList.length,
-              scrollDirection: Axis.vertical,
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                return FavoriteView(
-                  onClick: () => _handleClickFavoriteItem(_presenter.favoriteList[index]),
-                  favorite: _presenter.favoriteList[index],
-                  isFirstItem: index == 0,
-                  isLastItem: index == _presenter.favoriteList.length - 1,
-                );
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: onRefresh,
+                  child: _presenter.favoriteList.isNotEmpty
+                      ? ListView.separated(
+                          itemCount: _presenter.favoriteList.length,
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return FavoriteView(
+                              onClick: () =>
+                                  _handleClickFavoriteItem(_presenter.favoriteList[index]),
+                              favorite: _presenter.favoriteList[index],
+                              isFirstItem: index == 0,
+                              isLastItem: index == _presenter.favoriteList.length - 1,
+                            );
 
-                /*return Dismissible(
+                            /*return Dismissible(
                             key: UniqueKey(),
                             onDismissed: (direction) {
                               setState(() {
@@ -113,15 +116,15 @@ class FavoriteState extends State<Favorite> {
                               isLastItem: index == _presenter.favoriteList.length - 1,
                             ),
                           );*/
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return SizedBox.shrink();
-              },
-            )
-                : NoData(),
-          ),
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox.shrink();
+                          },
+                        )
+                      : NoData(),
+                ),
         ),
-        _presenter.isLoading ? DataLoading() : SizedBox.shrink(),
+        _presenter.isLoading ? DataLoading(/*text: _presenter.loadingMessage*/) : SizedBox.shrink(),
       ],
     );
   }

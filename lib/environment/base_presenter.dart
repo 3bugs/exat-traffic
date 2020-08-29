@@ -5,6 +5,7 @@ abstract class BasePre {}
 class BasePresenter<T extends StatefulWidget> {
   State<T> state;
   bool isLoading = false;
+  String loadingMessage;
 
   BasePresenter(this.state);
 
@@ -25,6 +26,12 @@ class BasePresenter<T extends StatefulWidget> {
   loaded() {
     setState(() {
       isLoading = false;
+    });
+  }
+
+  setLoadingMessage(msg) {
+    setState(() {
+      loadingMessage = msg;
     });
   }
 }
