@@ -267,9 +267,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 width: getPlatformSize(15.0),
                               ),*/
                               MapToolItem(
-                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
-                                iconWidth: getPlatformSize(18.52),
-                                iconHeight: getPlatformSize(18.52),
+                                image: AssetImage('assets/images/schematic_maps/ic_zoom_out.png'),
+                                imageWidth: getPlatformSize(18.52),
+                                imageHeight: getPlatformSize(18.52),
                                 marginTop: getPlatformSize(0.0),
                                 isChecked: false,
                                 showProgress: false,
@@ -282,9 +282,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 width: getPlatformSize(15.0),
                               ),
                               MapToolItem(
-                                icon: AssetImage('assets/images/schematic_maps/ic_zoom_in.png'),
-                                iconWidth: getPlatformSize(18.52),
-                                iconHeight: getPlatformSize(18.52),
+                                image: AssetImage('assets/images/schematic_maps/ic_zoom_in.png'),
+                                imageWidth: getPlatformSize(18.52),
+                                imageHeight: getPlatformSize(18.52),
                                 marginTop: getPlatformSize(0.0),
                                 isChecked: false,
                                 showProgress: false,
@@ -297,9 +297,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 width: getPlatformSize(15.0),
                               ),
                               MapToolItem(
-                                icon: AssetImage('assets/images/schematic_maps/ic_cctv.png'),
-                                iconWidth: getPlatformSize(23.16),
-                                iconHeight: getPlatformSize(19.19),
+                                image: AssetImage('assets/images/schematic_maps/ic_cctv.png'),
+                                imageWidth: getPlatformSize(23.16),
+                                imageHeight: getPlatformSize(19.19),
                                 marginTop: getPlatformSize(0.0),
                                 isChecked: _showCctv,
                                 showProgress: false,

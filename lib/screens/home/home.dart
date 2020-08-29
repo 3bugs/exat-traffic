@@ -231,7 +231,9 @@ class MyHomeState extends State<Home> {
   }
 
   void _handleClickMarker(BuildContext context, MarkerModel marker) {
-    widget.hideSearchOptions();
+    if (widget.hideSearchOptions != null) {
+      widget.hideSearchOptions();
+    }
 
     // ใส่ delay เพื่อรอให้ marker pan ไปอยู่กลาง map
     Future.delayed(Duration(milliseconds: 500), () {
@@ -246,7 +248,9 @@ class MyHomeState extends State<Home> {
   }
 
   void _handleClickMapTool(BuildContext context, MapTool mapTool) {
-    widget.hideSearchOptions();
+    if (widget.hideSearchOptions != null) {
+      widget.hideSearchOptions();
+    }
 
     switch (mapTool) {
       case MapTool.schematicMaps:
@@ -377,7 +381,10 @@ class MyHomeState extends State<Home> {
                           _moveToCurrentPosition(context);
                         },
                         onTap: (LatLng latLng) {
-                          widget.hideSearchOptions();
+                          if (widget.hideSearchOptions != null) {
+                            widget.hideSearchOptions();
+                          }
+
                           /*_addMarker(latLng);
                               _sendToVisualization(latLng);*/
                         },
@@ -399,9 +406,9 @@ class MyHomeState extends State<Home> {
                     child: Column(
                       children: <Widget>[
                         MapToolItem(
-                          icon: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
-                          iconWidth: getPlatformSize(16.4),
-                          iconHeight: getPlatformSize(18.3),
+                          image: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                          imageWidth: getPlatformSize(16.4),
+                          imageHeight: getPlatformSize(18.3),
                           marginTop: getPlatformSize(0.0),
                           isChecked: false,
                           showProgress: false,
@@ -410,9 +417,9 @@ class MyHomeState extends State<Home> {
 
                         // around me
                         MapToolItem(
-                          icon: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
-                          iconWidth: getPlatformSize(26.6),
-                          iconHeight: getPlatformSize(21.6),
+                          image: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
+                          imageWidth: getPlatformSize(26.6),
+                          imageHeight: getPlatformSize(21.6),
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.aroundMe,
                           showProgress: state.showProgress,
@@ -421,9 +428,9 @@ class MyHomeState extends State<Home> {
 
                         // layer
                         MapToolItem(
-                          icon: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
-                          iconWidth: getPlatformSize(15.5),
-                          iconHeight: getPlatformSize(16.5),
+                          image: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
+                          imageWidth: getPlatformSize(15.5),
+                          imageHeight: getPlatformSize(16.5),
                           marginTop: getPlatformSize(10.0),
                           isChecked: selectedMapTool == MapTool.layer,
                           showProgress: false,
@@ -432,9 +439,9 @@ class MyHomeState extends State<Home> {
 
                         // current location
                         MapToolItem(
-                          icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                          iconWidth: getPlatformSize(21.0),
-                          iconHeight: getPlatformSize(21.0),
+                          image: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                          imageWidth: getPlatformSize(21.0),
+                          imageHeight: getPlatformSize(21.0),
                           marginTop: getPlatformSize(10.0),
                           isChecked: false,
                           showProgress: false,
@@ -529,18 +536,20 @@ class MyHomeState extends State<Home> {
 
 class MapToolItem extends StatelessWidget {
   MapToolItem({
-    @required this.icon,
-    @required this.iconWidth,
-    @required this.iconHeight,
+    this.image,
+    this.icon,
+    @required this.imageWidth,
+    @required this.imageHeight,
     @required this.marginTop,
     @required this.isChecked,
     @required this.showProgress,
     @required this.onClick,
   });
 
-  final AssetImage icon;
-  final double iconWidth;
-  final double iconHeight;
+  final AssetImage image;
+  final Icon icon;
+  final double imageWidth;
+  final double imageHeight;
   final double marginTop;
   final bool isChecked;
   final bool showProgress;
@@ -598,11 +607,13 @@ class MapToolItem extends StatelessWidget {
                       strokeWidth: getPlatformSize(3),
                     ),
                   )
-                : Image(
-                    image: icon,
-                    width: iconWidth,
-                    height: iconHeight,
-                  ),
+                : (this.icon != null
+                    ? this.icon
+                    : Image(
+                        image: image,
+                        width: imageWidth,
+                        height: imageHeight,
+                      )),
           ),
         ),
       ),

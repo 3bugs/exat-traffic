@@ -51,7 +51,7 @@ class FavoriteState extends State<Favorite> {
           _presenter.setLoadingMessage("หาเส้นทางที่ใช้เวลาน้อยที่สุด");
           RouteModel bestRoute = await SearchPlacePresenter.findBestRoute(context, placeDetails);
 
-          if (bestRoute != null) {
+          if (bestRoute != null && widget.showBestRouteAfterSearch != null) {
             //assert(bestRoute.gateInCostTollList.isNotEmpty);
             // กลับไป _handleClickSearchOption ใน MyScaffold
             widget.showBestRouteAfterSearch(bestRoute);

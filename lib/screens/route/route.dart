@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
+import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -29,7 +30,9 @@ import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/api.dart';
 
 class MyRoute extends StatefulWidget {
-  const MyRoute(Key key) : super(key: key);
+  final Function showBestRouteAfterSearch;
+
+  const MyRoute(Key key, this.showBestRouteAfterSearch) : super(key: key);
 
   @override
   MyRouteState createState() => MyRouteState();
@@ -84,6 +87,20 @@ class MyRouteState extends State<MyRoute> {
           Constants.Message.LOCATION_NOT_AVAILABLE,
           [DialogButtonModel(text: "OK", value: DialogResult.yes)],
         );
+      }
+    });
+  }
+
+  void _handleClickSearch(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration.zero,
+        pageBuilder: (context, anim1, anim2) => SearchPlace(),
+      ),
+    ).then((bestRoute) {
+      if (bestRoute != null && widget.showBestRouteAfterSearch != null) {
+        widget.showBestRouteAfterSearch(bestRoute);
       }
     });
   }
@@ -1260,10 +1277,26 @@ class MyRouteState extends State<MyRoute> {
                   alignment: Alignment.topRight,
                   child: Column(
                     children: <Widget>[
+                      // search
                       MapToolItem(
-                        icon: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                        iconWidth: getPlatformSize(21.0),
-                        iconHeight: getPlatformSize(21.0),
+                        icon: Icon(
+                          Icons.search,
+                          size: getPlatformSize(21.0),
+                          color: Color(0xFF454F63),
+                        ),
+                        imageWidth: getPlatformSize(21.0),
+                        imageHeight: getPlatformSize(21.0),
+                        marginTop: getPlatformSize(10.0),
+                        isChecked: false,
+                        showProgress: false,
+                        onClick: () => _handleClickSearch(context),
+                      ),
+
+                      // current location
+                      MapToolItem(
+                        image: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                        imageWidth: getPlatformSize(21.0),
+                        imageHeight: getPlatformSize(21.0),
                         marginTop: getPlatformSize(10.0),
                         isChecked: false,
                         showProgress: false,
