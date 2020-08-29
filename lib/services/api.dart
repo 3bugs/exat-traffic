@@ -556,6 +556,16 @@ class ExatApi {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> responseJsonBody = json.decode(response.body);
+
+      bool isApiValid =
+          responseJsonBody.containsKey('status_code') && responseJsonBody.containsKey('data');
+      assert(isApiValid);
+      if (!isApiValid) {
+        String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server: Invalid API Response";
+        print(msg);
+        return ResponseResult(success: false, data: msg);
+      }
+
       if (responseJsonBody['status_code'].toString() == '200') {
         return ResponseResult(
             success: true, data: responseJsonBody['data'], decode: responseJsonBody);
