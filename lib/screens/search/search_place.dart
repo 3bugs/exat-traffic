@@ -158,7 +158,7 @@ class _SearchPlaceState extends State<SearchPlace> {
       titleList: _titleList,
       showSearch: true,
       searchBoxAutoFocus: true,
-      searchBoxHint: "พิมพ์ชื่อสถานที่ที่ต้องการหาเส้นทาง",
+      searchBoxHint: "พิมพ์ชื่อสถานที่",
       onSearchTextChanged: _handleSearchTextChange,
       builder: (BuildContext context, double containerHeight) {
         return _buildRootContent(containerHeight);

@@ -4,6 +4,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
+
 //import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
@@ -272,19 +273,35 @@ class MyDrawer extends StatelessWidget {
           ),
           Container(
             padding: EdgeInsets.only(
-              left: getPlatformSize(MARGIN_LEFT),
+              //left: getPlatformSize(MARGIN_LEFT),
               top: getPlatformSize(12.0),
               bottom: getPlatformSize(12.0),
             ),
-            child: Text(
-              "v${AppBloc.version}",
-              style: getTextStyle(
-                0,
-                sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                color: Colors.white.withOpacity(0.7),
-                isBold: true,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "v${AppBloc.version}",
+                  style: getTextStyle(
+                    0,
+                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                    color: Colors.white.withOpacity(0.7),
+                    isBold: true,
+                  ),
+                ),
+                SizedBox(width: getPlatformSize(16.0)),
+                Text(
+                  "Expressway Authority of Thailand",
+                  style: getTextStyle(
+                    1,
+                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                    color: Colors.white.withOpacity(0.7),
+                    isBold: false,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
