@@ -26,6 +26,7 @@ class ErrorView extends StatelessWidget {
   Widget _content() {
     return Container(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           this.title != null && this.title.trim().isNotEmpty

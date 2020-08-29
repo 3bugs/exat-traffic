@@ -6,6 +6,7 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:store_redirect/store_redirect.dart';
 import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/error_view.dart';
 
 import 'about_presenter.dart';
 
@@ -92,49 +93,60 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Widget _body() {
-    return _presenter.aboutModel == null
-        ? Expanded(child: DataLoading())
-        : Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                vertical: getPlatformSize(0.0),
-                horizontal: getPlatformSize(0.0),
-              ),
-              child: ListView(
-                physics: BouncingScrollPhysics(),
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: getPlatformSize(8.0),
-                      vertical: getPlatformSize(10.0),
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: getPlatformSize(10.0),
-                        ),
-                        for (var paragraph
-                        in _getParagraphList(_presenter.aboutModel.data[0].content))
-                          Padding(
-                            padding: EdgeInsets.only(
-                              bottom: getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
-                            ),
-                            child: Text(
-                              paragraph,
-                              style: getTextStyle(0),
-                            ),
-                          ),
-                        SizedBox(
-                          height: getPlatformSize(15.0),
-                        ),
-                        _iconLink(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+    return _presenter.error != null
+        ? Center(
+            child: ErrorView(
+              title: "ขออภัย",
+              text: _presenter.error.message,
+              buttonText: "ลองใหม่",
+              withBackground: true,
+              onClick: _presenter.getAbout,
             ),
-          );
+          )
+        : _presenter.aboutModel == null
+            ? Expanded(child: DataLoading())
+            : Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: getPlatformSize(0.0),
+                    horizontal: getPlatformSize(0.0),
+                  ),
+                  child: ListView(
+                    physics: BouncingScrollPhysics(),
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: getPlatformSize(8.0),
+                          vertical: getPlatformSize(10.0),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: getPlatformSize(10.0),
+                            ),
+                            for (var paragraph
+                                in _getParagraphList(_presenter.aboutModel.data[0].content))
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      getPlatformSize(Constants.Font.SPACE_BETWEEN_TEXT_PARAGRAPH),
+                                ),
+                                child: Text(
+                                  paragraph,
+                                  style: getTextStyle(0),
+                                ),
+                              ),
+                            SizedBox(
+                              height: getPlatformSize(15.0),
+                            ),
+                            _iconLink(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
   }
 
   /*Widget _textData() {

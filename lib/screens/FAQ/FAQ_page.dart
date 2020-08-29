@@ -5,6 +5,7 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/components/error_view.dart';
 import 'FAQ_presenter.dart';
 
 class FAQPage extends StatefulWidget {
@@ -31,28 +32,38 @@ class _FAQPageState extends State<FAQPage> {
   }
 
   Widget _content() {
-    return _presenter.faqModel == null
-        ? DataLoading()
-        : Container(
-            color: Constants.App.BACKGROUND_COLOR,
-            child: SmartRefresher(
-              enablePullDown: true,
-              controller: _refreshController,
-              onRefresh: _onRefresh,
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(
-                  horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                  vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                ),
-                physics: BouncingScrollPhysics(),
-                itemCount: _presenter.faqModel.data.length,
-                itemBuilder: (context, index) {
-                  open.add(false);
-                  return _dataCard(index);
-                },
-              ),
+    return _presenter.error != null
+        ? Center(
+            child: ErrorView(
+              title: "ขออภัย",
+              text: _presenter.error.message,
+              buttonText: "ลองใหม่",
+              withBackground: true,
+              onClick: _presenter.getFAQ,
             ),
-          );
+          )
+        : _presenter.faqModel == null
+            ? DataLoading()
+            : Container(
+                color: Constants.App.BACKGROUND_COLOR,
+                child: SmartRefresher(
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                      vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                    ),
+                    physics: BouncingScrollPhysics(),
+                    itemCount: _presenter.faqModel.data.length,
+                    itemBuilder: (context, index) {
+                      open.add(false);
+                      return _dataCard(index);
+                    },
+                  ),
+                ),
+              );
   }
 
   Widget _dataCard(int index) {

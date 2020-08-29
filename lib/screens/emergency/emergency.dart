@@ -11,6 +11,7 @@ import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/screens/emergency/emergency_presenter.dart';
 import 'package:exattraffic/models/emergency_number_model.dart';
 import 'package:exattraffic/screens/emergency/components/emergency_view.dart';
+import 'package:exattraffic/components/error_view.dart';
 
 class Emergency extends StatefulWidget {
   @override
@@ -109,32 +110,43 @@ class _EmergencyState extends State<Emergency> {
         top: getPlatformSize(0.0),
       ),
       //color: Constants.App.BACKGROUND_COLOR,
-      child: EmergencyPresenter.emergencyNumberList == null
-          ? DataLoading()
-          : SmartRefresher(
-              enablePullDown: true,
-              controller: _refreshController,
-              onRefresh: _onRefresh,
-              child: EmergencyPresenter.emergencyNumberList.isNotEmpty
-                  ? ListView.separated(
-                      itemCount: EmergencyPresenter.emergencyNumberList.length,
-                      scrollDirection: Axis.vertical,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return EmergencyView(
-                          onClick: () =>
-                              _handleClickNotificationItem(EmergencyPresenter.emergencyNumberList[index]),
-                          emergencyNumber: EmergencyPresenter.emergencyNumberList[index],
-                          isFirstItem: SHOW_SOS ? false : (index == 0),
-                          isLastItem: index == EmergencyPresenter.emergencyNumberList.length - 1,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return SizedBox.shrink();
-                      },
-                    )
-                  : NoData(),
-            ),
+      child: _presenter.error != null
+          ? Center(
+              child: ErrorView(
+                title: "ขออภัย",
+                text: _presenter.error.message,
+                buttonText: "ลองใหม่",
+                withBackground: true,
+                onClick: _presenter.getEmergencyNumberList,
+              ),
+            )
+          : EmergencyPresenter.emergencyNumberList == null
+              ? DataLoading()
+              : SmartRefresher(
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: EmergencyPresenter.emergencyNumberList.isNotEmpty
+                      ? ListView.separated(
+                          itemCount: EmergencyPresenter.emergencyNumberList.length,
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return EmergencyView(
+                              onClick: () => _handleClickNotificationItem(
+                                  EmergencyPresenter.emergencyNumberList[index]),
+                              emergencyNumber: EmergencyPresenter.emergencyNumberList[index],
+                              isFirstItem: SHOW_SOS ? false : (index == 0),
+                              isLastItem:
+                                  index == EmergencyPresenter.emergencyNumberList.length - 1,
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox.shrink();
+                          },
+                        )
+                      : NoData(),
+                ),
     );
   }
 

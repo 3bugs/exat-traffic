@@ -1,21 +1,19 @@
+import 'package:flutter/material.dart';
+
+import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/environment/base_presenter.dart';
 import 'package:exattraffic/models/help_model.dart';
-import 'package:flutter/material.dart';
-import '../../services/api.dart';
 import 'help_page.dart';
 
-
 class HelpPresenter extends BasePresenter<HelpPage>{
-  var ListModel;
   HelpModel helpModel;
 
   List<String> imgList = [];
 
   HelpPresenter(State<HelpPage> state) : super(state);
 
-
   getHelp() async {
-//    print("getHelp");
+    clearError();
 
     try {
       var res = await ExatApi.fetchHelp(state.context);
@@ -26,7 +24,9 @@ class HelpPresenter extends BasePresenter<HelpPage>{
           imgList.add(v.cover);
         });
       });
+      clearError();
     } catch (e) {
+      setError(1, e.toString());
       print(e);
     }
   }

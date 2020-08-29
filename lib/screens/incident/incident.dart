@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -42,36 +43,46 @@ class _IncidentState extends State<Incident> {
         top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
       ),
       color: Constants.App.BACKGROUND_COLOR,
-      child: _presenter.incidentListModel == null
-          ? DataLoading()
-          : SmartRefresher(
-              enablePullDown: true,
-              controller: _refreshController,
-              onRefresh: _onRefresh,
-              child: _presenter.incidentListModel.data.isNotEmpty
-                  ? ListView.separated(
-                      itemCount: _presenter.incidentListModel.data.length,
-                      scrollDirection: Axis.vertical,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return IncidentView(
-                          incident: IncidentModel(
-                            name: '${_presenter.incidentListModel.data[index].title}',
-                            description: '${_presenter.incidentListModel.data[index].detail}',
-                            date: '${_presenter.incidentListModel.data[index].createdAt}',
-                            imageUrl: '${_presenter.incidentListModel.data[index].cover}',
-                          ),
-                          isFirstItem: index == 0,
-                          isLastItem: index == _presenter.incidentListModel.data.length - 1,
-                          id: _presenter.incidentListModel.data[index].id,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return SizedBox.shrink();
-                      },
-                    )
-                  : NoData(),
-            ),
+      child: _presenter.error != null
+          ? Center(
+              child: ErrorView(
+                title: "ขออภัย",
+                text: _presenter.error.message,
+                buttonText: "ลองใหม่",
+                withBackground: true,
+                onClick: _presenter.getIncidentList,
+              ),
+            )
+          : _presenter.incidentListModel == null
+              ? DataLoading()
+              : SmartRefresher(
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: _presenter.incidentListModel.data.isNotEmpty
+                      ? ListView.separated(
+                          itemCount: _presenter.incidentListModel.data.length,
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return IncidentView(
+                              incident: IncidentModel(
+                                name: '${_presenter.incidentListModel.data[index].title}',
+                                description: '${_presenter.incidentListModel.data[index].detail}',
+                                date: '${_presenter.incidentListModel.data[index].createdAt}',
+                                imageUrl: '${_presenter.incidentListModel.data[index].cover}',
+                              ),
+                              isFirstItem: index == 0,
+                              isLastItem: index == _presenter.incidentListModel.data.length - 1,
+                              id: _presenter.incidentListModel.data[index].id,
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox.shrink();
+                          },
+                        )
+                      : NoData(),
+                ),
     );
   }
 }

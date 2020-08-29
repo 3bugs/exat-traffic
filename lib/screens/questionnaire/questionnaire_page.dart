@@ -1,4 +1,3 @@
-import 'package:exattraffic/components/my_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/components/data_loading.dart';
@@ -6,6 +5,8 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/components/my_button.dart';
 
 class QuestionnairePage extends StatefulWidget {
   @override
@@ -23,24 +24,34 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   QuestionnairePresenter _presenter;
 
   Widget _content() {
-    return _presenter.questionnaireModel == null
-        ? DataLoading()
-        : Column(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    children: <Widget>[
-                      _question(),
-                      _sendButton(),
-                    ],
+    return _presenter.error != null
+        ? Center(
+            child: ErrorView(
+              title: "ขออภัย",
+              text: _presenter.error.message,
+              buttonText: "ลองใหม่",
+              withBackground: true,
+              onClick: _presenter.getQuestionnaire,
+            ),
+          )
+        : _presenter.questionnaireModel == null
+            ? DataLoading()
+            : Column(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      child: ListView(
+                        physics: BouncingScrollPhysics(),
+                        children: <Widget>[
+                          _question(),
+                          _sendButton(),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              _navigator(),
-            ],
-          );
+                  _navigator(),
+                ],
+              );
   }
 
   Widget _question() {
@@ -254,7 +265,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   @override
   void initState() {
     _presenter = QuestionnairePresenter(this);
-    _presenter.getQuestionnair();
+    _presenter.getQuestionnaire();
     super.initState();
   }
 

@@ -11,13 +11,17 @@ class EmergencyPresenter extends BasePresenter<Emergency> {
   EmergencyPresenter(State<Emergency> state) : super(state);
 
   getEmergencyNumberList() async {
+    clearError();
+
     if (emergencyNumberList == null) {
       try {
         var res = await ExatApi.fetchEmergencyNumbers(state.context);
         setState(() {
           emergencyNumberList = res;
         });
+        clearError();
       } catch (e) {
+        setError(1, e.toString());
         print(e);
       }
     }

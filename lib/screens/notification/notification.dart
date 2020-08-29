@@ -1,4 +1,3 @@
-import 'package:exattraffic/screens/notification/notification_details.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -9,6 +8,8 @@ import 'package:exattraffic/screens/notification/notification_presenter.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/notification_model.dart';
+import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/screens/notification/notification_details.dart';
 
 class MyNotification extends StatefulWidget {
   @override
@@ -54,32 +55,42 @@ class _MyNotificationState extends State<MyNotification> {
         top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
       ),
       color: Constants.App.BACKGROUND_COLOR,
-      child: _presenter.notificationList == null
-          ? DataLoading()
-          : SmartRefresher(
-              enablePullDown: true,
-              controller: _refreshController,
-              onRefresh: _onRefresh,
-              child: _presenter.notificationList.isNotEmpty
-                  ? ListView.separated(
-                      itemCount: _presenter.notificationList.length,
-                      scrollDirection: Axis.vertical,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return NotificationView(
-                          onClick: () =>
-                              _handleClickNotificationItem(_presenter.notificationList[index]),
-                          notification: _presenter.notificationList[index],
-                          isFirstItem: index == 0,
-                          isLastItem: index == _presenter.notificationList.length - 1,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) {
-                        return SizedBox.shrink();
-                      },
-                    )
-                  : NoData(),
-            ),
+      child: _presenter.error != null
+          ? Center(
+              child: ErrorView(
+                title: "ขออภัย",
+                text: _presenter.error.message,
+                buttonText: "ลองใหม่",
+                withBackground: true,
+                onClick: _presenter.getNotificationList,
+              ),
+            )
+          : _presenter.notificationList == null
+              ? DataLoading()
+              : SmartRefresher(
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: _presenter.notificationList.isNotEmpty
+                      ? ListView.separated(
+                          itemCount: _presenter.notificationList.length,
+                          scrollDirection: Axis.vertical,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return NotificationView(
+                              onClick: () =>
+                                  _handleClickNotificationItem(_presenter.notificationList[index]),
+                              notification: _presenter.notificationList[index],
+                              isFirstItem: index == 0,
+                              isLastItem: index == _presenter.notificationList.length - 1,
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox.shrink();
+                          },
+                        )
+                      : NoData(),
+                ),
     );
   }
 }

@@ -1,7 +1,9 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
+import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
+import 'package:exattraffic/components/error_view.dart';
 import 'help_presenter.dart';
 
 List<T> map<T>(List list, Function handler) {
@@ -36,12 +38,12 @@ class _HelpPageState extends State<HelpPage> {
     super.initState();
   }
 
-  Widget slidebar(){
-    return  Row(
+  Widget slideBar() {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: map<Widget>(
         _presenter.imgList,
-            (index, url) {
+        (index, url) {
           return Container(
             width: 8.0,
             height: 8.0,
@@ -59,50 +61,63 @@ class _HelpPageState extends State<HelpPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    List child = _presenter.helpModel==null? null:
-    map<Widget>(
-      _presenter.imgList,
-          (index, i) {
-        return Container(
-          margin: EdgeInsets.all(5.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
-            child: Stack(children: <Widget>[
-              Image.network(
-                i,
-                fit: BoxFit.fill,
-                width: 1000.0,
-                height: double.infinity,
-              ),
-            ]),
-          ),
-        );
-      },
-    ).toList();
+    List child = _presenter.helpModel == null
+        ? null
+        : map<Widget>(
+            _presenter.imgList,
+            (index, i) {
+              return Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  child: Stack(children: <Widget>[
+                    Image.network(
+                      i,
+                      fit: BoxFit.fill,
+                      width: 1000.0,
+                      height: double.infinity,
+                    ),
+                  ]),
+                ),
+              );
+            },
+          ).toList();
 
     return YourScaffold(
       titleList: _titleList,
-      child: _presenter.helpModel==null?DataLoading():
-      Column(children: [
-        Expanded(
-          child: CarouselSlider(
-            items: child,
-            options: CarouselOptions(
-              autoPlay: false,
-              enlargeCenterPage: true,
-              enableInfiniteScroll: false,
-              aspectRatio: 1.8/3,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
-              },
-            ),
-          ),
-        ),
-        slidebar(),
-      ]),
+      child: _presenter.error != null
+          ? Center(
+              child: ErrorView(
+                title: "ขออภัย",
+                text: _presenter.error.message,
+                buttonText: "ลองใหม่",
+                withBackground: true,
+                onClick: _presenter.getHelp,
+              ),
+            )
+          : _presenter.helpModel == null
+              ? DataLoading()
+              : Column(
+                  children: [
+                    Expanded(
+                      child: CarouselSlider(
+                        items: child,
+                        options: CarouselOptions(
+                          autoPlay: false,
+                          enlargeCenterPage: true,
+                          enableInfiniteScroll: false,
+                          aspectRatio: 1.8 / 3,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _current = index;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    slideBar(),
+                  ],
+                ),
     );
   }
 }

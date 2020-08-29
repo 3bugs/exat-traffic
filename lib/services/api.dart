@@ -559,7 +559,7 @@ class ExatApi {
 
       bool isApiValid =
           responseJsonBody.containsKey('status_code') && responseJsonBody.containsKey('data');
-      assert(isApiValid);
+      //assert(isApiValid);
       if (!isApiValid) {
         String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server: Invalid API Response";
         print(msg);

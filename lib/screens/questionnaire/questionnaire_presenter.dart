@@ -1,21 +1,20 @@
+import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/environment/base_presenter.dart';
 import 'package:exattraffic/models/add_answers_model.dart';
 import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
-import 'package:flutter/material.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
-import '../../services/api.dart';
 
 class QuestionnairePresenter extends BasePresenter<QuestionnairePage> {
-  var ListModel;
   QuestionnaireModel questionnaireModel;
   AddAnswersModel addAnswersModel;
 
   QuestionnairePresenter(State<QuestionnairePage> state) : super(state);
 
-  getQuestionnair() async {
-//    print("getQuestionnair");
+  getQuestionnaire() async {
+    clearError();
 
     try {
       var res = await ExatApi.fetchQuestions(state.context);
@@ -23,9 +22,9 @@ class QuestionnairePresenter extends BasePresenter<QuestionnairePage> {
       setState(() {
         questionnaireModel = res;
       });
-
-      print(questionnaireModel.data.length);
+      clearError();
     } catch (e) {
+      setError(1, e.toString());
       print(e);
     }
   }
