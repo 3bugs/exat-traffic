@@ -217,7 +217,7 @@ class ExatApi {
     }
   }
 
-  static Future<AddAnswersModel> addAnswers(BuildContext context,String id,String score) async {
+  static Future<AddAnswersModel> addAnswers(BuildContext context,String id,String score,String detail) async {
     final String url = "$EXAT_API_BASED_URL/answers/add";
 
     ResponseResult responseResult = await _makeRequest(
@@ -225,7 +225,7 @@ class ExatApi {
       url,
       {"quest_id":id,
         "score":score,
-        "detail":"xxx",
+        "detail":detail,
         "token": "testToken device answer"
       },
     );
