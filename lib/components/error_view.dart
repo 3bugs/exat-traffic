@@ -14,8 +14,8 @@ class ErrorView extends StatelessWidget {
   final Function onClick;
 
   ErrorView({
-    @required this.title,
-    @required this.text,
+    this.title,
+    this.text,
     @required this.buttonText,
     this.withBackground = true,
     this.backgroundColor = Colors.white,
@@ -44,13 +44,15 @@ class ErrorView extends StatelessWidget {
           SizedBox(
             height: getPlatformSize(this.title != null && this.title.trim().isNotEmpty ? 8.0 : 0.0),
           ),
-          Text(
-            this.text,
-            textAlign: TextAlign.center,
-            style: getTextStyle(0),
-          ),
+          this.text != null && this.text.trim().isNotEmpty
+              ? Text(
+                  this.text,
+                  textAlign: TextAlign.center,
+                  style: getTextStyle(0),
+                )
+              : SizedBox.shrink(),
           SizedBox(
-            height: getPlatformSize(24.0),
+            height: getPlatformSize(this.text != null && this.text.trim().isNotEmpty ? 24.0 : 0.0),
           ),
           MyButton(
             text: this.buttonText,

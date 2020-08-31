@@ -36,8 +36,6 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-
-
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,

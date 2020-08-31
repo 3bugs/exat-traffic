@@ -5,14 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/constants.dart' as Constants;
+
+//import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/services/api.dart';
-import 'package:exattraffic/components/my_progress_indicator.dart';
+
+//import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/components/lazy_indexed_stack.dart';
+import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/models/error_model.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
@@ -47,7 +51,8 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
 
   //SocketIO _socketIO;
   Timer _timer;
-  Future<List<ExpressWayModel>> _futureExpressWayList;
+  List<ExpressWayModel> _futureExpressWayList;
+  ErrorModel _error;
 
   void _fetchTrafficData(Function callback) {
     MyApi.fetchTrafficData().then((trafficPointDataList) {
@@ -64,6 +69,26 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     });
   }
 
+  _fetchExpressWays(BuildContext context) async {
+    setState(() {
+      _error = null;
+    });
+
+    List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+    // ถ้าเอา fetch api ไปใส่ใน future builder โดยตรง จะทำให้ fetch ใหม่ทุกครั้งที่กลับมา list express way
+    try {
+      List<ExpressWayModel> tempList = await ExatApi.fetchExpressWays(context, markerList);
+      setState(() {
+        _futureExpressWayList = tempList;
+        _error = null;
+      });
+    } catch (error) {
+      setState(() {
+        _error = ErrorModel(code: 1, message: error.toString());
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,9 +102,7 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     _fetchTrafficData(null);
 
     Future.delayed(Duration.zero, () {
-      List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
-      // ถ้าเอา fetch api ไปใส่ใน future builder โดยตรง จะทำให้ fetch ใหม่ทุกครั้งที่กลับมา list express way
-      _futureExpressWayList = ExatApi.fetchExpressWays(context, markerList);
+      _fetchExpressWays(context);
     });
   }
 
@@ -89,13 +112,13 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     super.dispose();
   }
 
-  void _socketStatus(dynamic data) {
+  /*void _socketStatus(dynamic data) {
     print("Socket status: " + data);
   }
 
   void _onSocketInfo(dynamic data) {
     print("Socket info: " + data);
-  }
+  }*/
 
   void _handleClickUpDownSheet() {
     _keyBottomSheetScaffold.currentState.toggleSheet();
@@ -242,15 +265,13 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
               ),
               SizedBox(height: getPlatformSize(4.0)),
               Expanded(
-                child: FutureBuilder(
-                  future: _futureExpressWayList,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    return snapshot.hasData
+                child: _error == null
+                    ? _futureExpressWayList != null
                         ? LazyIndexedStack(
                             reuse: false,
                             itemBuilder: (context, index) {
                               return index == 0
-                                  ? ExpressWayList(snapshot.data, _handleClickExpressWay)
+                                  ? ExpressWayList(_futureExpressWayList, _handleClickExpressWay)
                                   : ExpressWayDetails(
                                       Key(_selectedExpressWay.name),
                                       _selectedExpressWay,
@@ -268,9 +289,14 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                                 strokeWidth: getPlatformSize(3.0),
                               ),
                             ),
-                          );
-                  },
-                ),
+                          )
+                    : Center(
+                        child: ErrorView(
+                          //text: "ขออภัย เกิดข้อผิดพลาดในการดึงข้อมูลทางพิเศษ",
+                          buttonText: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+                          onClick: () => _fetchExpressWays(context),
+                        ),
+                      ),
               ),
             ],
           ),
