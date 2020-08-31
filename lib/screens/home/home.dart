@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -21,6 +22,8 @@ import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:exattraffic/screens/widget/widget.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   final Function hideSearchOptions;
@@ -273,6 +276,58 @@ class MyHomeState extends State<Home> {
     }
   }
 
+  Widget _getWidget(WidgetType widgetType) {
+    return Consumer<WidgetPrefs>(
+      builder: (context, prefs, child) {
+        bool isFavoriteOn = prefs.widgetTypeList.contains(WidgetType.favorite.toString());
+        bool isIncidentOn = prefs.widgetTypeList.contains(WidgetType.incident.toString());
+        bool isExpressWayOn = prefs.widgetTypeList.contains(WidgetType.expressWay.toString());
+
+        switch (widgetType) {
+          case WidgetType.favorite:
+            return isFavoriteOn
+                ? LayerBottomSheet(
+                    collapsePosition: _mainContainerHeight -
+                        getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
+                        (isIncidentOn
+                            ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
+                            : 0.0) -
+                        (isExpressWayOn
+                            ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
+                            : 0.0),
+                    // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                  )
+                : SizedBox.shrink();
+            break;
+          case WidgetType.incident:
+            return isIncidentOn
+                ? LayerBottomSheet(
+                    collapsePosition: _mainContainerHeight -
+                        getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT) -
+                        (isExpressWayOn
+                            ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
+                            : 0.0),
+                    // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                  )
+                : SizedBox.shrink();
+            break;
+          case WidgetType.expressWay:
+            return isExpressWayOn
+                ? HomeBottomSheet(
+                    collapsePosition: _mainContainerHeight -
+                        getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY),
+                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                  )
+                : SizedBox.shrink();
+            break;
+        }
+        return SizedBox.shrink();
+      },
+    );
+  }
+
   @override
   void dispose() {
     if (_timer != null) {
@@ -453,16 +508,12 @@ class MyHomeState extends State<Home> {
                 ),
 
                 // bottom sheet
-                Visibility(
+                /*Visibility(
                   visible: true,
                   child: IndexedStack(
                     index: selectedMapTool == MapTool.none ? 0 : 1,
                     children: <Widget>[
-                      HomeBottomSheet(
-                        collapsePosition: _mainContainerHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_INITIAL),
-                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
-                      ),
+                      _getWidgets(),
                       LayerBottomSheet(
                         collapsePosition: _mainContainerHeight -
                             getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
@@ -470,6 +521,28 @@ class MyHomeState extends State<Home> {
                         expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                       ),
                     ],
+                  ),
+                ),*/
+
+                Visibility(
+                  visible: selectedMapTool == MapTool.none,
+                  child: _getWidget(WidgetType.favorite),
+                ),
+                Visibility(
+                  visible: selectedMapTool == MapTool.none,
+                  child: _getWidget(WidgetType.incident),
+                ),
+                Visibility(
+                  visible: selectedMapTool == MapTool.none,
+                  child: _getWidget(WidgetType.expressWay),
+                ),
+                Visibility(
+                  visible: selectedMapTool != MapTool.none,
+                  child: LayerBottomSheet(
+                    collapsePosition:
+                        _mainContainerHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                    // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                   ),
                 ),
 

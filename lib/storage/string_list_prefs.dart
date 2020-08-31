@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class StringListPrefs {
+class StringListPrefs extends ChangeNotifier {
   final String _keyPref;
 
   StringListPrefs(this._keyPref);

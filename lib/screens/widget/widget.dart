@@ -5,6 +5,8 @@ import 'package:exattraffic/screens/widget/widget_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/storage/widget_prefs.dart';
+import 'package:provider/provider.dart';
 
 class WidgetSetting extends StatefulWidget {
   @override
@@ -13,14 +15,41 @@ class WidgetSetting extends StatefulWidget {
 
 // https://github.com/rxlabz/orderable_stack/tree/master/orderable_stack_example
 
+enum WidgetType { favorite, incident, expressWay }
+
 class _WidgetSettingState extends State<WidgetSetting> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
   List<String> _titleList = ["วิดเจ็ต", "Widget", "小部件"];
 
   WidgetPresenter _presenter;
+  //WidgetPrefs _prefs;
+  List<Map<String, dynamic>> _widgetDataList = [
+    {
+      "text": "รายการโปรด",
+      "type": WidgetType.favorite,
+    },
+    {
+      "text": "เหตุการณ์",
+      "type": WidgetType.incident,
+    },
+    {
+      "text": "ทางพิเศษ",
+      "type": WidgetType.expressWay,
+    },
+  ];
 
-  void _handleChangeSelect(int item, bool value) {
+  _WidgetSettingState() {
+    //_prefs = WidgetPrefs();
+  }
 
+  void _handleChangeSelect(WidgetType widgetType, bool isSelected) async {
+    WidgetPrefs prefs = Provider.of<WidgetPrefs>(context, listen: false);
+    if (isSelected) {
+      await prefs.addId(widgetType.toString());
+    } else {
+      await prefs.removeId(widgetType.toString());
+    }
+    setState(() {});
   }
 
   Widget _content() {
@@ -36,26 +65,33 @@ class _WidgetSettingState extends State<WidgetSetting> {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                WidgetSettingItem(
-                  text: "ทางพิเศษ",
-                  selected: true,
-                  onChanged: (value) => _handleChangeSelect(0, value),
-                  marginTop: getPlatformSize(0.0),
-                ),
-                WidgetSettingItem(
-                  text: "รายการโปรด",
-                  selected: false,
-                  onChanged: (value) => _handleChangeSelect(1, value),
-                  marginTop: getPlatformSize(4.0),
-                ),
-                WidgetSettingItem(
-                  text: "เหตุการณ์",
-                  selected: true,
-                  onChanged: (value) => _handleChangeSelect(2, value),
-                  marginTop: getPlatformSize(4.0),
-                ),
-              ],
+              /*children: _widgetDataList
+                  .map<Widget>((widget) => FutureBuilder(
+                        future: _prefs.existId(widget['type'].toString()),
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          return snapshot.hasData
+                              ? WidgetSettingItem(
+                                  text: widget['text'],
+                                  selected: snapshot.data,
+                                  onChanged: (value) => _handleChangeSelect(widget['type'], value),
+                                  marginTop: getPlatformSize(4.0),
+                                )
+                              : SizedBox.shrink();
+                        },
+                      ))
+                  .toList(),*/
+              children: _widgetDataList
+                  .map<Widget>((widget) => Consumer<WidgetPrefs>(
+                        builder: (context, prefs, child) {
+                          return WidgetSettingItem(
+                            text: widget['text'],
+                            selected: prefs.widgetTypeList.contains(widget['type'].toString()),
+                            onChanged: (value) => _handleChangeSelect(widget['type'], value),
+                            marginTop: getPlatformSize(4.0),
+                          );
+                        },
+                      ))
+                  .toList(),
             ),
           ),
         ],
@@ -157,7 +193,7 @@ class WidgetSettingItem extends StatelessWidget {
                             width: getPlatformSize(8.0),
                             height: getPlatformSize(40.0),
                           ),
-                          Material(
+                          /*Material(
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () {},
@@ -175,7 +211,7 @@ class WidgetSettingItem extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),

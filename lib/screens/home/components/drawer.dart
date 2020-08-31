@@ -75,7 +75,7 @@ class MyDrawer extends StatelessWidget {
         );
       },
     ),
-    /*DrawerItemModel(
+    DrawerItemModel(
       text: 'วิดเจ็ต',
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
@@ -100,7 +100,7 @@ class MyDrawer extends StatelessWidget {
           ),
         );
       },
-    ),*/
+    ),
 
     /*DrawerItemModel(
       text: 'ข้อกำหนดและเงื่อนไข',

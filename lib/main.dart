@@ -1,3 +1,4 @@
+import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -14,8 +15,11 @@ void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(
       Phoenix(
-        child: ChangeNotifierProvider(
-          create: (context) => LanguageModel(),
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => LanguageModel()),
+            ChangeNotifierProvider(create: (context) => WidgetPrefs()),
+          ],
           child: MyApp(),
         ),
       ),
