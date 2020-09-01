@@ -1,19 +1,22 @@
+import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:exattraffic/storage/string_list_prefs.dart';
 
 class WidgetPrefs extends StringListPrefs {
   static const String KEY_PREF_WIDGET = "pref_widget";
 
-  final List<String> _widgetTypeList = List();
+  final List<String> _list = List();
 
   WidgetPrefs() : super(KEY_PREF_WIDGET) {
     updateList();
   }
 
-  List<String> get widgetTypeList => _widgetTypeList;
+  bool isWidgetOn(WidgetType widgetType) {
+    return _list.contains(widgetType.toString());
+  }
 
   updateList() async {
-    _widgetTypeList.clear();
-    _widgetTypeList.addAll(await getIdList());
+    _list.clear();
+    _list.addAll(await getIdList());
     notifyListeners();
   }
 

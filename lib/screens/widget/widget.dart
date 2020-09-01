@@ -22,8 +22,11 @@ class _WidgetSettingState extends State<WidgetSetting> {
   List<String> _titleList = ["วิดเจ็ต", "Widget", "小部件"];
 
   WidgetPresenter _presenter;
-  //WidgetPrefs _prefs;
   List<Map<String, dynamic>> _widgetDataList = [
+    {
+      "text": "ทางพิเศษ",
+      "type": WidgetType.expressWay,
+    },
     {
       "text": "รายการโปรด",
       "type": WidgetType.favorite,
@@ -32,15 +35,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
       "text": "เหตุการณ์",
       "type": WidgetType.incident,
     },
-    {
-      "text": "ทางพิเศษ",
-      "type": WidgetType.expressWay,
-    },
   ];
-
-  _WidgetSettingState() {
-    //_prefs = WidgetPrefs();
-  }
 
   void _handleChangeSelect(WidgetType widgetType, bool isSelected) async {
     WidgetPrefs prefs = Provider.of<WidgetPrefs>(context, listen: false);
@@ -85,7 +80,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                         builder: (context, prefs, child) {
                           return WidgetSettingItem(
                             text: widget['text'],
-                            selected: prefs.widgetTypeList.contains(widget['type'].toString()),
+                            selected: prefs.isWidgetOn(widget['type']),
                             onChanged: (value) => _handleChangeSelect(widget['type'], value),
                             marginTop: getPlatformSize(4.0),
                           );

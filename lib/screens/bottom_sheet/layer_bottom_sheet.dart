@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 

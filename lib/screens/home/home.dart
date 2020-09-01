@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:exattraffic/models/favorite_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
+import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -276,27 +280,101 @@ class MyHomeState extends State<Home> {
     }
   }
 
+  Future<List<FavoriteModel>> _getFavoriteList() async {
+    List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+    List<String> cctvIdList = await CctvFavoritePrefs().getIdList();
+    List<MarkerModel> cctvList = markerList
+        .where((marker) => (cctvIdList != null && cctvIdList.contains(marker.id.toString())))
+        .toList();
+    List<FavoriteModel> cctvFavoriteList = cctvList
+        .map<FavoriteModel>((cctvMarker) => FavoriteModel(
+              name: cctvMarker.name,
+              description: cctvMarker.routeName ?? "กล้อง CCTV",
+              //"${cctvMarker.latitude}, ${cctvMarker.longitude}",
+              type: FavoriteType.cctv,
+              marker: cctvMarker,
+            ))
+        .toList();
+
+    List<PlaceFavoriteModel> placeList = await PlaceFavoritePrefs().getPlaceList();
+    List<FavoriteModel> placeFavoriteList = placeList
+        .map<FavoriteModel>((placeFavorite) => FavoriteModel(
+              name: placeFavorite.placeName,
+              description: "สถานที่",
+              //"${cctvMarker.latitude}, ${cctvMarker.longitude}",
+              type: FavoriteType.place,
+              placeId: placeFavorite.placeId,
+            ))
+        .toList();
+
+    return placeFavoriteList..addAll(cctvFavoriteList);
+  }
+
   Widget _getWidget(WidgetType widgetType) {
     return Consumer<WidgetPrefs>(
       builder: (context, prefs, child) {
-        bool isFavoriteOn = prefs.widgetTypeList.contains(WidgetType.favorite.toString());
-        bool isIncidentOn = prefs.widgetTypeList.contains(WidgetType.incident.toString());
-        bool isExpressWayOn = prefs.widgetTypeList.contains(WidgetType.expressWay.toString());
+        bool isFavoriteOn = prefs.isWidgetOn(WidgetType.favorite);
+        bool isIncidentOn = prefs.isWidgetOn(WidgetType.incident);
+        bool isExpressWayOn = prefs.isWidgetOn(WidgetType.expressWay);
 
         switch (widgetType) {
           case WidgetType.favorite:
             return isFavoriteOn
-                ? LayerBottomSheet(
-                    collapsePosition: _mainContainerHeight -
-                        getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
-                        (isIncidentOn
-                            ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
-                            : 0.0) -
-                        (isExpressWayOn
-                            ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
-                            : 0.0),
-                    // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                ? FutureBuilder(
+                    future: _getFavoriteList(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        List<FavoriteModel> favoriteList = snapshot.data;
+                        List<TextImageModel> dataList = favoriteList
+                            .map<TextImageModel>((favorite) => TextImageModel(
+                                  text: favorite.name,
+                                  widget: favorite.type == FavoriteType.place
+                                      ? Image(
+                                          image: AssetImage(
+                                              'assets/images/favorite/image_widget_favorite_place.png'),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Stack(
+                                          children: <Widget>[
+                                            Image(
+                                              image: AssetImage(
+                                                  'assets/images/cctv_details/video_preview_mock.png'),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            Center(
+                                              child: Image(
+                                                image: AssetImage(
+                                                    'assets/images/cctv_details/ic_playback.png'),
+                                                width: getPlatformSize(30.0),
+                                                height: getPlatformSize(30.0),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ))
+                            .toList();
+
+                        return WidgetBottomSheet(
+                          title: "รายการโปรด",
+                          dataList: dataList,
+                          onClickItem: null,
+                          collapsePosition: _mainContainerHeight -
+                              getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
+                              (isIncidentOn
+                                  ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
+                                  : 0.0) -
+                              (isExpressWayOn
+                                  ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
+                                  : 0.0),
+                          // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                          expandPosition:
+                              getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
                   )
                 : SizedBox.shrink();
             break;

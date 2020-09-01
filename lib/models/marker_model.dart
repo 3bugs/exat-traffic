@@ -127,6 +127,16 @@ class MarkerModel {
       longitude = temp;
     }*/
 
+    double x, y;
+    try {
+      // เผื่อส่งมาเป็น int
+      x = json['x'].toDouble();
+      y = json['y'].toDouble();
+    } catch (_) {
+      x = null;
+      y = null;
+    }
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
@@ -142,8 +152,8 @@ class MarkerModel {
       direction: json['direction'],
       phone: json['tel'],
       groupId: json['group_id'],
-      x: json['x'],
-      y: json['y'],
+      x: x,
+      y: y,
       coreConfigList: coreConfigJson
           .map<CoreConfigModel>((coreConfigJson) => CoreConfigModel.fromJson(coreConfigJson))
           .toList(),

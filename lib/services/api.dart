@@ -545,6 +545,7 @@ class ExatApi {
     data.addAll(paramMap);
     final body = json.encode(data);
 
+    int beginTime = DateTime.now().millisecondsSinceEpoch;
     final response = await http.post(
       url,
       headers: {
@@ -553,8 +554,10 @@ class ExatApi {
       },
       body: body,
     );
+    int endTime = DateTime.now().millisecondsSinceEpoch;
 
     print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    print("Duration: ${((endTime - beginTime) / 1000).toStringAsFixed(1)} วินาที");
     print("API: $url");
     print("API Request Body: $body");
     print("API Response Status Code: ${response.statusCode}");

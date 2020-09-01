@@ -1,4 +1,3 @@
-import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -8,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/splash/splash.dart';
+import 'package:exattraffic/storage/util_prefs.dart';
+import 'package:exattraffic/storage/widget_prefs.dart';
 import 'constants.dart' as Constants;
 
 void main() {
@@ -19,6 +20,7 @@ void main() {
           providers: [
             ChangeNotifierProvider(create: (context) => LanguageModel()),
             ChangeNotifierProvider(create: (context) => WidgetPrefs()),
+            ChangeNotifierProvider(create: (context) => UtilPrefs()),
           ],
           child: MyApp(),
         ),

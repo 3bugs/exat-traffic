@@ -1,16 +1,20 @@
 import 'dart:async';
-import 'package:connectivity/connectivity.dart';
-import 'package:flutter/rendering.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/screens/scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/storage/util_prefs.dart';
 
 //use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
 
@@ -36,6 +40,8 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
+    doFirstRun();
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -51,6 +57,18 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
 
     Future.delayed(const Duration(milliseconds: 200), () async {
       _checkNetwork();
+    });
+  }
+
+  void doFirstRun() {
+    Future.delayed(Duration.zero, () async {
+      UtilPrefs utilPrefs = Provider.of<UtilPrefs>(context, listen: false);
+      WidgetPrefs widgetPrefs = Provider.of<WidgetPrefs>(context, listen: false);
+
+      if (await utilPrefs.isFirstRun()) {
+        await widgetPrefs.addId(WidgetType.expressWay.toString());
+        await utilPrefs.setFirstRunAlready();
+      }
     });
   }
 
