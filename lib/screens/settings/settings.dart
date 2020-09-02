@@ -160,11 +160,11 @@ class _SettingsState extends State<Settings> {
                   value: _notificationValue,
                   onChange: (bool value) => _handleSettingChange(SettingName.notification, value),
                 ),
-                SettingRow(
+                /*SettingRow(
                   text: "โหมดกลางคืน (สำหรับ Schematic Map)",
                   value: _nightModeValue,
                   onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
-                ),
+                ),*/
               ],
             ),
           ),

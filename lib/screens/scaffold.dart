@@ -155,7 +155,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     });
 
     _fragmentList = [
-      Home(_keyHomePage, hideSearchOptions),
+      Home(_keyHomePage, hideSearchOptions, showBestRouteAfterSearch),
       Favorite(_keyFavoritePage, showBestRouteAfterSearch),
       MyRoute(_keyRoutePage, showBestRouteAfterSearch),
       Incident(),

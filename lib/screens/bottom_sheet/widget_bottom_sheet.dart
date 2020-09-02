@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/components/no_data.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 
@@ -29,34 +30,6 @@ class WidgetBottomSheet extends StatefulWidget {
 class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
   final GlobalKey<BottomSheetScaffoldState> _keyBottomSheetScaffold = GlobalKey();
 
-  //AssetImage('assets/images/home/express_way_chalerm.jpg')
-  /*List<TextImageModel> _dataList = [
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-    TextImageModel(
-      text: "ทดสอบ",
-      assetImage: AssetImage('assets/images/home/express_way_chalerm.jpg'),
-    ),
-  ];*/
-
   @override
   void initState() {
     super.initState();
@@ -64,9 +37,9 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
 
   void _handleChangeSize(bool sheetExpanded) {}
 
-  void _handleClickItem(TextImageModel item) {
+  void _handleClickItem(TextImageModel item, int index) {
     if (widget.onClickItem != null) {
-      widget.onClickItem(item);
+      widget.onClickItem(item, index);
     }
   }
 
@@ -111,7 +84,8 @@ class _WidgetBottomSheetState extends State<WidgetBottomSheet> {
                 ],
               ),
               SizedBox(height: getPlatformSize(4.0)),
-              Expanded(
+              Container(
+                height: getPlatformSize(120.0),
                 child: ItemList(
                   dataList: widget.dataList,
                   onClickItem: _handleClickItem,
@@ -144,27 +118,28 @@ class _ItemListState extends State<ItemList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: getPlatformSize(120.0),
-      child: ListView.separated(
-        itemCount: widget.dataList.length,
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          TextImageModel item = widget.dataList[index];
+      child: widget.dataList == null || widget.dataList.isEmpty
+          ? NoData()
+          : ListView.separated(
+              itemCount: widget.dataList.length,
+              scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                TextImageModel item = widget.dataList[index];
 
-          return ItemView(
-            item: item,
-            isFirstItem: index == 0,
-            isLastItem: index == widget.dataList.length - 1,
-            onClick: () => widget.onClickItem(item),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            width: getPlatformSize(0.0),
-          );
-        },
-      ),
+                return ItemView(
+                  item: item,
+                  isFirstItem: index == 0,
+                  isLastItem: index == widget.dataList.length - 1,
+                  onClick: () => widget.onClickItem(item, index),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox(
+                  width: getPlatformSize(0.0),
+                );
+              },
+            ),
     );
   }
 }
@@ -172,6 +147,7 @@ class _ItemListState extends State<ItemList> {
 class TextImageModel {
   final String text;
   final Widget widget;
+
   /*final AssetImage assetImage;
   final String imageUrl;*/
 

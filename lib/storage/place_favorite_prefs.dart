@@ -1,11 +1,24 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:exattraffic/storage/string_list_prefs.dart';
+import 'package:exattraffic/models/favorite_model.dart';
 
 class PlaceFavoritePrefs extends StringListPrefs {
   static const String KEY_PREF_PLACE_FAVORITE = "pref_place_favorite";
 
-  PlaceFavoritePrefs() : super(KEY_PREF_PLACE_FAVORITE);
+  final List<PlaceFavoriteModel> _list = List();
+
+  PlaceFavoritePrefs() : super(KEY_PREF_PLACE_FAVORITE) {
+    updateList();
+  }
+
+  //List<PlaceFavoriteModel> get list => _list;
+
+  updateList() async {
+    _list.clear();
+    _list.addAll(await getPlaceList());
+    notifyListeners();
+  }
 
   Future<List<PlaceFavoriteModel>> getPlaceList() async {
     SharedPreferences prefs = await getSharedPrefs();
@@ -29,9 +42,30 @@ class PlaceFavoritePrefs extends StringListPrefs {
   }
 
   Future<void> addPlace(PlaceFavoriteModel placeToAdd) async {
-    addId(placeToAdd.placeId);
+    await addId(placeToAdd.placeId);
     SharedPreferences prefs = await getSharedPrefs();
     prefs.setString(placeToAdd.placeId, placeToAdd.placeName);
+    await updateList();
+  }
+
+  Future<void> removePlace(String placeId) async {
+    await removeId(placeId);
+    await updateList();
+  }
+
+  List<FavoriteModel> getFavoriteList() {
+    //List<PlaceFavoriteModel> placeList = await PlaceFavoritePrefs().getPlaceList();
+    List<PlaceFavoriteModel> placeList = _list;
+    List<FavoriteModel> placeFavoriteList = placeList
+        .map<FavoriteModel>((placeFavorite) => FavoriteModel(
+              name: placeFavorite.placeName,
+              description: "สถานที่",
+              //"${cctvMarker.latitude}, ${cctvMarker.longitude}",
+              type: FavoriteType.place,
+              placeId: placeFavorite.placeId,
+            ))
+        .toList();
+    return placeFavoriteList;
   }
 }
 

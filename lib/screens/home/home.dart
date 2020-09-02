@@ -2,17 +2,17 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:exattraffic/models/favorite_model.dart';
-import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
-import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
-//import 'package:exattraffic/storage/place_favorite_prefs.dart';
-import 'package:exattraffic/storage/widget_prefs.dart';
+import 'package:exattraffic/screens/search/search_place_presenter.dart';
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -27,12 +27,18 @@ import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/widget/widget.dart';
-import 'package:provider/provider.dart';
+import 'package:exattraffic/models/favorite_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
+import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
+
+//import 'package:exattraffic/storage/place_favorite_prefs.dart';
+import 'package:exattraffic/storage/widget_prefs.dart';
 
 class Home extends StatefulWidget {
   final Function hideSearchOptions;
+  final Function showBestRouteAfterSearch;
 
-  const Home(Key key, this.hideSearchOptions) : super(key: key);
+  const Home(Key key, this.hideSearchOptions, this.showBestRouteAfterSearch) : super(key: key);
 
   @override
   MyHomeState createState() => MyHomeState();
@@ -57,6 +63,8 @@ class MyHomeState extends State<Home> {
     target: LatLng(13.7563, 100.5018), // Bangkok
     zoom: 8,
   );
+
+  bool _isLoading = false;
 
   Future<void> _moveToCurrentPosition(BuildContext context,
       {bool showAlertIfLocationNotAvailable = false}) async {
@@ -310,6 +318,39 @@ class MyHomeState extends State<Home> {
     return placeFavoriteList..addAll(cctvFavoriteList);
   }*/
 
+  Future<void> _handleClickFavoriteItem(FavoriteModel favorite) async {
+    switch (favorite.type) {
+      case FavoriteType.cctv:
+        favorite.marker.showDetailsScreen(context, callback: null);
+        break;
+      case FavoriteType.place:
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        /*_presenter.setLoadingMessage("ดึงข้อมูลสถานที่");
+        _presenter.loading();*/
+        setState(() {
+          _isLoading = true;
+        });
+        try {
+          PlaceDetailsModel placeDetails =
+          await googleMapsServices.getPlaceDetails(favorite.placeId);
+          /*Position destination =
+            Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
+          //_presenter.setLoadingMessage("หาเส้นทางที่ใช้เวลาน้อยที่สุด");
+          RouteModel bestRoute = await SearchPlacePresenter.findBestRoute(context, placeDetails);
+
+          if (bestRoute != null && widget.showBestRouteAfterSearch != null) {
+            //assert(bestRoute.gateInCostTollList.isNotEmpty);
+            // กลับไป _handleClickSearchOption ใน MyScaffold
+            widget.showBestRouteAfterSearch(bestRoute);
+          }
+        } catch (error) {}
+        setState(() {
+          _isLoading = false;
+        });
+        break;
+    }
+  }
+
   Widget _getWidget(WidgetType widgetType) {
     return Consumer<WidgetPrefs>(
       builder: (context, prefs, child) {
@@ -323,52 +364,66 @@ class MyHomeState extends State<Home> {
                 ? Consumer<CctvFavoritePrefs>(
                     builder: (context, cctvFavoritePrefs, child) {
                       List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
-                      List<FavoriteModel> favoriteList =
+                      List<FavoriteModel> cctvFavoriteList =
                           cctvFavoritePrefs.getFavoriteList(markerList);
-                      List<TextImageModel> dataList = favoriteList
-                          .map<TextImageModel>((favorite) => TextImageModel(
-                                text: favorite.name,
-                                widget: favorite.type == FavoriteType.place
-                                    ? Image(
-                                        image: AssetImage(
-                                            'assets/images/favorite/image_widget_favorite_place.png'),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Stack(
-                                        children: <Widget>[
-                                          Image(
-                                            image: AssetImage(
-                                                'assets/images/cctv_details/video_preview_mock.png'),
-                                            fit: BoxFit.cover,
-                                          ),
-                                          Center(
-                                            child: Image(
-                                              image: AssetImage(
-                                                  'assets/images/cctv_details/ic_playback.png'),
-                                              width: getPlatformSize(30.0),
-                                              height: getPlatformSize(30.0),
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ))
-                          .toList();
 
-                      return WidgetBottomSheet(
-                        title: "รายการโปรด",
-                        dataList: dataList,
-                        onClickItem: null,
-                        collapsePosition: _mainContainerHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
-                            (isIncidentOn
-                                ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
-                                : 0.0) -
-                            (isExpressWayOn
-                                ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
-                                : 0.0),
-                        // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                      return Consumer<PlaceFavoritePrefs>(
+                        builder: (context, placeFavoritePrefs, child) {
+                          List<FavoriteModel> placeFavoriteList =
+                              placeFavoritePrefs.getFavoriteList();
+
+                          List<FavoriteModel> totalList = List();
+                          totalList.addAll(cctvFavoriteList);
+                          totalList.addAll(placeFavoriteList);
+
+                          List<TextImageModel> dataList = totalList
+                              .map<TextImageModel>((favorite) => TextImageModel(
+                                    text: favorite.name,
+                                    widget: favorite.type == FavoriteType.place
+                                        ? Image(
+                                            image: AssetImage(
+                                                'assets/images/favorite/image_widget_favorite_place.png'),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Stack(
+                                            children: <Widget>[
+                                              Image(
+                                                image: AssetImage(
+                                                    'assets/images/cctv_details/video_preview_mock.png'),
+                                                fit: BoxFit.cover,
+                                              ),
+                                              Center(
+                                                child: Image(
+                                                  image: AssetImage(
+                                                      'assets/images/cctv_details/ic_playback.png'),
+                                                  width: getPlatformSize(30.0),
+                                                  height: getPlatformSize(30.0),
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ))
+                              .toList();
+
+                          return WidgetBottomSheet(
+                            title: "รายการโปรด",
+                            dataList: dataList,
+                            onClickItem: (item, index) => _handleClickFavoriteItem(totalList[index]),
+                            collapsePosition: _mainContainerHeight -
+                                getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
+                                (isIncidentOn
+                                    ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
+                                    : 0.0) -
+                                (isExpressWayOn
+                                    ? getPlatformSize(
+                                        Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
+                                    : 0.0),
+                            // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                            expandPosition:
+                                getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                          );
+                        },
                       );
                     },
                   )
@@ -658,7 +713,7 @@ class MyHomeState extends State<Home> {
                 ),*/
 
                 Visibility(
-                  visible: state.showProgress,
+                  visible: state.showProgress || _isLoading,
                   child: Center(
                     child: MyProgressIndicator(),
                   ),

@@ -1,11 +1,11 @@
-import 'dart:math';
-
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
+import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:exattraffic/components/data_loading.dart';
+import 'package:exattraffic/components/my_button.dart';
 
 import 'consent_presenter.dart';
 
@@ -16,52 +16,49 @@ class ConsentPage extends StatefulWidget {
 
 class _ConsentPageState extends State<ConsentPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = [
-    "ข้อกำหนดและเงื่อนไข",
-    "Terms And Condition",
-    "附带条约"
-  ];
+  List<String> _titleList = ["ข้อตกลงและเงื่อนไข", "Terms And Condition", "附带条约"];
 
   bool checkValue = false;
   ConsentPresenter _presenter;
 
-  String _getDummyText() {
-    return new List(1000).fold("", (previousValue, element) => previousValue + "TEST-${Random().nextInt(100).toString()} ");
+  Widget _content() {
+    return _presenter.consentModel == null
+        ? DataLoading()
+        : Container(
+            color: Constants.App.BACKGROUND_COLOR,
+            padding: EdgeInsets.symmetric(
+              horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+              vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+            ),
+            //padding: EdgeInsets.all(10),
+            child: Column(
+              children: <Widget>[
+                _title(),
+                _body(),
+                _submit(),
+              ],
+            ),
+          );
   }
 
-  Widget _content(){
-    return _presenter.consentModel==null?DataLoading():
-    Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-//          border: Border.all(
-//            color: Colors.black12,
-//            width: getPlatformSize(10.0),
-//          ),
-          color: Colors.white
-      ),
-      child: Column(
-        children: <Widget>[
-
-          _title(),
-          _body(),
-          _submit(),
-
-        ],
-      ),
-    );
-  }
-
-  Widget _title(){
+  Widget _title() {
     return Container(
+      padding: EdgeInsets.only(bottom: getPlatformSize(8.0)),
       child: Center(
-        child: Text(_presenter.consentModel.data[0].title, style: getTextStyle(0)),
+        child: Text(
+          _presenter.consentModel.data[0].title,
+          style: getTextStyle(
+            0,
+            sizeEn: Constants.Font.BIGGER_SIZE_EN,
+            sizeTh: Constants.Font.BIGGER_SIZE_TH,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _body(){
-    return  Expanded(
+  Widget _body() {
+    return Expanded(
       child: Container(
         width: double.maxFinite,
         decoration: BoxDecoration(
@@ -69,34 +66,71 @@ class _ConsentPageState extends State<ConsentPage> {
               color: Color(0x11000000),
               width: getPlatformSize(10.0),
             ),
-            color: Colors.white
-        ),
-        padding: EdgeInsets.all(10),
+            color: Colors.white),
+        padding: EdgeInsets.all(getPlatformSize(10.0)),
         child: SingleChildScrollView(
-          child: Text(_presenter.consentModel.data[0].content),
+          child: Text(
+            _presenter.consentModel.data[0].content,
+            style: getTextStyle(0),
+          ),
         ),
       ),
     );
   }
 
-  Widget _submit(){
+  Widget _submit() {
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Row(
             children: <Widget>[
               Checkbox(
-                onChanged: (value){
+                onChanged: (value) {
                   setState(() {
                     checkValue = value;
                   });
                 },
                 value: checkValue,
               ),
-              Text("ยอมรับเงื่อนไข"),
+              Text(
+                "ยอมรับเงื่อนไข",
+                style: getTextStyle(0),
+              ),
             ],
           ),
-          Container(
+          MyButton(
+            text: "ยืนยัน",
+            onClick: () {
+              if (checkValue) {
+                print("send");
+                Navigator.pop(context);
+              } else {
+                Alert(
+                  context: context,
+                  type: AlertType.error,
+                  title: "เกิดข้อผิดพลาด",
+                  desc: "กรุณากดยอมรับเงื่อนไข",
+                  buttons: [
+                    DialogButton(
+                      child: Text(
+                        "OK",
+                        style: getTextStyle(
+                          0,
+                          color: Colors.white,
+                          sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                          sizeEn: Constants.Font.BIGGER_SIZE_EN,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      width: 120,
+                    )
+                  ],
+                ).show();
+              }
+            },
+          ),
+          /*Container(
             width: double.maxFinite,
             child: RaisedButton(
               shape: RoundedRectangleBorder(
@@ -104,10 +138,10 @@ class _ConsentPageState extends State<ConsentPage> {
 //                    side: BorderSide(color: Colors.red)
               ),
               onPressed: () {
-                if(checkValue) {
+                if (checkValue) {
                   print("send");
                   Navigator.pop(context);
-                }else{
+                } else {
                   Alert(
                     context: context,
                     type: AlertType.error,
@@ -132,7 +166,7 @@ class _ConsentPageState extends State<ConsentPage> {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-          ),
+          ),*/
         ],
       ),
     );

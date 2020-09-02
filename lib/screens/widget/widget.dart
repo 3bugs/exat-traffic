@@ -31,10 +31,10 @@ class _WidgetSettingState extends State<WidgetSetting> {
       "text": "รายการโปรด",
       "type": WidgetType.favorite,
     },
-    {
+    /*{
       "text": "เหตุการณ์",
       "type": WidgetType.incident,
-    },
+    },*/
   ];
 
   void _handleChangeSelect(WidgetType widgetType, bool isSelected) async {
@@ -132,15 +132,9 @@ class WidgetSettingItem extends StatelessWidget {
           SizedBox(
             width: getPlatformSize(25.0),
             height: getPlatformSize(25.0),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                unselectedWidgetColor: Color(0xFFC6C6C6),
-                toggleableActiveColor: Color(0xFF4E8305),
-              ),
-              child: Checkbox(
-                value: this.selected,
-                onChanged: this.onChanged,
-              ),
+            child: Checkbox(
+              value: this.selected,
+              onChanged: this.onChanged,
             ),
           ),
           SizedBox(

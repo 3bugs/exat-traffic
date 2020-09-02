@@ -205,7 +205,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
   }
 
   void _handleClickFavorite() async {
-    PlaceFavoritePrefs prefs = PlaceFavoritePrefs();
+    //PlaceFavoritePrefs prefs = PlaceFavoritePrefs();
+    PlaceFavoritePrefs prefs = Provider.of<PlaceFavoritePrefs>(context, listen: false);
 
     if (await prefs.existId(widget.destination.placeId)) {
       List<DialogButtonModel> dialogButtonList = [
@@ -218,7 +219,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
         dialogButtonList,
       );
       if (result == DialogResult.yes) {
-        prefs.removeId(widget.destination.placeId).then((_) {
+        prefs.removePlace(widget.destination.placeId).then((_) {
           setState(() {
             Fluttertoast.showToast(
               msg: "ลบ '${widget.destination.name}' ออกจากรายการโปรดแล้ว",
