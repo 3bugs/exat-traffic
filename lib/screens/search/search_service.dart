@@ -13,6 +13,8 @@ import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/components/layer_item.dart';
 import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
+import 'package:exattraffic/components/no_data.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'search_service_presenter.dart';
 
@@ -30,7 +32,7 @@ class SearchService extends StatefulWidget {
 }
 
 class _SearchServiceState extends State<SearchService> {
-  List<String> _titleList = ["ค้นหาบริการ", "Search", "搜索"];
+  LocaleText _title = LocaleText(thai: "ค้นหาบริการ", english: "Search", chinese: "搜索");
 
   //final GlobalKey _keyMainContainer = GlobalKey();
   //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
@@ -140,10 +142,7 @@ class _SearchServiceState extends State<SearchService> {
                         top: getPlatformSize(Constants.HomeScreen.SPACE_BEFORE_LIST),
                         bottom: getPlatformSize(8.0 + Constants.BottomSheet.HEIGHT_LAYER),
                       ),
-                      child: Text(
-                        "ไม่มีข้อมูล",
-                        style: getTextStyle(0),
-                      ),
+                      child: NoData(),
                     )
                   : Container(
                       //color: Constants.App.BACKGROUND_COLOR,
@@ -225,7 +224,7 @@ class _SearchServiceState extends State<SearchService> {
   Widget build(BuildContext context) {
     return YourScaffold(
       key: _keyScaffold,
-      titleList: _titleList,
+      title: _title,
       showSearch: true,
       onSearchTextChanged: _handleSearchTextChange,
       builder: (BuildContext context, double containerHeight) {

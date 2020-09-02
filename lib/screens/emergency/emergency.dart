@@ -12,6 +12,7 @@ import 'package:exattraffic/screens/emergency/emergency_presenter.dart';
 import 'package:exattraffic/models/emergency_number_model.dart';
 import 'package:exattraffic/screens/emergency/components/emergency_view.dart';
 import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class Emergency extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _EmergencyState extends State<Emergency> {
   final double overlapHeight = SHOW_SOS ? getPlatformSize(30.0) : 0.0;
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เบอร์โทรฉุกเฉิน", "Emergency Call", "紧急电话"];
+  LocaleText _title = LocaleText(thai: "เบอร์โทรฉุกเฉิน", english: "Emergency Call", chinese: "紧急电话");
 
   EmergencyPresenter _presenter;
   RefreshController _refreshController = RefreshController(initialRefresh: false);
@@ -152,6 +153,6 @@ class _EmergencyState extends State<Emergency> {
 
   @override
   Widget build(BuildContext context) {
-    return YourScaffold(titleList: _titleList, child: _content());
+    return YourScaffold(title: _title, child: _content());
   }
 }

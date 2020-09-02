@@ -1,4 +1,3 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -7,6 +6,8 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/my_button.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'consent_presenter.dart';
 
@@ -17,7 +18,8 @@ class ConsentPage extends StatefulWidget {
 
 class _ConsentPageState extends State<ConsentPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["ข้อตกลงและเงื่อนไข", "Terms And Condition", "附带条约"];
+  LocaleText _title =
+      LocaleText(thai: "ข้อตกลงและเงื่อนไข", english: "Terms And Conditions", chinese: "附带条约");
 
   bool checkValue = false;
   ConsentPresenter _presenter;
@@ -34,7 +36,7 @@ class _ConsentPageState extends State<ConsentPage> {
             //padding: EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
-                _title(),
+                _head(),
                 _body(),
                 _submit(),
               ],
@@ -42,7 +44,7 @@ class _ConsentPageState extends State<ConsentPage> {
           );
   }
 
-  Widget _title() {
+  Widget _head() {
     return Container(
       padding: EdgeInsets.only(bottom: getPlatformSize(8.0)),
       child: Center(
@@ -183,7 +185,7 @@ class _ConsentPageState extends State<ConsentPage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
 
       // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
       child: _content(),

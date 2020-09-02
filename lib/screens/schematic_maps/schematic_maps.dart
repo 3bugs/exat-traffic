@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:exattraffic/app/bloc.dart';
-import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -12,7 +11,8 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/home.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/models/marker_model.dart';
-import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/category_model.dart';
 
 // iOS setup
 // Opt-in to the embedded views preview by adding a boolean property to
@@ -408,7 +408,7 @@ class ScaleButton extends StatelessWidget {
             child: Text(
               text,
               style: getTextStyle(
-                0,
+                LanguageName.thai,
                 color: Colors.white,
               ),
             ),

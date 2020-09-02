@@ -7,6 +7,8 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/components/my_button.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class QuestionnairePage extends StatefulWidget {
   @override
@@ -15,7 +17,7 @@ class QuestionnairePage extends StatefulWidget {
 
 class _QuestionnairePageState extends State<QuestionnairePage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["แบบสอบถาม", "Questionnaire", "问卷调查"];
+  LocaleText _title = LocaleText(thai: "แบบสอบถาม", english: "Questionnaire", chinese: "问卷调查");
   int group = 1;
   int myIndex = 0;
   bool showArrowLeft = false;
@@ -69,7 +71,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
           Text(
             "${_presenter.questionnaireModel.data[myIndex].name}",
             style: getTextStyle(
-              0,
+              LanguageName.thai,
               sizeTh: Constants.Font.BIGGER_SIZE_TH,
               sizeEn: Constants.Font.BIGGER_SIZE_EN,
             ),
@@ -95,7 +97,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                       ),
                       Text(
                         "1 (ต่ำสุด)",
-                        style: getTextStyle(0),
+                        style: getTextStyle(LanguageName.thai),
                       ),
                     ],
                   ),
@@ -113,7 +115,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                       ),
                       Text(
                         "2",
-                        style: getTextStyle(0),
+                        style: getTextStyle(LanguageName.thai),
                       ),
                     ],
                   ),
@@ -131,7 +133,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                       ),
                       Text(
                         "3",
-                        style: getTextStyle(0),
+                        style: getTextStyle(LanguageName.thai),
                       ),
                     ],
                   ),
@@ -149,7 +151,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                       ),
                       Text(
                         "4",
-                        style: getTextStyle(0),
+                        style: getTextStyle(LanguageName.thai),
                       ),
                     ],
                   ),
@@ -167,7 +169,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                       ),
                       Text(
                         "5 (สูงสุด)",
-                        style: getTextStyle(0),
+                        style: getTextStyle(LanguageName.thai),
                       ),
                     ],
                   ),
@@ -272,7 +274,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _content(),
     );
   }

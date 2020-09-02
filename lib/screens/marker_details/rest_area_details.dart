@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/components/tool_item.dart';
+//import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/models/marker_categories/rest_area_model.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
 
@@ -102,20 +101,8 @@ class _RestAreaDetailsMainState extends State<RestAreaDetailsMain> {
                 Center(
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
-                      String name;
-                      switch (language.lang) {
-                        case 0:
-                          name = widget._restAreaModel.name;
-                          break;
-                        case 1:
-                          name = 'About Us';
-                          break;
-                        case 2:
-                          name = '关于我们';
-                          break;
-                      }
                       return Text(
-                        name,
+                        widget._restAreaModel.name,
                         style: getTextStyle(
                           language.lang,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,

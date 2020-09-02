@@ -3,9 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
-import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
-import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
-import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -28,6 +25,9 @@ import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
+import 'package:exattraffic/screens/search/search_place.dart';
 
 class MyRoute extends StatefulWidget {
   final Function showBestRouteAfterSearch;
@@ -929,7 +929,7 @@ class MyRouteState extends State<MyRoute> {
                                   child: Text(
                                     'Pickup Location',
                                     style: getTextStyle(
-                                      1,
+                                      LanguageName.english,
                                       color: Color(0xFFB2B2B2),
                                       sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
                                       sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
@@ -1087,7 +1087,7 @@ class MyRouteState extends State<MyRoute> {
                                   child: Text(
                                     'Destination Location',
                                     style: getTextStyle(
-                                      1,
+                                      LanguageName.english,
                                       color: Color(0xFFB2B2B2),
                                       sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
                                       sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),

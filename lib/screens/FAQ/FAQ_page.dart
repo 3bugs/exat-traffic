@@ -1,4 +1,3 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -7,6 +6,9 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
+
 import 'FAQ_presenter.dart';
 
 class FAQPage extends StatefulWidget {
@@ -16,7 +18,7 @@ class FAQPage extends StatefulWidget {
 
 class _FAQPageState extends State<FAQPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["คำถามที่พบบ่อย", "FAQ", "经常问的问题"];
+  LocaleText _title = LocaleText(thai: "คำถามที่พบบ่อย", english: "FAQ", chinese: "经常问的问题");
 
 //  bool open = false;
   FAQPresenter _presenter;
@@ -175,7 +177,7 @@ class _FAQPageState extends State<FAQPage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _content(),
     );
   }

@@ -8,6 +8,8 @@ import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/search/components/search_place_view.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/components/no_data.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'search_place_presenter.dart';
 
@@ -20,7 +22,7 @@ class SearchPlace extends StatefulWidget {
 }
 
 class _SearchPlaceState extends State<SearchPlace> {
-  List<String> _titleList = ["ค้นหาเส้นทาง", "Search", "搜索"];
+  LocaleText _title = LocaleText(thai: "ค้นหาเส้นทาง", english: "Search", chinese: "搜索");
 
   final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
   SearchPlacePresenter _presenter;
@@ -50,12 +52,7 @@ class _SearchPlaceState extends State<SearchPlace> {
 
   Widget _buildSearchResult() {
     if (_presenter.searchResultList.isEmpty) {
-      return Center(
-        child: Text(
-          "ไม่มีข้อมูล",
-          style: getTextStyle(0),
-        ),
-      );
+      return NoData();
     } else {
       return ListView.builder(
         //controller: _scrollController,
@@ -155,7 +152,7 @@ class _SearchPlaceState extends State<SearchPlace> {
   Widget build(BuildContext context) {
     return YourScaffold(
       key: _keyScaffold,
-      titleList: _titleList,
+      title: _title,
       showSearch: true,
       searchBoxAutoFocus: true,
       searchBoxHint: "พิมพ์ชื่อสถานที่",

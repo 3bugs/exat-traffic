@@ -6,11 +6,12 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/components/header.dart';
 import 'package:exattraffic/components/search_box.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 //https://medium.com/flutter-community/simple-ways-to-pass-to-and-share-data-with-widgets-pages-f8988534bd5b
 
 class YourScaffold extends StatefulWidget {
-  final List<String> titleList;
+  final LocaleText title;
   final Widget child;
   final Function builder;
   final bool showSearch;
@@ -20,7 +21,7 @@ class YourScaffold extends StatefulWidget {
 
   YourScaffold({
     Key key,
-    @required this.titleList,
+    @required this.title,
     this.child,
     this.builder,
     this.showSearch = false,
@@ -75,7 +76,7 @@ class YourScaffoldState extends State<YourScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    assert(widget.titleList != null && widget.titleList.length >= 3);
+    //assert(widget.title != null && widget.title.length >= 3);
 
     return wrapSystemUiOverlayStyle(
       child: Scaffold(
@@ -96,16 +97,20 @@ class YourScaffoldState extends State<YourScaffold> {
             child: Column(
               children: <Widget>[
                 // หัวด้านบน (พื้นหลังไล่เฉดสีฟ้า)
-                Header(
-                  titleList: widget.titleList,
-                  showDate: false,
-                  leftIcon: HeaderIcon(
-                    image: AssetImage('assets/images/home/ic_back_white.png'),
-                    onClick: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  rightIcon: null,
+                Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    return Header(
+                      title: widget.title.ofLanguage(language.lang),
+                      showDate: false,
+                      leftIcon: HeaderIcon(
+                        image: AssetImage('assets/images/home/ic_back_white.png'),
+                        onClick: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      rightIcon: null,
+                    );
+                  },
                 ),
 
                 Expanded(

@@ -1,4 +1,3 @@
-import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +23,8 @@ import 'package:exattraffic/services/fcm.dart';
 import 'package:exattraffic/screens/search/search_service.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/screens/emergency/emergency.dart';
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -44,79 +45,85 @@ List<ScreenProps> screenPropsList = [
     // home
     id: 0,
     showSearch: true,
-    titleList: [
-      'หน้าหลัก',
-      'Home',
-      '家园',
-    ],
-    searchHintList: [
-      'ค้นหา',
-      'Search',
-      '搜索',
-    ],
+    title: LocaleText(
+      thai: 'หน้าหลัก',
+      english: 'Home',
+      chinese: '家园',
+    ),
+    searchHint: LocaleText(
+      thai: 'ค้นหา',
+      english: 'Search',
+      chinese: '搜索',
+    ),
   ),
   ScreenProps(
     // favorite
     id: 1,
     showSearch: true,
-    titleList: [
-      'รายการโปรด',
-      'Favorite',
-      '喜爱',
-    ],
-    searchHintList: [
-      'ค้นหา',
-      'Search',
-      '搜索',
-      /*'ค้นหารายการโปรด',
+    title: LocaleText(
+      thai: 'รายการโปรด',
+      english: 'Favorite',
+      chinese: '喜爱',
+    ),
+    searchHint: LocaleText(
+      thai: 'ค้นหา',
+      english: 'Search',
+      chinese: '搜索',
+    ),
+    /*searchHint: [
+      'ค้นหารายการโปรด',
       'Search favorite',
-      '搜索收藏',*/
-    ],
+      '搜索收藏',
+    ],*/
   ),
   ScreenProps(
     // route
     id: 2,
-    titleList: [
-      'เส้นทาง',
-      'Route',
-      '路线',
-    ],
+    title: LocaleText(
+      thai: 'เส้นทาง',
+      english: 'Route',
+      chinese: '路线',
+    ),
   ),
   ScreenProps(
     // incident
     id: 3,
     showSearch: true,
-    titleList: [
-      'เหตุการณ์',
-      'Incident',
-      '事件',
-    ],
-    searchHintList: [
-      'ค้นหา',
-      'Search',
-      '搜索',
-      /*'ค้นหาเหตุการณ์',
+    title: LocaleText(
+      thai: 'เหตุการณ์',
+      english: 'Incident',
+      chinese: '事件',
+    ),
+    searchHint: LocaleText(
+      thai: 'ค้นหา',
+      english: 'Search',
+      chinese: '搜索',
+    ),
+    /*searchHint: [
+      'ค้นหาเหตุการณ์',
       'Search incident',
-      '搜索事件',*/
-    ],
+      '搜索事件',
+    ],*/
   ),
   ScreenProps(
     // notification
     id: 4,
     showSearch: true,
-    titleList: [
-      'การแจ้งเตือน',
-      'Notification',
-      '通知',
-    ],
-    searchHintList: [
-      'ค้นหา',
-      'Search',
-      '搜索',
-      /*'ค้นหาการแจ้งเตือน',
+    title: LocaleText(
+      thai: 'การแจ้งเตือน',
+      english: 'Notification',
+      chinese: '通知',
+    ),
+    searchHint: LocaleText(
+      thai: 'ค้นหา',
+      english: 'Search',
+      chinese: '搜索',
+    ),
+    /*searchHint: [
+      'ค้นหาการแจ้งเตือน',
       'Search notification',
-      '搜索通知',*/
-    ],
+      '搜索通知',
+    ],*/
   ),
 ];
 
@@ -268,10 +275,11 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       DialogButtonModel(text: "ใช่", value: DialogResult.yes)
     ];
     return await showMyDialog(
-      context,
-      "ต้องการออกจาก ${AppBloc.appName}?",
-      dialogButtonList,
-    ) == DialogResult.yes;
+          context,
+          "ต้องการออกจาก ${AppBloc.appName}?",
+          dialogButtonList,
+        ) ==
+        DialogResult.yes;
   }
 
   @override
@@ -323,28 +331,32 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                 child: Column(
                   children: <Widget>[
                     // หัวด้านบน (พื้นหลังไล่เฉดสีฟ้า)
-                    Header(
-                      titleList: _currentScreenProps.titleList,
-                      showDate: false,
-                      leftIcon: HeaderIcon(
-                        image: AssetImage('assets/images/home/ic_menu.png'),
-                        onClick: () {
-                          _keyDrawer.currentState.openDrawer();
-                        },
-                      ),
-                      rightIcon: HeaderIcon(
-                        image: AssetImage('assets/images/home/ic_phone_circle.png'),
-                        onClick: () {
-                          //Provider.of<LanguageModel>(context, listen: false).nextLang();
+                    Consumer<LanguageModel>(
+                      builder: (context, language, child) {
+                        return Header(
+                          title: _currentScreenProps.title.ofLanguage(language.lang),
+                          showDate: false,
+                          leftIcon: HeaderIcon(
+                            image: AssetImage('assets/images/home/ic_menu.png'),
+                            onClick: () {
+                              _keyDrawer.currentState.openDrawer();
+                            },
+                          ),
+                          rightIcon: HeaderIcon(
+                            image: AssetImage('assets/images/home/ic_phone_circle.png'),
+                            onClick: () {
+                              //Provider.of<LanguageModel>(context, listen: false).nextLang();
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Emergency(),
-                            ),
-                          );
-                        },
-                      ),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Emergency(),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
 
                     Expanded(
@@ -391,7 +403,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                               child: Consumer<LanguageModel>(
                                 builder: (context, language, child) {
                                   return Text(
-                                    _currentScreenProps.searchHintList[language.lang],
+                                    _currentScreenProps.searchHint.ofLanguage(language.lang),
                                     style: getTextStyle(
                                       language.lang,
                                       color: Constants.Font.DIM_COLOR,

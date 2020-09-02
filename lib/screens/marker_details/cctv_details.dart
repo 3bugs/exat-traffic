@@ -13,7 +13,7 @@ import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/login/login.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
-import 'package:exattraffic/app/app_bloc.dart';
+//import 'package:exattraffic/app/app_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class CctvDetails extends StatelessWidget {
@@ -252,20 +252,8 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                 Center(
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
-                      String name;
-                      switch (language.lang) {
-                        case 0:
-                          name = widget._cctvModel.name;
-                          break;
-                        case 1:
-                          name = 'About Us';
-                          break;
-                        case 2:
-                          name = '关于我们';
-                          break;
-                      }
                       return Text(
-                        name,
+                        widget._cctvModel.name,
                         style: getTextStyle(
                           language.lang,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,

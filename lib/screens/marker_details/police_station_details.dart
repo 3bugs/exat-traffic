@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -102,20 +101,8 @@ class _PoliceStationDetailsMainState extends State<PoliceStationDetailsMain> {
                 Center(
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
-                      String name;
-                      switch (language.lang) {
-                        case 0:
-                          name = widget._policeStationModel.name;
-                          break;
-                        case 1:
-                          name = 'About Us';
-                          break;
-                        case 2:
-                          name = '关于我们';
-                          break;
-                      }
                       return Text(
-                        name,
+                        widget._policeStationModel.name,
                         style: getTextStyle(
                           language.lang,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,

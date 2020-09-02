@@ -4,6 +4,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/models/locale_text.dart';
+
 import 'help_presenter.dart';
 
 List<T> map<T>(List list, Function handler) {
@@ -27,7 +29,7 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["ช่วยเหลือ", "Help", "救命"];
+  LocaleText _title = LocaleText(thai: "ช่วยเหลือ", english: "Help", chinese: "救命");
   int _current = 0;
   HelpPresenter _presenter;
 
@@ -84,7 +86,7 @@ class _HelpPageState extends State<HelpPage> {
           ).toList();
 
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _presenter.error != null
           ? Center(
               child: ErrorView(

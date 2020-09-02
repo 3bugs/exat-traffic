@@ -6,8 +6,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/models/notification_model.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'notification_details_presenter.dart';
 
@@ -32,7 +33,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["การแจ้งเตือน", "Notification", "通知"];
+  LocaleText _title = LocaleText(thai: "การแจ้งเตือน", english: "Notification", chinese: "通知");
 
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
@@ -189,7 +190,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
               Text(
                 formatDateTime(_presenter.notification.createdAt),
                 style: getTextStyle(
-                  0,
+                  LanguageName.thai,
                   sizeTh: Constants.Font.SMALLER_SIZE_TH,
                   sizeEn: Constants.Font.SMALLER_SIZE_EN,
                   color: Constants.Font.DIM_COLOR,
@@ -198,7 +199,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
               Text(
                 _presenter.notification.routeName,
                 style: getTextStyle(
-                  0,
+                  LanguageName.thai,
                   sizeTh: Constants.Font.SMALLER_SIZE_TH,
                   sizeEn: Constants.Font.SMALLER_SIZE_EN,
                   color: Constants.Font.DIM_COLOR,
@@ -212,7 +213,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
           Text(
             _presenter.notification.detail,
             style: getTextStyle(
-              0,
+              LanguageName.thai,
               sizeTh: Constants.Font.BIGGER_SIZE_TH,
               sizeEn: Constants.Font.BIGGER_SIZE_EN,
               isBold: true,
@@ -230,7 +231,7 @@ class _NotificationDetailsState extends State<NotificationDetails> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _content(),
     );
   }

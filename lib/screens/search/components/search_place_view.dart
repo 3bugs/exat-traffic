@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -58,20 +58,8 @@ class SearchPlaceView extends StatelessWidget {
                     Expanded(
                       child: Consumer<LanguageModel>(
                         builder: (context, language, child) {
-                          String name;
-                          switch (language.lang) {
-                            case 0:
-                              name = searchResult.placeDetails.name;
-                              break;
-                            case 1:
-                              name = 'Expressway';
-                              break;
-                            case 2:
-                              name = '高速公路';
-                              break;
-                          }
                           return Text(
-                            name,
+                            searchResult.placeDetails.name,
                             style: getTextStyle(
                               language.lang,
                               color: Constants.App.ACCENT_COLOR,
@@ -89,20 +77,8 @@ class SearchPlaceView extends StatelessWidget {
                 ),
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String description;
-                    switch (language.lang) {
-                      case 0:
-                        description = searchResult.placeDetails.formattedAddress;
-                        break;
-                      case 1:
-                        description = 'Expressway';
-                        break;
-                      case 2:
-                        description = '高速公路';
-                        break;
-                    }
                     return Text(
-                      description,
+                      searchResult.placeDetails.formattedAddress,
                       style: getTextStyle(
                         language.lang,
                         color: Constants.Font.DIM_COLOR,

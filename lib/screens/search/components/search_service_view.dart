@@ -1,7 +1,6 @@
-import 'package:exattraffic/models/category_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -9,6 +8,7 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/components/list_item.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
+import 'package:exattraffic/models/category_model.dart';
 
 class SearchServiceView extends StatelessWidget {
   SearchServiceView({
@@ -45,20 +45,8 @@ class SearchServiceView extends StatelessWidget {
               children: <Widget>[
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = marker.name;
-                        break;
-                      case 1:
-                        name = 'Expressway';
-                        break;
-                      case 2:
-                        name = '高速公路';
-                        break;
-                    }
                     return Text(
-                      name,
+                      marker.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
@@ -84,20 +72,8 @@ class SearchServiceView extends StatelessWidget {
                     SizedBox(width: getPlatformSize(8.0)),
                     Consumer<LanguageModel>(
                       builder: (context, language, child) {
-                        String description;
-                        switch (language.lang) {
-                          case 0:
-                            description = marker.category.name;
-                            break;
-                          case 1:
-                            description = 'Expressway';
-                            break;
-                          case 2:
-                            description = '高速公路';
-                            break;
-                        }
                         return Text(
-                          description,
+                          marker.category.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: getTextStyle(

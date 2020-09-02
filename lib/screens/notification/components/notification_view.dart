@@ -55,20 +55,8 @@ class NotificationView extends StatelessWidget {
               ),
               Consumer<LanguageModel>(
                 builder: (context, language, child) {
-                  String name;
-                  switch (language.lang) {
-                    case 0:
-                      name = notification.detail;
-                      break;
-                    case 1:
-                      name = 'Expressway';
-                      break;
-                    case 2:
-                      name = '高速公路';
-                      break;
-                  }
                   return Text(
-                    name,
+                    notification.detail,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: getTextStyle(
@@ -84,20 +72,8 @@ class NotificationView extends StatelessWidget {
           ),
           Consumer<LanguageModel>(
             builder: (context, language, child) {
-              String description;
-              switch (language.lang) {
-                case 0:
-                  description = notification.routeName;
-                  break;
-                case 1:
-                  description = 'Expressway';
-                  break;
-                case 2:
-                  description = '高速公路';
-                  break;
-              }
               return Text(
-                description,
+                notification.routeName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: getTextStyle(

@@ -8,6 +8,7 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'about_presenter.dart';
 
@@ -22,7 +23,7 @@ class _AboutPageState extends State<AboutPage> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เกี่ยวกับเรา", "About Us", "关于我们"];
+  LocaleText _title = LocaleText(thai: "เกี่ยวกับเรา", english: "About Us", chinese: "关于我们");
   AboutPresenter _presenter;
 
   @override
@@ -229,7 +230,7 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-        titleList: _titleList,
+        title: _title,
         // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
         child: _content());
   }

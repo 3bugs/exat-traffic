@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/locale_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -11,12 +12,12 @@ class About extends StatefulWidget {
 
 class _AboutState extends State<About> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เกี่ยวกับเรา", "About Us", "关于我们"];
+  LocaleText _title = LocaleText(thai: "เกี่ยวกับเรา", english: "About Us", chinese: "关于我们");
 
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
 
       // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
       child: Container(

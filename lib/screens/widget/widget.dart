@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/screens/widget/widget_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
-import 'package:provider/provider.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class WidgetSetting extends StatefulWidget {
   @override
@@ -19,7 +21,7 @@ enum WidgetType { favorite, incident, expressWay }
 
 class _WidgetSettingState extends State<WidgetSetting> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["วิดเจ็ต", "Widget", "小部件"];
+  LocaleText _title = LocaleText(thai: "วิดเจ็ต", english: "Widget", chinese: "小部件");
 
   WidgetPresenter _presenter;
   List<Map<String, dynamic>> _widgetDataList = [
@@ -103,7 +105,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _content(),
     );
   }
@@ -172,7 +174,7 @@ class WidgetSettingItem extends StatelessWidget {
                             child: Text(
                               this.text,
                               style: getTextStyle(
-                                0,
+                                LanguageName.thai,
                                 //color: Constants.App.ACCENT_COLOR,
                                 //isBold: true,
                               ),

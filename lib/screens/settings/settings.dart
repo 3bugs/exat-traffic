@@ -8,6 +8,7 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ enum SettingName { language, notification, nightMode }
 
 class _SettingsState extends State<Settings> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["การตั้งค่า", "Settings", "设定值"];
+  LocaleText _title = LocaleText(thai: "การตั้งค่า", english: "Settings", chinese: "设定值");
 
   List<LanguageOptionModel> _languageOptionList = [
     LanguageOptionModel("ไทย", LanguageName.thai, isThaiText: true),
@@ -36,18 +37,21 @@ class _SettingsState extends State<Settings> {
   ];
 
   SettingsPresenter _presenter;
+
   //LanguageName _languageValue = LanguageName.thai;
   bool _notificationValue = false;
   bool _nightModeValue = false;
 
   void _handleClickLanguage(LanguageName lang) {
-    LanguageModel languageModel = Provider.of<LanguageModel>(context, listen: false);
-
     /*if (lang == _languageValue) return;
 
     setState(() {
       _languageValue = lang;
     });*/
+
+    LanguageModel languageModel = Provider.of<LanguageModel>(context, listen: false);
+    if (languageModel.lang == lang) return;
+    languageModel.lang = lang;
 
     Future.delayed(Duration(milliseconds: 250), () async {
       DialogResult result = await showMyDialog(
@@ -108,16 +112,17 @@ class _SettingsState extends State<Settings> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _languageOptionList
                                 .where((item) => (_languageOptionList.indexOf(item) <
-                                _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                                    _languageOptionList.length ~/ 2 +
+                                        (_languageOptionList.length % 2)))
                                 .map<Widget>(
                                   (item) => OptionButton(
-                                text: item.text,
-                                value: item.value,
-                                groupValue: language.lang,
-                                isThaiText: item.isThaiText,
-                                onClick: () => _handleClickLanguage(item.value),
-                              ),
-                            )
+                                    text: item.text,
+                                    value: item.value,
+                                    groupValue: language.lang,
+                                    isThaiText: item.isThaiText,
+                                    onClick: () => _handleClickLanguage(item.value),
+                                  ),
+                                )
                                 .toList(),
                           ),
                         ),
@@ -129,16 +134,17 @@ class _SettingsState extends State<Settings> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: _languageOptionList
                                 .where((item) => (_languageOptionList.indexOf(item) >=
-                                _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
+                                    _languageOptionList.length ~/ 2 +
+                                        (_languageOptionList.length % 2)))
                                 .map<Widget>(
                                   (item) => OptionButton(
-                                text: item.text,
-                                value: item.value,
-                                groupValue: language.lang,
-                                isThaiText: item.isThaiText,
-                                onClick: () => _handleClickLanguage(item.value),
-                              ),
-                            )
+                                    text: item.text,
+                                    value: item.value,
+                                    groupValue: language.lang,
+                                    isThaiText: item.isThaiText,
+                                    onClick: () => _handleClickLanguage(item.value),
+                                  ),
+                                )
                                 .toList(),
                           ),
                         )
@@ -176,7 +182,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       child: _content(),
     );
   }
@@ -222,7 +228,10 @@ class OptionButton<T> extends StatelessWidget {
                 this.onClick();
               },
             ),
-            Text(this.text, style: getTextStyle(this.isThaiText ? 0 : 1)),
+            Text(
+              this.text,
+              style: getTextStyle(this.isThaiText ? LanguageName.thai : LanguageName.english),
+            ),
             SizedBox(
               width: getPlatformSize(12.0),
             )
@@ -251,7 +260,7 @@ class SettingRow extends StatelessWidget {
       children: <Widget>[
         Text(
           text,
-          style: getTextStyle(0),
+          style: getTextStyle(LanguageName.thai),
         ),
         Visibility(
           visible: onChange != null,

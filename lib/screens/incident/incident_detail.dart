@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
@@ -8,6 +5,8 @@ import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'incident_detail_presenter.dart';
 
@@ -29,7 +28,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["เหตุการณ์", "Incident", "事件"];
+  LocaleText _title = LocaleText(thai: "เหตุการณ์", english: "Incident", chinese: "事件");
 
   @override
   void initState() {
@@ -189,7 +188,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
       // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
       child: _content(),
     );

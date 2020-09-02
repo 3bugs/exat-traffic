@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class TestOverlap extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class _TestOverlapState extends State<TestOverlap> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  List<String> _titleList = ["ทดสอบ Overlap", "Test Overlap", "关于我们"];
+  LocaleText _title = LocaleText(thai: "ทดสอบ Overlap", english: "Test Overlap", chinese: "关于我们");
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class _TestOverlapState extends State<TestOverlap> {
   @override
   Widget build(BuildContext context) {
     return YourScaffold(
-      titleList: _titleList,
+      title: _title,
 
       // แก้ไขตรง child นี้ได้เลย เพื่อแสดง content ตามที่ต้องการ
       child: Stack(
