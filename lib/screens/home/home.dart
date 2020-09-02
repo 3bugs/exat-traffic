@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:exattraffic/models/favorite_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
 import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
-import 'package:exattraffic/storage/place_favorite_prefs.dart';
+//import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -280,7 +280,7 @@ class MyHomeState extends State<Home> {
     }
   }
 
-  Future<List<FavoriteModel>> _getFavoriteList() async {
+  /*Future<List<FavoriteModel>> _getFavoriteList() async {
     List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
     List<String> cctvIdList = await CctvFavoritePrefs().getIdList();
     List<MarkerModel> cctvList = markerList
@@ -308,7 +308,7 @@ class MyHomeState extends State<Home> {
         .toList();
 
     return placeFavoriteList..addAll(cctvFavoriteList);
-  }
+  }*/
 
   Widget _getWidget(WidgetType widgetType) {
     return Consumer<WidgetPrefs>(
@@ -320,60 +320,56 @@ class MyHomeState extends State<Home> {
         switch (widgetType) {
           case WidgetType.favorite:
             return isFavoriteOn
-                ? FutureBuilder(
-                    future: _getFavoriteList(),
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
-                        List<FavoriteModel> favoriteList = snapshot.data;
-                        List<TextImageModel> dataList = favoriteList
-                            .map<TextImageModel>((favorite) => TextImageModel(
-                                  text: favorite.name,
-                                  widget: favorite.type == FavoriteType.place
-                                      ? Image(
-                                          image: AssetImage(
-                                              'assets/images/favorite/image_widget_favorite_place.png'),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Stack(
-                                          children: <Widget>[
-                                            Image(
+                ? Consumer<CctvFavoritePrefs>(
+                    builder: (context, cctvFavoritePrefs, child) {
+                      List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+                      List<FavoriteModel> favoriteList =
+                          cctvFavoritePrefs.getFavoriteList(markerList);
+                      List<TextImageModel> dataList = favoriteList
+                          .map<TextImageModel>((favorite) => TextImageModel(
+                                text: favorite.name,
+                                widget: favorite.type == FavoriteType.place
+                                    ? Image(
+                                        image: AssetImage(
+                                            'assets/images/favorite/image_widget_favorite_place.png'),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Stack(
+                                        children: <Widget>[
+                                          Image(
+                                            image: AssetImage(
+                                                'assets/images/cctv_details/video_preview_mock.png'),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          Center(
+                                            child: Image(
                                               image: AssetImage(
-                                                  'assets/images/cctv_details/video_preview_mock.png'),
-                                              fit: BoxFit.cover,
+                                                  'assets/images/cctv_details/ic_playback.png'),
+                                              width: getPlatformSize(30.0),
+                                              height: getPlatformSize(30.0),
+                                              fit: BoxFit.contain,
                                             ),
-                                            Center(
-                                              child: Image(
-                                                image: AssetImage(
-                                                    'assets/images/cctv_details/ic_playback.png'),
-                                                width: getPlatformSize(30.0),
-                                                height: getPlatformSize(30.0),
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ))
-                            .toList();
+                                          ),
+                                        ],
+                                      ),
+                              ))
+                          .toList();
 
-                        return WidgetBottomSheet(
-                          title: "รายการโปรด",
-                          dataList: dataList,
-                          onClickItem: null,
-                          collapsePosition: _mainContainerHeight -
-                              getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
-                              (isIncidentOn
-                                  ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
-                                  : 0.0) -
-                              (isExpressWayOn
-                                  ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
-                                  : 0.0),
-                          // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                          expandPosition:
-                              getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
-                        );
-                      } else {
-                        return SizedBox.shrink();
-                      }
+                      return WidgetBottomSheet(
+                        title: "รายการโปรด",
+                        dataList: dataList,
+                        onClickItem: null,
+                        collapsePosition: _mainContainerHeight -
+                            getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
+                            (isIncidentOn
+                                ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_INCIDENT)
+                                : 0.0) -
+                            (isExpressWayOn
+                                ? getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_EXPRESS_WAY)
+                                : 0.0),
+                        // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                      );
                     },
                   )
                 : SizedBox.shrink();

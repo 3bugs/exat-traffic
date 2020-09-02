@@ -1,3 +1,5 @@
+import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -21,6 +23,8 @@ void main() {
             ChangeNotifierProvider(create: (context) => LanguageModel()),
             ChangeNotifierProvider(create: (context) => WidgetPrefs()),
             ChangeNotifierProvider(create: (context) => UtilPrefs()),
+            ChangeNotifierProvider(create: (context) => CctvFavoritePrefs()),
+            ChangeNotifierProvider(create: (context) => PlaceFavoritePrefs()),
           ],
           child: MyApp(),
         ),

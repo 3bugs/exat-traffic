@@ -511,6 +511,10 @@ class MyRouteState extends State<MyRoute> {
     try {
       positionStream = Geolocator().getPositionStream(locationOptions);
       if (positionStream != null) {
+        print("///////////////////////////////////////////");
+        print("////////// SETUP LOCATION UPDATE //////////");
+        print("///////////////////////////////////////////");
+
         _positionStreamSubscription = positionStream.listen((Position position) {
           positionChangeListener(position);
         });
@@ -716,7 +720,10 @@ class MyRouteState extends State<MyRoute> {
 
                       if (_positionStreamSubscription == null) {
                         _setupLocationUpdate((Position position) {
+                          print("////////////////////////////////////////////");
+                          print("////////// SEARCH LOCATION UPDATE //////////");
                           print("Current location: ${position.latitude}, ${position.longitude}");
+                          print("////////////////////////////////////////////");
                           context
                               .bloc<RouteBloc>()
                               .add(UpdateCurrentLocationSearch(currentLocation: position));

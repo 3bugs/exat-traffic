@@ -52,7 +52,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
   }
 
   Future<Icon> _getFavoriteIcon() async {
-    return (await widget._cctvModel.isFavoriteOn())
+    return (await widget._cctvModel.isFavoriteOn(context))
         ? Icon(
             Icons.star,
             color: Constants.App.FAVORITE_ON_COLOR,
@@ -68,7 +68,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
   }
 
   void _handleClickFavorite(BuildContext context) async {
-    if (await widget._cctvModel.isFavoriteOn()) {
+    if (await widget._cctvModel.isFavoriteOn(context)) {
       List<DialogButtonModel> dialogButtonList = [
         DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
         DialogButtonModel(text: "ใช่", value: DialogResult.yes)
@@ -79,7 +79,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
         dialogButtonList,
       );
       if (result == DialogResult.yes) {
-        widget._cctvModel.toggleFavorite().then((_) {
+        widget._cctvModel.toggleFavorite(context).then((_) {
           setState(() {
             Fluttertoast.showToast(
               msg: "ลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
@@ -94,7 +94,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
         });
       }
     } else {
-      widget._cctvModel.toggleFavorite().then((_) {
+      widget._cctvModel.toggleFavorite(context).then((_) {
         setState(() {
           Fluttertoast.showToast(
               msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",

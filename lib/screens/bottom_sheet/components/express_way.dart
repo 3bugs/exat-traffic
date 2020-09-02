@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,12 +43,21 @@ class ExpressWayImageView extends StatelessWidget {
                 borderRadius: BorderRadius.all(
                   Radius.circular(getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
                 ),
-                child: Image(
-                  image: expressWay.image,
-                  width: getPlatformSize(122.0),
-                  height: getPlatformSize(78.0),
-                  fit: BoxFit.cover,
-                ),
+                child: expressWay.imageUrl != null && expressWay.imageUrl.trim().startsWith("http")
+                    ? SizedBox(
+                        width: getPlatformSize(122.0),
+                        height: getPlatformSize(78.0),
+                        child: MyCachedImage(
+                          imageUrl: expressWay.imageUrl.trim(),
+                          progressIndicatorSize: ProgressIndicatorSize.small,
+                        ),
+                      )
+                    : Image(
+                        image: expressWay.image,
+                        width: getPlatformSize(122.0),
+                        height: getPlatformSize(78.0),
+                        fit: BoxFit.cover,
+                      ),
               ),
               Container(
                 padding: EdgeInsets.only(
