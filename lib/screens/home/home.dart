@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/search/search_place_presenter.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
@@ -229,7 +230,7 @@ class MyHomeState extends State<Home> {
     painter.text = TextSpan(
       text: label,
       style: getTextStyle(
-        0,
+        LanguageName.thai,
         sizeTh: 50.0,
         sizeEn: 50.0,
         isBold: true,

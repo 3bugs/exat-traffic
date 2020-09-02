@@ -1,8 +1,6 @@
 import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
@@ -22,7 +20,7 @@ class TrafficPointView extends StatelessWidget {
   final bool isLastItem;
   final Function onClick;
 
-  final Random _rnd = Random();
+  //final Random _rnd = Random();
 
   Color _getTrafficStatus() {
     List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
@@ -99,20 +97,8 @@ class TrafficPointView extends StatelessWidget {
                             child: Container(
                               child: Consumer<LanguageModel>(
                                 builder: (context, language, child) {
-                                  String name;
-                                  switch (language.lang) {
-                                    case 0:
-                                      name = trafficPoint.cctvMarkerModel.name;
-                                      break;
-                                    case 1:
-                                      name = 'Expressway';
-                                      break;
-                                    case 2:
-                                      name = '高速公路';
-                                      break;
-                                  }
                                   return Text(
-                                    name,
+                                    trafficPoint.cctvMarkerModel.name,
                                     style: getTextStyle(language.lang),
                                   );
                                 },
@@ -167,7 +153,7 @@ class TrafficPointView extends StatelessWidget {
             width: getPlatformSize(100.0),
             height: getPlatformSize(65.0),
             child: false/*trafficPoint.cctvMarkerModel.godImageUrl != null*/
-                ? MyCachedImage(
+                ? MyCachedImage(// ignore: dead_code
                     imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
                     progressIndicatorSize: ProgressIndicatorSize.small,
                   )

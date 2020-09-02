@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -104,7 +105,7 @@ class _FAQPageState extends State<FAQPage> {
                       child: Text(
                         "${_presenter.faqModel.data[index].name}",
                         style: getTextStyle(
-                          0,
+                          LanguageName.thai,
                           color: open[index] ? Color(0xFF1C1C1C) : Constants.Font.DEFAULT_COLOR,
                           sizeTh: open[index]
                               ? Constants.Font.BIGGER_SIZE_TH
@@ -150,7 +151,7 @@ class _FAQPageState extends State<FAQPage> {
                         ),
                         child: Text(
                           "${_presenter.faqModel.data[index].detail}",
-                          style: getTextStyle(0),
+                          style: getTextStyle(LanguageName.thai),
                         ),
                       ),
                     ],

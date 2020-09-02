@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/language_model.dart';
 
 class DialogButton extends StatelessWidget {
   DialogButton({
@@ -32,7 +33,7 @@ class DialogButton extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         style: getTextStyle(
-          0,
+          LanguageName.thai,
           sizeTh: Constants.Font.BIGGER_SIZE_TH,
           sizeEn: Constants.Font.BIGGER_SIZE_EN,
           color: Colors.white,

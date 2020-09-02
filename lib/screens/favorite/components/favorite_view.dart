@@ -63,20 +63,8 @@ class FavoriteView extends StatelessWidget {
               children: <Widget>[
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = favorite.name;
-                        break;
-                      case 1:
-                        name = 'Expressway';
-                        break;
-                      case 2:
-                        name = '高速公路';
-                        break;
-                    }
                     return Text(
-                      name,
+                      favorite.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
@@ -90,20 +78,8 @@ class FavoriteView extends StatelessWidget {
                 ),
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String description;
-                    switch (language.lang) {
-                      case 0:
-                        description = favorite.description;
-                        break;
-                      case 1:
-                        description = 'Expressway';
-                        break;
-                      case 2:
-                        description = '高速公路';
-                        break;
-                    }
                     return Text(
-                      description,
+                      favorite.description,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: getTextStyle(

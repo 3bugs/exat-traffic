@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class About extends StatefulWidget {
   @override
@@ -26,7 +27,7 @@ class _AboutState extends State<About> {
           ),
         ),
         child: Center(
-          child: Text("ABOUT US", style: getTextStyle(0)),
+          child: Text("ABOUT US", style: getTextStyle(LanguageName.thai)),
         ),
       ),
     );

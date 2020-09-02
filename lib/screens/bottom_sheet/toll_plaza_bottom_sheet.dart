@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
@@ -8,6 +8,13 @@ import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/components/bottom_sheet_scaffold.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/bottom_sheet/components/toll_plaza_lane_item.dart';
+import 'package:exattraffic/models/locale_text.dart';
+
+LocaleText baht = LocaleText(
+  thai: 'บาท',
+  english: 'Baht',
+  chinese: '铢',
+);
 
 class TollPlazaBottomSheet extends StatefulWidget {
   TollPlazaBottomSheet({
@@ -50,7 +57,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
     });
   }
 
-  Widget _getCarItem(int language, int widthFlex, String label, String iconPath, double iconWidth,
+  Widget _getCarItem(LanguageName language, int widthFlex, String label, String iconPath, double iconWidth,
       double iconHeight, double iconMarginTop) {
     return Expanded(
       flex: widthFlex,
@@ -84,7 +91,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
     );
   }
 
-  Widget _getFeeItem(int language, int widthFlex, int fee) {
+  Widget _getFeeItem(LanguageName language, int widthFlex, int fee) {
     return Expanded(
       flex: widthFlex,
       child: Column(
@@ -116,7 +123,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                 ),
               ),*/
               style: getTextStyle(
-                1,
+                LanguageName.english,
                 color: TEXT_COLOR,
                 sizeTh: 50.0,
                 sizeEn: 35.0,
@@ -131,7 +138,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
               bottom: getPlatformSize(8.0),
             ),
             child: Text(
-              'บาท',
+              baht.ofLanguage(language),
               style: getTextStyle(
                 language,
                 color: TEXT_COLOR,

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -75,20 +74,8 @@ class _ToolItemState extends State<ToolItem> {
                 ),
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = widget._text;
-                        break;
-                      case 1:
-                        name = 'Expressway';
-                        break;
-                      case 2:
-                        name = '高速公路';
-                        break;
-                    }
                     return Text(
-                      name,
+                      widget._text,
                       style: getTextStyle(
                         language.lang,
                         color: widget._checked ? Colors.white : Color(0xFFB8B8B8),

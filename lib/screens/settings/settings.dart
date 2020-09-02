@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/screens/settings/settings_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -13,20 +15,6 @@ class Settings extends StatefulWidget {
 }
 
 enum SettingName { language, notification, nightMode }
-enum LanguageName {
-  thai,
-  english,
-  chinese,
-  japanese,
-  korean,
-  lao,
-  myanmar,
-  vietnamese,
-  khmer,
-  malay,
-  indonesian,
-  filipino
-}
 
 class _SettingsState extends State<Settings> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
@@ -48,16 +36,18 @@ class _SettingsState extends State<Settings> {
   ];
 
   SettingsPresenter _presenter;
-  LanguageName _languageValue = LanguageName.thai;
+  //LanguageName _languageValue = LanguageName.thai;
   bool _notificationValue = false;
   bool _nightModeValue = false;
 
   void _handleClickLanguage(LanguageName lang) {
-    if (lang == _languageValue) return;
+    LanguageModel languageModel = Provider.of<LanguageModel>(context, listen: false);
+
+    /*if (lang == _languageValue) return;
 
     setState(() {
       _languageValue = lang;
-    });
+    });*/
 
     Future.delayed(Duration(milliseconds: 250), () async {
       DialogResult result = await showMyDialog(
@@ -108,49 +98,53 @@ class _SettingsState extends State<Settings> {
                 SettingRow(
                   text: "ภาษา",
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _languageOptionList
-                            .where((item) => (_languageOptionList.indexOf(item) <
+                Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _languageOptionList
+                                .where((item) => (_languageOptionList.indexOf(item) <
                                 _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
-                            .map<Widget>(
-                              (item) => OptionButton(
+                                .map<Widget>(
+                                  (item) => OptionButton(
                                 text: item.text,
                                 value: item.value,
-                                groupValue: _languageValue,
+                                groupValue: language.lang,
                                 isThaiText: item.isThaiText,
                                 onClick: () => _handleClickLanguage(item.value),
                               ),
                             )
-                            .toList(),
-                      ),
-                    ),
-                    SizedBox(
-                      width: getPlatformSize(0.0),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _languageOptionList
-                            .where((item) => (_languageOptionList.indexOf(item) >=
+                                .toList(),
+                          ),
+                        ),
+                        SizedBox(
+                          width: getPlatformSize(0.0),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _languageOptionList
+                                .where((item) => (_languageOptionList.indexOf(item) >=
                                 _languageOptionList.length ~/ 2 + (_languageOptionList.length % 2)))
-                            .map<Widget>(
-                              (item) => OptionButton(
+                                .map<Widget>(
+                                  (item) => OptionButton(
                                 text: item.text,
                                 value: item.value,
-                                groupValue: _languageValue,
+                                groupValue: language.lang,
                                 isThaiText: item.isThaiText,
                                 onClick: () => _handleClickLanguage(item.value),
                               ),
                             )
-                            .toList(),
-                      ),
-                    )
-                  ],
+                                .toList(),
+                          ),
+                        )
+                      ],
+                    );
+                  },
                 ),
                 SizedBox(
                   height: getPlatformSize(8.0),

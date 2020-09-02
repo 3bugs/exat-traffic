@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class NoData extends StatelessWidget {
   @override
@@ -9,7 +10,7 @@ class NoData extends StatelessWidget {
       child: Center(
         child: Text(
           "ไม่มีข้อมูล",
-          style: getTextStyle(0),
+          style: getTextStyle(LanguageName.thai),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class DataLoading extends StatelessWidget {
   final String text;
@@ -26,7 +27,7 @@ class DataLoading extends StatelessWidget {
                     child: Text(
                       this.text,
                       style: getTextStyle(
-                        0,
+                        LanguageName.thai,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,
                         //color: Constants.Font.DIM_COLOR,

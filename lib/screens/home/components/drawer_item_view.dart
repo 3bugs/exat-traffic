@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:flutter/rendering.dart';
-import 'package:http/http.dart';
+//import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/drawer_item_model.dart';
@@ -59,20 +59,8 @@ class DrawerItemView extends StatelessWidget {
                 Expanded(
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
-                      String name;
-                      switch (language.lang) {
-                        case 0:
-                          name = drawerItemModel.text;
-                          break;
-                        case 1:
-                          name = 'About Us';
-                          break;
-                        case 2:
-                          name = '关于我们';
-                          break;
-                      }
                       return Text(
-                        name,
+                        drawerItemModel.text,
                         style: getTextStyle(
                           language.lang,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,

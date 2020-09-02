@@ -5,7 +5,7 @@ import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
 
-import 'package:exattraffic/screens/consent/consent_page.dart';
+//import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
 import 'package:exattraffic/screens/questionnaire/questionnaire_page.dart';
@@ -13,6 +13,7 @@ import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:exattraffic/app/app_bloc.dart';
 import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class MyDrawer extends StatelessWidget {
   // ignore: non_constant_identifier_names
@@ -207,7 +208,7 @@ class MyDrawer extends StatelessWidget {
                               'EXAT Traffic',
                               //'Promlert Lovichit',
                               style: getTextStyle(
-                                1,
+                                LanguageName.english,
                                 sizeEn: Constants.Font.BIGGEST_SIZE_EN,
                                 color: Colors.white,
                               ),
@@ -283,7 +284,7 @@ class MyDrawer extends StatelessWidget {
                 Text(
                   "v${AppBloc.version}",
                   style: getTextStyle(
-                    0,
+                    LanguageName.thai,
                     sizeTh: Constants.Font.SMALLER_SIZE_TH,
                     sizeEn: Constants.Font.SMALLER_SIZE_EN,
                     color: Colors.white.withOpacity(0.7),
@@ -294,7 +295,7 @@ class MyDrawer extends StatelessWidget {
                 Text(
                   "Expressway Authority of Thailand",
                   style: getTextStyle(
-                    1,
+                    LanguageName.english,
                     sizeTh: Constants.Font.SMALLER_SIZE_TH,
                     sizeEn: Constants.Font.SMALLER_SIZE_EN,
                     color: Colors.white.withOpacity(0.7),

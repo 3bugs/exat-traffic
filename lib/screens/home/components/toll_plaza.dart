@@ -111,21 +111,8 @@ class TollPlazaView extends StatelessWidget {
                           ),
                           child: Consumer<LanguageModel>(
                             builder: (context, language, child) {
-                              String name;
-                              switch (language.lang) {
-                                case 0:
-                                  name = tollPlaza.name;
-                                  break;
-                                case 1:
-                                  name = 'Expressway';
-                                  break;
-                                case 2:
-                                  name = '高速公路';
-                                  break;
-                              }
-
                               return Text(
-                                name,
+                                tollPlaza.name,
                                 style: getTextStyle(language.lang),
                               );
                             },

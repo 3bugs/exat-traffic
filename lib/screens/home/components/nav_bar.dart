@@ -1,30 +1,31 @@
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:provider/provider.dart';
 
-List<String> homeLabelList = [
-  'หน้าหลัก',
-  'Home',
-  '家园',
-];
-List<String> favoriteLabelList = [
-  'รายการโปรด',
-  'Favorite',
-  '喜爱',
-];
-List<String> incidentLabelList = [
-  'เหตุการณ์',
-  'Incident',
-  '事件',
-];
-List<String> notificationLabelList = [
-  'การแจ้งเตือน',
-  'Notification',
-  '通知',
-];
+LocaleText homeLabel = LocaleText(
+  thai: 'หน้าหลัก',
+  english: 'Home',
+  chinese: '家园',
+);
+LocaleText favoriteLabel = LocaleText(
+  thai: 'รายการโปรด',
+  english: 'Favorite',
+  chinese: '喜爱',
+);
+LocaleText incidentLabel = LocaleText(
+  thai: 'เหตุการณ์',
+  english: 'Incident',
+  chinese: '事件',
+);
+LocaleText notificationLabel = LocaleText(
+  thai: 'การแจ้งเตือน',
+  english: 'Notification',
+  chinese: '通知',
+);
 
 class MyNavBar extends StatefulWidget {
   MyNavBar({
@@ -56,7 +57,7 @@ class _MyNavBarState extends State<MyNavBar> {
     @required AssetImage icon,
     @required double iconWidth,
     @required double iconHeight,
-    @required List<String> labelList,
+    @required LocaleText label,
   }) {
     return BottomNavigationBarItem(
       icon: Image(
@@ -68,8 +69,8 @@ class _MyNavBarState extends State<MyNavBar> {
         padding: EdgeInsets.only(top: getPlatformSize(5.0)),
         child: Consumer<LanguageModel>(builder: (context, language, child) {
           return Text(
-            labelList[language.lang],
-            style: language.lang == 0
+            label.ofLanguage(language.lang),
+            style: language.lang == LanguageName.thai
                 ? TextStyle(
                     fontFamily: 'DBHeavent',
                     fontSize: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
@@ -115,7 +116,7 @@ class _MyNavBarState extends State<MyNavBar> {
                         : AssetImage('assets/images/nav_bar/ic_nav_home_off.png'),
                     iconWidth: getIconSizeByState(widget.currentTabIndex == 0, getPlatformSize(25.5)),
                     iconHeight: getIconSizeByState(widget.currentTabIndex == 0, getPlatformSize(21.0)),
-                    labelList: homeLabelList,
+                    label: homeLabel,
                   ),
                   _getNavBarItem(
                     icon: widget.currentTabIndex == 1
@@ -123,7 +124,7 @@ class _MyNavBarState extends State<MyNavBar> {
                         : AssetImage('assets/images/nav_bar/ic_nav_favorite_off.png'),
                     iconWidth: getIconSizeByState(widget.currentTabIndex == 1, getPlatformSize(22.0)),
                     iconHeight: getIconSizeByState(widget.currentTabIndex == 1, getPlatformSize(21.0)),
-                    labelList: favoriteLabelList,
+                    label: favoriteLabel,
                   ),
                   BottomNavigationBarItem(
                     icon: Opacity(
@@ -138,7 +139,7 @@ class _MyNavBarState extends State<MyNavBar> {
                         : AssetImage('assets/images/nav_bar/ic_nav_incident_off.png'),
                     iconWidth: getIconSizeByState(widget.currentTabIndex == 3, getPlatformSize(17.0)),
                     iconHeight: getIconSizeByState(widget.currentTabIndex == 3, getPlatformSize(21.0)),
-                    labelList: incidentLabelList,
+                    label: incidentLabel,
                   ),
                   _getNavBarItem(
                     icon: widget.currentTabIndex == 4
@@ -146,7 +147,7 @@ class _MyNavBarState extends State<MyNavBar> {
                         : AssetImage('assets/images/nav_bar/ic_nav_notification_off.png'),
                     iconWidth: getIconSizeByState(widget.currentTabIndex == 4, getPlatformSize(21.0)),
                     iconHeight: getIconSizeByState(widget.currentTabIndex == 4, getPlatformSize(21.0)),
-                    labelList: notificationLabelList,
+                    label: notificationLabel,
                   ),
                 ],
               ),

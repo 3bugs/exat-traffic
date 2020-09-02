@@ -6,13 +6,13 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
 
 class Header extends StatefulWidget {
-  final List<String> titleList; // list of title สำหรับแต่ละภาษา
+  final String title; // list of title สำหรับแต่ละภาษา
   final bool showDate;
   final HeaderIcon leftIcon;
   final HeaderIcon rightIcon;
 
   Header({
-    @required this.titleList,
+    @required this.title,
     this.showDate = false,
     @required this.leftIcon,
     @required this.rightIcon,
@@ -115,7 +115,7 @@ class _HeaderState extends State<Header> {
                 child: Consumer<LanguageModel>(
                   builder: (context, language, child) {
                     return Text(
-                      widget.titleList[language.lang],
+                      widget.title,
                       style: getHeadlineTextStyle(context, lang: language.lang),
                       overflow: TextOverflow.ellipsis,
                     );
@@ -132,7 +132,7 @@ class _HeaderState extends State<Header> {
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
                       return Text(
-                        dateList[language.lang],
+                        dateList[1],
                         style: getTextStyle(
                           language.lang,
                           color: Colors.white,

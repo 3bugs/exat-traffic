@@ -12,8 +12,15 @@ import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/storage/place_favorite_prefs.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
+
+LocaleText baht = LocaleText(
+  thai: 'บาท',
+  english: 'Baht',
+  chinese: '铢',
+);
 
 class RouteBottomSheet extends StatefulWidget {
   RouteBottomSheet({
@@ -58,7 +65,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     });
   }
 
-  Widget _getCarItem(int language, int widthFlex, String label, String iconPath, double iconWidth,
+  Widget _getCarItem(LanguageName language, int widthFlex, String label, String iconPath, double iconWidth,
       double iconHeight, double iconMarginTop) {
     return Expanded(
       flex: widthFlex,
@@ -92,7 +99,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     );
   }
 
-  Widget _getFeeItem(int language, int widthFlex, int fee) {
+  Widget _getFeeItem(LanguageName language, int widthFlex, int fee) {
     return Expanded(
       flex: widthFlex,
       child: Column(
@@ -129,7 +136,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
             child: Text(
               fee.toString(),
               style: getTextStyle(
-                1,
+                LanguageName.english,
                 color: Colors.white,
                 sizeTh: 50.0,
                 sizeEn: 35.0,
@@ -144,7 +151,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
               bottom: getPlatformSize(8.0),
             ),
             child: Text(
-              'บาท',
+              baht.ofLanguage(language),
               style: getTextStyle(
                 language,
                 color: Colors.white,

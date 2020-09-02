@@ -1,4 +1,3 @@
-import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +5,7 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/components/my_cached_image.dart';
 
 class ExpressWayImageView extends StatelessWidget {
   ExpressWayImageView({
@@ -65,21 +65,8 @@ class ExpressWayImageView extends StatelessWidget {
                 ),
                 child: Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = expressWay.name;
-                        break;
-                      case 1:
-                        name = 'Expressway';
-                        break;
-                      case 2:
-                        name = '高速公路';
-                        break;
-                    }
-
                     return Text(
-                      name,
+                      expressWay.name,
                       style: getTextStyle(
                         language.lang,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,

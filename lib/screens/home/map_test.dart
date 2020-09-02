@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -97,7 +98,7 @@ class _MapTestMainState extends State<MapTestMain> {
         title: Text(
           'สำหรับทดสอบ Visualization',
           style: getTextStyle(
-            0,
+            LanguageName.thai,
             sizeTh: 30.0,
             color: Colors.white,
           ),

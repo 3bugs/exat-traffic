@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:store_redirect/store_redirect.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/etc/utils.dart';
-import 'package:store_redirect/store_redirect.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/error_view.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 import 'about_presenter.dart';
 
@@ -133,7 +134,7 @@ class _AboutPageState extends State<AboutPage> {
                                 ),
                                 child: Text(
                                   paragraph,
-                                  style: getTextStyle(0),
+                                  style: getTextStyle(LanguageName.thai),
                                 ),
                               ),
                             SizedBox(

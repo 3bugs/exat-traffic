@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
@@ -141,7 +142,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           Text(
             formatDateTime(_presenter.incidentDetailModel.data.createdAt),
             style: getTextStyle(
-              0,
+              LanguageName.thai,
               sizeTh: Constants.Font.SMALLER_SIZE_TH,
               sizeEn: Constants.Font.SMALLER_SIZE_EN,
               color: Constants.Font.DIM_COLOR,
@@ -153,7 +154,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
           Text(
             _presenter.incidentDetailModel.data.title,
             style: getTextStyle(
-              0,
+              LanguageName.thai,
               sizeTh: Constants.Font.BIGGER_SIZE_TH,
               sizeEn: Constants.Font.BIGGER_SIZE_EN,
               isBold: true,
@@ -169,7 +170,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
               ),
               child: Text(
                 paragraph,
-                style: getTextStyle(0),
+                style: getTextStyle(LanguageName.thai),
               ),
             )
         ],

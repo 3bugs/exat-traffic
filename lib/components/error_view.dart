@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/components/my_button.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/language_model.dart';
 
 class ErrorView extends StatelessWidget {
   final String title;
@@ -34,7 +35,7 @@ class ErrorView extends StatelessWidget {
                   this.title,
                   textAlign: TextAlign.center,
                   style: getTextStyle(
-                    0,
+                    LanguageName.thai,
                     isBold: true,
                     sizeTh: Constants.Font.BIGGER_SIZE_TH,
                     sizeEn: Constants.Font.BIGGER_SIZE_EN,
@@ -48,7 +49,7 @@ class ErrorView extends StatelessWidget {
               ? Text(
                   this.text,
                   textAlign: TextAlign.center,
-                  style: getTextStyle(0),
+                  style: getTextStyle(LanguageName.thai),
                 )
               : SizedBox.shrink(),
           SizedBox(

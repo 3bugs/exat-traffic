@@ -57,20 +57,8 @@ class EmergencyView extends StatelessWidget {
               children: <Widget>[
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = emergencyNumber.name;
-                        break;
-                      case 1:
-                        name = 'Expressway';
-                        break;
-                      case 2:
-                        name = '高速公路';
-                        break;
-                    }
                     return Text(
-                      name,
+                      emergencyNumber.name,
                       style: getTextStyle(
                         language.lang,
                         color: isSos ? Constants.App.SOS_COLOR : Constants.App.ACCENT_COLOR,

@@ -17,16 +17,17 @@ import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/components/lazy_indexed_stack.dart';
 import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/models/error_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
 import 'components/traffic_point_item.dart';
 
-List<String> expressWayHeaderList = [
-  'ทางพิเศษ',
-  'Expressway',
-  '高速公路',
-];
+LocaleText headerText = LocaleText(
+  thai: 'ทางพิเศษ',
+  english: 'Expressway',
+  chinese: '高速公路',
+);
 
 class HomeBottomSheet extends StatefulWidget {
   static final List<TrafficPointDataModel> trafficPointDataList = List();
@@ -208,24 +209,10 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                     child: Center(
                       child: Consumer<LanguageModel>(
                         builder: (context, language, child) {
-                          String name;
-                          if (_selectedExpressWay != null) {
-                            switch (language.lang) {
-                              case 0:
-                                name = _selectedExpressWay.name;
-                                break;
-                              case 1:
-                                name = 'Expressway';
-                                break;
-                              case 2:
-                                name = '高速公路';
-                                break;
-                            }
-                          }
                           return Text(
                             _selectedExpressWay == null
-                                ? expressWayHeaderList[language.lang]
-                                : name,
+                                ? headerText.ofLanguage(language.lang)
+                                : _selectedExpressWay.name,
                             style: getTextStyle(language.lang, isBold: true),
                           );
                         },

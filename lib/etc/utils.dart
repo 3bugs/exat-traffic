@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -53,7 +54,7 @@ Future<Position> getCurrentLocationNotNull() async {
 const double DEFAULT_LINE_HEIGHT = -1;
 
 TextStyle getTextStyle(
-  int lang, {
+  LanguageName lang, {
   double sizeTh = Constants.Font.DEFAULT_SIZE_TH,
   double sizeEn = Constants.Font.DEFAULT_SIZE_EN,
   Color color = Constants.Font.DEFAULT_COLOR,
@@ -61,11 +62,11 @@ TextStyle getTextStyle(
   double heightTh = DEFAULT_LINE_HEIGHT,
   double heightEn = DEFAULT_LINE_HEIGHT,
 }) {
-  String fontFamily = lang == 0 ? (isBold ? 'DBHeavent-Med' : 'DBHeavent') : null;
+  String fontFamily = lang == LanguageName.thai ? (isBold ? 'DBHeavent-Med' : 'DBHeavent') : null;
   FontWeight fontWeight =
-      lang == 0 ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
-  double fontSize = lang == 0 ? getPlatformSize(sizeTh) : getPlatformSize(sizeEn);
-  double height = lang == 0 ? heightTh : heightEn;
+      lang == LanguageName.thai ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
+  double fontSize = lang == LanguageName.thai ? getPlatformSize(sizeTh) : getPlatformSize(sizeEn);
+  double height = lang == LanguageName.thai ? heightTh : heightEn;
 
   return height == DEFAULT_LINE_HEIGHT
       ? TextStyle(
@@ -83,7 +84,7 @@ TextStyle getTextStyle(
         );
 }
 
-TextStyle getHeadlineTextStyle(BuildContext context, {int lang = 0}) {
+TextStyle getHeadlineTextStyle(BuildContext context, {LanguageName lang = LanguageName.thai}) {
   final bool isBigScreen =
       screenWidth(context) > getPlatformSize(400) && screenHeight(context) > getPlatformSize(700);
 
@@ -169,7 +170,7 @@ Future<DialogResult> showMyDialog(
           Text(
             message,
             style: getTextStyle(
-              0,
+              LanguageName.thai,
               sizeTh: getPlatformSize(Constants.Font.BIGGER_SIZE_TH),
               sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
             ),
@@ -202,7 +203,7 @@ Future<DialogResult> showMyDialog(
                 child: Text(
                   dialogButton.text,
                   style: getTextStyle(
-                    0,
+                    LanguageName.thai,
                     sizeTh: Constants.Font.BIGGER_SIZE_TH,
                     sizeEn: Constants.Font.BIGGER_SIZE_EN,
                     color: Constants.App.PRIMARY_COLOR,

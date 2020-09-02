@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -48,7 +49,7 @@ class _ConsentPageState extends State<ConsentPage> {
         child: Text(
           _presenter.consentModel.data[0].title,
           style: getTextStyle(
-            0,
+            LanguageName.thai,
             sizeEn: Constants.Font.BIGGER_SIZE_EN,
             sizeTh: Constants.Font.BIGGER_SIZE_TH,
           ),
@@ -71,7 +72,7 @@ class _ConsentPageState extends State<ConsentPage> {
         child: SingleChildScrollView(
           child: Text(
             _presenter.consentModel.data[0].content,
-            style: getTextStyle(0),
+            style: getTextStyle(LanguageName.thai),
           ),
         ),
       ),
@@ -95,7 +96,7 @@ class _ConsentPageState extends State<ConsentPage> {
               ),
               Text(
                 "ยอมรับเงื่อนไข",
-                style: getTextStyle(0),
+                style: getTextStyle(LanguageName.thai),
               ),
             ],
           ),
@@ -116,7 +117,7 @@ class _ConsentPageState extends State<ConsentPage> {
                       child: Text(
                         "OK",
                         style: getTextStyle(
-                          0,
+                          LanguageName.thai,
                           color: Colors.white,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,
                           sizeEn: Constants.Font.BIGGER_SIZE_EN,

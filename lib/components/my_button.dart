@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:exattraffic/models/language_model.dart';
 
 class MyButton extends StatelessWidget {
   final String text;
@@ -29,7 +30,7 @@ class MyButton extends StatelessWidget {
       child: Text(
         this.text,
         style: getTextStyle(
-          0,
+          LanguageName.thai,
           color: Colors.white,
           sizeTh: Constants.Font.BIGGER_SIZE_TH,
           sizeEn: Constants.Font.BIGGER_SIZE_EN,

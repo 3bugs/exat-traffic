@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 //import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -65,7 +66,7 @@ class TollPlazaLaneItemView extends StatelessWidget {
             Text(
               "ช่อง",
               style: getTextStyle(
-                0,
+                LanguageName.thai,
                 color: Colors.white,
                 isBold: true,
                 /*sizeTh: Constants.Font.BIGGER_SIZE_TH,
@@ -92,7 +93,7 @@ class TollPlazaLaneItemView extends StatelessWidget {
               laneText,
               textAlign: TextAlign.center,
               style: getTextStyle(
-                0,
+                LanguageName.thai,
                 color: Colors.white,
                 isBold: true,
                 /*sizeTh: Constants.Font.SMALLER_SIZE_TH,
@@ -103,7 +104,7 @@ class TollPlazaLaneItemView extends StatelessWidget {
               laneTextEn,
               textAlign: TextAlign.center,
               style: getTextStyle(
-                1,
+                LanguageName.english,
                 color: Colors.white,
                 isBold: true,
                 //sizeTh: Constants.Font.SMALLER_SIZE_TH,

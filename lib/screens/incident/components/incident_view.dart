@@ -75,20 +75,8 @@ class IncidentView extends StatelessWidget {
               children: <Widget>[
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String name;
-                    switch (language.lang) {
-                      case 0:
-                        name = incident.name;
-                        break;
-                      case 1:
-                        name = 'Lorem ipsum dolor sit amet';
-                        break;
-                      case 2:
-                        name = '高速公路 高速公路';
-                        break;
-                    }
                     return Text(
-                      name,
+                      incident.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
@@ -102,22 +90,8 @@ class IncidentView extends StatelessWidget {
                 ),
                 Consumer<LanguageModel>(
                   builder: (context, language, child) {
-                    String description;
-                    switch (language.lang) {
-                      case 0:
-                        description = incident.description;
-                        break;
-                      case 1:
-                        description =
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-                        break;
-                      case 2:
-                        description =
-                            '高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路 高速公路';
-                        break;
-                    }
                     return Text(
-                      description,
+                      incident.description,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: getTextStyle(
@@ -132,7 +106,7 @@ class IncidentView extends StatelessWidget {
                 ),
                 Consumer<LanguageModel>(builder: (context, language, child) {
                   return SizedBox(
-                    height: getPlatformSize(language.lang == 0 ? 3.0 : 6.0),
+                    height: getPlatformSize(language.lang == LanguageName.thai ? 3.0 : 6.0),
                   );
                 }),
                 Row(
@@ -155,7 +129,7 @@ class IncidentView extends StatelessWidget {
                         return Text(
                           incident.date,
                           style: getTextStyle(
-                            1, // ใช้ system default font เสมอ
+                            LanguageName.english, // ใช้ system default font เสมอ
                             color: Color(0xFFC0C0C0),
                             sizeEn: Constants.Font.LIST_DATE_SIZE,
                           ),
