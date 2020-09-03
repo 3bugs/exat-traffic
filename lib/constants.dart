@@ -75,11 +75,11 @@ class Font {
 
 class Api {
   //static const String SERVER = "http://163.47.9.26";
-  static const String SERVER = "http://202.94.76.77";
+  static String SERVER = "http://202.94.76.78";
 }
 
 class SchematicMapsScreen {
-  static const String SCHEMATIC_MAPS_URL = "${Api.SERVER}/demo/schematic_map_full.html?backend=0";
+  static String SCHEMATIC_MAPS_URL = "${Api.SERVER}/demo/schematic_map_full.html?backend=0";
 }
 
 class Message {

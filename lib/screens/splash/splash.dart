@@ -17,6 +17,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/storage/util_prefs.dart';
 import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/widget/widget.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 //use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
 
@@ -36,7 +37,10 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _animation;
   String _splashImageUrl;
-  bool _isError = false;
+
+  //bool _isError = false;
+  ErrorView _errorView;
+  String _loadingMessage;
 
   @override
   void initState() {
@@ -76,17 +80,38 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
 
   void _checkNetwork() async {
     setState(() {
-      _isError = false;
+      _errorView = null;
+      _loadingMessage = "Checking network availability";
     });
 
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       setState(() {
-        _isError = true;
+        _errorView = ErrorView(
+          title: "ไม่มีการเชื่อมต่อเครือข่าย!",
+          text:
+          "${AppBloc.appName} ไม่สามารถทำงานได้ หากไม่มีการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่",
+          buttonText: "ลองใหม่",
+          onClick: () => _checkNetwork(),
+        );
       });
     } else {
-      _checkUserConsent();
+      _fetchServerIp();
     }
+  }
+
+  void _fetchServerIp() async {
+    setState(() {
+      _errorView = null;
+      _loadingMessage = "Fetching server's IP address";
+    });
+
+    try {
+      Constants.Api.SERVER = await MyApi.fetchServerIp();
+    } catch (_) {
+      Constants.Api.SERVER = "http://202.94.76.78";
+    }
+    _checkUserConsent();
   }
 
   void _checkUserConsent() async {
@@ -111,6 +136,11 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   }
 
   void _fetchSplashData(BuildContext context) async {
+    setState(() {
+      _errorView = null;
+      _loadingMessage = "Fetching splash data";
+    });
+
     GeolocationStatus geolocationStatus = await Geolocator().checkGeolocationPermissionStatus();
     if (geolocationStatus == GeolocationStatus.granted) {
       try {
@@ -138,8 +168,16 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     }
 
     //Future.delayed(Duration.zero, () {
-    context.bloc<AppBloc>().add(FetchMarker(context: context));
+    _loadMapsData();
     //});
+  }
+
+  void _loadMapsData() {
+    setState(() {
+      _errorView = null;
+      _loadingMessage = "Fetching EXAT maps data";
+    });
+    context.bloc<AppBloc>().add(FetchMarker(context: context));
   }
 
   @override
@@ -160,7 +198,16 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
             ),
           );
         } else if (state is FetchMarkerFailure) {
-          alert(context, "Error", state.message);
+          setState(() {
+            _errorView = ErrorView(
+              title: "ขออภัย",
+              text:
+              "${AppBloc.appName} ไม่สามารถอ่านข้อมูลจาก Server ได้ [${state.message}]",
+              buttonText: "ลองใหม่",
+              onClick: () => _loadMapsData(),
+            );
+          });
+          //alert(context, "Error", state.message);
         }
       },
       child: Scaffold(
@@ -206,7 +253,10 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                 ),
                 _splashImageUrl != null
                     ? Container(
-                        padding: EdgeInsets.all(getPlatformSize(24.0)),
+                        padding: EdgeInsets.symmetric(
+                          vertical: getPlatformSize(32.0),
+                          horizontal: getPlatformSize(20.0),
+                        ),
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
@@ -214,13 +264,13 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                               fit: BoxFit.contain,
                             ),
                           ),
-                          child: Center(
+                          /*child: Center(
                             child: CircularProgressIndicator(),
-                          ),
+                          ),*/
                         ),
                       )
                     : SizedBox.shrink(),
-                _isError
+                _errorView != null
                     ? Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: getPlatformSize(Constants.LoginScreen.HORIZONTAL_MARGIN),
@@ -230,17 +280,49 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            ErrorView(
-                              title: "ไม่มีการเชื่อมต่อเครือข่าย!",
-                              text:
-                                  "${AppBloc.appName} ไม่สามารถทำงานได้ หากไม่มีการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่",
-                              buttonText: "ลองใหม่",
-                              onClick: () => _checkNetwork(),
-                            ),
+                            _errorView
                           ],
                         ),
                       )
                     : SizedBox.shrink(),
+                Visibility(
+                  visible:
+                      _loadingMessage != null && _loadingMessage.isNotEmpty && _errorView == null,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: getPlatformSize(8.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            width: getPlatformSize(16.0),
+                            height: getPlatformSize(16.0),
+                            child: CircularProgressIndicator(
+                              strokeWidth: getPlatformSize(3),
+                              backgroundColor: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
+                          SizedBox(
+                            width: getPlatformSize(8.0),
+                          ),
+                          Text(
+                            _loadingMessage ?? "", //'Loading...',
+                            style: getTextStyle(
+                              LanguageName.english,
+                              sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                              sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                              color: Colors.white.withOpacity(0.5),
+                              //isBold: true,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

@@ -30,33 +30,6 @@ import 'package:provider/provider.dart';
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
 
-Future<ResponseResult> getServerIp() async {
-  final response = await http.get("");
-
-  print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-  print("API: $url");
-  print("API Response Status Code: ${response.statusCode}");
-  print("API Response Body: ${response.body}");
-  print("-------------------------------------------------------");
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> responseBodyJson = json.decode(response.body);
-    ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
-
-    if (error.code == 0) {
-      List dataList = responseBodyJson['data_list'];
-      return ResponseResult(success: true, data: dataList);
-    } else {
-      print(error.message);
-      return ResponseResult(success: false, data: error.message);
-    }
-  } else {
-    String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server";
-    print(msg);
-    return ResponseResult(success: false, data: msg);
-  }
-}
-
 Future<Position> _getCurrentLocationForApi() async {
   Position position = await Geolocator().getLastKnownPosition(
     desiredAccuracy: LocationAccuracy.high,
@@ -77,11 +50,23 @@ class ResponseResult {
 }
 
 class MyApi {
-  static const String MY_API_BASED_URL = "${Constants.Api.SERVER}/api";
-  static const String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
-  static const String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
-  static const String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
-  static const String FIND_BEST_ROUTE_URL = "$MY_API_BASED_URL/best_route";
+  static String MY_API_BASED_URL = "${Constants.Api.SERVER}/api";
+  static String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
+  static String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
+  static String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
+  static String FIND_BEST_ROUTE_URL = "$MY_API_BASED_URL/best_route";
+
+  static Future<String> fetchServerIp() async {
+    ResponseResult responseResult = await _makeRequest("http://163.47.9.26/server_ip");
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      String ip = dataList[0]['ip'];
+      print('Server IP: $ip');
+      return ip;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
 
   static Future<List<TrafficPointDataModel>> fetchTrafficData() async {
     ResponseResult responseResult = await _makeRequest(FETCH_TRAFFIC_DATA_URL);
@@ -232,7 +217,7 @@ class RouteModel {
 }
 
 class ExatApi {
-  static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8089';
+  static String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8089';
 
   static List<ExpressWayModel> _expressWayList;
 

@@ -10,14 +10,17 @@ abstract class AppState extends Equatable {
 class FetchMarkerInitial extends AppState {}
 
 class FetchMarkerFailure extends AppState {
+  DateTime dateTime;
   final String message;
 
   FetchMarkerFailure({
     @required this.message,
-  });
+  }) {
+    dateTime = DateTime.now();
+  }
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [message, dateTime];
 }
 
 class FetchMarkerSuccess extends AppState {
