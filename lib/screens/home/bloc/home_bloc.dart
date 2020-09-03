@@ -3,12 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bloc/bloc.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final BuildContext _context;
@@ -18,7 +20,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   //Map<int, bool> categorySelectedMap = Map();
 
-  HomeBloc(this._context, {
+  HomeBloc(
+    this._context, {
     @required this.markerList,
     @required this.categoryList,
   }) : super(Initial(
@@ -92,7 +95,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     if (event is ClickMapTool &&
         event.mapTool == MapTool.none &&
         currentState.selectedMapTool != MapTool.none) {
-
       yield MapToolChange(
         selectedMapTool: MapTool.none,
         markerList: List<MarkerModel>(),

@@ -1,9 +1,10 @@
 //import 'dart:async';
 //import 'package:cached_network_image/cached_network_image.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -13,8 +14,9 @@ import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/screens/login/login.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
+
 //import 'package:exattraffic/app/app_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class CctvDetails extends StatelessWidget {
   CctvDetails(this._cctvModel);
@@ -26,6 +28,17 @@ class CctvDetails extends StatelessWidget {
     return wrapSystemUiOverlayStyle(child: CctvDetailsMain(_cctvModel));
   }
 }
+
+LocaleText videoStreamingText = LocaleText(
+  thai: 'ภาพเคลื่อนไหว',
+  english: 'Video Streaming',
+  chinese: '视频流',
+);
+LocaleText photoText = LocaleText(
+  thai: 'ภาพนิ่ง',
+  english: 'Photo',
+  chinese: '照片',
+);
 
 class CctvDetailsMain extends StatefulWidget {
   CctvDetailsMain(this._cctvModel);
@@ -97,13 +110,13 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       widget._cctvModel.toggleFavorite(context).then((_) {
         setState(() {
           Fluttertoast.showToast(
-              msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Color(0xFFDEDEDE),
-              textColor: Colors.black,
-              fontSize: 14.0,
+            msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Color(0xFFDEDEDE),
+            textColor: Colors.black,
+            fontSize: 14.0,
           );
         });
       });
@@ -348,38 +361,42 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                   padding: EdgeInsets.symmetric(
                     horizontal: getPlatformSize(Constants.CctvPlayerScreen.HORIZONTAL_MARGIN),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      _isValidUrl(streamUrl)
-                          ? ToolItem(
-                              'ภาพเคลื่อนไหว',
-                              AssetImage('assets/images/cctv_details/ic_video.png'),
-                              getPlatformSize(30.79),
-                              getPlatformSize(25.51),
-                              this._checkedToolItemIndex == 0,
-                              () => this._handleClickTool(context, 0),
-                            )
-                          : SizedBox.shrink(),
-                      _isValidUrl(imageUrl)
-                          ? ToolItem(
-                              'ภาพถ่าย',
-                              AssetImage('assets/images/cctv_details/ic_picture.png'),
-                              getPlatformSize(23.67),
-                              getPlatformSize(20.06),
-                              this._checkedToolItemIndex == 1,
-                              () => this._handleClickTool(context, 1),
-                            )
-                          : SizedBox.shrink(),
-                      /*ToolItem(
-                        'เส้นทาง',
-                        AssetImage('assets/images/cctv_details/ic_route.png'),
-                        getPlatformSize(27.06),
-                        getPlatformSize(35.21),
-                        this._checkedToolItemIndex == 2,
-                        () => this._handleClickTool(context, 2),
-                      ),*/
-                    ],
+                  child: Consumer<LanguageModel>(
+                    builder: (context, language, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          _isValidUrl(streamUrl)
+                              ? ToolItem(
+                                  videoStreamingText.ofLanguage(language.lang),
+                                  AssetImage('assets/images/cctv_details/ic_video.png'),
+                                  getPlatformSize(30.79),
+                                  getPlatformSize(25.51),
+                                  this._checkedToolItemIndex == 0,
+                                  () => this._handleClickTool(context, 0),
+                                )
+                              : SizedBox.shrink(),
+                          _isValidUrl(imageUrl)
+                              ? ToolItem(
+                                  photoText.ofLanguage(language.lang),
+                                  AssetImage('assets/images/cctv_details/ic_picture.png'),
+                                  getPlatformSize(23.67),
+                                  getPlatformSize(20.06),
+                                  this._checkedToolItemIndex == 1,
+                                  () => this._handleClickTool(context, 1),
+                                )
+                              : SizedBox.shrink(),
+                          /*ToolItem(
+                          'เส้นทาง',
+                          AssetImage('assets/images/cctv_details/ic_route.png'),
+                          getPlatformSize(27.06),
+                          getPlatformSize(35.21),
+                          this._checkedToolItemIndex == 2,
+                          () => this._handleClickTool(context, 2),
+                        ),*/
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],

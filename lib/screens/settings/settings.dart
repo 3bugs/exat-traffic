@@ -1,3 +1,4 @@
+import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -41,6 +42,7 @@ class _SettingsState extends State<Settings> {
   //LanguageName _languageValue = LanguageName.thai;
   bool _notificationValue = false;
   bool _nightModeValue = false;
+  LanguageName _selectedLang;
 
   void _handleClickLanguage(LanguageName lang) {
     /*if (lang == _languageValue) return;
@@ -51,18 +53,41 @@ class _SettingsState extends State<Settings> {
 
     LanguageModel languageModel = Provider.of<LanguageModel>(context, listen: false);
     if (languageModel.lang == lang) return;
+
     languageModel.lang = lang;
+    _selectedLang = lang;
+    _confirmRestart();
+  }
+
+  void _confirmRestart() {
+    LocaleText confirmRestartText = LocaleText(
+      thai:
+      '${Constants.App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่',
+      english: 'Restart required. Do you want to restart ${Constants.App.NAME} now?',
+      chinese: '需要重新启动。 您要立即重新启动${Constants.App.NAME}吗？',
+    );
+    LocaleText restartText = LocaleText(
+      thai: 'เริ่มใหม่เดี๋ยวนี้',
+      english: 'RESTART NOW',
+      chinese: '现在重启',
+    );
+    LocaleText noText = LocaleText(
+      thai: 'ไม่ใช่',
+      english: 'NO',
+      chinese: '没有',
+    );
 
     Future.delayed(Duration(milliseconds: 250), () async {
       DialogResult result = await showMyDialog(
         context,
-        "${Constants.App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่",
+        confirmRestartText.ofLanguage(_selectedLang),
         [
-          DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
-          DialogButtonModel(text: "เริ่มใหม่เดี๋ยวนี้", value: DialogResult.yes),
+          DialogButtonModel(text: noText.ofLanguage(_selectedLang), value: DialogResult.no),
+          DialogButtonModel(text: restartText.ofLanguage(_selectedLang), value: DialogResult.yes),
         ],
       );
       if (result == DialogResult.yes) {
+        ExatApi.clearCache();
         Phoenix.rebirth(context);
       }
     });
@@ -85,6 +110,10 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  LocaleText languageText = LocaleText(thai: 'ภาษา', english: 'Language', chinese: '语言');
+  LocaleText notificationText =
+      LocaleText(thai: 'การแจ้งเตือน', english: 'Notification', chinese: '通知');
+
   Widget _content() {
     return Container(
       color: Constants.App.BACKGROUND_COLOR,
@@ -96,15 +125,15 @@ class _SettingsState extends State<Settings> {
               horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
               vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                SettingRow(
-                  text: "ภาษา",
-                ),
-                Consumer<LanguageModel>(
-                  builder: (context, language, child) {
-                    return Row(
+            child: Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    SettingRow(
+                      text: languageText.ofLanguage(language.lang),
+                    ),
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Expanded(
@@ -149,23 +178,24 @@ class _SettingsState extends State<Settings> {
                           ),
                         )
                       ],
-                    );
-                  },
-                ),
-                SizedBox(
-                  height: getPlatformSize(8.0),
-                ),
-                SettingRow(
-                  text: "การแจ้งเตือน",
-                  value: _notificationValue,
-                  onChange: (bool value) => _handleSettingChange(SettingName.notification, value),
-                ),
-                /*SettingRow(
-                  text: "โหมดกลางคืน (สำหรับ Schematic Map)",
-                  value: _nightModeValue,
-                  onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
-                ),*/
-              ],
+                    ),
+                    SizedBox(
+                      height: getPlatformSize(8.0),
+                    ),
+                    SettingRow(
+                      text: notificationText.ofLanguage(language.lang),
+                      value: _notificationValue,
+                      onChange: (bool value) =>
+                          _handleSettingChange(SettingName.notification, value),
+                    ),
+                    /*SettingRow(
+                    text: "โหมดกลางคืน (สำหรับ Schematic Map)",
+                    value: _nightModeValue,
+                    onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
+                  ),*/
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -184,6 +214,13 @@ class _SettingsState extends State<Settings> {
     return YourScaffold(
       title: _title,
       child: _content(),
+      onClickBack: () {
+        if (_selectedLang != null) {
+          _confirmRestart();
+        } else {
+          Navigator.pop(context);
+        }
+      },
     );
   }
 }

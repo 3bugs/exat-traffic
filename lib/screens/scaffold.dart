@@ -127,6 +127,18 @@ List<ScreenProps> screenPropsList = [
   ),
 ];
 
+LocaleText searchServiceText = LocaleText(
+  thai: 'ค้นหาบริการ',
+  english: 'Search Service',
+  chinese: '搜索服务',
+);
+
+LocaleText searchPlaceText = LocaleText(
+  thai: 'ค้นหาเส้นทาง',
+  english: 'Search Place',
+  chinese: '搜索地点',
+);
+
 class MyScaffoldMain extends StatefulWidget {
   MyScaffoldMain();
 
@@ -270,13 +282,31 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       return Future.value(false);
     }
 
+    LanguageName lang = Provider.of<LanguageModel>(context, listen: false).lang;
+
+    LocaleText confirmText = LocaleText(
+      thai: 'ต้องการออกจาก ${AppBloc.appName}?',
+      english: 'Are you sure you want to exit?',
+      chinese: '你确定要离开？',
+    );
+    LocaleText yesText = LocaleText(
+      thai: 'ใช่',
+      english: 'YES',
+      chinese: '是',
+    );
+    LocaleText noText = LocaleText(
+      thai: 'ไม่ใช่',
+      english: 'NO',
+      chinese: '没有',
+    );
+
     List<DialogButtonModel> dialogButtonList = [
-      DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
-      DialogButtonModel(text: "ใช่", value: DialogResult.yes)
+      DialogButtonModel(text: noText.ofLanguage(lang), value: DialogResult.no),
+      DialogButtonModel(text: yesText.ofLanguage(lang), value: DialogResult.yes)
     ];
     return await showMyDialog(
           context,
-          "ต้องการออกจาก ${AppBloc.appName}?",
+          confirmText.ofLanguage(lang),
           dialogButtonList,
         ) ==
         DialogResult.yes;
@@ -482,7 +512,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                                   child: Consumer<LanguageModel>(
                                                     builder: (context, language, child) {
                                                       return Text(
-                                                        'ค้นหาบริการ',
+                                                        searchServiceText.ofLanguage(language.lang),
                                                         style: getTextStyle(
                                                           language.lang,
                                                           color: Color(0xFF454F63),
@@ -546,7 +576,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                                   child: Consumer<LanguageModel>(
                                                     builder: (context, language, child) {
                                                       return Text(
-                                                        'ค้นหาเส้นทาง',
+                                                        searchPlaceText.ofLanguage(language.lang),
                                                         style: getTextStyle(
                                                           language.lang,
                                                           color: Color(0xFF454F63),

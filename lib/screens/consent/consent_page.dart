@@ -107,7 +107,7 @@ class _ConsentPageState extends State<ConsentPage> {
             onClick: () {
               if (checkValue) {
                 print("send");
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               } else {
                 Alert(
                   context: context,

@@ -22,7 +22,7 @@ class SearchPlace extends StatefulWidget {
 }
 
 class _SearchPlaceState extends State<SearchPlace> {
-  LocaleText _title = LocaleText(thai: "ค้นหาเส้นทาง", english: "Search", chinese: "搜索");
+  LocaleText _title = LocaleText(thai: "ค้นหาเส้นทาง", english: "Search Place", chinese: "搜索地点");
 
   final GlobalKey<YourScaffoldState> _keyScaffold = GlobalKey();
   SearchPlacePresenter _presenter;

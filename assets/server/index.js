@@ -150,6 +150,20 @@ app.get('/api/route_traffic', (req, res) => {
   });
 });
 
+app.get('/server_ip', (req, res) => {
+  res.json({
+    error: {
+      code: CODE_SUCCESS,
+      message: 'ok',
+    },
+    data_list: [
+      {
+        ip: 'http://202.94.76.77', // ไม่ต้องมี / ปิดท้าย
+      }
+    ],
+  });
+});
+
 app.get('/api/:item/:id?', (req, res) => {
     const db = mysql.createConnection({
       host: 'localhost',

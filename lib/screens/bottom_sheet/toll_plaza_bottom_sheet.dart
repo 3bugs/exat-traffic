@@ -10,10 +10,35 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/bottom_sheet/components/toll_plaza_lane_item.dart';
 import 'package:exattraffic/models/locale_text.dart';
 
-LocaleText baht = LocaleText(
+LocaleText bahtText = LocaleText(
   thai: 'บาท',
   english: 'Baht',
   chinese: '铢',
+);
+LocaleText fourWheelsText = LocaleText(
+  thai: '4 ล้อ',
+  english: '4 Wheels',
+  chinese: '4轮',
+);
+LocaleText sixToTenWheelsText = LocaleText(
+  thai: '6-10 ล้อ',
+  english: '6-10 Wheels',
+  chinese: '6-10个轮子',
+);
+LocaleText overTenWheelsText = LocaleText(
+  thai: 'เกิน 10 ล้อ',
+  english: 'Over 10 Wheels',
+  chinese: '超过10个轮子',
+);
+LocaleText laneText = LocaleText(
+  thai: 'ช่อง',
+  english: 'lane',
+  chinese: '车道',
+);
+LocaleText distanceBasedTollsText = LocaleText(
+  thai: 'ค่าผ่านทางตามระยะทาง',
+  english: 'Distance-based tolls',
+  chinese: '基于距离的通行费',
 );
 
 class TollPlazaBottomSheet extends StatefulWidget {
@@ -138,7 +163,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
               bottom: getPlatformSize(8.0),
             ),
             child: Text(
-              baht.ofLanguage(language),
+              bahtText.ofLanguage(language),
               style: getTextStyle(
                 language,
                 color: TEXT_COLOR,
@@ -279,7 +304,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                   _getCarItem(
                                     language.lang,
                                     8,
-                                    '4 ล้อ',
+                                    fourWheelsText.ofLanguage(language.lang),
                                     'assets/images/route/ic_car_small.png',
                                     46.0,
                                     25.8,
@@ -288,7 +313,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                   _getCarItem(
                                     language.lang,
                                     10,
-                                    '6-10 ล้อ',
+                                    sixToTenWheelsText.ofLanguage(language.lang),
                                     'assets/images/route/ic_car_medium-new.png',
                                     84.65,
                                     38.66,
@@ -297,7 +322,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                   _getCarItem(
                                     language.lang,
                                     11,
-                                    'เกิน 10 ล้อ',
+                                    overTenWheelsText.ofLanguage(language.lang),
                                     'assets/images/route/ic_car_large-new.png',
                                     118.25,
                                     42.01,
@@ -318,7 +343,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            "ค่าผ่านทางตามระยะทาง",
+                                            distanceBasedTollsText.ofLanguage(language.lang),
                                             style: getTextStyle(
                                               language.lang,
                                               color: TEXT_COLOR,

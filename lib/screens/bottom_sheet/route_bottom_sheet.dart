@@ -16,10 +16,30 @@ import 'package:exattraffic/models/locale_text.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 
-LocaleText baht = LocaleText(
+LocaleText bahtText = LocaleText(
   thai: 'บาท',
   english: 'Baht',
   chinese: '铢',
+);
+LocaleText fourWheelsText = LocaleText(
+  thai: '4 ล้อ',
+  english: '4 Wheels',
+  chinese: '4轮',
+);
+LocaleText sixToTenWheelsText = LocaleText(
+  thai: '6-10 ล้อ',
+  english: '6-10 Wheels',
+  chinese: '6-10个轮子',
+);
+LocaleText overTenWheelsText = LocaleText(
+  thai: 'เกิน 10 ล้อ',
+  english: 'Over 10 Wheels',
+  chinese: '超过10个轮子',
+);
+LocaleText totalTollsText = LocaleText(
+  thai: 'ค่าผ่านทางรวม',
+  english: 'Total tolls',
+  chinese: '工具总数',
 );
 
 class RouteBottomSheet extends StatefulWidget {
@@ -119,7 +139,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
               bottom: getPlatformSize(8.0),
             ),
             child: Text(
-              'ค่าผ่านทางรวม',
+              totalTollsText.ofLanguage(language),
               style: getTextStyle(
                 language,
                 color: Colors.white,
@@ -151,7 +171,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
               bottom: getPlatformSize(8.0),
             ),
             child: Text(
-              baht.ofLanguage(language),
+              bahtText.ofLanguage(language),
               style: getTextStyle(
                 language,
                 color: Colors.white,
@@ -440,7 +460,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                         _getCarItem(
                           language.lang,
                           8,
-                          '4 ล้อ',
+                          fourWheelsText.ofLanguage(language.lang),
                           'assets/images/route/ic_car_small.png',
                           46.0,
                           25.8,
@@ -449,7 +469,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                         _getCarItem(
                           language.lang,
                           10,
-                          '6-10 ล้อ',
+                          sixToTenWheelsText.ofLanguage(language.lang),
                           'assets/images/route/ic_car_medium-new.png',
                           84.65,
                           38.66,
@@ -458,7 +478,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                         _getCarItem(
                           language.lang,
                           11,
-                          'เกิน 10 ล้อ',
+                          overTenWheelsText.ofLanguage(language.lang),
                           'assets/images/route/ic_car_large-new.png',
                           118.25,
                           42.01,

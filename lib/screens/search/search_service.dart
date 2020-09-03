@@ -32,7 +32,7 @@ class SearchService extends StatefulWidget {
 }
 
 class _SearchServiceState extends State<SearchService> {
-  LocaleText _title = LocaleText(thai: "ค้นหาบริการ", english: "Search", chinese: "搜索");
+  LocaleText _title = LocaleText(thai: "ค้นหาบริการ", english: "Search Service", chinese: "搜索服务");
 
   //final GlobalKey _keyMainContainer = GlobalKey();
   //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()

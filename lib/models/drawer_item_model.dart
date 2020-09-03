@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'locale_text.dart';
+
 class DrawerItemModel {
   DrawerItemModel({
     @required this.text,
@@ -7,7 +9,7 @@ class DrawerItemModel {
     @required this.onClick,
   });
 
-  final String text;
+  final LocaleText text;
   final AssetImage icon;
   final Function onClick;
 }

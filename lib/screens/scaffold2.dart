@@ -18,6 +18,7 @@ class YourScaffold extends StatefulWidget {
   final bool searchBoxAutoFocus;
   final String searchBoxHint;
   final Function onSearchTextChanged;
+  final Function onClickBack;
 
   YourScaffold({
     Key key,
@@ -28,6 +29,7 @@ class YourScaffold extends StatefulWidget {
     this.searchBoxAutoFocus = false,
     this.searchBoxHint = "ค้นหา",
     this.onSearchTextChanged,
+    this.onClickBack,
   }) : super(key: key);
 
   @override
@@ -74,106 +76,123 @@ class YourScaffoldState extends State<YourScaffold> {
     FocusScope.of(context).unfocus();
   }
 
+  Future<bool> _handleClickDeviceBackButton() {
+    if (widget.onClickBack != null) {
+      widget.onClickBack();
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+      //Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //assert(widget.title != null && widget.title.length >= 3);
 
     return wrapSystemUiOverlayStyle(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false, // prevent keyboard from pushing layout up
-        appBar: null,
-        bottomNavigationBar: SafeArea(
-          child: SizedBox.shrink(),
-        ),
-        body: DecoratedBox(
-          position: DecorationPosition.background,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: BG_GRADIENT_COLORS,
-              stops: BG_GRADIENT_STOPS,
-            ),
+      child: WillPopScope(
+        onWillPop: _handleClickDeviceBackButton,
+        child: Scaffold(
+          resizeToAvoidBottomInset: false, // prevent keyboard from pushing layout up
+          appBar: null,
+          bottomNavigationBar: SafeArea(
+            child: SizedBox.shrink(),
           ),
-          child: SafeArea(
-            child: Column(
-              children: <Widget>[
-                // หัวด้านบน (พื้นหลังไล่เฉดสีฟ้า)
-                Consumer<LanguageModel>(
-                  builder: (context, language, child) {
-                    return Header(
-                      title: widget.title.ofLanguage(language.lang),
-                      showDate: false,
-                      leftIcon: HeaderIcon(
-                        image: AssetImage('assets/images/home/ic_back_white.png'),
-                        onClick: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      rightIcon: null,
-                    );
-                  },
-                ),
-
-                Expanded(
-                  child: Stack(
-                    key: _keyMainContainer,
-                    children: <Widget>[
-                      // main container wrapper
-                      Container(
-                        margin: EdgeInsets.only(
-                          top: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        // main container
-
-                        child: widget.builder != null
-                            ? widget.builder(
-                                context,
-                                _mainContainerHeight -
-                                    getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION),
-                              )
-                            : widget.child,
-                        //child: widget.child,
-                        /*child: InheritedDataProvider(
-                          containerHeight: _mainContainerHeight,
-                          child: widget.child,
-                        ),*/
-                      ),
-
-                      // ช่อง search
-                      Visibility(
-                        visible: widget.showSearch,
-                        child: SearchBox(
-                          onClickCloseButton: () {
-                            widget.onSearchTextChanged("");
-                            _textEditingController.clear();
-                            FocusScope.of(context).unfocus();
+          body: DecoratedBox(
+            position: DecorationPosition.background,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: BG_GRADIENT_COLORS,
+                stops: BG_GRADIENT_STOPS,
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: <Widget>[
+                  // หัวด้านบน (พื้นหลังไล่เฉดสีฟ้า)
+                  Consumer<LanguageModel>(
+                    builder: (context, language, child) {
+                      return Header(
+                        title: widget.title.ofLanguage(language.lang),
+                        showDate: false,
+                        leftIcon: HeaderIcon(
+                          image: AssetImage('assets/images/home/ic_back_white.png'),
+                          onClick: () {
+                            if (widget.onClickBack != null) {
+                              widget.onClickBack();
+                            } else {
+                              Navigator.pop(context);
+                            }
                           },
-                          child: Consumer<LanguageModel>(
-                            builder: (context, language, child) {
-                              return TextField(
-                                autofocus: widget.searchBoxAutoFocus,
-                                controller: _textEditingController,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.only(
-                                    top: getPlatformSize(4.0),
-                                    bottom: getPlatformSize(4.0),
-                                  ),
-                                  border: InputBorder.none,
-                                  hintText: widget.searchBoxHint, //_searchHintList[language.lang],
-                                ),
-                                style: getTextStyle(language.lang),
-                              );
+                        ),
+                        rightIcon: null,
+                      );
+                    },
+                  ),
+
+                  Expanded(
+                    child: Stack(
+                      key: _keyMainContainer,
+                      children: <Widget>[
+                        // main container wrapper
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                          ),
+                          // main container
+
+                          child: widget.builder != null
+                              ? widget.builder(
+                                  context,
+                                  _mainContainerHeight -
+                                      getPlatformSize(Constants.HomeScreen.MAPS_VERTICAL_POSITION),
+                                )
+                              : widget.child,
+                          //child: widget.child,
+                          /*child: InheritedDataProvider(
+                            containerHeight: _mainContainerHeight,
+                            child: widget.child,
+                          ),*/
+                        ),
+
+                        // ช่อง search
+                        Visibility(
+                          visible: widget.showSearch,
+                          child: SearchBox(
+                            onClickCloseButton: () {
+                              widget.onSearchTextChanged("");
+                              _textEditingController.clear();
+                              FocusScope.of(context).unfocus();
                             },
+                            child: Consumer<LanguageModel>(
+                              builder: (context, language, child) {
+                                return TextField(
+                                  autofocus: widget.searchBoxAutoFocus,
+                                  controller: _textEditingController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.only(
+                                      top: getPlatformSize(4.0),
+                                      bottom: getPlatformSize(4.0),
+                                    ),
+                                    border: InputBorder.none,
+                                    hintText: widget.searchBoxHint, //_searchHintList[language.lang],
+                                  ),
+                                  style: getTextStyle(language.lang),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

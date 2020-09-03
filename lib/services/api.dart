@@ -1,3 +1,4 @@
+import 'package:exattraffic/models/language_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,7 +12,7 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/error_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
-import 'package:exattraffic/etc/utils.dart';
+//import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
 import 'package:exattraffic/models/add_answers_model.dart';
@@ -24,9 +25,37 @@ import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:exattraffic/models/notification_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/models/emergency_number_model.dart';
+import 'package:provider/provider.dart';
 
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
+
+Future<ResponseResult> getServerIp() async {
+  final response = await http.get("");
+
+  print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  print("API: $url");
+  print("API Response Status Code: ${response.statusCode}");
+  print("API Response Body: ${response.body}");
+  print("-------------------------------------------------------");
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> responseBodyJson = json.decode(response.body);
+    ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
+
+    if (error.code == 0) {
+      List dataList = responseBodyJson['data_list'];
+      return ResponseResult(success: true, data: dataList);
+    } else {
+      print(error.message);
+      return ResponseResult(success: false, data: error.message);
+    }
+  } else {
+    String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server";
+    print(msg);
+    return ResponseResult(success: false, data: msg);
+  }
+}
 
 Future<Position> _getCurrentLocationForApi() async {
   Position position = await Geolocator().getLastKnownPosition(
@@ -205,6 +234,12 @@ class RouteModel {
 class ExatApi {
   static const String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8089';
 
+  static List<ExpressWayModel> _expressWayList;
+
+  static void clearCache() {
+    _expressWayList = null;
+  }
+
   static Future<List> fetchSplash(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/posts/detailByName";
 
@@ -225,8 +260,6 @@ class ExatApi {
       throw Exception(responseResult.data);
     }
   }
-
-  static List<ExpressWayModel> _expressWayList;
 
   static Future<List<ExpressWayModel>> fetchExpressWays(
     BuildContext context,
@@ -483,6 +516,7 @@ class ExatApi {
       {
         "name": "terms",
       },
+      sendLocation: false,
     );
     if (responseResult.success) {
       ConsentModel _model = ConsentModel.fromJson(responseResult.decode);
@@ -536,7 +570,7 @@ class ExatApi {
       "deviceType": Platform.isAndroid ? "android" : "ios",
       "screenWidth": MediaQuery.of(context).size.width,
       "screenHeight": MediaQuery.of(context).size.height,
-      "lang": "TH",
+      "lang": Provider.of<LanguageModel>(context, listen: false).langCode,
       "lat": currentLocation != null ? currentLocation.latitude : null,
       "lng": currentLocation != null ? currentLocation.longitude : null,
       "altitude": currentLocation != null ? currentLocation.altitude : null,

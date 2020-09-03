@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
+import 'package:provider/provider.dart';
 
 Widget wrapSystemUiOverlayStyle({@required Widget child}) {
   return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -146,6 +147,8 @@ Future<DialogResult> showMyDialog(
   List<DialogButtonModel> dialogButtonList, {
   String title = Constants.App.NAME,
 }) async {
+  LanguageName lang = Provider.of<LanguageModel>(context, listen: false).lang;
+
   return showDialog(
     context: context,
     builder: (context) => new AlertDialog(
@@ -170,7 +173,7 @@ Future<DialogResult> showMyDialog(
           Text(
             message,
             style: getTextStyle(
-              LanguageName.thai,
+              lang,
               sizeTh: getPlatformSize(Constants.Font.BIGGER_SIZE_TH),
               sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
             ),
@@ -203,7 +206,7 @@ Future<DialogResult> showMyDialog(
                 child: Text(
                   dialogButton.text,
                   style: getTextStyle(
-                    LanguageName.thai,
+                    lang,
                     sizeTh: Constants.Font.BIGGER_SIZE_TH,
                     sizeEn: Constants.Font.BIGGER_SIZE_EN,
                     color: Constants.App.PRIMARY_COLOR,

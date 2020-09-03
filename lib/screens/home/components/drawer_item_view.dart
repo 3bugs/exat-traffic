@@ -60,7 +60,7 @@ class DrawerItemView extends StatelessWidget {
                   child: Consumer<LanguageModel>(
                     builder: (context, language, child) {
                       return Text(
-                        drawerItemModel.text,
+                        drawerItemModel.text.ofLanguage(language.lang),
                         style: getTextStyle(
                           language.lang,
                           sizeTh: Constants.Font.BIGGER_SIZE_TH,

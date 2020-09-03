@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:connectivity/connectivity.dart';
@@ -15,6 +15,8 @@ import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/storage/util_prefs.dart';
+import 'package:exattraffic/screens/consent/consent_page.dart';
+import 'package:exattraffic/screens/widget/widget.dart';
 
 //use Navigator.pushReplacement(BuildContext context, Route<T> newRoute) to open a new route which replace the current route of the navigator
 
@@ -83,7 +85,28 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
         _isError = true;
       });
     } else {
+      _checkUserConsent();
+    }
+  }
+
+  void _checkUserConsent() async {
+    UtilPrefs utilPrefs = UtilPrefs();
+    if (await utilPrefs.userConsent()) {
       _fetchSplashData(context);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConsentPage(),
+        ),
+      ).then((consent) {
+        if (consent == true) {
+          utilPrefs.setUserConsentAlready();
+          _fetchSplashData(context);
+        } else {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+      });
     }
   }
 
