@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -10,6 +11,8 @@ import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/notification_model.dart';
 import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/screens/notification/notification_details.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class MyNotification extends StatefulWidget {
   @override
@@ -57,12 +60,16 @@ class _MyNotificationState extends State<MyNotification> {
       color: Constants.App.BACKGROUND_COLOR,
       child: _presenter.error != null
           ? Center(
-              child: ErrorView(
-                title: "ขออภัย",
-                text: _presenter.error.message,
-                buttonText: "ลองใหม่",
-                withBackground: true,
-                onClick: _presenter.getNotificationList,
+              child: Consumer<LanguageModel>(
+                builder: (context, language, child) {
+                  return ErrorView(
+                    title: LocaleText.error().ofLanguage(language.lang),
+                    text: _presenter.error.message,
+                    buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                    withBackground: true,
+                    onClick: _presenter.getNotificationList(),
+                  );
+                },
               ),
             )
           : _presenter.notificationList == null

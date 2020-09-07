@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/components/error_view.dart';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 import 'help_presenter.dart';
 
@@ -89,12 +91,16 @@ class _HelpPageState extends State<HelpPage> {
       title: _title,
       child: _presenter.error != null
           ? Center(
-              child: ErrorView(
-                title: "ขออภัย",
-                text: _presenter.error.message,
-                buttonText: "ลองใหม่",
-                withBackground: true,
-                onClick: _presenter.getHelp,
+              child: Consumer<LanguageModel>(
+                builder: (context, language, child) {
+                  return ErrorView(
+                    title: LocaleText.error().ofLanguage(language.lang),
+                    text: _presenter.error.message,
+                    buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                    withBackground: true,
+                    onClick: _presenter.getHelp(),
+                  );
+                },
               ),
             )
           : _presenter.helpModel == null

@@ -551,4 +551,86 @@ class LocaleText {
       indonesian: 'Tol berbasis jarak',
     );
   }
+
+  factory LocaleText.noData() {
+    return LocaleText(
+      thai: 'ไม่มีข้อมูล',
+      english: 'No data',
+      chinese: '没有数据',
+      japanese: 'データなし',
+      korean: '데이터 없음',
+      lao: 'ບໍ່​ມີ​ຂໍ້​ມູນ',
+      vietnamese: 'không có dữ liệu',
+      myanmar: 'ဒေတာမရှိ',
+      khmer: 'គ្មាន​ទិន្នន័យ',
+      malay: 'tiada data',
+      indonesian: 'tidak ada data',
+    );
+  }
+
+  factory LocaleText.error() {
+    return LocaleText(
+      thai: 'ผิดพลาด',
+      english: 'Error',
+      chinese: '错误',
+      japanese: 'エラー',
+      korean: '오류',
+      lao: 'ຄວາມຜິດພາດ',
+      vietnamese: 'lỗi',
+      myanmar: 'အမှား',
+      khmer: 'កំហុស',
+      malay: 'kesilapan',
+      indonesian: 'kesalahan',
+    );
+  }
+
+  factory LocaleText.tryAgain() {
+    return LocaleText(
+      thai: 'ลองอีกครั้ง',
+      english: 'Try again',
+      chinese: '再试一次',
+      japanese: '再試行',
+      korean: '다시 시도하십시오',
+      lao: 'ລອງ​ອີກ​ຄັ້ງ',
+      vietnamese: 'thử lại',
+      myanmar: 'ထပ်ကြိုးစားပါ',
+      khmer: 'ព្យាយាម​ម្តង​ទៀត',
+      malay: 'cuba lagi',
+      indonesian: 'coba lagi',
+    );
+  }
+
+  factory LocaleText.cantFetchDataFromServer() {
+    return LocaleText(
+      thai: 'ไม่สามารถดึงข้อมูลจาก server',
+      english: 'Can\'t fetch data from server.',
+      chinese: '无法从服务器获取数据',
+      japanese: 'サーバーからデータを取得できません',
+      korean: '서버에서 데이터를 가져올 수 없습니다.',
+      lao: 'ບໍ່ສາມາດດຶງຂໍ້ມູນຈາກເຊີບເວີໄດ້',
+      vietnamese: 'không thể tìm nạp dữ liệu từ máy chủ',
+      myanmar: 'ဆာဗာမှဒေတာများကို ရယူ၍ မရပါ',
+      khmer: 'មិនអាចទៅយកទិន្នន័យពីម៉ាស៊ីនមេ',
+      malay: 'tidak dapat mengambil data dari pelayan',
+      indonesian: 'tidak dapat mengambil data dari server',
+    );
+  }
+
+  factory LocaleText.locationNotAvailable() {
+    return LocaleText(
+      thai: "ขออภัย ฟังก์ชันนี้จำเป็นต้องใช้ข้อมูลตำแหน่งปัจจุบันของคุณในการทำงาน แต่ ${Constants.App.NAME} ไม่สามารถตรวจสอบตำแหน่งปัจจุบันได้ " +
+          "อาจเป็นเพราะคุณไม่ได้เปิดการตั้งค่า Location หรือคุณไม่อนุญาตให้ ${Constants.App.NAME} เข้าถึงตำแหน่งปัจจุบันของคุณ\n" +
+          "     กรุณาเปิดการตั้งค่า Location และอนุญาตให้ ${Constants.App.NAME} เข้าถึงตำแหน่งปัจจุบันของคุณ แล้วลองใหม่อีกครั้ง",
+      english: 'Can\'t get your current location.',
+      chinese: '无法获取您的当前位置',
+      japanese: '現在地を取得できません',
+      korean: '현재 위치를 알 수 없습니다',
+      lao: 'ບໍ່ສາມາດຮັບທີ່ຢູ່ປະຈຸບັນຂອງທ່ານ',
+      vietnamese: 'không thể có được vị trí hiện tại của bạn',
+      myanmar: 'သင့်လက်ရှိတည်နေရာကိုမရနိုင်ပါ',
+      khmer: 'មិនអាចទទួលបានទីតាំងបច្ចុប្បន្នរបស់អ្នក',
+      malay: 'tidak dapat mendapatkan lokasi semasa anda',
+      indonesian: 'tidak bisa mendapatkan lokasi Anda saat ini',
+    );
+  }
 }

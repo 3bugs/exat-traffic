@@ -82,9 +82,9 @@ class SchematicMapsScreen {
   static String SCHEMATIC_MAPS_URL = "${Api.SERVER}/demo/schematic_map_full.html?backend=0";
 }
 
-class Message {
+/*class Message {
   static const String LOCATION_NOT_AVAILABLE =
       "ขออภัย ฟังก์ชันนี้จำเป็นต้องใช้ข้อมูลตำแหน่งปัจจุบันของคุณในการทำงาน แต่ ${App.NAME} ไม่สามารถตรวจสอบตำแหน่งปัจจุบันได้ " +
           "อาจเป็นเพราะคุณไม่ได้เปิดการตั้งค่า Location หรือคุณไม่อนุญาตให้ ${App.NAME} เข้าถึงตำแหน่งปัจจุบันของคุณ\n" +
           "     กรุณาเปิดการตั้งค่า Location และอนุญาตให้ ${App.NAME} เข้าถึงตำแหน่งปัจจุบันของคุณ แล้วลองใหม่อีกครั้ง";
-}
+}*/

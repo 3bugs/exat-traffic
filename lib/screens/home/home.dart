@@ -31,9 +31,8 @@ import 'package:exattraffic/screens/search/search_place_presenter.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/storage/place_favorite_prefs.dart';
-
-//import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class Home extends StatefulWidget {
   final Function hideSearchOptions;
@@ -81,9 +80,11 @@ class MyHomeState extends State<Home> {
     } else {
       if (showAlertIfLocationNotAvailable) {
         //alert(context, Constants.App.NAME, Constants.Message.LOCATION_NOT_AVAILABLE);
+        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
         showMyDialog(
           context,
-          Constants.Message.LOCATION_NOT_AVAILABLE,
+          LocaleText.locationNotAvailable().ofLanguage(language.lang),
+          //Constants.Message.LOCATION_NOT_AVAILABLE,
           [DialogButtonModel(text: "OK", value: DialogResult.yes)],
         );
       }
@@ -333,7 +334,7 @@ class MyHomeState extends State<Home> {
         });
         try {
           PlaceDetailsModel placeDetails =
-          await googleMapsServices.getPlaceDetails(favorite.placeId);
+              await googleMapsServices.getPlaceDetails(favorite.placeId);
           /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
           //_presenter.setLoadingMessage("หาเส้นทางที่ใช้เวลาน้อยที่สุด");
@@ -410,7 +411,8 @@ class MyHomeState extends State<Home> {
                           return WidgetBottomSheet(
                             title: "รายการโปรด",
                             dataList: dataList,
-                            onClickItem: (item, index) => _handleClickFavoriteItem(totalList[index]),
+                            onClickItem: (item, index) =>
+                                _handleClickFavoriteItem(totalList[index]),
                             collapsePosition: _mainContainerHeight -
                                 getPlatformSize(Constants.BottomSheet.HEIGHT_WIDGET_FAVORITE) -
                                 (isIncidentOn

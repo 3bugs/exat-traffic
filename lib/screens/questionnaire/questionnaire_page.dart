@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -28,12 +29,16 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
   Widget _content() {
     return _presenter.error != null
         ? Center(
-            child: ErrorView(
-              title: "ขออภัย",
-              text: _presenter.error.message,
-              buttonText: "ลองใหม่",
-              withBackground: true,
-              onClick: _presenter.getQuestionnaire,
+            child: Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return ErrorView(
+                  title: LocaleText.error().ofLanguage(language.lang),
+                  text: _presenter.error.message,
+                  buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                  withBackground: true,
+                  onClick: _presenter.getQuestionnaire,
+                );
+              },
             ),
           )
         : _presenter.questionnaireModel == null

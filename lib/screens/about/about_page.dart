@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:store_redirect/store_redirect.dart';
 
@@ -97,12 +98,16 @@ class _AboutPageState extends State<AboutPage> {
   Widget _body() {
     return _presenter.error != null
         ? Center(
-            child: ErrorView(
-              title: "ขออภัย",
-              text: _presenter.error.message,
-              buttonText: "ลองใหม่",
-              withBackground: true,
-              onClick: _presenter.getAbout,
+            child: Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return ErrorView(
+                  title: LocaleText.error().ofLanguage(language.lang),
+                  text: _presenter.error.message,
+                  buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                  withBackground: true,
+                  onClick: _presenter.getAbout,
+                );
+              },
             ),
           )
         : _presenter.aboutModel == null

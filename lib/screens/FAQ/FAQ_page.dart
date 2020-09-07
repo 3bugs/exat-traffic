@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:exattraffic/screens/scaffold2.dart';
@@ -37,12 +38,16 @@ class _FAQPageState extends State<FAQPage> {
   Widget _content() {
     return _presenter.error != null
         ? Center(
-            child: ErrorView(
-              title: "ขออภัย",
-              text: _presenter.error.message,
-              buttonText: "ลองใหม่",
-              withBackground: true,
-              onClick: _presenter.getFAQ,
+            child: Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return ErrorView(
+                  title: LocaleText.error().ofLanguage(language.lang),
+                  text: _presenter.error.message,
+                  buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                  withBackground: true,
+                  onClick: _presenter.getFAQ(),
+                );
+              },
             ),
           )
         : _presenter.faqModel == null

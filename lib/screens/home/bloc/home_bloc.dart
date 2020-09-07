@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'package:exattraffic/models/locale_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:bloc/bloc.dart';
 import 'package:provider/provider.dart';
 
-import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/screens/home/bloc/bloc.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
@@ -73,9 +73,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
         }
       } else {
+        LanguageModel language = Provider.of<LanguageModel>(_context, listen: false);
         showMyDialog(
           _context,
-          Constants.Message.LOCATION_NOT_AVAILABLE,
+          LocaleText.locationNotAvailable().ofLanguage(language.lang),
+          //Constants.Message.LOCATION_NOT_AVAILABLE,
           [DialogButtonModel(text: "OK", value: DialogResult.yes)],
         );
       }

@@ -2,16 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:exattraffic/constants.dart' as Constants;
+//import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/environment/base_presenter.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class SearchPlacePresenter extends BasePresenter<SearchPlace> {
   static const DELAY_SEARCH_MS = 750;
@@ -122,13 +125,16 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
     loaded();
   }
 
-  static Future<RouteModel> findBestRoute(BuildContext context, PlaceDetailsModel destination) async {
+  static Future<RouteModel> findBestRoute(
+      BuildContext context, PlaceDetailsModel destination) async {
     Position origin = await getCurrentLocationNotNull();
 
     if (origin == null) {
+      LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
       showMyDialog(
         context,
-        Constants.Message.LOCATION_NOT_AVAILABLE,
+        LocaleText.locationNotAvailable().ofLanguage(language.lang),
+        //Constants.Message.LOCATION_NOT_AVAILABLE,
         [DialogButtonModel(text: "OK", value: DialogResult.yes)],
       );
       return Future.value(null);

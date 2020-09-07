@@ -5,11 +5,7 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/locale_text.dart';
 
-LocaleText noDataText = LocaleText(
-  thai: 'ไม่มีข้อมูล',
-  english: 'No data',
-  chinese: '没有数据',
-);
+LocaleText noDataText = LocaleText.noData();
 
 class NoData extends StatelessWidget {
   @override

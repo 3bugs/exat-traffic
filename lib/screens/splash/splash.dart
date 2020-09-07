@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exattraffic/models/locale_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -39,7 +40,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
   String _splashImageUrl;
 
   //bool _isError = false;
-  ErrorView _errorView;
+  Widget _errorView;
   String _loadingMessage;
 
   @override
@@ -200,12 +201,15 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
           );
         } else if (state is FetchMarkerFailure) {
           setState(() {
-            _errorView = ErrorView(
-              title: "ขออภัย",
-              text:
-              "${AppBloc.appName} ไม่สามารถอ่านข้อมูลจาก Server ได้ [${state.message}]",
-              buttonText: "ลองใหม่",
-              onClick: () => _loadMapsData(),
+            _errorView = Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return ErrorView(
+                  title: LocaleText.error().ofLanguage(language.lang),
+                  text: LocaleText.cantFetchDataFromServer().ofLanguage(language.lang) + ' [${state.message}]',
+                  buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                  onClick: () => _loadMapsData(),
+                );
+              },
             );
           });
           //alert(context, "Error", state.message);

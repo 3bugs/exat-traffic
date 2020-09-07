@@ -28,6 +28,7 @@ import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class MyRoute extends StatefulWidget {
   final Function showBestRouteAfterSearch;
@@ -82,9 +83,11 @@ class MyRouteState extends State<MyRoute> {
           });
         });
       } else {
+        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
         showMyDialog(
           context,
-          Constants.Message.LOCATION_NOT_AVAILABLE,
+          LocaleText.locationNotAvailable().ofLanguage(language.lang),
+          //Constants.Message.LOCATION_NOT_AVAILABLE,
           [DialogButtonModel(text: "OK", value: DialogResult.yes)],
         );
       }
