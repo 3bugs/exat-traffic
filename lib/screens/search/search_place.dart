@@ -81,9 +81,11 @@ class _SearchPlaceState extends State<SearchPlace> {
       List<PredictionModel> predictionListFromApi =
           _presenter.predictionList ?? List<PredictionModel>();
 
+      LanguageModel languageModel = Provider.of<LanguageModel>(context, listen: false);
+      String search = LocaleText.search().ofLanguage(languageModel.lang);
       List<PredictionModel> predictionList = [
         PredictionModel(
-          description: "ค้นหา '${_presenter.searchTerm}'",
+          description: "$search '${_presenter.searchTerm}'",
           distanceMeters: 0,
           placeId: SearchPlace.DUMMY_PLACE_ID,
         ),

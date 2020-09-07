@@ -1,4 +1,5 @@
 import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/storage/util_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -83,9 +84,11 @@ class _SettingsState extends State<Settings> {
   void _handleSettingChange(SettingName settingName, bool newValue) {
     switch (settingName) {
       case SettingName.notification:
-        setState(() {
+        /*setState(() {
           _notificationValue = !_notificationValue;
-        });
+        });*/
+        UtilPrefs prefs = Provider.of<UtilPrefs>(context, listen: false);
+        prefs.setNotification(newValue);
         break;
       case SettingName.nightMode:
         setState(() {
@@ -168,11 +171,22 @@ class _SettingsState extends State<Settings> {
                     SizedBox(
                       height: getPlatformSize(8.0),
                     ),
-                    SettingRow(
-                      text: notificationText.ofLanguage(language.lang),
-                      value: _notificationValue,
-                      onChange: (bool value) =>
-                          _handleSettingChange(SettingName.notification, value),
+                    Consumer<UtilPrefs>(
+                      builder: (context, prefs, child) {
+                        return FutureBuilder(
+                          future: prefs.getNotification(),
+                          builder: (context, snapshot) {
+                            return snapshot.hasData
+                                ? SettingRow(
+                                    text: notificationText.ofLanguage(language.lang),
+                                    value: snapshot.data,
+                                    onChange: (bool value) =>
+                                        _handleSettingChange(SettingName.notification, value),
+                                  )
+                                : SizedBox.shrink();
+                          },
+                        );
+                      },
                     ),
                     /*SettingRow(
                     text: "โหมดกลางคืน (สำหรับ Schematic Map)",
