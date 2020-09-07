@@ -15,6 +15,7 @@ import 'search_place_presenter.dart';
 
 class SearchPlace extends StatefulWidget {
   static const String DUMMY_PLACE_ID = "place-id";
+
   const SearchPlace();
 
   @override
@@ -150,12 +151,14 @@ class _SearchPlaceState extends State<SearchPlace> {
 
   @override
   Widget build(BuildContext context) {
+    LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+
     return YourScaffold(
       key: _keyScaffold,
       title: _title,
       showSearch: true,
       searchBoxAutoFocus: true,
-      searchBoxHint: "พิมพ์ชื่อสถานที่",
+      searchBoxHint: LocaleText.enterPlaceName().ofLanguage(language.lang),
       onSearchTextChanged: _handleSearchTextChange,
       builder: (BuildContext context, double containerHeight) {
         return _buildRootContent(containerHeight);

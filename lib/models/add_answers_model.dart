@@ -8,7 +8,7 @@ class AddAnswersModel {
   AddAnswersModel.fromJson(Map<String, dynamic> json) {
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     error = json['error'];
-    statusCode = json['status_code'];
+    statusCode = json['status_code'].toString();
   }
 
   Map<String, dynamic> toJson() {

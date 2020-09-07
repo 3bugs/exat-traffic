@@ -122,7 +122,7 @@ class _EmergencyState extends State<Emergency> {
                     text: _presenter.error.message,
                     buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                     withBackground: true,
-                    onClick: _presenter.getEmergencyNumberList(),
+                    onClick: _presenter.getEmergencyNumberList,
                   );
                 },
               ),

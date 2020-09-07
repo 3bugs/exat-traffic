@@ -633,4 +633,52 @@ class LocaleText {
       indonesian: 'tidak bisa mendapatkan lokasi Anda saat ini',
     );
   }
+
+  factory LocaleText.selectEntrance() {
+    return LocaleText(
+      thai: 'เลือกทางเข้า',
+      english: 'Select entrance',
+      chinese: '选择入口',
+      japanese: '入口を選択',
+      korean: '선택 입구',
+      lao: 'ເລືອກທາງເຂົ້າ',
+      vietnamese: 'chọn lối vào',
+      myanmar: 'ဝင်ပေါက်ကိုရွေးပါ',
+      khmer: 'ជ្រើសរើសច្រកចូល',
+      malay: 'pilih pintu masuk',
+      indonesian: 'pilih pintu masuk',
+    );
+  }
+
+  factory LocaleText.selectExit() {
+    return LocaleText(
+      thai: 'เลือกทางออก',
+      english: 'Select exit',
+      chinese: '选择退出',
+      japanese: '出口を選択',
+      korean: '종료 선택',
+      lao: 'ເລືອກທາງອອກ',
+      vietnamese: 'chọn lối ra',
+      myanmar: 'ထွက်ကိုရွေးချယ်ပါ',
+      khmer: 'ជ្រើសរើសច្រកចេញ',
+      malay: 'pilih jalan keluar',
+      indonesian: 'pilih keluar',
+    );
+  }
+
+  factory LocaleText.enterPlaceName() {
+    return LocaleText(
+      thai: 'พิมพ์ชื่อสถานที่',
+      english: 'Enter place name',
+      chinese: '输入地名',
+      japanese: '地名を入力してください',
+      korean: '지명을 입력',
+      lao: 'ໃສ່ຊື່ສະຖານທີ່',
+      vietnamese: 'nhập tên địa điểm',
+      myanmar: 'နေရာအမည်ထည့်ပါ',
+      khmer: 'បញ្ចូលឈ្មោះកន្លែង',
+      malay: 'masukkan nama tempat',
+      indonesian: 'masukkan nama tempat',
+    );
+  }
 }

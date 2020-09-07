@@ -98,7 +98,7 @@ class _HelpPageState extends State<HelpPage> {
                     text: _presenter.error.message,
                     buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                     withBackground: true,
-                    onClick: _presenter.getHelp(),
+                    onClick: _presenter.getHelp,
                   );
                 },
               ),

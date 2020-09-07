@@ -67,7 +67,7 @@ class _MyNotificationState extends State<MyNotification> {
                     text: _presenter.error.message,
                     buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                     withBackground: true,
-                    onClick: _presenter.getNotificationList(),
+                    onClick: _presenter.getNotificationList,
                   );
                 },
               ),

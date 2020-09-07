@@ -27,7 +27,7 @@ class YourScaffold extends StatefulWidget {
     this.builder,
     this.showSearch = false,
     this.searchBoxAutoFocus = false,
-    this.searchBoxHint = "ค้นหา",
+    this.searchBoxHint,
     this.onSearchTextChanged,
     this.onClickBack,
   }) : super(key: key);
@@ -170,6 +170,11 @@ class YourScaffoldState extends State<YourScaffold> {
                             },
                             child: Consumer<LanguageModel>(
                               builder: (context, language, child) {
+                                String searchBoxHint = widget.searchBoxHint;
+                                if (searchBoxHint == null) {
+                                  searchBoxHint = LocaleText.search().ofLanguage(language.lang);
+                                }
+
                                 return TextField(
                                   autofocus: widget.searchBoxAutoFocus,
                                   controller: _textEditingController,
@@ -180,7 +185,7 @@ class YourScaffoldState extends State<YourScaffold> {
                                       bottom: getPlatformSize(4.0),
                                     ),
                                     border: InputBorder.none,
-                                    hintText: widget.searchBoxHint, //_searchHintList[language.lang],
+                                    hintText: searchBoxHint, //_searchHintList[language.lang],
                                   ),
                                   style: getTextStyle(language.lang),
                                 );

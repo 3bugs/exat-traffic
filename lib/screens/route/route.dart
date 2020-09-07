@@ -930,7 +930,7 @@ class MyRouteState extends State<MyRoute> {
                                     top: getPlatformSize(2.0),
                                   ),
                                   child: Text(
-                                    'Pickup Location',
+                                    'From Entrance',
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
@@ -962,7 +962,7 @@ class MyRouteState extends State<MyRoute> {
                                                       .bestRoute
                                                       .origin
                                                       .name
-                                                  : 'เลือกต้นทาง',
+                                                  : LocaleText.selectEntrance().ofLanguage(language.lang),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: getTextStyle(
@@ -1088,7 +1088,7 @@ class MyRouteState extends State<MyRoute> {
                                     top: getPlatformSize(2.0),
                                   ),
                                   child: Text(
-                                    'Destination Location',
+                                    'To Exit',
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
@@ -1119,7 +1119,7 @@ class MyRouteState extends State<MyRoute> {
                                                     .bestRoute
                                                     .destination
                                                     .name
-                                                : 'เลือกปลายทาง',
+                                                : LocaleText.selectExit().ofLanguage(language.lang),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: getTextStyle(

@@ -55,7 +55,7 @@ class _IncidentState extends State<Incident> {
                     text: _presenter.error.message,
                     buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                     withBackground: true,
-                    onClick: _presenter.getIncidentList(),
+                    onClick: _presenter.getIncidentList,
                   );
                 },
               ),

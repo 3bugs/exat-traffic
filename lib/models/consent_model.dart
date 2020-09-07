@@ -13,7 +13,7 @@ class ConsentModel {
       });
     }
     error = json['error'];
-    statusCode = json['status_code'];
+    statusCode = json['status_code'].toString();
   }
 
   Map<String, dynamic> toJson() {

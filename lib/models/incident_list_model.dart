@@ -16,7 +16,7 @@ class IncidentListModel {
     }
     dataMappingLangs = json['data_mapping_langs'];
     error = json['error'];
-    statusCode = json['status_code'];
+    statusCode = json['status_code'].toString();
   }
 
   Map<String, dynamic> toJson() {

@@ -45,7 +45,7 @@ class _FAQPageState extends State<FAQPage> {
                   text: _presenter.error.message,
                   buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                   withBackground: true,
-                  onClick: _presenter.getFAQ(),
+                  onClick: _presenter.getFAQ,
                 );
               },
             ),

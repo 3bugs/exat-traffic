@@ -296,9 +296,13 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                               Text(
                                 widget.googleRoute == null
                                     ? ''
-                                    : widget.googleRoute['legs'][0]['duration']['text']
-                                        .replaceAll('hour', 'ชม.')
-                                        .replaceAll('mins', 'นาที'),
+                                    : (language.lang == LanguageName.thai
+                                        ? widget.googleRoute['legs'][0]['duration']['text']
+                                            .replaceAll('hours', 'ชม.')
+                                            .replaceAll('hour', 'ชม.')
+                                            .replaceAll('mins', 'นาที')
+                                            .replaceAll('min', 'นาที')
+                                        : widget.googleRoute['legs'][0]['duration']['text']),
                                 style: getTextStyle(
                                   language.lang,
                                   isBold: true,
