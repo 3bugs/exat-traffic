@@ -73,6 +73,8 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
   }
 
   void _handleClickFavorite(BuildContext context) async {
+    LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+
     if (await widget._cctvModel.isFavoriteOn(context)) {
       List<DialogButtonModel> dialogButtonList = [
         DialogButtonModel(text: "ไม่ใช่", value: DialogResult.no),
@@ -80,14 +82,16 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       ];
       DialogResult result = await showMyDialog(
         context,
-        "ยืนยันลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรด?",
+        LocaleText.confirmDeleteFromFavorite().ofLanguage(language.lang),
+        //"ยืนยันลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรด?",
         dialogButtonList,
       );
       if (result == DialogResult.yes) {
         widget._cctvModel.toggleFavorite(context).then((_) {
           setState(() {
             Fluttertoast.showToast(
-              msg: "ลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
+              msg: LocaleText.deletedFromFavorite().ofLanguage(language.lang),
+              //msg: "ลบกล้อง CCTV '${widget._cctvModel.name}' ออกจากรายการโปรดแล้ว",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
@@ -102,7 +106,8 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
       widget._cctvModel.toggleFavorite(context).then((_) {
         setState(() {
           Fluttertoast.showToast(
-            msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
+            msg: LocaleText.savedToFavorite().ofLanguage(language.lang),
+            //msg: "เพิ่มกล้อง CCTV '${widget._cctvModel.name}' ในรายการโปรดแล้ว",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,

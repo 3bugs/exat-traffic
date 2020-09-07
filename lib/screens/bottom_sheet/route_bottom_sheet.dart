@@ -215,6 +215,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
   void _handleClickFavorite() async {
     //PlaceFavoritePrefs prefs = PlaceFavoritePrefs();
     PlaceFavoritePrefs prefs = Provider.of<PlaceFavoritePrefs>(context, listen: false);
+    LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
 
     if (await prefs.existId(widget.destination.placeId)) {
       List<DialogButtonModel> dialogButtonList = [
@@ -223,14 +224,16 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
       ];
       DialogResult result = await showMyDialog(
         context,
-        "ยืนยันลบ '${widget.destination.name}' ออกจากรายการโปรด?",
+        LocaleText.confirmDeleteFromFavorite().ofLanguage(language.lang),
+        //"ยืนยันลบ '${widget.destination.name}' ออกจากรายการโปรด?",
         dialogButtonList,
       );
       if (result == DialogResult.yes) {
         prefs.removePlace(widget.destination.placeId).then((_) {
           setState(() {
             Fluttertoast.showToast(
-              msg: "ลบ '${widget.destination.name}' ออกจากรายการโปรดแล้ว",
+              msg: LocaleText.deletedFromFavorite().ofLanguage(language.lang),
+              //msg: "ลบ '${widget.destination.name}' ออกจากรายการโปรดแล้ว",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
@@ -247,7 +250,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
           .then((_) {
         setState(() {
           Fluttertoast.showToast(
-            msg: "เพิ่ม '${widget.destination.name}' ในรายการโปรดแล้ว",
+            msg: LocaleText.savedToFavorite().ofLanguage(language.lang),
+            //msg: "เพิ่ม '${widget.destination.name}' ในรายการโปรดแล้ว",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,

@@ -681,4 +681,52 @@ class LocaleText {
       indonesian: 'masukkan nama tempat',
     );
   }
+
+  factory LocaleText.savedToFavorite() {
+    return LocaleText(
+      thai: 'เพิ่มในรายการโปรดแล้ว',
+      english: 'Saved to favorite.',
+      chinese: '保存到收藏夹',
+      japanese: 'お気に入りに保存しました',
+      korean: '즐겨 찾기에 저장',
+      lao: 'ບັນທຶກເປັນທີ່ນິຍົມ',
+      vietnamese: 'được lưu vào mục yêu thích',
+      myanmar: 'အကြိုက်ဆုံးသို့သိမ်းဆည်းထားသည်',
+      khmer: 'រក្សាទុកទៅក្នុងចំណូលចិត្ត',
+      malay: 'disimpan ke kegemaran',
+      indonesian: 'disimpan ke favorit',
+    );
+  }
+
+  factory LocaleText.deletedFromFavorite() {
+    return LocaleText(
+      thai: 'ลบออกจากรายการโปรดแล้ว',
+      english: 'Deleted from favorite.',
+      chinese: '从收藏夹中删除',
+      japanese: 'お気に入りから削除しました',
+      korean: '즐겨 찾기에서 삭제',
+      lao: 'ຖືກລຶບອອກຈາກສິ່ງທີ່ມັກ',
+      vietnamese: 'bị xóa khỏi mục yêu thích',
+      myanmar: 'အကြိုက်ဆုံးမှဖျက်သိမ်းလိုက်သည်',
+      khmer: 'លុបពីចំណូលចិត្ត',
+      malay: 'dipadam dari kegemaran',
+      indonesian: 'dihapus dari favorit',
+    );
+  }
+
+  factory LocaleText.confirmDeleteFromFavorite() {
+    return LocaleText(
+      thai: 'ยืนยันลบออกจากรายการโปรด?',
+      english: 'Delete from favorite. Are you sure?',
+      chinese: '从收藏夹中删除。 你确定吗？',
+      japanese: 'お気に入りから削除します。 本気ですか？',
+      korean: '즐겨 찾기에서 삭제합니다. 확실합니까?',
+      lao: 'ລົບຈາກທີ່ມັກ. ເຈົ້າ​ແນ່​ໃຈ​ບໍ່?',
+      vietnamese: 'xóa khỏi mục yêu thích. bạn có chắc không?',
+      myanmar: 'အကြိုက်ဆုံးမှဖျက်ပါ။ သေချာလား?',
+      khmer: 'លុបពីសំណព្វ តើ​អ្នក​ប្រាកដ​ឬ​អត់?',
+      malay: 'padam dari kegemaran. Adakah anda pasti?',
+      indonesian: 'hapus dari favorit. apakah kamu yakin',
+    );
+  }
 }
