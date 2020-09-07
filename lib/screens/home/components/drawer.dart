@@ -4,6 +4,7 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/drawer_item_model.dart';
 import 'package:exattraffic/screens/FAQ/FAQ_page.dart';
 import 'package:exattraffic/screens/about/about_page.dart';
+
 //import 'package:exattraffic/screens/consent/consent_page.dart';
 import 'package:exattraffic/screens/help/help_page.dart';
 import 'package:exattraffic/screens/home/components/drawer_item_view.dart';
@@ -23,7 +24,7 @@ class MyDrawer extends StatelessWidget {
 
   final List<DrawerItemModel> _drawerItemList = [
     DrawerItemModel(
-      text: LocaleText(thai: "เกี่ยวกับเรา", english: "About Us", chinese: "关于我们"),
+      text: LocaleText.aboutUs(),
       icon: AssetImage('assets/images/drawer/ic_about_us.png'),
       onClick: (BuildContext context) {
         // ปิด drawer
@@ -38,7 +39,7 @@ class MyDrawer extends StatelessWidget {
       },
     ),
     DrawerItemModel(
-      text: LocaleText(thai: "แบบสอบถาม", english: "Questionnaire", chinese: "问卷调查"),
+      text: LocaleText.questionnaire(),
       icon: AssetImage('assets/images/drawer/ic_questionnaire.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
@@ -51,7 +52,7 @@ class MyDrawer extends StatelessWidget {
       },
     ),
     DrawerItemModel(
-      text: LocaleText(thai: "ช่วยเหลือ", english: "Help", chinese: "救命"),
+      text: LocaleText.help(),
       icon: AssetImage('assets/images/drawer/ic_help.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
@@ -64,7 +65,7 @@ class MyDrawer extends StatelessWidget {
       },
     ),
     DrawerItemModel(
-      text: LocaleText(thai: "คำถามที่พบบ่อย", english: "FAQ", chinese: "经常问的问题"),
+      text: LocaleText.faq(),
       icon: AssetImage('assets/images/drawer/ic_faq.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
@@ -77,7 +78,7 @@ class MyDrawer extends StatelessWidget {
       },
     ),
     DrawerItemModel(
-      text: LocaleText(thai: "วิดเจ็ต", english: "Widget", chinese: "小部件"),
+      text: LocaleText.widget(),
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
@@ -90,7 +91,7 @@ class MyDrawer extends StatelessWidget {
       },
     ),
     DrawerItemModel(
-      text: LocaleText(thai: "การตั้งค่า", english: "Settings", chinese: "设定值"),
+      text: LocaleText.settings(),
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
         Navigator.pop(context);
@@ -99,9 +100,7 @@ class MyDrawer extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => Settings(),
           ),
-        ).then((isLanguageChanged) {
-
-        });
+        ).then((isLanguageChanged) {});
       },
     ),
 

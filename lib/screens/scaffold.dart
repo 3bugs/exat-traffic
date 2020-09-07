@@ -45,31 +45,15 @@ List<ScreenProps> screenPropsList = [
     // home
     id: 0,
     showSearch: true,
-    title: LocaleText(
-      thai: 'หน้าหลัก',
-      english: 'Home',
-      chinese: '家园',
-    ),
-    searchHint: LocaleText(
-      thai: 'ค้นหา',
-      english: 'Search',
-      chinese: '搜索',
-    ),
+    title: LocaleText.home(),
+    searchHint: LocaleText.search(),
   ),
   ScreenProps(
     // favorite
     id: 1,
     showSearch: true,
-    title: LocaleText(
-      thai: 'รายการโปรด',
-      english: 'Favorite',
-      chinese: '喜爱',
-    ),
-    searchHint: LocaleText(
-      thai: 'ค้นหา',
-      english: 'Search',
-      chinese: '搜索',
-    ),
+    title: LocaleText.favorite(),
+    searchHint: LocaleText.search(),
     /*searchHint: [
       'ค้นหารายการโปรด',
       'Search favorite',
@@ -79,26 +63,14 @@ List<ScreenProps> screenPropsList = [
   ScreenProps(
     // route
     id: 2,
-    title: LocaleText(
-      thai: 'เส้นทาง',
-      english: 'Route',
-      chinese: '路线',
-    ),
+    title: LocaleText.route(),
   ),
   ScreenProps(
     // incident
     id: 3,
     showSearch: true,
-    title: LocaleText(
-      thai: 'เหตุการณ์',
-      english: 'Incident',
-      chinese: '事件',
-    ),
-    searchHint: LocaleText(
-      thai: 'ค้นหา',
-      english: 'Search',
-      chinese: '搜索',
-    ),
+    title: LocaleText.incident(),
+    searchHint: LocaleText.search(),
     /*searchHint: [
       'ค้นหาเหตุการณ์',
       'Search incident',
@@ -109,16 +81,8 @@ List<ScreenProps> screenPropsList = [
     // notification
     id: 4,
     showSearch: true,
-    title: LocaleText(
-      thai: 'การแจ้งเตือน',
-      english: 'Notification',
-      chinese: '通知',
-    ),
-    searchHint: LocaleText(
-      thai: 'ค้นหา',
-      english: 'Search',
-      chinese: '搜索',
-    ),
+    title: LocaleText.notification(),
+    searchHint: LocaleText.search(),
     /*searchHint: [
       'ค้นหาการแจ้งเตือน',
       'Search notification',
@@ -127,17 +91,8 @@ List<ScreenProps> screenPropsList = [
   ),
 ];
 
-LocaleText searchServiceText = LocaleText(
-  thai: 'ค้นหาบริการ',
-  english: 'Search Service',
-  chinese: '搜索服务',
-);
-
-LocaleText searchPlaceText = LocaleText(
-  thai: 'ค้นหาเส้นทาง',
-  english: 'Search Place',
-  chinese: '搜索地点',
-);
+LocaleText searchServiceText = LocaleText.searchService();
+LocaleText searchPlaceText = LocaleText.searchPlace();
 
 class MyScaffoldMain extends StatefulWidget {
   MyScaffoldMain();
@@ -284,21 +239,9 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
     LanguageName lang = Provider.of<LanguageModel>(context, listen: false).lang;
 
-    LocaleText confirmText = LocaleText(
-      thai: 'ต้องการออกจาก ${AppBloc.appName}?',
-      english: 'Are you sure you want to exit?',
-      chinese: '你确定要离开？',
-    );
-    LocaleText yesText = LocaleText(
-      thai: 'ใช่',
-      english: 'YES',
-      chinese: '是',
-    );
-    LocaleText noText = LocaleText(
-      thai: 'ไม่ใช่',
-      english: 'NO',
-      chinese: '没有',
-    );
+    LocaleText confirmText = LocaleText.confirmExit();
+    LocaleText yesText = LocaleText.yes();
+    LocaleText noText = LocaleText.no();
 
     List<DialogButtonModel> dialogButtonList = [
       DialogButtonModel(text: noText.ofLanguage(lang), value: DialogResult.no),

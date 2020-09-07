@@ -29,7 +29,7 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "ช่วยเหลือ", english: "Help", chinese: "救命");
+  LocaleText _title = LocaleText.help();
   int _current = 0;
   HelpPresenter _presenter;
 

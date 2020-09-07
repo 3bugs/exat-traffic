@@ -18,7 +18,7 @@ class FAQPage extends StatefulWidget {
 
 class _FAQPageState extends State<FAQPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "คำถามที่พบบ่อย", english: "FAQ", chinese: "经常问的问题");
+  LocaleText _title = LocaleText.faq();
 
 //  bool open = false;
   FAQPresenter _presenter;

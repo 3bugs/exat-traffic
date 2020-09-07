@@ -10,36 +10,12 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/screens/bottom_sheet/components/toll_plaza_lane_item.dart';
 import 'package:exattraffic/models/locale_text.dart';
 
-LocaleText bahtText = LocaleText(
-  thai: 'บาท',
-  english: 'Baht',
-  chinese: '铢',
-);
-LocaleText fourWheelsText = LocaleText(
-  thai: '4 ล้อ',
-  english: '4 Wheels',
-  chinese: '4轮',
-);
-LocaleText sixToTenWheelsText = LocaleText(
-  thai: '6-10 ล้อ',
-  english: '6-10 Wheels',
-  chinese: '6-10个轮子',
-);
-LocaleText overTenWheelsText = LocaleText(
-  thai: 'เกิน 10 ล้อ',
-  english: 'Over 10 Wheels',
-  chinese: '超过10个轮子',
-);
-LocaleText laneText = LocaleText(
-  thai: 'ช่อง',
-  english: 'lane',
-  chinese: '车道',
-);
-LocaleText distanceBasedTollsText = LocaleText(
-  thai: 'ค่าผ่านทางตามระยะทาง',
-  english: 'Distance-based tolls',
-  chinese: '基于距离的通行费',
-);
+LocaleText bahtText = LocaleText.baht();
+LocaleText fourWheelsText = LocaleText.fourWheels();
+LocaleText sixToTenWheelsText = LocaleText.sixToTenWheels();
+LocaleText overTenWheelsText = LocaleText.overTenWheels();
+LocaleText laneText = LocaleText.lane();
+LocaleText distanceBasedTollsText = LocaleText.distanceBasedTolls();
 
 class TollPlazaBottomSheet extends StatefulWidget {
   TollPlazaBottomSheet({

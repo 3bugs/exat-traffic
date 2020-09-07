@@ -6,26 +6,10 @@ import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:provider/provider.dart';
 
-LocaleText homeLabel = LocaleText(
-  thai: 'หน้าหลัก',
-  english: 'Home',
-  chinese: '家园',
-);
-LocaleText favoriteLabel = LocaleText(
-  thai: 'รายการโปรด',
-  english: 'Favorite',
-  chinese: '喜爱',
-);
-LocaleText incidentLabel = LocaleText(
-  thai: 'เหตุการณ์',
-  english: 'Incident',
-  chinese: '事件',
-);
-LocaleText notificationLabel = LocaleText(
-  thai: 'การแจ้งเตือน',
-  english: 'Notification',
-  chinese: '通知',
-);
+LocaleText homeLabel = LocaleText.home();
+LocaleText favoriteLabel = LocaleText.favorite();
+LocaleText incidentLabel = LocaleText.incident();
+LocaleText notificationLabel = LocaleText.notification();
 
 class MyNavBar extends StatefulWidget {
   MyNavBar({

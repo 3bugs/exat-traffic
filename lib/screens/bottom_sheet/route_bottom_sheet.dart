@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 //import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
@@ -16,31 +17,11 @@ import 'package:exattraffic/models/locale_text.dart';
 
 import 'components/bottom_sheet_scaffold.dart';
 
-LocaleText bahtText = LocaleText(
-  thai: 'บาท',
-  english: 'Baht',
-  chinese: '铢',
-);
-LocaleText fourWheelsText = LocaleText(
-  thai: '4 ล้อ',
-  english: '4 Wheels',
-  chinese: '4轮',
-);
-LocaleText sixToTenWheelsText = LocaleText(
-  thai: '6-10 ล้อ',
-  english: '6-10 Wheels',
-  chinese: '6-10个轮子',
-);
-LocaleText overTenWheelsText = LocaleText(
-  thai: 'เกิน 10 ล้อ',
-  english: 'Over 10 Wheels',
-  chinese: '超过10个轮子',
-);
-LocaleText totalTollsText = LocaleText(
-  thai: 'ค่าผ่านทางรวม',
-  english: 'Total tolls',
-  chinese: '工具总数',
-);
+LocaleText bahtText = LocaleText.baht();
+LocaleText fourWheelsText = LocaleText.fourWheels();
+LocaleText sixToTenWheelsText = LocaleText.sixToTenWheels();
+LocaleText overTenWheelsText = LocaleText.overTenWheels();
+LocaleText totalTollsText = LocaleText.totalTolls();
 
 class RouteBottomSheet extends StatefulWidget {
   RouteBottomSheet({
@@ -85,8 +66,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     });
   }
 
-  Widget _getCarItem(LanguageName language, int widthFlex, String label, String iconPath, double iconWidth,
-      double iconHeight, double iconMarginTop) {
+  Widget _getCarItem(LanguageName language, int widthFlex, String label, String iconPath,
+      double iconWidth, double iconHeight, double iconMarginTop) {
     return Expanded(
       flex: widthFlex,
       child: Container(
@@ -261,7 +242,9 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
         });
       }
     } else {
-      prefs.addPlace(PlaceFavoriteModel(widget.destination.placeId, widget.destination.name)).then((_) {
+      prefs
+          .addPlace(PlaceFavoriteModel(widget.destination.placeId, widget.destination.name))
+          .then((_) {
         setState(() {
           Fluttertoast.showToast(
             msg: "เพิ่ม '${widget.destination.name}' ในรายการโปรดแล้ว",

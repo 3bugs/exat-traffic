@@ -17,7 +17,7 @@ class QuestionnairePage extends StatefulWidget {
 
 class _QuestionnairePageState extends State<QuestionnairePage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "แบบสอบถาม", english: "Questionnaire", chinese: "问卷调查");
+  LocaleText _title = LocaleText.questionnaire();
   int group = 1;
   int myIndex = 0;
   bool showArrowLeft = false;

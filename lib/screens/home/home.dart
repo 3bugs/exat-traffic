@@ -2,11 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/screens/search/search_place_presenter.dart';
-import 'package:exattraffic/services/api.dart';
-import 'package:exattraffic/services/google_maps_services.dart';
-import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -31,6 +26,11 @@ import 'package:exattraffic/screens/widget/widget.dart';
 import 'package:exattraffic/models/favorite_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
 import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/screens/search/search_place_presenter.dart';
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
 
 //import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';

@@ -23,11 +23,7 @@ import 'components/bottom_sheet_scaffold.dart';
 import 'components/express_way.dart';
 import 'components/traffic_point_item.dart';
 
-LocaleText headerText = LocaleText(
-  thai: 'ทางพิเศษ',
-  english: 'Expressway',
-  chinese: '高速公路',
-);
+LocaleText headerText = LocaleText.expressWay();
 
 class HomeBottomSheet extends StatefulWidget {
   static final List<TrafficPointDataModel> trafficPointDataList = List();

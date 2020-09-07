@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:exattraffic/etc/utils.dart';
-import 'package:exattraffic/constants.dart' as Constants;
+//import 'package:exattraffic/constants.dart' as Constants;
 
 import 'tab_strip.dart';
 

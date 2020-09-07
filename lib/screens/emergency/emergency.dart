@@ -26,7 +26,7 @@ class _EmergencyState extends State<Emergency> {
   final double overlapHeight = SHOW_SOS ? getPlatformSize(30.0) : 0.0;
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "เบอร์โทรฉุกเฉิน", english: "Emergency Call", chinese: "紧急电话");
+  LocaleText _title = LocaleText.emergencyCall();
 
   EmergencyPresenter _presenter;
   RefreshController _refreshController = RefreshController(initialRefresh: false);

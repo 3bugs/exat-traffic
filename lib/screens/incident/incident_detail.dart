@@ -28,7 +28,7 @@ class _IncidentDetailPageState extends State<IncidentDetailPage> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "เหตุการณ์", english: "Incident", chinese: "事件");
+  LocaleText _title = LocaleText.incident();
 
   @override
   void initState() {

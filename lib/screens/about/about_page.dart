@@ -23,7 +23,7 @@ class _AboutPageState extends State<AboutPage> {
   final double overlapHeight = getPlatformSize(30.0);
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "เกี่ยวกับเรา", english: "About Us", chinese: "关于我们");
+  LocaleText _title = LocaleText.aboutUs();
   AboutPresenter _presenter;
 
   @override

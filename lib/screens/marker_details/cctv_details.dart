@@ -29,16 +29,8 @@ class CctvDetails extends StatelessWidget {
   }
 }
 
-LocaleText videoStreamingText = LocaleText(
-  thai: 'ภาพเคลื่อนไหว',
-  english: 'Video Streaming',
-  chinese: '视频流',
-);
-LocaleText photoText = LocaleText(
-  thai: 'ภาพนิ่ง',
-  english: 'Photo',
-  chinese: '照片',
-);
+LocaleText videoStreamingText = LocaleText.videoStreaming();
+LocaleText photoText = LocaleText.photo();
 
 class CctvDetailsMain extends StatefulWidget {
   CctvDetailsMain(this._cctvModel);

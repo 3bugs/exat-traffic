@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-import 'package:exattraffic/screens/widget/widget_presenter.dart';
+//import 'package:exattraffic/screens/widget/widget_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
@@ -21,16 +21,16 @@ enum WidgetType { favorite, incident, expressWay }
 
 class _WidgetSettingState extends State<WidgetSetting> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "วิดเจ็ต", english: "Widget", chinese: "小部件");
+  LocaleText _title = LocaleText.widget();
 
-  WidgetPresenter _presenter;
+  //WidgetPresenter _presenter;
   List<Map<String, dynamic>> _widgetDataList = [
     {
-      "text": "ทางพิเศษ",
+      "text": LocaleText.expressWay(),
       "type": WidgetType.expressWay,
     },
     {
-      "text": "รายการโปรด",
+      "text": LocaleText.favorite(),
       "type": WidgetType.favorite,
     },
     /*{
@@ -80,11 +80,15 @@ class _WidgetSettingState extends State<WidgetSetting> {
               children: _widgetDataList
                   .map<Widget>((widget) => Consumer<WidgetPrefs>(
                         builder: (context, prefs, child) {
-                          return WidgetSettingItem(
-                            text: widget['text'],
-                            selected: prefs.isWidgetOn(widget['type']),
-                            onChanged: (value) => _handleChangeSelect(widget['type'], value),
-                            marginTop: getPlatformSize(4.0),
+                          return Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return WidgetSettingItem(
+                                text: widget['text'].ofLanguage(language.lang),
+                                selected: prefs.isWidgetOn(widget['type']),
+                                onChanged: (value) => _handleChangeSelect(widget['type'], value),
+                                marginTop: getPlatformSize(4.0),
+                              );
+                            },
                           );
                         },
                       ))
@@ -98,7 +102,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
 
   @override
   void initState() {
-    _presenter = WidgetPresenter(this);
+    //_presenter = WidgetPresenter(this);
     super.initState();
   }
 

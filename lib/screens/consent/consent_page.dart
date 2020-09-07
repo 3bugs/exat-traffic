@@ -18,8 +18,7 @@ class ConsentPage extends StatefulWidget {
 
 class _ConsentPageState extends State<ConsentPage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title =
-      LocaleText(thai: "ข้อตกลงและเงื่อนไข", english: "Terms And Conditions", chinese: "附带条约");
+  LocaleText _title = LocaleText.termsAndConditions();
 
   bool checkValue = false;
   ConsentPresenter _presenter;

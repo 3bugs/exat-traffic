@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
 
-import 'package:exattraffic/screens/settings/settings_presenter.dart';
+//import 'package:exattraffic/screens/settings/settings_presenter.dart';
 import 'package:exattraffic/screens/scaffold2.dart';
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
@@ -20,7 +20,7 @@ enum SettingName { language, notification, nightMode }
 
 class _SettingsState extends State<Settings> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
-  LocaleText _title = LocaleText(thai: "การตั้งค่า", english: "Settings", chinese: "设定值");
+  LocaleText _title = LocaleText.settings();
 
   List<LanguageOptionModel> _languageOptionList = [
     LanguageOptionModel("ไทย", LanguageName.thai, isThaiText: true),
@@ -34,10 +34,10 @@ class _SettingsState extends State<Settings> {
     LanguageOptionModel("khmer", LanguageName.khmer),
     LanguageOptionModel("melayu", LanguageName.malay),
     LanguageOptionModel("bahasa Indonesia", LanguageName.indonesian),
-    LanguageOptionModel("Pilipino", LanguageName.filipino),
+    //LanguageOptionModel("Pilipino", LanguageName.filipino),
   ];
 
-  SettingsPresenter _presenter;
+  //SettingsPresenter _presenter;
 
   //LanguageName _languageValue = LanguageName.thai;
   bool _notificationValue = false;
@@ -60,22 +60,9 @@ class _SettingsState extends State<Settings> {
   }
 
   void _confirmRestart() {
-    LocaleText confirmRestartText = LocaleText(
-      thai:
-      '${Constants.App.NAME} จำเป็นต้องเริ่มการทำงานใหม่เมื่อมีการเปลี่ยนภาษา คุณต้องการให้เริ่มการทำงานใหม่เดี๋ยวนี้หรือไม่',
-      english: 'Restart required. Do you want to restart ${Constants.App.NAME} now?',
-      chinese: '需要重新启动。 您要立即重新启动${Constants.App.NAME}吗？',
-    );
-    LocaleText restartText = LocaleText(
-      thai: 'เริ่มใหม่เดี๋ยวนี้',
-      english: 'RESTART NOW',
-      chinese: '现在重启',
-    );
-    LocaleText noText = LocaleText(
-      thai: 'ไม่ใช่',
-      english: 'NO',
-      chinese: '没有',
-    );
+    LocaleText confirmRestartText = LocaleText.confirmRestart();
+    LocaleText restartText = LocaleText.restartNow();
+    LocaleText noText = LocaleText.no();
 
     Future.delayed(Duration(milliseconds: 250), () async {
       DialogResult result = await showMyDialog(
@@ -110,9 +97,8 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  LocaleText languageText = LocaleText(thai: 'ภาษา', english: 'Language', chinese: '语言');
-  LocaleText notificationText =
-      LocaleText(thai: 'การแจ้งเตือน', english: 'Notification', chinese: '通知');
+  LocaleText languageText = LocaleText.language();
+  LocaleText notificationText = LocaleText.notification();
 
   Widget _content() {
     return Container(
@@ -205,7 +191,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   void initState() {
-    _presenter = SettingsPresenter(this);
+    //_presenter = SettingsPresenter(this);
     super.initState();
   }
 

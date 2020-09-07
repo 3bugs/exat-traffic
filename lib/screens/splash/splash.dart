@@ -121,8 +121,9 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => ConsentPage(),
+        PageRouteBuilder(
+          transitionDuration: Duration.zero,
+          pageBuilder: (context, anim1, anim2) => ConsentPage(),
         ),
       ).then((consent) {
         if (consent == true) {
