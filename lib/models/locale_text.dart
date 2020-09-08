@@ -410,7 +410,7 @@ class LocaleText {
 
   factory LocaleText.termsAndConditions() {
     return LocaleText(
-      thai: "ข้อตกลงและเงื่อนไข",
+      thai: "ข้อกำหนดและเงื่อนไข",
       english: "Terms And Conditions",
       chinese: "附带条约",
       japanese: '規約と条件',
@@ -581,6 +581,22 @@ class LocaleText {
       khmer: 'កំហុស',
       malay: 'kesilapan',
       indonesian: 'kesalahan',
+    );
+  }
+
+  factory LocaleText.errorPleaseTryAgain() {
+    return LocaleText(
+      thai: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
+      english: 'Error, please try again',
+      chinese: '错误，请重试',
+      japanese: 'エラー、もう一度やり直してください',
+      korean: '오류, 다시 시도하십시오',
+      lao: 'ຜິດພາດ, ກະລຸນາລອງ ໃໝ່ ອີກຄັ້ງ',
+      vietnamese: 'Lỗi. Vui lòng thử lại',
+      myanmar: 'ကျေးဇူးပြု၍ ထပ်မံကြိုးစားပါ',
+      khmer: 'កំហុសសូមព្យាយាមម្តងទៀត',
+      malay: 'ralat, sila cuba lagi',
+      indonesian: 'kesalahan, coba lagi',
     );
   }
 

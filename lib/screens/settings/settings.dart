@@ -32,9 +32,9 @@ class _SettingsState extends State<Settings> {
     LanguageOptionModel("Tiếng Việt", LanguageName.vietnamese),
     LanguageOptionModel("ລາວ", LanguageName.lao),
     LanguageOptionModel("မြန်မာ", LanguageName.myanmar),
-    LanguageOptionModel("khmer", LanguageName.khmer),
-    LanguageOptionModel("melayu", LanguageName.malay),
-    LanguageOptionModel("bahasa Indonesia", LanguageName.indonesian),
+    LanguageOptionModel("កម្ពុជា", LanguageName.khmer),
+    LanguageOptionModel("Bahasa Malaysia", LanguageName.malay),
+    LanguageOptionModel("Indonesia", LanguageName.indonesian),
     //LanguageOptionModel("Pilipino", LanguageName.filipino),
   ];
 

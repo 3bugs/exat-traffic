@@ -71,6 +71,7 @@ class _ConsentPageState extends State<ConsentPage> {
             color: Colors.white),
         padding: EdgeInsets.all(getPlatformSize(10.0)),
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Text(
             _presenter.consentModel.data[0].content,
             style: getTextStyle(LanguageName.thai),
@@ -85,21 +86,31 @@ class _ConsentPageState extends State<ConsentPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Checkbox(
-                onChanged: (value) {
-                  setState(() {
-                    checkValue = value;
-                  });
-                },
-                value: checkValue,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  checkValue = !checkValue;
+                });
+              },
+              child: Row(
+                children: <Widget>[
+                  Checkbox(
+                    onChanged: (value) {
+                      setState(() {
+                        checkValue = value;
+                      });
+                    },
+                    value: checkValue,
+                  ),
+                  Text(
+                    "ยอมรับข้อกำหนดและเงื่อนไข",
+                    style: getTextStyle(LanguageName.thai),
+                  ),
+                ],
               ),
-              Text(
-                "ยอมรับเงื่อนไข",
-                style: getTextStyle(LanguageName.thai),
-              ),
-            ],
+            ),
           ),
           MyButton(
             text: "ยืนยัน",
@@ -112,7 +123,7 @@ class _ConsentPageState extends State<ConsentPage> {
                   context: context,
                   type: AlertType.error,
                   title: "เกิดข้อผิดพลาด",
-                  desc: "กรุณากดยอมรับเงื่อนไข",
+                  desc: "กรุณากดยอมรับข้อกำหนดและเงื่อนไข",
                   buttons: [
                     DialogButton(
                       child: Text(

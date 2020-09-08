@@ -499,7 +499,7 @@ class ExatApi {
       context,
       url,
       {
-        "name": "terms",
+        "name": "termsandconditions",
       },
       sendLocation: false,
     );

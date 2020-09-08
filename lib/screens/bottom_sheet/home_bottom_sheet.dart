@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:exattraffic/components/no_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -274,10 +275,15 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
                             ),
                           )
                     : Center(
-                        child: ErrorView(
-                          //text: "ขออภัย เกิดข้อผิดพลาดในการดึงข้อมูลทางพิเศษ",
-                          buttonText: "เกิดข้อผิดพลาด กรุณาลองใหม่",
-                          onClick: () => _fetchExpressWays(context),
+                        child: Consumer<LanguageModel>(
+                          builder: (context, language, child) {
+                            return ErrorView(
+                              //text: "ขออภัย เกิดข้อผิดพลาดในการดึงข้อมูลทางพิเศษ",
+                              buttonText:
+                                  LocaleText.errorPleaseTryAgain().ofLanguage(language.lang),
+                              onClick: () => _fetchExpressWays(context),
+                            );
+                          },
                         ),
                       ),
               ),
@@ -385,25 +391,27 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
               // list ทางพิเศษ (text), todo: เปลี่ยนเป็น route
               Container(
                 height: getPlatformSize(44.0),
-                child: ListView.separated(
-                  itemCount: widget._expressWay.legList.length,
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (BuildContext context, int index) {
-                    LegModel leg = widget._expressWay.legList[index];
+                child: widget._expressWay.legList != null && widget._expressWay.legList.isNotEmpty
+                    ? ListView.separated(
+                        itemCount: widget._expressWay.legList.length,
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          LegModel leg = widget._expressWay.legList[index];
 
-                    return LegView(
-                      legModel: leg,
-                      isFirstItem: index == 0,
-                      isLastItem: index == widget._expressWay.legList.length - 1,
-                      selected: leg == _selectedLeg,
-                      onSelectLeg: _handleClickLeg,
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox.shrink();
-                  },
-                ),
+                          return LegView(
+                            legModel: leg,
+                            isFirstItem: index == 0,
+                            isLastItem: index == widget._expressWay.legList.length - 1,
+                            selected: leg == _selectedLeg,
+                            onSelectLeg: _handleClickLeg,
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return SizedBox.shrink();
+                        },
+                      )
+                    : NoData(),
               ),
 
               _selectedLeg != null
@@ -411,27 +419,31 @@ class _ExpressWayDetailsState extends State<ExpressWayDetails> {
                   // traffic point list
                   Expanded(
                       child: Container(
-                        child: ListView.separated(
-                          controller: _scrollController,
-                          itemCount: _selectedLeg.trafficPointList.length,
-                          scrollDirection: Axis.vertical,
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            TrafficPointModel trafficPoint = _selectedLeg.trafficPointList[index];
+                        child: _selectedLeg.trafficPointList != null &&
+                                _selectedLeg.trafficPointList.isNotEmpty
+                            ? ListView.separated(
+                                controller: _scrollController,
+                                itemCount: _selectedLeg.trafficPointList.length,
+                                scrollDirection: Axis.vertical,
+                                physics: BouncingScrollPhysics(),
+                                itemBuilder: (BuildContext context, int index) {
+                                  TrafficPointModel trafficPoint =
+                                      _selectedLeg.trafficPointList[index];
 
-                            return TrafficPointView(
-                              trafficPoint: trafficPoint,
-                              isFirstItem: index == 0,
-                              isLastItem: index == _selectedLeg.trafficPointList.length - 1,
-                              onClick: () {
-                                widget._onSelectTrafficPoint(context, trafficPoint);
-                              },
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return SizedBox.shrink();
-                          },
-                        ),
+                                  return TrafficPointView(
+                                    trafficPoint: trafficPoint,
+                                    isFirstItem: index == 0,
+                                    isLastItem: index == _selectedLeg.trafficPointList.length - 1,
+                                    onClick: () {
+                                      widget._onSelectTrafficPoint(context, trafficPoint);
+                                    },
+                                  );
+                                },
+                                separatorBuilder: (BuildContext context, int index) {
+                                  return SizedBox.shrink();
+                                },
+                              )
+                            : NoData(),
                       ),
                     )
                   : SizedBox.shrink(),

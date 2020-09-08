@@ -29,10 +29,10 @@ class ExpressWayModel {
       name: json['name'],
       index: index,
       imageUrl: json['cover'],
-      chunkDataMap: _chunkDataList[index],
-      legList: _chunkDataList[index]['legs']
+      chunkDataMap: index < _chunkDataList.length ? _chunkDataList[index] : null,
+      legList: index < _chunkDataList.length ? (_chunkDataList[index]['legs']
           .map<LegModel>((legJson) => LegModel.fromJson(legJson, markerList))
-          .toList(),
+          .toList()) : List(),
       image: _getMockedAssetImage(index), // mocked
     );
   }

@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/storage/util_prefs.dart';
 
 class MyFcm {
-  final BuildContext context;
+  final BuildContext _context;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
-  MyFcm(this.context);
+  MyFcm(this._context);
 
-  configFcm() {
-    _firebaseMessaging.subscribeToTopic('message_incident');
-    _firebaseMessaging.subscribeToTopic('message_event');
+  configFcm() async {
+    UtilPrefs utilPrefs = Provider.of<UtilPrefs>(_context, listen: false);
+
+    if (await utilPrefs.getNotification()) {
+      _firebaseMessaging.subscribeToTopic('message_incident');
+      _firebaseMessaging.subscribeToTopic('message_event');
+    } else {
+      _firebaseMessaging.unsubscribeFromTopic('message_incident');
+      _firebaseMessaging.unsubscribeFromTopic('message_event');
+    }
 
     _firebaseMessaging.requestNotificationPermissions(); // จำเป็นสำหรับ ios
 
@@ -30,7 +39,7 @@ class MyFcm {
           final Map<String, dynamic> dataMap = message['data'];
           final String titleTh = dataMap['title_th'];
           final String titleEn = dataMap['title_en'];
-          alert(context, "แจ้งเตือน", titleTh);
+          alert(_context, "แจ้งเตือน", titleTh);
         } else {
           print('***** MESSAGE DOES NOT CONTAIN DATA *****');
         }

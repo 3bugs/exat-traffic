@@ -117,7 +117,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
 
   void _checkUserConsent() async {
     UtilPrefs utilPrefs = UtilPrefs();
-    if (true /*await utilPrefs.userConsent()*/) {
+    if (await utilPrefs.userConsent()) {
       _fetchSplashData(context);
     } else {
       Navigator.push(
