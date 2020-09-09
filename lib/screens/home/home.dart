@@ -59,11 +59,13 @@ class MyHomeState extends State<Home> {
   //double _mainContainerTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _mainContainerHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
+  static const INITIAL_ZOOM = 8.0;
   static const CameraPosition INITIAL_POSITION = CameraPosition(
     target: LatLng(13.7563, 100.5018), // Bangkok
-    zoom: 8,
+    zoom: INITIAL_ZOOM,
   );
 
+  double _zoom = INITIAL_ZOOM;
   bool _isLoading = false;
 
   Future<void> _moveToCurrentPosition(BuildContext context,
@@ -150,17 +152,56 @@ class MyHomeState extends State<Home> {
 
   Future<Set<Marker>> _createMarkerSet(BuildContext context, List<MarkerModel> markerList) async {
     Set<Marker> markerSet = Set();
-    for (MarkerModel markerModel in markerList) {
-      Marker marker = await _createMarker(context, markerModel);
-      markerSet.add(marker);
-      /*marker = await _createTextMarker(context, markerModel);
-      markerSet.add(marker);*/
-    }
-    return markerSet;
 
-    /*return markerList.map((MarkerModel marker) async {
-      return await _createMarker(context, marker);
-    }).toSet();*/
+    if (_zoom > 12) {
+      for (MarkerModel marker in markerList) {
+        Marker m = await _createMarker(context, marker);
+        markerSet.add(m);
+      }
+    } else {
+      Map<int, ClusterModel> clusterMap = Map();
+
+      markerList.forEach((marker) async {
+        if (marker.groupId == 0) {
+          Marker m = await _createMarker(context, marker);
+          markerSet.add(m);
+        } else {
+          if (clusterMap.containsKey(marker.groupId)) {
+            ClusterModel cluster = clusterMap[marker.groupId];
+            cluster.markerList.add(marker);
+          } else {
+            ClusterModel cluster = ClusterModel(
+              id: marker.groupId,
+              name: marker.groupName,
+            );
+            cluster.markerList.add(marker);
+            clusterMap[marker.groupId] = cluster;
+          }
+        }
+      });
+
+      List<ClusterModel> clusterList = clusterMap.entries.map((entry) => entry.value).toList();
+      print("^^^^^^^^^^^^^^^^^^^^^^^^^ CLUSTER ^^^^^^^^^^^^^^^^^^^^^^^^^");
+      clusterList.forEach((cluster) {
+        print("CLUSTER ID: ${cluster.id}, MARKER COUNT: ${cluster.markerList.length}, AVG LATLNG: ${cluster.getAverageLatLng()}");
+        cluster.markerList.forEach((marker) {
+          print("--- MARKER CATEGORY CODE: ${marker.category.code}, LAT: ${marker.latitude}, LNG: ${marker.longitude}");
+        });
+      });
+
+      List<ClusterModel> oneMarkerClusterList =
+          clusterList.where((cluster) => cluster.markerList.length == 1).toList();
+      oneMarkerClusterList.forEach((cluster) async {
+        Marker m = await _createMarker(context, cluster.markerList[0]);
+        markerSet.add(m);
+      });
+
+      List<ClusterModel> manyMarkersClusterList =
+          clusterList.where((cluster) => cluster.markerList.length > 1).toList();
+      markerSet.addAll(await _createClusterMarkerSet(context, manyMarkersClusterList));
+    }
+
+    return markerSet;
   }
 
   Future<Marker> _createMarker(BuildContext context, MarkerModel marker) async {
@@ -187,37 +228,59 @@ class MyHomeState extends State<Home> {
     );
   }
 
-  /*Future<Marker> _createTextMarker(BuildContext context, MarkerModel marker) async {
+  Future<Set<Marker>> _createClusterMarkerSet(
+      BuildContext context, List<ClusterModel> clusterList) async {
+    Set<Marker> markerSet = Set();
+
+    for (ClusterModel cluster in clusterList) {
+      Marker marker = await _createClusterMarker(context, cluster);
+      markerSet.add(marker);
+    }
+
+    return markerSet;
+  }
+
+  static const int CLUSTER_ICON_SIZE = 120;
+
+  Future<Marker> _createClusterMarker(BuildContext context, ClusterModel cluster) async {
     //String markerIdVal = uuid.v1();
-    final MarkerId markerId = MarkerId('marker-label-${marker.id.toString()}');
+    final MarkerId markerId = MarkerId('cluster-marker-${cluster.id.toString()}');
 
-    BitmapDescriptor markerIcon =
-        BitmapDescriptor.fromBytes(await getBytesFromCanvas(marker.name, 500, 60));
+    String label = cluster.markerList.length.toString();
+    BitmapDescriptor markerIcon = BitmapDescriptor.fromBytes(
+        await getBytesFromCanvas(label, CLUSTER_ICON_SIZE, CLUSTER_ICON_SIZE));
 
+    LatLng averageLatLng = cluster.getAverageLatLng();
     return Marker(
       markerId: markerId,
-      position: LatLng(marker.latitude, marker.longitude),
+      position: LatLng(averageLatLng.latitude, averageLatLng.longitude),
       //icon: marker.category.markerIconBitmap, // local icon
       icon: markerIcon,
-      anchor: const Offset(0.5, 0.0),
+      anchor: const Offset(0.5, 0.5),
       // network icon
       alpha: 1.0,
-      infoWindow: (false)
-          ? InfoWindow(
-              title: marker.name + (kReleaseMode ? "" : " [${marker.category.code}-${marker.id}]"),
-              snippet: marker.category.name,
-            )
-          : InfoWindow.noText,
-      onTap: null,
+      //infoWindow: InfoWindow.noText,
+      onTap: () => _handleClickClusterMarker(context, cluster),
     );
-  }*/
+  }
 
   Future<Uint8List> getBytesFromCanvas(String label, int width, int height) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..color = Colors.transparent;
-    final Radius radius = Radius.circular(20.0);
-    canvas.drawRRect(
+    //final Paint paint = Paint()..color = Constants.App.PRIMARY_COLOR.withOpacity(0.8);
+    final Paint fill = Paint()..color = Color(0xFFF98008).withOpacity(0.8);
+    final Paint strokeWhite = Paint()
+      ..color = Colors.white.withOpacity(0.7)
+      ..strokeWidth = 4.0
+      ..style = PaintingStyle.stroke;
+    //final Radius radius = Radius.circular(60.0);
+    canvas.drawCircle(
+        Offset(CLUSTER_ICON_SIZE / 2, CLUSTER_ICON_SIZE / 2), CLUSTER_ICON_SIZE / 2, fill);
+    canvas.drawCircle(Offset(CLUSTER_ICON_SIZE / 2, CLUSTER_ICON_SIZE / 2),
+        (CLUSTER_ICON_SIZE - 15) / 2, strokeWhite);
+    canvas.drawCircle(Offset(CLUSTER_ICON_SIZE / 2, CLUSTER_ICON_SIZE / 2),
+        (CLUSTER_ICON_SIZE - 35) / 2, strokeWhite);
+    /*canvas.drawRRect(
       RRect.fromRectAndCorners(
         Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
         topLeft: radius,
@@ -226,15 +289,16 @@ class MyHomeState extends State<Home> {
         bottomRight: radius,
       ),
       paint,
-    );
+    );*/
     TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
     painter.text = TextSpan(
       text: label,
       style: getTextStyle(
         LanguageName.thai,
-        sizeTh: 50.0,
-        sizeEn: 50.0,
+        sizeTh: 60.0,
+        sizeEn: 60.0,
         isBold: true,
+        color: Colors.white,
       ),
     );
     painter.layout();
@@ -256,6 +320,16 @@ class MyHomeState extends State<Home> {
     Future.delayed(Duration(milliseconds: 500), () {
       marker.showDetailsScreen(context);
     });
+  }
+
+  void _handleClickClusterMarker(BuildContext context, ClusterModel cluster) async {
+    LatLng averageLatLng = cluster.getAverageLatLng();
+    final CameraPosition currentPosition = CameraPosition(
+      target: LatLng(averageLatLng.latitude, averageLatLng.longitude),
+      zoom: 15,
+    );
+    final GoogleMapController controller = await _googleMapController.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(currentPosition));
   }
 
   void goHome() {
@@ -287,6 +361,16 @@ class MyHomeState extends State<Home> {
         break;
       case MapTool.none:
         break;
+    }
+  }
+
+  void _handleCameraMove(CameraPosition cameraPosition) {
+    double oldZoom = _zoom;
+    double newZoom = cameraPosition.zoom;
+    _zoom = cameraPosition.zoom;
+    print("ZOOM LEVEL: $_zoom");
+    if ((oldZoom >= 12 && newZoom < 12) || (oldZoom < 12 && newZoom >= 12)) {
+      setState(() {});
     }
   }
 
@@ -487,253 +571,259 @@ class MyHomeState extends State<Home> {
           },
         ),
       ],
-      child: BlocBuilder<HomeBloc, HomeState>(
-        buildWhen: (previousState, state) {
-          return true;
-        },
-        builder: (context, state) {
-          print('--------------------------------------- HOME BUILDER');
-
-          _homeBlocContext = context;
-
-          MapTool selectedMapTool = state.selectedMapTool;
+      child: BlocListener<HomeBloc, HomeState>(
+        listener: (context, state) {
           List<MarkerModel> markerList = state.markerList;
-          //List<CategoryModel> categoryList = state.categoryList;
-          //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
-
-          /*Set<Marker> markerSet = markerList.map((MarkerModel marker) {
-            return _createMarker(context, marker);
-          }).toSet();*/
 
           if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
               state is MarkerLayerChange) {
-            /*new Future.delayed(Duration(milliseconds: 1000), () async {
+            new Future.delayed(Duration(milliseconds: 1000), () async {
               List<LatLng> markerLatLngList =
                   markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
               LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
               final GoogleMapController controller = await _googleMapController.future;
               controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
-            });*/
+            });
           } else if (state is MapToolChange && state.selectedMapTool == MapTool.none) {
             _moveToCurrentPosition(context);
           }
+        },
+        child: BlocBuilder<HomeBloc, HomeState>(
+          buildWhen: (previousState, state) {
+            return true;
+          },
+          builder: (context, state) {
+            print('--------------------------------------- HOME BUILDER');
 
-          return Container(
-            key: _keyMainContainer,
-            /*decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.redAccent,
-                width: 2.0,
-              ),
-            ),*/
-            child: Stack(
-              overflow: Overflow.visible,
-              children: <Widget>[
-                FutureBuilder(
-                  future: _createMarkerSet(context, markerList),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
-                          state is MarkerLayerChange) {
-                        new Future.delayed(Duration(milliseconds: 1000), () async {
-                          List<LatLng> markerLatLngList = markerList
-                              .map((marker) => LatLng(marker.latitude, marker.longitude))
-                              .toList();
-                          LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
-                          final GoogleMapController controller = await _googleMapController.future;
-                          controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
-                        });
-                      }
-                    }
+            _homeBlocContext = context;
 
-                    if (true /*snapshot.hasData*/) {
-                      return GoogleMap(
-                        key: _keyGoogleMaps,
-                        padding: EdgeInsets.only(
-                          //bottom: (state.selectedMapTool == MapTool.layer) || (state.selectedMapTool == MapTool.aroundMe) ? getPlatformSize(100.0) : 0.0,
-                          top: getPlatformSize(20.0),
-                          bottom: getPlatformSize(140.0),
-                          left: getPlatformSize(0.0),
-                          right: getPlatformSize(50.0),
-                        ),
-                        mapType: MapType.normal,
-                        initialCameraPosition: INITIAL_POSITION,
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: false,
-                        trafficEnabled: false,
-                        zoomControlsEnabled: false,
-                        mapToolbarEnabled: false,
-                        onMapCreated: (GoogleMapController controller) {
-                          _googleMapController.complete(controller);
-                          _moveToCurrentPosition(context);
-                        },
-                        onTap: (LatLng latLng) {
-                          if (widget.hideSearchOptions != null) {
-                            widget.hideSearchOptions();
-                          }
+            MapTool selectedMapTool = state.selectedMapTool;
+            List<MarkerModel> markerList = state.markerList;
+            //List<CategoryModel> categoryList = state.categoryList;
+            //Map<int, bool> categorySelectedMap = state.categorySelectedMap;
 
-                          /*_addMarker(latLng);
-                              _sendToVisualization(latLng);*/
-                        },
-                        markers: snapshot.hasData ? snapshot.data : null,
-                      );
-                    }
-                  },
+            /*Set<Marker> markerSet = markerList.map((MarkerModel marker) {
+              return _createMarker(context, marker);
+            }).toSet();*/
+
+            /*if ((state is MapToolChange && state.selectedMapTool != MapTool.none) ||
+                state is MarkerLayerChange) {
+              new Future.delayed(Duration(milliseconds: 1000), () async {
+                List<LatLng> markerLatLngList =
+                    markerList.map((marker) => LatLng(marker.latitude, marker.longitude)).toList();
+                LatLngBounds latLngBounds = boundsFromLatLngList(markerLatLngList);
+                final GoogleMapController controller = await _googleMapController.future;
+                controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 50));
+              });
+            } else if (state is MapToolChange && state.selectedMapTool == MapTool.none) {
+              _moveToCurrentPosition(context);
+            }*/
+
+            return Container(
+              key: _keyMainContainer,
+              /*decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.redAccent,
+                  width: 2.0,
                 ),
+              ),*/
+              child: Stack(
+                overflow: Overflow.visible,
+                children: <Widget>[
+                  FutureBuilder(
+                    future: _createMarkerSet(context, markerList),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (true /*snapshot.hasData*/) {
+                        return GoogleMap(
+                          key: _keyGoogleMaps,
+                          padding: EdgeInsets.only(
+                            //bottom: (state.selectedMapTool == MapTool.layer) || (state.selectedMapTool == MapTool.aroundMe) ? getPlatformSize(100.0) : 0.0,
+                            top: getPlatformSize(20.0),
+                            bottom: getPlatformSize(140.0),
+                            left: getPlatformSize(0.0),
+                            right: getPlatformSize(50.0),
+                          ),
+                          mapType: MapType.normal,
+                          initialCameraPosition: INITIAL_POSITION,
+                          myLocationEnabled: true,
+                          myLocationButtonEnabled: false,
+                          trafficEnabled: false,
+                          zoomControlsEnabled: false,
+                          mapToolbarEnabled: false,
+                          onMapCreated: (GoogleMapController controller) {
+                            _googleMapController.complete(controller);
+                            _moveToCurrentPosition(context);
+                          },
+                          onTap: (LatLng latLng) {
+                            if (widget.hideSearchOptions != null) {
+                              widget.hideSearchOptions();
+                            }
 
-                // Map tools
-                Container(
-                  padding: EdgeInsets.only(
-                    top: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
-                    left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                    right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                            /*_addMarker(latLng);
+                                _sendToVisualization(latLng);*/
+                          },
+                          onCameraMove: _handleCameraMove,
+                          markers: snapshot.hasData ? snapshot.data : null,
+                        );
+                      }
+                    },
                   ),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Column(
+
+                  // Map tools
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                      left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                      right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+                    ),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Column(
+                        children: <Widget>[
+                          MapToolItem(
+                            image: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
+                            imageWidth: getPlatformSize(16.4),
+                            imageHeight: getPlatformSize(18.3),
+                            marginTop: getPlatformSize(0.0),
+                            isChecked: false,
+                            showProgress: false,
+                            onClick: () => _handleClickMapTool(context, MapTool.schematicMaps),
+                          ),
+
+                          // around me
+                          MapToolItem(
+                            image: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
+                            imageWidth: getPlatformSize(26.6),
+                            imageHeight: getPlatformSize(21.6),
+                            marginTop: getPlatformSize(10.0),
+                            isChecked: selectedMapTool == MapTool.aroundMe,
+                            showProgress: state.showProgress,
+                            onClick: () => _handleClickMapTool(context, MapTool.aroundMe),
+                          ),
+
+                          // layer
+                          MapToolItem(
+                            image: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
+                            imageWidth: getPlatformSize(15.5),
+                            imageHeight: getPlatformSize(16.5),
+                            marginTop: getPlatformSize(10.0),
+                            isChecked: selectedMapTool == MapTool.layer,
+                            showProgress: false,
+                            onClick: () => _handleClickMapTool(context, MapTool.layer),
+                          ),
+
+                          // current location
+                          MapToolItem(
+                            image: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
+                            imageWidth: getPlatformSize(21.0),
+                            imageHeight: getPlatformSize(21.0),
+                            marginTop: getPlatformSize(10.0),
+                            isChecked: false,
+                            showProgress: false,
+                            onClick: () => _handleClickMapTool(context, MapTool.currentLocation),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // bottom sheet
+                  /*Visibility(
+                    visible: true,
+                    child: IndexedStack(
+                      index: selectedMapTool == MapTool.none ? 0 : 1,
                       children: <Widget>[
-                        MapToolItem(
-                          image: AssetImage('assets/images/map_tools/ic_map_tool_schematic.png'),
-                          imageWidth: getPlatformSize(16.4),
-                          imageHeight: getPlatformSize(18.3),
-                          marginTop: getPlatformSize(0.0),
-                          isChecked: false,
-                          showProgress: false,
-                          onClick: () => _handleClickMapTool(context, MapTool.schematicMaps),
-                        ),
-
-                        // around me
-                        MapToolItem(
-                          image: AssetImage('assets/images/map_tools/ic_map_tool_nearby.png'),
-                          imageWidth: getPlatformSize(26.6),
-                          imageHeight: getPlatformSize(21.6),
-                          marginTop: getPlatformSize(10.0),
-                          isChecked: selectedMapTool == MapTool.aroundMe,
-                          showProgress: state.showProgress,
-                          onClick: () => _handleClickMapTool(context, MapTool.aroundMe),
-                        ),
-
-                        // layer
-                        MapToolItem(
-                          image: AssetImage('assets/images/map_tools/ic_map_tool_layer.png'),
-                          imageWidth: getPlatformSize(15.5),
-                          imageHeight: getPlatformSize(16.5),
-                          marginTop: getPlatformSize(10.0),
-                          isChecked: selectedMapTool == MapTool.layer,
-                          showProgress: false,
-                          onClick: () => _handleClickMapTool(context, MapTool.layer),
-                        ),
-
-                        // current location
-                        MapToolItem(
-                          image: AssetImage('assets/images/map_tools/ic_map_tool_location.png'),
-                          imageWidth: getPlatformSize(21.0),
-                          imageHeight: getPlatformSize(21.0),
-                          marginTop: getPlatformSize(10.0),
-                          isChecked: false,
-                          showProgress: false,
-                          onClick: () => _handleClickMapTool(context, MapTool.currentLocation),
+                        _getWidgets(),
+                        LayerBottomSheet(
+                          collapsePosition: _mainContainerHeight -
+                              getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                          // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                          expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                         ),
                       ],
                     ),
+                  ),*/
+
+                  Visibility(
+                    visible: selectedMapTool == MapTool.none,
+                    child: _getWidget(WidgetType.favorite),
                   ),
-                ),
-
-                // bottom sheet
-                /*Visibility(
-                  visible: true,
-                  child: IndexedStack(
-                    index: selectedMapTool == MapTool.none ? 0 : 1,
-                    children: <Widget>[
-                      _getWidgets(),
-                      LayerBottomSheet(
-                        collapsePosition: _mainContainerHeight -
-                            getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
-                        // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
-                      ),
-                    ],
+                  Visibility(
+                    visible: selectedMapTool == MapTool.none,
+                    child: _getWidget(WidgetType.incident),
                   ),
-                ),*/
-
-                Visibility(
-                  visible: selectedMapTool == MapTool.none,
-                  child: _getWidget(WidgetType.favorite),
-                ),
-                Visibility(
-                  visible: selectedMapTool == MapTool.none,
-                  child: _getWidget(WidgetType.incident),
-                ),
-                Visibility(
-                  visible: selectedMapTool == MapTool.none,
-                  child: _getWidget(WidgetType.expressWay),
-                ),
-                Visibility(
-                  visible: selectedMapTool != MapTool.none,
-                  child: LayerBottomSheet(
-                    collapsePosition:
-                        _mainContainerHeight - getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
-                    // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
-                    expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                  Visibility(
+                    visible: selectedMapTool == MapTool.none,
+                    child: _getWidget(WidgetType.expressWay),
                   ),
-                ),
-
-                BlocListener<MarkerBloc, MarkerState>(
-                  listener: (context, state) {
-                    if (state is ShowTollPlazaBottomSheet) {
-                      _keyTollPlazaBottomSheet.currentState.toggleSheet();
-                    }
-                  },
-                  child: BlocBuilder<MarkerBloc, MarkerState>(
-                    builder: (context, state) {
-                      TollPlazaModel tollPlaza;
-
-                      if (state is ShowTollPlazaBottomSheet) {
-                        tollPlaza = state.tollPlaza;
-                      }
-                      return TollPlazaBottomSheet(
-                        key: _keyTollPlazaBottomSheet,
-                        collapsePosition: _mainContainerHeight,
-                        expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
-                        tollPlazaModel: tollPlaza,
-                      );
-                    },
-                  ),
-                ),
-
-                /*BlocBuilder<MarkerBloc, MarkerState>(
-                  builder: (context, state) {
-                    if (state is ShowTollPlazaBottomSheet) {
-                      _keyTollPlazaBottomSheet.currentState.toggleSheet();
-                    }
-
-                    return TollPlazaBottomSheet(
-                      key: _keyTollPlazaBottomSheet,
-                      collapsePosition: _mainContainerHeight + getPlatformSize(1.0),
-                      expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
-                    );
-                  },
-                ),*/
-
-                Visibility(
-                  visible: state.showProgress || _isLoading,
-                  child: Center(
-                    child: MyProgressIndicator(),
-                  ),
-                ),
-
-                /*Visibility(
-                  visible: state.showProgress,
-                  child: Container(
-                    child: Center(
-                      child: CircularProgressIndicator(),
+                  Visibility(
+                    visible: selectedMapTool != MapTool.none,
+                    child: LayerBottomSheet(
+                      collapsePosition: _mainContainerHeight -
+                          getPlatformSize(Constants.BottomSheet.HEIGHT_LAYER),
+                      // expandPosition ไม่ได้ใช้ เพราะ layer bottom sheet ยืดไม่ได้
+                      expandPosition: getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
                     ),
                   ),
-                ),*/
-              ],
-            ),
-          );
-        },
+
+                  BlocListener<MarkerBloc, MarkerState>(
+                    listener: (context, state) {
+                      if (state is ShowTollPlazaBottomSheet) {
+                        _keyTollPlazaBottomSheet.currentState.toggleSheet();
+                      }
+                    },
+                    child: BlocBuilder<MarkerBloc, MarkerState>(
+                      builder: (context, state) {
+                        TollPlazaModel tollPlaza;
+
+                        if (state is ShowTollPlazaBottomSheet) {
+                          tollPlaza = state.tollPlaza;
+                        }
+                        return TollPlazaBottomSheet(
+                          key: _keyTollPlazaBottomSheet,
+                          collapsePosition: _mainContainerHeight,
+                          expandPosition:
+                              getPlatformSize(Constants.HomeScreen.MAP_TOOL_TOP_POSITION),
+                          tollPlazaModel: tollPlaza,
+                        );
+                      },
+                    ),
+                  ),
+
+                  /*BlocBuilder<MarkerBloc, MarkerState>(
+                    builder: (context, state) {
+                      if (state is ShowTollPlazaBottomSheet) {
+                        _keyTollPlazaBottomSheet.currentState.toggleSheet();
+                      }
+
+                      return TollPlazaBottomSheet(
+                        key: _keyTollPlazaBottomSheet,
+                        collapsePosition: _mainContainerHeight + getPlatformSize(1.0),
+                        expandPosition: getPlatformSize(MAP_TOOL_TOP_POSITION),
+                      );
+                    },
+                  ),*/
+
+                  Visibility(
+                    visible: state.showProgress || _isLoading,
+                    child: Center(
+                      child: MyProgressIndicator(),
+                    ),
+                  ),
+
+                  /*Visibility(
+                    visible: state.showProgress,
+                    child: Container(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),*/
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
+import 'package:exattraffic/components/options_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -107,6 +108,8 @@ class MyRouteState extends State<MyRoute> {
       }
     });
   }
+
+  void _handleClickTimePeriodOption(BuildContext context) {}
 
   void _handleCameraMove(CameraPosition cameraPosition) {
     //_mapTarget = cameraPosition.target;
@@ -962,7 +965,8 @@ class MyRouteState extends State<MyRoute> {
                                                       .bestRoute
                                                       .origin
                                                       .name
-                                                  : LocaleText.selectEntrance().ofLanguage(language.lang),
+                                                  : LocaleText.selectEntrance()
+                                                      .ofLanguage(language.lang),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: getTextStyle(
@@ -1341,7 +1345,37 @@ class MyRouteState extends State<MyRoute> {
                 collapsePosition: _googleMapsHeight,
                 expandPosition: getPlatformSize(100.0),
                 tollPlazaModel: _tollPlaza,
-              )
+              ),
+
+              Consumer<LanguageModel>(
+                builder: (context, language, child) {
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: getPlatformSize(60.0)),
+                      child: Wrap(
+                        children: <Widget>[
+                          OptionsDialog(
+                            optionList: [
+                              OptionModel(
+                                  text: "15 นาที", //searchServiceText.ofLanguage(language.lang),
+                                  onClick: () => _handleClickTimePeriodOption(context),
+                                  bulletColor: Color(0xFF3497FD)),
+                              OptionModel(
+                                  text: "30 นาที", //searchPlaceText.ofLanguage(language.lang),
+                                  onClick: () => _handleClickTimePeriodOption(context),
+                                  bulletColor: Color(0xFF3ACCE1)),
+                              OptionModel(
+                                  text: "45 นาที", //searchPlaceText.ofLanguage(language.lang),
+                                  onClick: () => _handleClickTimePeriodOption(context),
+                                  bulletColor: Color(0xFF3ACCE1)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

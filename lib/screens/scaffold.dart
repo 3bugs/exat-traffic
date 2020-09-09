@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/options_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -394,148 +395,21 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                               width: MediaQuery.of(context).size.width,
                               top: getPlatformSize(66.0),
                               left: 0.0,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  left: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                                  right: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-                                ),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0x22777777),
-                                        blurRadius: getPlatformSize(6.0),
-                                        spreadRadius: getPlatformSize(3.0),
-                                        offset: Offset(
-                                          getPlatformSize(1.0), // move right
-                                          getPlatformSize(1.0), // move down
-                                        ),
-                                      ),
+                              child: Consumer<LanguageModel>(
+                                builder: (context, language, child) {
+                                  return OptionsDialog(
+                                    optionList: [
+                                      OptionModel(
+                                          text: searchServiceText.ofLanguage(language.lang),
+                                          onClick: () => _handleClickSearchOption(0),
+                                          bulletColor: Color(0xFF3497FD)),
+                                      OptionModel(
+                                          text: searchPlaceText.ofLanguage(language.lang),
+                                          onClick: () => _handleClickSearchOption(1),
+                                          bulletColor: Color(0xFF3ACCE1)),
                                     ],
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(
-                                          getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-                                    ),
-                                  ),
-                                  child: Column(
-                                    children: <Widget>[
-                                      // ค้นหาบริการผู้ใช้ทาง
-                                      Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () => _handleClickSearchOption(0),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(
-                                                getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-                                            topRight: Radius.circular(
-                                                getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: getPlatformSize(18.0),
-                                              horizontal: getPlatformSize(20.0),
-                                            ),
-                                            child: Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  width: getPlatformSize(10.0),
-                                                  height: getPlatformSize(10.0),
-                                                  margin: EdgeInsets.only(
-                                                    right: getPlatformSize(16.0),
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFF3497FD),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(getPlatformSize(3.0)),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Consumer<LanguageModel>(
-                                                    builder: (context, language, child) {
-                                                      return Text(
-                                                        searchServiceText.ofLanguage(language.lang),
-                                                        style: getTextStyle(
-                                                          language.lang,
-                                                          color: Color(0xFF454F63),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // เส้นคั่น
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                          left: getPlatformSize(20.0),
-                                          right: getPlatformSize(20.0),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Color(0xFFF4F4F4),
-                                              width: getPlatformSize(1.0),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // ค้นหาเส้นทาง
-                                      Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () => _handleClickSearchOption(1),
-                                          borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(
-                                                getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-                                            bottomRight: Radius.circular(
-                                                getPlatformSize(Constants.App.BOX_BORDER_RADIUS)),
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: getPlatformSize(18.0),
-                                              horizontal: getPlatformSize(20.0),
-                                            ),
-                                            child: Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  width: getPlatformSize(10.0),
-                                                  height: getPlatformSize(10.0),
-                                                  margin: EdgeInsets.only(
-                                                    right: getPlatformSize(16.0),
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Color(0xFF3ACCE1),
-                                                    borderRadius: BorderRadius.all(
-                                                      Radius.circular(getPlatformSize(3.0)),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Consumer<LanguageModel>(
-                                                    builder: (context, language, child) {
-                                                      return Text(
-                                                        searchPlaceText.ofLanguage(language.lang),
-                                                        style: getTextStyle(
-                                                          language.lang,
-                                                          color: Color(0xFF454F63),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ),
                           ),

@@ -12,6 +12,7 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/error_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
+
 //import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
@@ -362,6 +363,22 @@ class ExatApi {
     if (responseResult.success) {
       Map<String, dynamic> markerJson = responseResult.data;
       return MarkerModel.fromJson(markerJson);
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<List<int>> fetchTimePeriod(BuildContext context) async {
+    final String url = "$EXAT_API_BASED_URL/coreconfigs/view";
+
+    ResponseResult responseResult = await _makeRequest(
+      context,
+      url,
+      {"requestData": "time_period", "filterBy": "group", "fields": "*"},
+    );
+    if (responseResult.success) {
+      List dataList = responseResult.data;
+      return dataList.map<int>((period) => int.parse(period['value'])).toList();
     } else {
       throw Exception(responseResult.data);
     }

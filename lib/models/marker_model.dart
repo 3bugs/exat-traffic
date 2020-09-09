@@ -13,6 +13,7 @@ import 'package:exattraffic/screens/marker_details/police_station_details.dart';
 import 'package:exattraffic/screens/marker_details/rest_area_details.dart';
 import 'package:exattraffic/models/marker_categories/uturn_model.dart';
 import 'package:exattraffic/screens/marker_details/uturn_details.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkerModel {
   final int id;
@@ -33,6 +34,7 @@ class MarkerModel {
   final String direction;
   final String phone;
   final int groupId;
+  final String groupName;
   final double x;
   final double y;
   final List<CoreConfigModel> coreConfigList;
@@ -80,6 +82,7 @@ class MarkerModel {
     @required this.direction,
     @required this.phone,
     @required this.groupId,
+    @required this.groupName,
     @required this.x,
     @required this.y,
     @required this.coreConfigList,
@@ -137,6 +140,10 @@ class MarkerModel {
       y = null;
     }
 
+    List group = json['group'] ?? List();
+    int groupId = group.isNotEmpty ? group[0]['parent'] : 0;
+    String groupName = group.isNotEmpty ? group[0]['group_name'] : '';
+
     return MarkerModel(
       id: json['id'],
       name: json['name'],
@@ -151,7 +158,9 @@ class MarkerModel {
       godImageUrl: godImageUrl,
       direction: json['direction'],
       phone: json['tel'],
-      groupId: json['group_id'],
+      //groupId: json['group_id'],
+      groupId: groupId,
+      groupName: groupName,
       x: x,
       y: y,
       coreConfigList: coreConfigJson
@@ -261,6 +270,31 @@ class MarkerModel {
         'lat': this.latitude,
         'lng': this.longitude,
       };
+}
+
+class ClusterModel {
+  final int id;
+  final String name;
+  final List<MarkerModel> markerList = List();
+
+  ClusterModel({@required this.id, @required this.name});
+
+  LatLng getAverageLatLng() {
+    /*if (this.markerList.length == 1) {
+      return LatLng(this.markerList[0].latitude, this.markerList[0].longitude);
+    }*/
+    return this.markerList.fold(null, (previousLatLng, marker) {
+      double lat, lng;
+      if (previousLatLng == null) {
+        lat = marker.latitude;
+        lng = marker.longitude;
+      } else {
+        lat = (previousLatLng.latitude + marker.latitude) / 2;
+        lng = (previousLatLng.longitude + marker.longitude) / 2;
+      }
+      return LatLng(lat, lng);
+    });
+  }
 }
 
 /*

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
+
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/core_configs_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
-import 'package:flutter/material.dart';
 
 class ExpressWayModel {
   ExpressWayModel({

@@ -28,7 +28,7 @@ class BottomSheet {
   static const double HEIGHT_WIDGET_FAVORITE = 194.0;
   static const double HEIGHT_WIDGET_INCIDENT = 194.0;
   static const double HEIGHT_LAYER = 145.0;
-  static const double HEIGHT_ROUTE_COLLAPSED = 102.0;
+  static const double HEIGHT_ROUTE_COLLAPSED = 106.0;
   static const double HEIGHT_ROUTE_EXPANDED = 335.0;
   static const Color LAYER_ITEM_BORDER_COLOR_OFF = Color(0xFF898989);
   static const Color LAYER_ITEM_BORDER_COLOR_ON = App.PRIMARY_COLOR;

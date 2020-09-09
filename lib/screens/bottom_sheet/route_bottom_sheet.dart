@@ -396,21 +396,67 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                       right: getPlatformSize(16.0),
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
-                            style: getTextStyle(
-                              language.lang,
-                              color: Colors.white,
-                              sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                              sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                            ),
-                          ),
-                        ),
+                        widget.showArrivalTime
+                            ? Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 0.5,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(getPlatformSize(4.0)),
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.only(
+                                      top: getPlatformSize(2.0),
+                                      bottom: getPlatformSize(2.0),
+                                      left: getPlatformSize(8.0),
+                                      right: getPlatformSize(4.0),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(
+                                          'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
+                                          style: getTextStyle(
+                                            language.lang,
+                                            color: Colors.white,
+                                            sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                            sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: getPlatformSize(6.0),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.white,
+                                          size: 20.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
+                                style: getTextStyle(
+                                  language.lang,
+                                  color: Colors.white,
+                                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                ),
+                              ),
                         widget.showArrivalTime
                             ? Text(
-                                'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
+                                'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,
