@@ -23,6 +23,7 @@ class LanguageModel extends ChangeNotifier {
   static const String EN = "EN";
 
   final Map<LanguageName, String> _languageCodeMap = Map();
+  final Map<LanguageName, String> _languageCodeGoogleApiMap = Map();
   LanguageName _lang;
 
   LanguageModel() {
@@ -44,6 +45,19 @@ class LanguageModel extends ChangeNotifier {
     _languageCodeMap[LanguageName.malay] = "MY";
     _languageCodeMap[LanguageName.indonesian] = "ID";
     _languageCodeMap[LanguageName.filipino] = "PH";
+
+    _languageCodeGoogleApiMap[LanguageName.thai] = 'th';
+    _languageCodeGoogleApiMap[LanguageName.english] = 'en';
+    _languageCodeGoogleApiMap[LanguageName.chinese] = 'zh-CN';
+    _languageCodeGoogleApiMap[LanguageName.japanese] = "ja";
+    _languageCodeGoogleApiMap[LanguageName.korean] = "ko";
+    _languageCodeGoogleApiMap[LanguageName.vietnamese] = "vi";
+    _languageCodeGoogleApiMap[LanguageName.lao] = "lo";
+    _languageCodeGoogleApiMap[LanguageName.myanmar] = "my";
+    _languageCodeGoogleApiMap[LanguageName.khmer] = "km";
+    _languageCodeGoogleApiMap[LanguageName.malay] = "ms";
+    _languageCodeGoogleApiMap[LanguageName.indonesian] = "id";
+    _languageCodeGoogleApiMap[LanguageName.filipino] = "fil";
   }
 
   Future<SharedPreferences> _getSharedPrefs() async {
@@ -66,6 +80,10 @@ class LanguageModel extends ChangeNotifier {
 
   String get langCode {
     return _languageCodeMap[_lang] ?? EN;
+  }
+
+  String get langCodeGoogleApi {
+    return _languageCodeGoogleApiMap[_lang] ?? 'en';
   }
 
   LanguageName get lang => _lang;

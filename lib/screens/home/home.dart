@@ -410,7 +410,7 @@ class MyHomeState extends State<Home> {
         favorite.marker.showDetailsScreen(context, callback: null);
         break;
       case FavoriteType.place:
-        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices(context);
         /*_presenter.setLoadingMessage("ดึงข้อมูลสถานที่");
         _presenter.loading();*/
         setState(() {

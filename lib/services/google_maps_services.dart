@@ -4,15 +4,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/secret.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 final String apiKey = Platform.isAndroid
     ? Secret.GOOGLE_API_KEY_ANDROID
     : Secret.GOOGLE_API_KEY_IOS;
 
 class GoogleMapsServices {
+  final BuildContext _context;
+
+  GoogleMapsServices(this._context);
+
   // https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&waypoints=via:13.8133553%2C100.55055219999997%7Cvia:13.660109%2C100.66368499999999%7C&origin=13.7998143,100.4187235&destination=13.56686331,100.937025
   Future<Map<String, dynamic>> getRoute(
       LatLng origin, LatLng destination, List<LatLng> wayPointList) async {
@@ -90,12 +96,13 @@ class GoogleMapsServices {
   }
 
   Future<ResponseResult> _makeRequest(String endPoint, Map<String, dynamic> params) async {
+    String languageCode = Provider.of<LanguageModel>(_context, listen: false).langCodeGoogleApi;
     String queryParams = "";
     params.forEach((key, value) {
       queryParams += "&$key=$value";
     });
     final String url =
-        "https://maps.googleapis.com/maps/api/$endPoint/json?key=$apiKey&language=th$queryParams";
+        "https://maps.googleapis.com/maps/api/$endPoint/json?key=$apiKey&language=$languageCode$queryParams";
     http.Response response = await http.get(
       url,
       headers: {"referer": "http://${Platform.isAndroid ? 'android' : 'ios'}.exat.co.th/"},

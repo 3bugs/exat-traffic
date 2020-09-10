@@ -40,7 +40,7 @@ class FavoriteState extends State<Favorite> {
         favorite.marker.showDetailsScreen(context, callback: onRefresh);
         break;
       case FavoriteType.place:
-        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices(context);
         _presenter.setLoadingMessage("ดึงข้อมูลสถานที่");
         _presenter.loading();
         try {

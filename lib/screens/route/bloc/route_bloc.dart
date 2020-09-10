@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,12 +16,13 @@ import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
+  final BuildContext _context;
   final List<MarkerModel> markerList;
   final List<CategoryModel> categoryList;
   List<GateInModel> _gateInList;
   RouteModel _bestRoute;
 
-  RouteBloc({
+  RouteBloc(this._context, {
     @required this.markerList,
     @required this.categoryList,
   }) : super(FetchGateInInitial());
@@ -170,7 +172,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       );
 
       try {
-        final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+        final GoogleMapsServices googleMapsServices = GoogleMapsServices(_context);
 
         final List<LatLng> partTollLatLngList = selectedCostToll.partTollMarkerList
             .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))

@@ -746,19 +746,19 @@ class LocaleText {
     );
   }
 
-  factory LocaleText.departAt() {
+  factory LocaleText.departureTime() {
     return LocaleText(
-      thai: 'ออกเดินทางเวลา',
-      english: 'Depart at',
-      chinese: '出发于',
-      japanese: '出発する',
-      korean: '출발하다',
-      lao: 'ອອກເດີນທາງທີ່',
-      vietnamese: 'khởi hành lúc',
-      myanmar: 'ထွက်သွားပါ',
-      khmer: 'ចាកចេញនៅ',
-      malay: 'bertolak pada',
-      indonesian: 'berangkat pada',
+      thai: 'เวลาออกเดินทาง',
+      english: 'Departure time',
+      chinese: '出发时间',
+      japanese: '出発時間',
+      korean: '출발 시각',
+      lao: 'ເວລາອອກເດີນທາງ',
+      vietnamese: 'Giờ khởi hành',
+      myanmar: 'ထွက်ခွာချိန်',
+      khmer: 'មោង​ចាកចេញ',
+      malay: 'Masa berlepas',
+      indonesian: 'Waktu keberangkatan',
     );
   }
 

@@ -19,7 +19,7 @@ import 'package:exattraffic/models/locale_text.dart';
 class SearchPlacePresenter extends BasePresenter<SearchPlace> {
   static const DELAY_SEARCH_MS = 750;
 
-  final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
+  GoogleMapsServices _googleMapsServices;
   String searchTerm;
   List<PredictionModel> predictionList = List();
   List<SearchResultModel> searchResultList;
@@ -28,7 +28,9 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
 
   SearchPlacePresenter(
     State<SearchPlace> state,
-  ) : super(state);
+  ) : super(state) {
+    _googleMapsServices = GoogleMapsServices(state.context);
+  }
 
   void search(String text) async {
     String newText = text ?? "";
@@ -146,7 +148,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
       BlocProvider.of<AppBloc>(context).markerList,
     );
 
-    final GoogleMapsServices googleMapsServices = GoogleMapsServices();
+    final GoogleMapsServices googleMapsServices = GoogleMapsServices(context);
 
     routeList = await Future.wait<GateInCostTollModel>(
       routeList.map((gateInCostToll) async {
