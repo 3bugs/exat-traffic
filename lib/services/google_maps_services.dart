@@ -2,13 +2,15 @@ import 'dart:io' show Platform;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:exattraffic/services/api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:exattraffic/services/api.dart';
+import 'package:exattraffic/secret.dart';
+
 final String apiKey = Platform.isAndroid
-    ? 'AIzaSyCLaUOby2AjMfukSfJhzvdz8OWcoJzYIkI'
-    : 'AIzaSyB2LvMGn_8nDYSmArH2ONrwhQxRXNG1PcA';
+    ? Secret.GOOGLE_API_KEY_ANDROID
+    : Secret.GOOGLE_API_KEY_IOS;
 
 class GoogleMapsServices {
   // https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&waypoints=via:13.8133553%2C100.55055219999997%7Cvia:13.660109%2C100.66368499999999%7C&origin=13.7998143,100.4187235&destination=13.56686331,100.937025

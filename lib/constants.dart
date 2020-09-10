@@ -32,6 +32,16 @@ class BottomSheet {
   static const double HEIGHT_ROUTE_EXPANDED = 335.0;
   static const Color LAYER_ITEM_BORDER_COLOR_OFF = Color(0xFF898989);
   static const Color LAYER_ITEM_BORDER_COLOR_ON = App.PRIMARY_COLOR;
+  static const Color TAB_STRIP_COLOR_1 = Color(0xFF665EFF);
+  static const Color TAB_STRIP_COLOR_2 = Color(0xFF5773FF);
+  static const Color TAB_STRIP_COLOR_3 = Color(0xFF3497FD);
+  static const Color TAB_STRIP_COLOR_4 = Color(0xFF3ACCE1);
+  static const List<Color> TAB_STRIP_COLOR_LIST = [
+    TAB_STRIP_COLOR_1,
+    TAB_STRIP_COLOR_2,
+    TAB_STRIP_COLOR_3,
+    TAB_STRIP_COLOR_4,
+  ];
 }
 
 class HomeScreen {

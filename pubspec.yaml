@@ -49,6 +49,7 @@ dependencies:
   flutter_phoenix: "^0.1.0" # restart app
   enum_to_string: ^1.0.9
   google_maps_cluster_manager: ^0.1.0
+  sprintf: "^4.0.0"
 
   # Map markers clustering
   fluster: ^1.1.2

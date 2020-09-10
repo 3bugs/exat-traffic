@@ -745,4 +745,52 @@ class LocaleText {
       indonesian: 'hapus dari favorit. apakah kamu yakin',
     );
   }
+
+  factory LocaleText.departAt() {
+    return LocaleText(
+      thai: 'ออกเดินทางเวลา',
+      english: 'Depart at',
+      chinese: '出发于',
+      japanese: '出発する',
+      korean: '출발하다',
+      lao: 'ອອກເດີນທາງທີ່',
+      vietnamese: 'khởi hành lúc',
+      myanmar: 'ထွက်သွားပါ',
+      khmer: 'ចាកចេញនៅ',
+      malay: 'bertolak pada',
+      indonesian: 'berangkat pada',
+    );
+  }
+
+  factory LocaleText.now() {
+    return LocaleText(
+      thai: 'ตอนนี้',
+      english: 'Now',
+      chinese: '现在',
+      japanese: '今',
+      korean: '지금',
+      lao: 'ດຽວນີ້',
+      vietnamese: 'hiện nay',
+      myanmar: 'အခု',
+      khmer: 'ឥឡូវ​នេះ',
+      malay: 'sekarang',
+      indonesian: 'sekarang',
+    );
+  }
+
+  factory LocaleText.minutesLater() {
+    return LocaleText(
+      thai: '%d นาทีข้างหน้า',
+      english: '%d minutes later',
+      chinese: '%d分钟后',
+      japanese: '%d分後',
+      korean: '%d 분 후',
+      lao: 'ໃນ %d ນາທີ',
+      vietnamese: '%d phút sau',
+      myanmar: '%d မိနစ်အကြာတွင်',
+      khmer: '%d នាទីក្រោយមក',
+      malay: '%d minit kemudian',
+      indonesian: '%d menit kemudian',
+    );
+  }
 }

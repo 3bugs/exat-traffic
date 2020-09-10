@@ -1,10 +1,10 @@
-import 'package:exattraffic/models/language_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/gate_in_model.dart';
@@ -12,7 +12,6 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/error_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
-
 //import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
@@ -26,7 +25,7 @@ import 'package:exattraffic/models/questionnair_model.dart';
 import 'package:exattraffic/models/notification_model.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/models/emergency_number_model.dart';
-import 'package:provider/provider.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 // https://bezkoder.com/dart-flutter-parse-json-string-array-to-object-list/
 // https://medium.com/flutter-community/parsing-complex-json-in-flutter-747c46655f51
@@ -368,8 +367,13 @@ class ExatApi {
     }
   }
 
+  static List<int> _timePeriodList;
   static Future<List<int>> fetchTimePeriod(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/coreconfigs/view";
+
+    if (_timePeriodList != null) {
+      return _timePeriodList;
+    }
 
     ResponseResult responseResult = await _makeRequest(
       context,
@@ -378,7 +382,9 @@ class ExatApi {
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
-      return dataList.map<int>((period) => int.parse(period['value'])).toList();
+      _timePeriodList = [0];
+      _timePeriodList.addAll(dataList.map<int>((period) => int.parse(period['value'])).toList());
+      return _timePeriodList;
     } else {
       throw Exception(responseResult.data);
     }

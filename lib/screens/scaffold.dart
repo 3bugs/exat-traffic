@@ -400,13 +400,15 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                                   return OptionsDialog(
                                     optionList: [
                                       OptionModel(
-                                          text: searchServiceText.ofLanguage(language.lang),
-                                          onClick: () => _handleClickSearchOption(0),
-                                          bulletColor: Color(0xFF3497FD)),
+                                        text: searchServiceText.ofLanguage(language.lang),
+                                        onClick: () => _handleClickSearchOption(0),
+                                        bulletColor: Constants.BottomSheet.TAB_STRIP_COLOR_3,
+                                      ),
                                       OptionModel(
-                                          text: searchPlaceText.ofLanguage(language.lang),
-                                          onClick: () => _handleClickSearchOption(1),
-                                          bulletColor: Color(0xFF3ACCE1)),
+                                        text: searchPlaceText.ofLanguage(language.lang),
+                                        onClick: () => _handleClickSearchOption(1),
+                                        bulletColor: Constants.BottomSheet.TAB_STRIP_COLOR_4,
+                                      ),
                                     ],
                                   );
                                 },

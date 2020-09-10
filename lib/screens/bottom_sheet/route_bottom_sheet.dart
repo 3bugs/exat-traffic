@@ -32,6 +32,7 @@ class RouteBottomSheet extends StatefulWidget {
     @required this.googleRoute,
     this.destination,
     @required this.showArrivalTime,
+    this.onClickTimePeriodOption,
   });
 
   final double expandPosition;
@@ -41,6 +42,7 @@ class RouteBottomSheet extends StatefulWidget {
   final Map<String, dynamic> googleRoute;
   final PlaceDetailsModel destination;
   final bool showArrivalTime;
+  final Function onClickTimePeriodOption;
 
   @override
   _RouteBottomSheetState createState() => _RouteBottomSheetState();
@@ -403,7 +405,11 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                             ? Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    if (widget.onClickTimePeriodOption != null) {
+                                      widget.onClickTimePeriodOption();
+                                    }
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(

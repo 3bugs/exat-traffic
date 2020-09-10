@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:io' show Platform;
 
-import 'package:exattraffic/components/options_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:sprintf/sprintf.dart';
 
 import 'package:exattraffic/screens/route/bloc/bloc.dart';
 import 'package:exattraffic/etc/utils.dart';
@@ -30,6 +30,8 @@ import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/components/options_dialog.dart';
+import 'package:exattraffic/components/my_progress_indicator.dart';
 
 class MyRoute extends StatefulWidget {
   final Function showBestRouteAfterSearch;
@@ -52,6 +54,8 @@ class MyRouteState extends State<MyRoute> {
   );
   static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 20; // km per hour
 
+  bool _isLoading = false;
+
   //double _googleMapsTop = 0; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
   double _googleMapsHeight = 400; // กำหนดไปก่อน ค่าจริงจะมาจาก _afterLayout()
 
@@ -67,6 +71,40 @@ class MyRouteState extends State<MyRoute> {
   RouteBloc _routeBloc;
 
   TollPlazaModel _tollPlaza;
+
+  List<int> _timePeriodList;
+  bool _timePeriodDialogVisible = false;
+
+  void _handleClickTimePeriodOptionInBottomSheet() {
+    if (_timePeriodDialogVisible)
+      _hideTimePeriodDialog();
+    else
+      _showTimePeriodDialog();
+  }
+
+  void _showTimePeriodDialog() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      _timePeriodList = await ExatApi.fetchTimePeriod(context);
+      setState(() {
+        _timePeriodDialogVisible = true;
+      });
+    } catch (e) {
+      alert(context, "", e.toString());
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _hideTimePeriodDialog() {
+    setState(() {
+      _timePeriodDialogVisible = false;
+    });
+  }
 
   void _handleClickMyLocation(BuildContext context) {
     _moveMapToCurrentPosition(context).then((locationEnabled) {
@@ -109,7 +147,9 @@ class MyRouteState extends State<MyRoute> {
     });
   }
 
-  void _handleClickTimePeriodOption(BuildContext context) {}
+  void _handleClickTimePeriodOption(BuildContext context) {
+    _hideTimePeriodDialog();
+  }
 
   void _handleCameraMove(CameraPosition cameraPosition) {
     //_mapTarget = cameraPosition.target;
@@ -1319,6 +1359,7 @@ class MyRouteState extends State<MyRoute> {
                       googleRoute: state.bestRoute.gateInCostTollList[0].googleRoute,
                       destination: state.bestRoute.destination,
                       showArrivalTime: true,
+                      onClickTimePeriodOption: this._handleClickTimePeriodOptionInBottomSheet,
                     );
                   } else {
                     final GateInModel selectedGateIn = state.selectedGateIn;
@@ -1347,35 +1388,45 @@ class MyRouteState extends State<MyRoute> {
                 tollPlazaModel: _tollPlaza,
               ),
 
-              Consumer<LanguageModel>(
-                builder: (context, language, child) {
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: getPlatformSize(60.0)),
-                      child: Wrap(
-                        children: <Widget>[
-                          OptionsDialog(
-                            optionList: [
-                              OptionModel(
-                                  text: "15 นาที", //searchServiceText.ofLanguage(language.lang),
+              // dialog เลือกช่วงเวลา
+              if (_timePeriodDialogVisible)
+                Consumer<LanguageModel>(
+                  builder: (context, language, child) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: getPlatformSize(60.0)),
+                        child: Wrap(
+                          children: <Widget>[
+                            OptionsDialog(
+                              title: LocaleText.departAt().ofLanguage(language.lang),
+                              optionList: _timePeriodList.asMap().entries.map((entry) {
+                                return OptionModel(
+                                  text: entry.value == 0
+                                      ? LocaleText.now().ofLanguage(language.lang)
+                                      : sprintf(
+                                          LocaleText.minutesLater().ofLanguage(language.lang),
+                                          [entry.value],
+                                        ),
+                                  //searchServiceText.ofLanguage(language.lang),
                                   onClick: () => _handleClickTimePeriodOption(context),
-                                  bulletColor: Color(0xFF3497FD)),
-                              OptionModel(
-                                  text: "30 นาที", //searchPlaceText.ofLanguage(language.lang),
-                                  onClick: () => _handleClickTimePeriodOption(context),
-                                  bulletColor: Color(0xFF3ACCE1)),
-                              OptionModel(
-                                  text: "45 นาที", //searchPlaceText.ofLanguage(language.lang),
-                                  onClick: () => _handleClickTimePeriodOption(context),
-                                  bulletColor: Color(0xFF3ACCE1)),
-                            ],
-                          ),
-                        ],
+                                  bulletColor:
+                                      Constants.BottomSheet.TAB_STRIP_COLOR_LIST[entry.key % 4],
+                                );
+                              }).toList(),
+                              itemPadding: EdgeInsets.symmetric(
+                                vertical: getPlatformSize(12.0),
+                                horizontal: getPlatformSize(20.0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
+
+              if (_isLoading)
+                Center(child: MyProgressIndicator()),
             ],
           ),
         ),

@@ -6,9 +6,11 @@ import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/models/language_model.dart';
 
 class OptionsDialog extends StatelessWidget {
+  final String title;
   final List<OptionModel> optionList;
+  final EdgeInsets itemPadding;
 
-  OptionsDialog({@required this.optionList});
+  OptionsDialog({this.title, @required this.optionList, this.itemPadding});
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +37,44 @@ class OptionsDialog extends StatelessWidget {
         ),
       ),
       child: Column(
-        children: optionList
-            .asMap()
-            .entries
-            .map<Widget>(
-              (entry) => OptionItem(
-                option: entry.value,
-                isFirstItem: entry.key == 0,
-                isLastItem: entry.key == optionList.length - 1,
-              ),
-            )
-            .toList(),
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (this.title != null)
+            Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return Container(
+                  //padding: this.itemPadding,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: getPlatformSize(12.0),
+                      bottom: getPlatformSize(8.0),
+                      left: getPlatformSize(0.0),
+                      right: getPlatformSize(0.0),
+                    ),
+                    child: Text(
+                      this.title,
+                      style: getTextStyle(language.lang, color: Color(0xFF454F63), isBold: true),
+                    ),
+                  ),
+                );
+              },
+            ),
+          //if (this.title != null) _buildSeparator(),
+          Column(
+            children: optionList
+                .asMap()
+                .entries
+                .map<Widget>(
+                  (entry) => OptionItem(
+                    option: entry.value,
+                    padding: this.itemPadding,
+                    isFirstItem: entry.key == 0 && this.title == null,
+                    isLastItem: entry.key == optionList.length - 1,
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }
@@ -65,11 +94,13 @@ class OptionModel {
 
 class OptionItem extends StatelessWidget {
   final OptionModel option;
+  final EdgeInsets padding;
   final bool isFirstItem;
   final bool isLastItem;
 
   OptionItem({
     @required this.option,
+    @required this.padding,
     this.isFirstItem = false,
     this.isLastItem = false,
   });
@@ -79,6 +110,7 @@ class OptionItem extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        if (!this.isFirstItem) _buildSeparator(),
         Material(
           color: Colors.transparent,
           child: InkWell(
@@ -97,10 +129,11 @@ class OptionItem extends StatelessWidget {
                       )
                     : BorderRadius.zero,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: getPlatformSize(18.0),
-                horizontal: getPlatformSize(20.0),
-              ),
+              padding: this.padding ??
+                  EdgeInsets.symmetric(
+                    vertical: getPlatformSize(18.0),
+                    horizontal: getPlatformSize(20.0),
+                  ),
               child: Row(
                 children: <Widget>[
                   Container(
@@ -134,23 +167,24 @@ class OptionItem extends StatelessWidget {
             ),
           ),
         ),
-        this.isLastItem
-            ? SizedBox.shrink()
-            : Container(
-                margin: EdgeInsets.only(
-                  left: getPlatformSize(20.0),
-                  right: getPlatformSize(20.0),
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Color(0xFFF4F4F4),
-                      width: getPlatformSize(1.0),
-                    ),
-                  ),
-                ),
-              ),
       ],
     );
   }
+}
+
+Widget _buildSeparator() {
+  return Container(
+    margin: EdgeInsets.only(
+      left: getPlatformSize(20.0),
+      right: getPlatformSize(20.0),
+    ),
+    decoration: BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: Color(0xFFF4F4F4),
+          width: getPlatformSize(1.0),
+        ),
+      ),
+    ),
+  );
 }
