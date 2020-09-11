@@ -206,11 +206,13 @@ class RouteModel {
   final PlaceDetailsModel origin;
   final PlaceDetailsModel destination;
   final List<GateInCostTollModel> gateInCostTollList = List();
+  final int departureTime;
 
   RouteModel({
     @required this.origin,
     @required this.destination,
     @required GateInCostTollModel gateInCostToll,
+    @required this.departureTime,
   }) {
     this.gateInCostTollList.add(gateInCostToll);
   }
@@ -262,7 +264,7 @@ class ExatApi {
       {},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
       //return dataList.map((expressWayJson) => ExpressWayModel.fromJson(expressWayJson)).toList();
       List<ExpressWayModel> expressWayList = dataList
           .asMap()
@@ -285,7 +287,7 @@ class ExatApi {
       {"cat_emer_id": "*"},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
       List<EmergencyNumberModel> emergencyNumberList =
           dataList.map((markerJson) => EmergencyNumberModel.fromJson(markerJson)).toList();
 
@@ -306,7 +308,7 @@ class ExatApi {
       {"limit": "", "sort": "ASC"},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
       List<MarkerModel> markerList =
           dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
@@ -331,7 +333,7 @@ class ExatApi {
       {"type": "markers"},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
 
       // filter ให้เหลือเฉพาะ category ที่ใช้งาน (status = 1)
       //List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
@@ -381,7 +383,7 @@ class ExatApi {
       {"requestData": "time_period", "filterBy": "group", "fields": "*"},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
       _timePeriodList = [0];
       _timePeriodList.addAll(dataList.map<int>((period) => int.parse(period['value'])).toList());
       return _timePeriodList;
@@ -544,7 +546,7 @@ class ExatApi {
       {"limit": 100},
     );
     if (responseResult.success) {
-      List dataList = responseResult.data;
+      List dataList = responseResult.data ?? List();
       List<NotificationModel> notificationList = await Future.wait(dataList
           .map((markerJson) async => await NotificationModel.fromJson(markerJson))
           .toList());

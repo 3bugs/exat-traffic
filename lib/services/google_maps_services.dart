@@ -2,6 +2,8 @@ import 'dart:io' show Platform;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -9,10 +11,12 @@ import 'package:provider/provider.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/secret.dart';
 import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/app/bloc.dart';
+import 'package:exattraffic/etc/utils.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
-final String apiKey = Platform.isAndroid
-    ? Secret.GOOGLE_API_KEY_ANDROID
-    : Secret.GOOGLE_API_KEY_IOS;
+final String apiKey =
+    Platform.isAndroid ? Secret.GOOGLE_API_KEY_ANDROID : Secret.GOOGLE_API_KEY_IOS;
 
 class GoogleMapsServices {
   final BuildContext _context;
@@ -21,7 +25,11 @@ class GoogleMapsServices {
 
   // https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyC1e9L1eA1YyOhsKW4-BhhwHD2fgtqWnak&language=th&waypoints=via:13.8133553%2C100.55055219999997%7Cvia:13.660109%2C100.66368499999999%7C&origin=13.7998143,100.4187235&destination=13.56686331,100.937025
   Future<Map<String, dynamic>> getRoute(
-      LatLng origin, LatLng destination, List<LatLng> wayPointList) async {
+    LatLng origin,
+    LatLng destination,
+    List<LatLng> wayPointList,
+    int departureTime,
+  ) async {
     // &waypoints=via:-37.81223 %2C 144.96254 %7C via:-34.92788 %2C 138.60008
 
     String wayPoints = wayPointList.fold("", (String previousValue, LatLng wayPoint) {
@@ -32,6 +40,7 @@ class GoogleMapsServices {
     params["waypoints"] = wayPoints;
     params["origin"] = "${origin.latitude},${origin.longitude}";
     params["destination"] = "${destination.latitude},${destination.longitude}";
+    params["departure_time"] = departureTime == 0 ? 'now' : departureTime;
 
     final ResponseResult result = await _makeRequest("directions", params);
     if (result.success) {
@@ -196,6 +205,78 @@ class PlaceDetailsModel {
       formattedAddress: json['formatted_address'],
       latitude: json['geometry']['location']['lat'],
       longitude: json['geometry']['location']['lng'],
+    );
+  }
+
+  Future<RouteModel> findBestRoute(BuildContext context, {int departureTime = 0}) async {
+    Position origin = await getCurrentLocationNotNull();
+
+    if (origin == null) {
+      LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+      showMyDialog(
+        context,
+        LocaleText.locationNotAvailable().ofLanguage(language.lang),
+        //Constants.Message.LOCATION_NOT_AVAILABLE,
+        [DialogButtonModel(text: "OK", value: DialogResult.yes)],
+      );
+      return Future.value(null);
+    }
+
+    List<GateInCostTollModel> routeList = await MyApi.findRoute(
+      origin,
+      Position(latitude: this.latitude, longitude: this.longitude),
+      BlocProvider.of<AppBloc>(context).markerList,
+    );
+
+    final GoogleMapsServices googleMapsServices = GoogleMapsServices(context);
+
+    routeList = await Future.wait<GateInCostTollModel>(
+      routeList.map((gateInCostToll) async {
+        final List<LatLng> partTollLatLngList = List();
+
+        // เพิ่มด่านทางเข้าใน way points
+        partTollLatLngList
+            .add(LatLng(gateInCostToll.gateIn.latitude, gateInCostToll.gateIn.longitude));
+        // เพิ่มด่านระหว่างทางใน way points
+        partTollLatLngList.addAll(
+          gateInCostToll.costToll.partTollMarkerList
+              .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
+              .toList(),
+        );
+        // เพิ่มทางออกใน way points
+        partTollLatLngList
+            .add(LatLng(gateInCostToll.costToll.latitude, gateInCostToll.costToll.longitude));
+
+        final Map<String, dynamic> googleRoute = await googleMapsServices.getRoute(
+          LatLng(origin.latitude, origin.longitude),
+          LatLng(this.latitude, this.longitude),
+          partTollLatLngList,
+          departureTime,
+        );
+        gateInCostToll.googleRoute = googleRoute;
+
+        return gateInCostToll;
+      }).toList(),
+    );
+
+    //routeList.map((gateInCostToll) => print(gateInCostToll)).toList();
+    GateInCostTollModel bestGateInCostToll = routeList.reduce((value, element) =>
+        (value.googleRoute['legs'][0]['duration']['value'] <
+                element.googleRoute['legs'][0]['duration']['value']
+            ? value
+            : element));
+    //print(bestGateInCostToll);
+    return RouteModel(
+      origin: PlaceDetailsModel(
+        "", // no place id for user's location
+        name: "ตำแหน่งปัจจุบันของคุณ",
+        formattedAddress: null,
+        latitude: origin.latitude,
+        longitude: origin.longitude,
+      ),
+      destination: this,
+      gateInCostToll: bestGateInCostToll,
+      departureTime: departureTime,
     );
   }
 }

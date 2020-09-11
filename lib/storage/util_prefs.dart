@@ -1,3 +1,4 @@
+import 'package:exattraffic/services/fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,7 +35,7 @@ class UtilPrefs extends ChangeNotifier {
 
   Future<bool> getNotification() async {
     SharedPreferences prefs = await getSharedPrefs();
-    return prefs.getBool(KEY_PREF_NOTIFICATION) ?? false;
+    return prefs.getBool(KEY_PREF_NOTIFICATION) ?? true;
     /*if (prefs.containsKey(KEY_PREF_NOTIFICATION)) {
       return prefs.getBool(KEY_PREF_NOTIFICATION);
     } else {
@@ -44,7 +45,8 @@ class UtilPrefs extends ChangeNotifier {
 
   Future<void> setNotification(bool status) async {
     SharedPreferences prefs = await getSharedPrefs();
-    prefs.setBool(KEY_PREF_NOTIFICATION, status);
+    await prefs.setBool(KEY_PREF_NOTIFICATION, status);
     notifyListeners();
+    MyFcm.setNotification(status);
   }
 }

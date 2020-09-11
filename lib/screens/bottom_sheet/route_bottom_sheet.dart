@@ -31,6 +31,7 @@ class RouteBottomSheet extends StatefulWidget {
     @required this.costToll,
     @required this.googleRoute,
     this.destination,
+    @required this.departureTimestamp,
     @required this.showArrivalTime,
     this.onClickTimePeriodOption,
   });
@@ -41,6 +42,7 @@ class RouteBottomSheet extends StatefulWidget {
   final CostTollModel costToll;
   final Map<String, dynamic> googleRoute;
   final PlaceDetailsModel destination;
+  final int departureTimestamp;
   final bool showArrivalTime;
   final Function onClickTimePeriodOption;
 
@@ -170,7 +172,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
 
   String _getArrivalTimeText() {
     int routeDurationSeconds =
-        widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration']['value'];
+        widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration_in_traffic']['value'];
 
     DateTime arrivalDate = new DateTime.now().add(Duration(seconds: routeDurationSeconds));
     String hourText = (arrivalDate.hour < 10 ? "0" : "") + arrivalDate.hour.toString();
@@ -303,12 +305,12 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 widget.googleRoute == null
                                     ? ''
                                     : (language.lang == LanguageName.thai
-                                        ? widget.googleRoute['legs'][0]['duration']['text']
+                                        ? widget.googleRoute['legs'][0]['duration_in_traffic']['text']
                                             .replaceAll('hours', 'ชม.')
                                             .replaceAll('hour', 'ชม.')
                                             .replaceAll('mins', 'นาที')
                                             .replaceAll('min', 'นาที')
-                                        : widget.googleRoute['legs'][0]['duration']['text']),
+                                        : widget.googleRoute['legs'][0]['duration_in_traffic']['text']),
                                 style: getTextStyle(
                                   language.lang,
                                   isBold: true,

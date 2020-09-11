@@ -147,14 +147,24 @@ class MyRouteState extends State<MyRoute> {
     });
   }
 
-  void _handleClickTimePeriodOption(BuildContext context) {
+  Future<void> _handleClickTimePeriodOption(int time) async {
     _hideTimePeriodDialog();
+    //RouteModel bestRoute = BlocProvider.of<RouteBloc>(context).bestRoute;
+    setState(() {
+      _isLoading = true;
+    });
+    int departureTimestamp = (DateTime.now().millisecondsSinceEpoch / 1000).round() + (time * 60);
+    RouteModel newBestRoute =
+        await _routeBloc.bestRoute.destination.findBestRoute(context, departureTime: departureTimestamp);
+    setState(() {
+      _routeBloc.add(ShowSearchResultRoute(bestRoute: newBestRoute));
+      _isLoading = false;
+    });
   }
 
   void _stopLocationTracking() {
-    if (_positionStreamSubscription != null &&
-        !_positionStreamSubscription.isPaused) {
-      _positionStreamSubscription.pause();
+    if (_positionStreamSubscription != null) {
+      _positionStreamSubscription.cancel();
     }
     _positionStreamSubscription = null;
   }
@@ -581,6 +591,7 @@ class MyRouteState extends State<MyRoute> {
 
   @override
   void dispose() {
+    _stopLocationTracking();
     super.dispose();
   }
 
@@ -601,6 +612,85 @@ class MyRouteState extends State<MyRoute> {
       ],
       child: BlocListener<RouteBloc, RouteState>(
         listener: (context, state) {
+          final List<GateInModel> gateInList = state.gateInList ?? List();
+          final List<CostTollModel> costTollList = state.costTollList ?? List();
+          final GateInModel selectedGateIn = state.selectedGateIn;
+          final googleRoute = state.googleRoute;
+          final Position currentLocation = state.currentLocation;
+
+          final Set<Polyline> polyLineSet = <Polyline>{};
+          Polyline polyline;
+          if (googleRoute != null) {
+            polyline = createRoutePolyline(googleRoute['overview_polyline']['points']);
+            polyLineSet.add(polyline);
+          }
+
+          if (state is FetchGateInSuccess) {
+            _stopLocationTracking();
+
+            // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
+            new Future.delayed(Duration(milliseconds: 1000), () async {
+              List<LatLng> gateInLatLngList =
+                  gateInList.map((gateIn) => LatLng(gateIn.latitude, gateIn.longitude)).toList();
+              LatLngBounds latLngBounds = boundsFromLatLngList(gateInLatLngList);
+              final GoogleMapController controller = await _googleMapController.future;
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+            });
+          }
+
+          if (state is FetchCostTollSuccess) {
+            // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
+            new Future.delayed(Duration(milliseconds: 1000), () async {
+              List<LatLng> costTollLatLngList = costTollList
+                  .map((costToll) => LatLng(costToll.latitude, costToll.longitude))
+                  .toList();
+              costTollLatLngList.add(LatLng(selectedGateIn.latitude, selectedGateIn.longitude));
+              LatLngBounds latLngBounds = boundsFromLatLngList(costTollLatLngList);
+              final GoogleMapController controller = await _googleMapController.future;
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+            });
+          }
+
+          if (state is FetchDirectionsSuccess) {
+            // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
+            new Future.delayed(Duration(milliseconds: 1000), () async {
+              LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
+              final GoogleMapController controller = await _googleMapController.future;
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+            });
+
+            // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+            try {
+              getCurrentLocation().then((Position position) {
+                context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
+              });
+            } catch (e) {
+              print(e);
+            }
+
+            if (_positionStreamSubscription == null) {
+              _setupLocationUpdate((Position position) {
+                print("////////////////////////////////////////////");
+                print("/////// ENTRANCE/EXIT LOCATION UPDATE //////");
+                print("Current location: ${position.latitude}, ${position.longitude}");
+                print("////////////////////////////////////////////");
+                context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
+              });
+              _positionStreamSubscription.pause();
+            }
+            if (_positionStreamSubscription.isPaused) {
+              _positionStreamSubscription.resume();
+            }
+          } else if (state is LocationTrackingUpdated) {
+            if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
+              final CameraPosition position = CameraPosition(
+                target: LatLng(currentLocation.latitude, currentLocation.longitude),
+                zoom: _mapZoomLevel ?? 15,
+              );
+              _moveMapToPosition(context, position);
+            }
+          }
+
           if ((state is LocationTrackingUpdated && state.notification != null) ||
               (state is ShowSearchLocationTrackingUpdated && state.notification != null)) {
             AlertModel notification = state.notification;
@@ -610,6 +700,9 @@ class MyRouteState extends State<MyRoute> {
             });
           }
 
+          /* **************************************
+             *************** SEARCH ***************
+             ************************************** */
           if (state is ShowSearchResultRouteState &&
               !(state is ShowSearchLocationTrackingUpdated)) {
             _stopLocationTracking(); // STOP NAVIGATION
@@ -650,7 +743,9 @@ class MyRouteState extends State<MyRoute> {
                 });
               });
             });
-          } else if (state is ShowSearchLocationTrackingUpdated) {
+          }
+
+          if (state is ShowSearchLocationTrackingUpdated) {
             //if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
             final Position currentLocation = state.currentLocation;
             final CameraPosition position = CameraPosition(
@@ -675,13 +770,6 @@ class MyRouteState extends State<MyRoute> {
                   final CostTollModel selectedCostToll = state.selectedCostToll;
                   final googleRoute = state.googleRoute;
                   final Position currentLocation = state.currentLocation;
-                  final AlertModel notification = state.notification;
-
-                  if (notification != null) {
-                    /*Future.delayed(Duration.zero, () {
-                      alert(context, notification.title, notification.message);
-                    });*/
-                  }
 
                   List<GateInModel> filteredGateInList = gateInList.where((GateInModel gateIn) {
                     return selectedGateIn == null ? true : gateIn.selected;
@@ -716,77 +804,6 @@ class MyRouteState extends State<MyRoute> {
                   Set<Marker> currentLocationSet = Set();
                   if (currentLocation != null) {
                     currentLocationSet.add(_createCurrentLocationMarker(currentLocation));
-                  }
-
-                  if (state is FetchGateInSuccess) {
-                    print("STATE: FetchGateInSuccess");
-
-                    _stopLocationTracking();
-
-                    // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
-                    new Future.delayed(Duration(milliseconds: 1000), () async {
-                      List<LatLng> gateInLatLngList = gateInList
-                          .map((gateIn) => LatLng(gateIn.latitude, gateIn.longitude))
-                          .toList();
-                      LatLngBounds latLngBounds = boundsFromLatLngList(gateInLatLngList);
-                      final GoogleMapController controller = await _googleMapController.future;
-                      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
-                    });
-                  } else if (state is FetchCostTollSuccess) {
-                    print("STATE: FetchCostTollSuccess");
-
-                    // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
-                    new Future.delayed(Duration(milliseconds: 1000), () async {
-                      List<LatLng> costTollLatLngList = costTollList
-                          .map((costToll) => LatLng(costToll.latitude, costToll.longitude))
-                          .toList();
-                      costTollLatLngList
-                          .add(LatLng(selectedGateIn.latitude, selectedGateIn.longitude));
-                      LatLngBounds latLngBounds = boundsFromLatLngList(costTollLatLngList);
-                      final GoogleMapController controller = await _googleMapController.future;
-                      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
-                    });
-                  } else if (state is FetchDirectionsSuccess) {
-                    print("STATE: FetchDirectionsSuccess");
-
-                    // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
-                    new Future.delayed(Duration(milliseconds: 1000), () async {
-                      LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
-                      final GoogleMapController controller = await _googleMapController.future;
-                      controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
-                    });
-
-                    // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                    try {
-                      getCurrentLocation().then((Position position) {
-                        context
-                            .bloc<RouteBloc>()
-                            .add(UpdateCurrentLocation(currentLocation: position));
-                      });
-                    } catch (e) {
-                      print(e);
-                    }
-
-                    if (_positionStreamSubscription == null) {
-                      _setupLocationUpdate((Position position) {
-                        print("Current location: ${position.latitude}, ${position.longitude}");
-                        context
-                            .bloc<RouteBloc>()
-                            .add(UpdateCurrentLocation(currentLocation: position));
-                      });
-                      _positionStreamSubscription.pause();
-                    }
-                    if (_positionStreamSubscription.isPaused) {
-                      _positionStreamSubscription.resume();
-                    }
-                  } else if (state is LocationTrackingUpdated) {
-                    if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
-                      final CameraPosition position = CameraPosition(
-                        target: LatLng(currentLocation.latitude, currentLocation.longitude),
-                        zoom: _mapZoomLevel ?? 15,
-                      );
-                      _moveMapToPosition(context, position);
-                    }
                   }
 
                   /* **************************************
@@ -1322,59 +1339,65 @@ class MyRouteState extends State<MyRoute> {
               // ปุ่ม start/stop navigation
               BlocBuilder<RouteBloc, RouteState>(
                 builder: (context, state) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      right: getPlatformSize(16.0),
-                      bottom: getPlatformSize(Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED + 16.0),
-                    ),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          if (state is ShowSearchLocationTrackingUpdated) {
-                            context
-                                .bloc<RouteBloc>()
-                                .add(ShowSearchResultRoute(bestRoute: state.bestRoute));
-                          } else {
-                            // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-                            try {
-                              getCurrentLocation().then((Position position) {
-                                context
-                                    .bloc<RouteBloc>()
-                                    .add(UpdateCurrentLocationSearch(currentLocation: position));
-                              });
-                            } catch (e) {
-                              print(e);
-                            }
+                  bool visible = false;
+                  if (state is ShowSearchResultRouteState) {
+                    visible = true;
+                  }
 
-                            if (_positionStreamSubscription == null) {
-                              _setupLocationUpdate((Position position) {
-                                print("////////////////////////////////////////////");
-                                print("////////// SEARCH LOCATION UPDATE //////////");
-                                print(
-                                    "Current location: ${position.latitude}, ${position.longitude}");
-                                print("////////////////////////////////////////////");
-                                context
-                                    .bloc<RouteBloc>()
-                                    .add(UpdateCurrentLocationSearch(currentLocation: position));
-                              });
-                              _positionStreamSubscription.pause();
-                            }
-                            if (_positionStreamSubscription.isPaused) {
-                              _positionStreamSubscription.resume();
-                            }
-                          }
-                        },
-                        child: Icon(
-                          state is ShowSearchLocationTrackingUpdated
-                              ? Icons.stop
-                              : Icons.navigation,
-                          color: Colors.white,
-                        ),
-                        backgroundColor: Constants.App.PRIMARY_COLOR,
-                      ),
-                    ),
-                  );
+                  return !visible
+                      ? SizedBox.shrink()
+                      : Padding(
+                          padding: EdgeInsets.only(
+                            right: getPlatformSize(16.0),
+                            bottom: getPlatformSize(
+                                Constants.BottomSheet.HEIGHT_ROUTE_COLLAPSED + 16.0),
+                          ),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                if (state is ShowSearchLocationTrackingUpdated) {
+                                  context
+                                      .bloc<RouteBloc>()
+                                      .add(ShowSearchResultRoute(bestRoute: state.bestRoute));
+                                } else {
+                                  // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+                                  try {
+                                    getCurrentLocation().then((Position position) {
+                                      context.bloc<RouteBloc>().add(
+                                          UpdateCurrentLocationSearch(currentLocation: position));
+                                    });
+                                  } catch (e) {
+                                    print(e);
+                                  }
+
+                                  if (_positionStreamSubscription == null) {
+                                    _setupLocationUpdate((Position position) {
+                                      print("////////////////////////////////////////////");
+                                      print("////////// SEARCH LOCATION UPDATE //////////");
+                                      print(
+                                          "Current location: ${position.latitude}, ${position.longitude}");
+                                      print("////////////////////////////////////////////");
+                                      context.bloc<RouteBloc>().add(
+                                          UpdateCurrentLocationSearch(currentLocation: position));
+                                    });
+                                    _positionStreamSubscription.pause();
+                                  }
+                                  if (_positionStreamSubscription.isPaused) {
+                                    _positionStreamSubscription.resume();
+                                  }
+                                }
+                              },
+                              child: Icon(
+                                state is ShowSearchLocationTrackingUpdated
+                                    ? Icons.stop
+                                    : Icons.navigation,
+                                color: Colors.white,
+                              ),
+                              backgroundColor: Constants.App.PRIMARY_COLOR,
+                            ),
+                          ),
+                        );
                 },
               ),
 
@@ -1392,6 +1415,7 @@ class MyRouteState extends State<MyRoute> {
                       costToll: state.bestRoute.gateInCostTollList[0].costToll,
                       googleRoute: state.bestRoute.gateInCostTollList[0].googleRoute,
                       destination: state.bestRoute.destination,
+                      departureTimestamp: state.bestRoute.departureTime,
                       showArrivalTime: true,
                       onClickTimePeriodOption: this._handleClickTimePeriodOptionInBottomSheet,
                     );
@@ -1409,6 +1433,7 @@ class MyRouteState extends State<MyRoute> {
                             gateIn: selectedGateIn,
                             costToll: selectedCostToll,
                             googleRoute: state.googleRoute,
+                            departureTimestamp: 0,
                             showArrivalTime: false,
                           );
                   }
@@ -1438,13 +1463,14 @@ class MyRouteState extends State<MyRoute> {
                                   text: entry.value == 0
                                       ? LocaleText.now().ofLanguage(language.lang)
                                       : sprintf(
-                                          LocaleText.minutesLater().ofLanguage(language.lang),
-                                          [entry.value],
-                                        ),
+                                    LocaleText.minutesLater().ofLanguage(language.lang),
+                                    [entry.value],
+                                  ),
                                   //searchServiceText.ofLanguage(language.lang),
-                                  onClick: () => _handleClickTimePeriodOption(context),
+                                  onClick: () =>
+                                      _handleClickTimePeriodOption(entry.value),
                                   bulletColor:
-                                      Constants.BottomSheet.TAB_STRIP_COLOR_LIST[entry.key % 4],
+                                  Constants.BottomSheet.TAB_STRIP_COLOR_LIST[entry.key % 4],
                                 );
                               }).toList(),
                               itemPadding: EdgeInsets.symmetric(

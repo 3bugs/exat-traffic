@@ -94,7 +94,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
             await _googleMapsServices.getPlaceDetails(prediction.placeId);
         /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
-        RouteModel bestRoute = await findBestRoute(state.context, placeDetails);
+        RouteModel bestRoute = await placeDetails.findBestRoute(state.context);
 
         if (bestRoute != null) {
           assert(bestRoute.gateInCostTollList.isNotEmpty);
@@ -116,7 +116,7 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         latitude: searchResult.placeDetails.latitude,
         longitude: searchResult.placeDetails.longitude,
       );*/
-      RouteModel bestRoute = await findBestRoute(state.context, searchResult.placeDetails);
+      RouteModel bestRoute = await searchResult.placeDetails.findBestRoute(state.context);
 
       if (bestRoute != null) {
         assert(bestRoute.gateInCostTollList.isNotEmpty);
@@ -125,76 +125,5 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
       }
     } catch (error) {}
     loaded();
-  }
-
-  static Future<RouteModel> findBestRoute(
-      BuildContext context, PlaceDetailsModel destination) async {
-    Position origin = await getCurrentLocationNotNull();
-
-    if (origin == null) {
-      LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
-      showMyDialog(
-        context,
-        LocaleText.locationNotAvailable().ofLanguage(language.lang),
-        //Constants.Message.LOCATION_NOT_AVAILABLE,
-        [DialogButtonModel(text: "OK", value: DialogResult.yes)],
-      );
-      return Future.value(null);
-    }
-
-    List<GateInCostTollModel> routeList = await MyApi.findRoute(
-      origin,
-      Position(latitude: destination.latitude, longitude: destination.longitude),
-      BlocProvider.of<AppBloc>(context).markerList,
-    );
-
-    final GoogleMapsServices googleMapsServices = GoogleMapsServices(context);
-
-    routeList = await Future.wait<GateInCostTollModel>(
-      routeList.map((gateInCostToll) async {
-        final List<LatLng> partTollLatLngList = List();
-
-        // เพิ่มด่านทางเข้าใน way points
-        partTollLatLngList
-            .add(LatLng(gateInCostToll.gateIn.latitude, gateInCostToll.gateIn.longitude));
-        // เพิ่มด่านระหว่างทางใน way points
-        partTollLatLngList.addAll(
-          gateInCostToll.costToll.partTollMarkerList
-              .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
-              .toList(),
-        );
-        // เพิ่มทางออกใน way points
-        partTollLatLngList
-            .add(LatLng(gateInCostToll.costToll.latitude, gateInCostToll.costToll.longitude));
-
-        final Map<String, dynamic> googleRoute = await googleMapsServices.getRoute(
-          LatLng(origin.latitude, origin.longitude),
-          LatLng(destination.latitude, destination.longitude),
-          partTollLatLngList,
-        );
-        gateInCostToll.googleRoute = googleRoute;
-
-        return gateInCostToll;
-      }).toList(),
-    );
-
-    //routeList.map((gateInCostToll) => print(gateInCostToll)).toList();
-    GateInCostTollModel bestGateInCostToll = routeList.reduce((value, element) =>
-        (value.googleRoute['legs'][0]['duration']['value'] <
-                element.googleRoute['legs'][0]['duration']['value']
-            ? value
-            : element));
-    //print(bestGateInCostToll);
-    return RouteModel(
-      origin: PlaceDetailsModel(
-        "", // no place id for user's location
-        name: "ตำแหน่งปัจจุบันของคุณ",
-        formattedAddress: null,
-        latitude: origin.latitude,
-        longitude: origin.longitude,
-      ),
-      destination: destination,
-      gateInCostToll: bestGateInCostToll,
-    );
   }
 }

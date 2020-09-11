@@ -84,9 +84,6 @@ class _SettingsState extends State<Settings> {
   void _handleSettingChange(SettingName settingName, bool newValue) {
     switch (settingName) {
       case SettingName.notification:
-        /*setState(() {
-          _notificationValue = !_notificationValue;
-        });*/
         UtilPrefs prefs = Provider.of<UtilPrefs>(context, listen: false);
         prefs.setNotification(newValue);
         break;

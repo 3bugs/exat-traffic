@@ -49,7 +49,7 @@ class FavoriteState extends State<Favorite> {
           /*Position destination =
             Position(latitude: placeDetails.latitude, longitude: placeDetails.longitude);*/
           _presenter.setLoadingMessage("หาเส้นทางที่ใช้เวลาน้อยที่สุด");
-          RouteModel bestRoute = await SearchPlacePresenter.findBestRoute(context, placeDetails);
+          RouteModel bestRoute = await placeDetails.findBestRoute(context);
 
           if (bestRoute != null && widget.showBestRouteAfterSearch != null) {
             //assert(bestRoute.gateInCostTollList.isNotEmpty);

@@ -75,6 +75,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
       if (await utilPrefs.isFirstRun()) {
         await widgetPrefs.addId(WidgetType.expressWay.toString());
         await utilPrefs.setFirstRunAlready();
+        await utilPrefs.setNotification(true);
       }
     });
   }

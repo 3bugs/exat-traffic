@@ -27,13 +27,15 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     @required this.categoryList,
   }) : super(FetchGateInInitial());
 
+  RouteModel get bestRoute => _bestRoute;
+
   @override
   Stream<RouteState> mapEventToState(RouteEvent event) async* {
     final currentState = state;
 
     if (event is ShowSearchResultRoute) {
       // ให้ clear marker และ pause location tracking
-      yield FetchGateInSuccess(gateInList: List<GateInModel>());
+      //yield FetchGateInSuccess(gateInList: List<GateInModel>());
 
       _bestRoute = event.bestRoute;
 
@@ -182,6 +184,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           LatLng(currentState.selectedGateIn.latitude, currentState.selectedGateIn.longitude),
           LatLng(selectedCostToll.latitude, selectedCostToll.longitude),
           partTollLatLngList,
+          0
         );
         yield FetchDirectionsSuccess(
           gateInList: currentState.gateInList,
