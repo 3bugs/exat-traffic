@@ -793,4 +793,68 @@ class LocaleText {
       indonesian: '%d menit kemudian',
     );
   }
+
+  factory LocaleText.leaveArrive() {
+    return LocaleText(
+      thai: 'เดินทาง %s น. ถึง %s น.',
+      english: 'Leave %s, arrive %s',
+      chinese: '出发%s，到达%s',
+      japanese: '出発%s、到着%s',
+      korean: '출발 %s, 도착 %s',
+      lao: 'ການອອກເດີນທາງ %s, ມາຮອດ %s',
+      vietnamese: 'khởi hành %s, đến %s',
+      myanmar: 'ထွက်ခွာ %s, %s ရောက်ရှိ',
+      khmer: 'ការចាកចេញ %s, មកដល់ %s',
+      malay: 'bertolak %s, tiba %s',
+      indonesian: 'keberangkatan %s, tiba %s',
+    );
+  }
+
+  factory LocaleText.leaveNowArrive() {
+    return LocaleText(
+      thai: 'เดินทางตอนนี้ ถึง %s น.',
+      english: 'Leave now, arrive %s',
+      chinese: '现在出发，到达%s',
+      japanese: '今出発、%s着',
+      korean: '지금 출발, %s 도착',
+      lao: 'ອອກເດີນທາງດຽວນີ້, ມາຮອດເວລາ %s',
+      vietnamese: 'khởi hành ngay bây giờ, đến lúc %s',
+      myanmar: 'ယခုထွက်ခွာ, %s ရောက်ရှိမည်',
+      khmer: 'ការចាកចេញឥឡូវនេះមកដល់ %s',
+      malay: 'bertolak sekarang, tiba %s',
+      indonesian: 'keberangkatan sekarang, tiba %s',
+    );
+  }
+
+  factory LocaleText.totalTollPlaza() {
+    return LocaleText(
+      thai: 'ผ่านทั้งหมด %d ด่าน',
+      english: '%d Toll plaza',
+      chinese: '%d收费站',
+      japanese: '%d道路料金所',
+      korean: '%d 톨게이트',
+      lao: '%d ດ່ານເກັບ​ເງິນ',
+      vietnamese: 'Trạm thu lộ phí',
+      myanmar: '%d ေငြျဖတ္တြဲ',
+      khmer: '%d ថូលហ្គេត',
+      malay: '%d Plaza Tol',
+      indonesian: '%d Tol Plaza',
+    );
+  }
+
+  factory LocaleText.currentLocation() {
+    return LocaleText(
+      thai: 'ตำแหน่งปัจจุบันของคุณ',
+      english: 'Current location',
+      chinese: '当前位置',
+      japanese: '現在位置',
+      korean: '현재 위치',
+      lao: 'ສະຖານທີ່ປະຈຸບັນ',
+      vietnamese: 'vị trí hiện tại',
+      myanmar: 'လက်ရှိတည်နေရာ',
+      khmer: 'ទីតាំង​បច្ចុប្បន្ន',
+      malay: 'lokasi sekarang',
+      indonesian: 'lokasi saat ini',
+    );
+  }
 }

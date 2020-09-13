@@ -155,7 +155,11 @@ class MyRouteState extends State<MyRoute> {
     });
     int departureTimestamp = (DateTime.now().millisecondsSinceEpoch / 1000).round() + (time * 60);
     RouteModel newBestRoute =
-        await _routeBloc.bestRoute.destination.findBestRoute(context, departureTime: departureTimestamp);
+        await _routeBloc.bestRoute.destination.findBestRouteAgain(
+            context,
+            _routeBloc.bestRoute.gateInCostTollList[0],
+            time == 0 ? 0 : departureTimestamp
+        );
     setState(() {
       _routeBloc.add(ShowSearchResultRoute(bestRoute: newBestRoute));
       _isLoading = false;

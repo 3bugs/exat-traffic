@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 //import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:sprintf/sprintf.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -170,14 +171,34 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
     );
   }
 
-  String _getArrivalTimeText() {
-    int routeDurationSeconds =
-        widget.googleRoute == null ? 0 : widget.googleRoute['legs'][0]['duration_in_traffic']['value'];
+  String _getFormattedTime(LanguageName lang, DateTime dateTime) {
+    String hourText = (dateTime.hour < 10 ? "0" : "") + dateTime.hour.toString();
+    String minuteText = (dateTime.minute < 10 ? "0" : "") + dateTime.minute.toString();
+    return lang == LanguageName.thai ? '$hourText.$minuteText' : '$hourText:$minuteText';
+  }
 
-    DateTime arrivalDate = new DateTime.now().add(Duration(seconds: routeDurationSeconds));
-    String hourText = (arrivalDate.hour < 10 ? "0" : "") + arrivalDate.hour.toString();
-    String minuteText = (arrivalDate.minute < 10 ? "0" : "") + arrivalDate.minute.toString();
-    return '$hourText.$minuteText';
+  String _getArrivalTimeText(LanguageName lang) {
+    int routeDurationSeconds = widget.googleRoute == null
+        ? 0
+        : widget.googleRoute['legs'][0]['duration_in_traffic']['value'];
+
+    DateTime departureDate = widget.departureTimestamp == 0
+        ? DateTime.now()
+        : DateTime.fromMillisecondsSinceEpoch(widget.departureTimestamp * 1000);
+    DateTime arrivalDate = departureDate.add(Duration(seconds: routeDurationSeconds));
+    return _getFormattedTime(lang, arrivalDate);
+  }
+
+  String _getDepartArrivalText(LanguageName lang) {
+    if (widget.departureTimestamp == 0) {
+      return sprintf(LocaleText.leaveNowArrive().ofLanguage(lang), [_getArrivalTimeText(lang)]);
+    } else {
+      DateTime departureDate =
+          DateTime.fromMillisecondsSinceEpoch(widget.departureTimestamp * 1000);
+
+      return sprintf(LocaleText.leaveArrive().ofLanguage(lang),
+          [_getFormattedTime(lang, departureDate), _getArrivalTimeText(lang)]);
+    }
   }
 
   int _getNumTollPlaza() {
@@ -305,12 +326,14 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 widget.googleRoute == null
                                     ? ''
                                     : (language.lang == LanguageName.thai
-                                        ? widget.googleRoute['legs'][0]['duration_in_traffic']['text']
-                                            .replaceAll('hours', 'ชม.')
+                                        ? widget.googleRoute['legs'][0]['duration_in_traffic']
+                                            ['text']
+                                        /*.replaceAll('hours', 'ชม.')
                                             .replaceAll('hour', 'ชม.')
                                             .replaceAll('mins', 'นาที')
-                                            .replaceAll('min', 'นาที')
-                                        : widget.googleRoute['legs'][0]['duration_in_traffic']['text']),
+                                            .replaceAll('min', 'นาที')*/
+                                        : widget.googleRoute['legs'][0]['duration_in_traffic']
+                                            ['text']),
                                 style: getTextStyle(
                                   language.lang,
                                   isBold: true,
@@ -325,7 +348,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                               Text(
                                 widget.googleRoute == null
                                     ? ''
-                                    : '(${widget.googleRoute['legs'][0]['distance']['text'].replaceAll('km', 'กม.')})',
+                                    : '(${widget.googleRoute['legs'][0]['distance']['text']})',
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,
@@ -432,7 +455,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'เดินทางตอนนี้ ถึง ${_getArrivalTimeText()} น.',
+                                          _getDepartArrivalText(language.lang),
                                           style: getTextStyle(
                                             language.lang,
                                             color: Colors.white,
@@ -454,7 +477,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                 ),
                               )
                             : Text(
-                                'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
+                                sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
+                                    [_getNumTollPlaza()]),
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,
@@ -464,7 +488,8 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                               ),
                         widget.showArrivalTime
                             ? Text(
-                                'ผ่านทั้งหมด ${_getNumTollPlaza()} ด่าน',
+                                sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
+                                    [_getNumTollPlaza()]),
                                 style: getTextStyle(
                                   language.lang,
                                   color: Colors.white,

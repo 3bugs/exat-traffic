@@ -54,12 +54,16 @@ class _MyNavBarState extends State<MyNavBar> {
       _timer.cancel();
     }
     _timer = null;
+
+    setState(() {
+      _markerIconVisible = true;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    //_startTimer();
   }
 
   @override
