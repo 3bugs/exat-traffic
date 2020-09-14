@@ -53,6 +53,8 @@ class MyRouteState extends State<MyRoute> {
     zoom: 10,
   );
   static const SPEED_THRESHOLD_TO_TRACK_LOCATION = 20; // km per hour
+  static const double LOCATION_TRACKING_ZOOM = 18;
+  static const double LOCATION_TRACKING_TILT = 60;
 
   bool _isLoading = false;
 
@@ -74,6 +76,13 @@ class MyRouteState extends State<MyRoute> {
 
   List<int> _timePeriodList;
   bool _timePeriodDialogVisible = false;
+
+  static const String FROM_ENTRANCE = 'FROM ENTRANCE';
+  static const String TO_EXIT = 'TO EXIT';
+  static const String ORIGIN = 'ORIGIN';
+  static const String DESTINATION = 'DESTINATION';
+  String _entranceLabel = FROM_ENTRANCE;
+  String _exitLabel = TO_EXIT;
 
   void _handleClickTimePeriodOptionInBottomSheet() {
     if (_timePeriodDialogVisible)
@@ -154,12 +163,8 @@ class MyRouteState extends State<MyRoute> {
       _isLoading = true;
     });
     int departureTimestamp = (DateTime.now().millisecondsSinceEpoch / 1000).round() + (time * 60);
-    RouteModel newBestRoute =
-        await _routeBloc.bestRoute.destination.findBestRouteAgain(
-            context,
-            _routeBloc.bestRoute.gateInCostTollList[0],
-            time == 0 ? 0 : departureTimestamp
-        );
+    RouteModel newBestRoute = await _routeBloc.bestRoute.destination.findBestRouteAgain(
+        context, _routeBloc.bestRoute.gateInCostTollList[0], time == 0 ? 0 : departureTimestamp);
     setState(() {
       _routeBloc.add(ShowSearchResultRoute(bestRoute: newBestRoute));
       _isLoading = false;
@@ -309,7 +314,7 @@ class MyRouteState extends State<MyRoute> {
       markerId: markerId,
       position: LatLng(currentLocation.latitude, currentLocation.longitude),
       icon: BitmapDescriptor.fromBytes(_carMarkerIcon),
-      rotation: currentLocation.heading,
+      //rotation: currentLocation.heading,
       anchor: const Offset(0.5, 0.5),
     );
   }
@@ -616,6 +621,8 @@ class MyRouteState extends State<MyRoute> {
       ],
       child: BlocListener<RouteBloc, RouteState>(
         listener: (context, state) {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+
           final List<GateInModel> gateInList = state.gateInList ?? List();
           final List<CostTollModel> costTollList = state.costTollList ?? List();
           final GateInModel selectedGateIn = state.selectedGateIn;
@@ -630,7 +637,19 @@ class MyRouteState extends State<MyRoute> {
           }
 
           if (state is FetchGateInSuccess) {
+            setState(() {
+              _entranceLabel = FROM_ENTRANCE;
+              _exitLabel = TO_EXIT;
+            });
             _stopLocationTracking();
+            //Scaffold.of(context).hideCurrentSnackBar();
+            final snackBar = SnackBar(
+              content: Text(
+                LocaleText.selectEntrance().ofLanguage(language.lang),
+                style: getTextStyle(language.lang, color: Colors.white),
+              ),
+            );
+            Scaffold.of(context).showSnackBar(snackBar);
 
             // pan/zoom map ให้ครอบคลุม bound ของ gateIn ทั้งหมด
             new Future.delayed(Duration(milliseconds: 1000), () async {
@@ -643,6 +662,17 @@ class MyRouteState extends State<MyRoute> {
           }
 
           if (state is FetchCostTollSuccess) {
+            _stopLocationTracking();
+            //Scaffold.of(context).hideCurrentSnackBar();
+
+            final snackBar = SnackBar(
+              content: Text(
+                LocaleText.selectExit().ofLanguage(language.lang),
+                style: getTextStyle(language.lang, color: Colors.white),
+              ),
+            );
+            Scaffold.of(context).showSnackBar(snackBar);
+
             // pan/zoom map ให้ครอบคลุม bound ของ costToll ทั้งหมด & selectedGateIn
             new Future.delayed(Duration(milliseconds: 1000), () async {
               List<LatLng> costTollLatLngList = costTollList
@@ -656,43 +686,27 @@ class MyRouteState extends State<MyRoute> {
           }
 
           if (state is FetchDirectionsSuccess) {
+            _stopLocationTracking();
+
             // pan/zoom map ให้ครอบคลุม bound ของ directions polyline
             new Future.delayed(Duration(milliseconds: 1000), () async {
               LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
               final GoogleMapController controller = await _googleMapController.future;
               controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
             });
+          }
 
-            // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
-            try {
-              getCurrentLocation().then((Position position) {
-                context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
-              });
-            } catch (e) {
-              print(e);
-            }
-
-            if (_positionStreamSubscription == null) {
-              _setupLocationUpdate((Position position) {
-                print("////////////////////////////////////////////");
-                print("/////// ENTRANCE/EXIT LOCATION UPDATE //////");
-                print("Current location: ${position.latitude}, ${position.longitude}");
-                print("////////////////////////////////////////////");
-                context.bloc<RouteBloc>().add(UpdateCurrentLocation(currentLocation: position));
-              });
-              _positionStreamSubscription.pause();
-            }
-            if (_positionStreamSubscription.isPaused) {
-              _positionStreamSubscription.resume();
-            }
-          } else if (state is LocationTrackingUpdated) {
-            if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
-              final CameraPosition position = CameraPosition(
-                target: LatLng(currentLocation.latitude, currentLocation.longitude),
-                zoom: _mapZoomLevel ?? 15,
-              );
-              _moveMapToPosition(context, position);
-            }
+          if (state is LocationTrackingUpdated) {
+            //if (currentLocation.speed * 3.6 > SPEED_THRESHOLD_TO_TRACK_LOCATION) {
+            final CameraPosition position = CameraPosition(
+              target: LatLng(currentLocation.latitude, currentLocation.longitude),
+              //zoom: _mapZoomLevel ?? 15,
+              zoom: LOCATION_TRACKING_ZOOM,
+              bearing: state.currentLocation.heading,
+              tilt: LOCATION_TRACKING_TILT,
+            );
+            _moveMapToPosition(context, position);
+            //}
           }
 
           if ((state is LocationTrackingUpdated && state.notification != null) ||
@@ -709,6 +723,10 @@ class MyRouteState extends State<MyRoute> {
              ************************************** */
           if (state is ShowSearchResultRouteState &&
               !(state is ShowSearchLocationTrackingUpdated)) {
+            setState(() {
+              _entranceLabel = ORIGIN;
+              _exitLabel = DESTINATION;
+            });
             _stopLocationTracking(); // STOP NAVIGATION
 
             Polyline polyline = createRoutePolyline(
@@ -754,7 +772,10 @@ class MyRouteState extends State<MyRoute> {
             final Position currentLocation = state.currentLocation;
             final CameraPosition position = CameraPosition(
               target: LatLng(currentLocation.latitude, currentLocation.longitude),
-              zoom: _mapZoomLevel ?? 15,
+              //zoom: _mapZoomLevel ?? 15,
+              zoom: LOCATION_TRACKING_ZOOM,
+              bearing: state.currentLocation.heading,
+              tilt: LOCATION_TRACKING_TILT,
             );
             _moveMapToPosition(context, position);
             //}
@@ -969,7 +990,7 @@ class MyRouteState extends State<MyRoute> {
                                     top: getPlatformSize(2.0),
                                   ),
                                   child: Text(
-                                    'From Entrance',
+                                    _entranceLabel,
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
@@ -987,121 +1008,151 @@ class MyRouteState extends State<MyRoute> {
 
                                     bool isSearchMode = (state is ShowSearchResultRouteState);
 
-                                    return DropdownButton<GateInModel>(
-                                      value: selectedGateIn,
-                                      hint: Consumer<LanguageModel>(
-                                        builder: (context, language, child) {
-                                          return Container(
-                                            padding: EdgeInsets.only(
-                                              left: getPlatformSize(6.0),
-                                            ),
-                                            child: Text(
-                                              isSearchMode
-                                                  ? (state as ShowSearchResultRouteState)
-                                                      .bestRoute
-                                                      .origin
-                                                      .name
-                                                  : LocaleText.selectEntrance()
-                                                      .ofLanguage(language.lang),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: getTextStyle(
-                                                language.lang,
-                                                color: isSearchMode ? null : Color(0xFFB2B2B2),
-                                                heightTh: 0.8,
-                                                heightEn: 1.15,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      icon: isSearchMode
-                                          ? SizedBox.shrink()
-                                          : Image(
-                                              image: AssetImage(
-                                                  'assets/images/route/ic_down_arrow.png'),
-                                              width: getPlatformSize(12.0),
-                                              height: getPlatformSize(7.4),
-                                            ),
-                                      iconSize: getPlatformSize(24.0),
-                                      elevation: 2,
-                                      //style: getTextStyle(1),
-                                      underline: SizedBox.shrink(),
-                                      isDense: true,
-                                      isExpanded: true,
-                                      onChanged: (GateInModel gateIn) {
-                                        _selectGateInMarker(context, gateIn);
-
-                                        final CameraPosition position = CameraPosition(
-                                          target: LatLng(gateIn.latitude, gateIn.longitude),
-                                          zoom: 12,
-                                        );
-                                        _moveMapToPosition(context, position);
-                                      },
-                                      selectedItemBuilder: (BuildContext context) {
-                                        return gateInList.map<Widget>((GateInModel gateIn) {
-                                          return Consumer<LanguageModel>(
+                                    return (state is FetchGateInInitial)
+                                        ? Consumer<LanguageModel>(
                                             builder: (context, language, child) {
-                                              return Container(
-                                                padding: EdgeInsets.only(
-                                                  left: getPlatformSize(6.0),
-                                                ),
-                                                child: Text(
-                                                  gateIn.toString(),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: getTextStyle(
-                                                    language.lang,
-                                                    heightTh: 0.8,
-                                                    heightEn: 1.15,
+                                            return Padding(
+                                              padding: EdgeInsets.all(getPlatformSize(4.0)),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  SizedBox(
+                                                    width: getPlatformSize(14.0),
+                                                    height: getPlatformSize(14.0),
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: getPlatformSize(3.0),
+                                                    ),
                                                   ),
+                                                  Text(
+                                                    '.',
+                                                    style: getTextStyle(
+                                                      language.lang,
+                                                      color: Colors.transparent,
+                                                      heightTh: 0.8,
+                                                      heightEn: 1.15,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          })
+                                        : DropdownButton<GateInModel>(
+                                            value: selectedGateIn,
+                                            hint: Consumer<LanguageModel>(
+                                              builder: (context, language, child) {
+                                                return Container(
+                                                  padding: EdgeInsets.only(
+                                                    left: getPlatformSize(6.0),
+                                                  ),
+                                                  child: Text(
+                                                    isSearchMode
+                                                        ? (state as ShowSearchResultRouteState)
+                                                            .bestRoute
+                                                            .origin
+                                                            .name
+                                                        : LocaleText.selectEntrance()
+                                                            .ofLanguage(language.lang),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: getTextStyle(
+                                                      language.lang,
+                                                      color:
+                                                          isSearchMode ? null : Color(0xFFB2B2B2),
+                                                      heightTh: 0.8,
+                                                      heightEn: 1.15,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            icon: isSearchMode
+                                                ? SizedBox.shrink()
+                                                : Image(
+                                                    image: AssetImage(
+                                                        'assets/images/route/ic_down_arrow.png'),
+                                                    width: getPlatformSize(12.0),
+                                                    height: getPlatformSize(7.4),
+                                                  ),
+                                            iconSize: getPlatformSize(24.0),
+                                            elevation: 2,
+                                            //style: getTextStyle(1),
+                                            underline: SizedBox.shrink(),
+                                            isDense: true,
+                                            isExpanded: true,
+                                            onChanged: (GateInModel gateIn) {
+                                              _selectGateInMarker(context, gateIn);
+
+                                              final CameraPosition position = CameraPosition(
+                                                target: LatLng(gateIn.latitude, gateIn.longitude),
+                                                zoom: 12,
+                                              );
+                                              _moveMapToPosition(context, position);
+                                            },
+                                            selectedItemBuilder: (BuildContext context) {
+                                              return gateInList.map<Widget>((GateInModel gateIn) {
+                                                return Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Container(
+                                                      padding: EdgeInsets.only(
+                                                        left: getPlatformSize(6.0),
+                                                      ),
+                                                      child: Text(
+                                                        gateIn.toString(),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: getTextStyle(
+                                                          language.lang,
+                                                          heightTh: 0.8,
+                                                          heightEn: 1.15,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              }).toList();
+                                            },
+                                            items: gateInList.map((GateInModel gateIn) {
+                                              return DropdownMenuItem<GateInModel>(
+                                                value: gateIn,
+                                                child: Consumer<LanguageModel>(
+                                                  builder: (context, language, child) {
+                                                    return Container(
+                                                      padding: EdgeInsets.only(
+                                                        left: getPlatformSize(6.0),
+                                                        top: getPlatformSize(4.0),
+                                                        bottom: getPlatformSize(4.0),
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            gateIn.routeName.trim(),
+                                                            style: getTextStyle(
+                                                              language.lang,
+                                                              color: Color(0xFFB2B2B2),
+                                                              sizeTh: getPlatformSize(
+                                                                  Constants.Font.SMALLER_SIZE_TH),
+                                                              sizeEn: getPlatformSize(
+                                                                  Constants.Font.SMALLER_SIZE_EN),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            gateIn.toString().trim(),
+                                                            style: getTextStyle(
+                                                              language.lang,
+                                                              heightTh: 0.8,
+                                                              heightEn: 1.15,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               );
-                                            },
+                                            }).toList(),
                                           );
-                                        }).toList();
-                                      },
-                                      items: gateInList.map((GateInModel gateIn) {
-                                        return DropdownMenuItem<GateInModel>(
-                                          value: gateIn,
-                                          child: Consumer<LanguageModel>(
-                                            builder: (context, language, child) {
-                                              return Container(
-                                                padding: EdgeInsets.only(
-                                                  left: getPlatformSize(6.0),
-                                                  top: getPlatformSize(4.0),
-                                                  bottom: getPlatformSize(4.0),
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      gateIn.routeName.trim(),
-                                                      style: getTextStyle(
-                                                        language.lang,
-                                                        color: Color(0xFFB2B2B2),
-                                                        sizeTh: getPlatformSize(
-                                                            Constants.Font.SMALLER_SIZE_TH),
-                                                        sizeEn: getPlatformSize(
-                                                            Constants.Font.SMALLER_SIZE_EN),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      gateIn.toString().trim(),
-                                                      style: getTextStyle(
-                                                        language.lang,
-                                                        heightTh: 0.8,
-                                                        heightEn: 1.15,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      }).toList(),
-                                    );
                                   },
                                 ),
 
@@ -1128,7 +1179,7 @@ class MyRouteState extends State<MyRoute> {
                                     top: getPlatformSize(2.0),
                                   ),
                                   child: Text(
-                                    'To Exit',
+                                    _exitLabel,
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
@@ -1145,120 +1196,154 @@ class MyRouteState extends State<MyRoute> {
 
                                   bool isSearchMode = (state is ShowSearchResultRouteState);
 
-                                  return DropdownButton<CostTollModel>(
-                                    value: selectedCostToll,
-                                    hint: Consumer<LanguageModel>(
-                                      builder: (context, language, child) {
-                                        return Container(
-                                          padding: EdgeInsets.only(
-                                            left: getPlatformSize(6.0),
-                                          ),
-                                          child: Text(
-                                            isSearchMode
-                                                ? (state as ShowSearchResultRouteState)
-                                                    .bestRoute
-                                                    .destination
-                                                    .name
-                                                : LocaleText.selectExit().ofLanguage(language.lang),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: getTextStyle(
-                                              language.lang,
-                                              color: isSearchMode ? null : Color(0xFFB2B2B2),
-                                              heightTh: 0.8,
-                                              heightEn: 1.15,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    icon: isSearchMode
-                                        ? SizedBox.shrink()
-                                        : Image(
-                                            image:
-                                                AssetImage('assets/images/route/ic_down_arrow.png'),
-                                            width: getPlatformSize(12.0),
-                                            height: getPlatformSize(7.4),
-                                          ),
-                                    iconSize: getPlatformSize(24.0),
-                                    elevation: 2,
-                                    //style: getTextStyle(1),
-                                    underline: SizedBox.shrink(),
-                                    isDense: true,
-                                    isExpanded: true,
-                                    onChanged: (CostTollModel costToll) {
-                                      _selectCostTollMarker(context, costToll);
-
-                                      final CameraPosition position = CameraPosition(
-                                        target: LatLng(costToll.latitude, costToll.longitude),
-                                        zoom: 12,
-                                      );
-                                      _moveMapToPosition(context, position);
-                                    },
-                                    selectedItemBuilder: (BuildContext context) {
-                                      return costTollList.map<Widget>((CostTollModel costToll) {
-                                        return Consumer<LanguageModel>(
+                                  return (state is FetchCostTollInitial)
+                                      ? Consumer<LanguageModel>(
                                           builder: (context, language, child) {
-                                            return Container(
-                                              padding: EdgeInsets.only(
-                                                left: getPlatformSize(6.0),
-                                              ),
-                                              child: Text(
-                                                costToll.toString(),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: getTextStyle(
-                                                  language.lang,
-                                                  heightTh: 0.8,
-                                                  heightEn: 1.15,
+                                          return Padding(
+                                            padding: EdgeInsets.all(getPlatformSize(4.0)),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: getPlatformSize(14.0),
+                                                  height: getPlatformSize(14.0),
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: getPlatformSize(3.0),
+                                                  ),
                                                 ),
+                                                Text(
+                                                  '.',
+                                                  style: getTextStyle(
+                                                    language.lang,
+                                                    color: Colors.transparent,
+                                                    heightTh: 0.8,
+                                                    heightEn: 1.15,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        })
+                                      : DropdownButton<CostTollModel>(
+                                          value: selectedCostToll,
+                                          hint: Consumer<LanguageModel>(
+                                            builder: (context, language, child) {
+                                              return Container(
+                                                padding: EdgeInsets.only(
+                                                  left: getPlatformSize(6.0),
+                                                ),
+                                                child: Text(
+                                                  isSearchMode
+                                                      ? (state as ShowSearchResultRouteState)
+                                                          .bestRoute
+                                                          .destination
+                                                          .name
+                                                      : ((state is FetchGateInInitial) ||
+                                                              (state is FetchGateInSuccess) ||
+                                                              (state is FetchGateInFailure)
+                                                          ? ' '
+                                                          : LocaleText.selectExit()
+                                                              .ofLanguage(language.lang)),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: getTextStyle(
+                                                    language.lang,
+                                                    color: isSearchMode ? null : Color(0xFFB2B2B2),
+                                                    heightTh: 0.8,
+                                                    heightEn: 1.15,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          icon: isSearchMode
+                                              ? SizedBox.shrink()
+                                              : Image(
+                                                  image: AssetImage(
+                                                      'assets/images/route/ic_down_arrow.png'),
+                                                  width: getPlatformSize(12.0),
+                                                  height: getPlatformSize(7.4),
+                                                ),
+                                          iconSize: getPlatformSize(24.0),
+                                          elevation: 2,
+                                          //style: getTextStyle(1),
+                                          underline: SizedBox.shrink(),
+                                          isDense: true,
+                                          isExpanded: true,
+                                          onChanged: (CostTollModel costToll) {
+                                            _selectCostTollMarker(context, costToll);
+
+                                            final CameraPosition position = CameraPosition(
+                                              target: LatLng(costToll.latitude, costToll.longitude),
+                                              zoom: 12,
+                                            );
+                                            _moveMapToPosition(context, position);
+                                          },
+                                          selectedItemBuilder: (BuildContext context) {
+                                            return costTollList
+                                                .map<Widget>((CostTollModel costToll) {
+                                              return Consumer<LanguageModel>(
+                                                builder: (context, language, child) {
+                                                  return Container(
+                                                    padding: EdgeInsets.only(
+                                                      left: getPlatformSize(6.0),
+                                                    ),
+                                                    child: Text(
+                                                      costToll.toString(),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: getTextStyle(
+                                                        language.lang,
+                                                        heightTh: 0.8,
+                                                        heightEn: 1.15,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }).toList();
+                                          },
+                                          items: costTollList.map((CostTollModel costToll) {
+                                            return DropdownMenuItem<CostTollModel>(
+                                              value: costToll,
+                                              child: Consumer<LanguageModel>(
+                                                builder: (context, language, child) {
+                                                  return Container(
+                                                    padding: EdgeInsets.only(
+                                                      left: getPlatformSize(6.0),
+                                                      top: getPlatformSize(4.0),
+                                                      bottom: getPlatformSize(4.0),
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                          costToll.routeName,
+                                                          style: getTextStyle(
+                                                            language.lang,
+                                                            color: Color(0xFFB2B2B2),
+                                                            sizeTh: getPlatformSize(
+                                                                Constants.Font.SMALLER_SIZE_TH),
+                                                            sizeEn: getPlatformSize(
+                                                                Constants.Font.SMALLER_SIZE_EN),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          costToll.toString().trim(),
+                                                          style: getTextStyle(
+                                                            language.lang,
+                                                            heightTh: 0.8,
+                                                            heightEn: 1.15,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             );
-                                          },
+                                          }).toList(),
                                         );
-                                      }).toList();
-                                    },
-                                    items: costTollList.map((CostTollModel costToll) {
-                                      return DropdownMenuItem<CostTollModel>(
-                                        value: costToll,
-                                        child: Consumer<LanguageModel>(
-                                          builder: (context, language, child) {
-                                            return Container(
-                                              padding: EdgeInsets.only(
-                                                left: getPlatformSize(6.0),
-                                                top: getPlatformSize(4.0),
-                                                bottom: getPlatformSize(4.0),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Text(
-                                                    costToll.routeName,
-                                                    style: getTextStyle(
-                                                      language.lang,
-                                                      color: Color(0xFFB2B2B2),
-                                                      sizeTh: getPlatformSize(
-                                                          Constants.Font.SMALLER_SIZE_TH),
-                                                      sizeEn: getPlatformSize(
-                                                          Constants.Font.SMALLER_SIZE_EN),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    costToll.toString().trim(),
-                                                    style: getTextStyle(
-                                                      language.lang,
-                                                      heightTh: 0.8,
-                                                      heightEn: 1.15,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
                                 }),
                               ],
                             ),
@@ -1344,7 +1429,9 @@ class MyRouteState extends State<MyRoute> {
               BlocBuilder<RouteBloc, RouteState>(
                 builder: (context, state) {
                   bool visible = false;
-                  if (state is ShowSearchResultRouteState) {
+                  if (state is ShowSearchResultRouteState ||
+                      state is FetchDirectionsSuccess ||
+                      state is LocationTrackingUpdated) {
                     visible = true;
                   }
 
@@ -1360,11 +1447,43 @@ class MyRouteState extends State<MyRoute> {
                             alignment: Alignment.bottomRight,
                             child: FloatingActionButton(
                               onPressed: () {
+                                if (state is LocationTrackingUpdated) {
+                                  context.bloc<RouteBloc>().add(StopLocationTracking());
+                                } else if (state is FetchDirectionsSuccess) {
+                                  // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
+                                  try {
+                                    getCurrentLocation().then((Position position) {
+                                      context
+                                          .bloc<RouteBloc>()
+                                          .add(DoLocationTracking(currentLocation: position));
+                                    });
+                                  } catch (e) {
+                                    print(e);
+                                  }
+
+                                  if (_positionStreamSubscription == null) {
+                                    _setupLocationUpdate((Position position) {
+                                      print("////////////////////////////////////////////");
+                                      print("/////// ENTRANCE/EXIT LOCATION UPDATE //////");
+                                      print(
+                                          "Current location: ${position.latitude}, ${position.longitude}");
+                                      print("////////////////////////////////////////////");
+                                      context
+                                          .bloc<RouteBloc>()
+                                          .add(DoLocationTracking(currentLocation: position));
+                                    });
+                                    _positionStreamSubscription.pause();
+                                  }
+                                  if (_positionStreamSubscription.isPaused) {
+                                    _positionStreamSubscription.resume();
+                                  }
+                                }
+
                                 if (state is ShowSearchLocationTrackingUpdated) {
                                   context
                                       .bloc<RouteBloc>()
                                       .add(ShowSearchResultRoute(bestRoute: state.bestRoute));
-                                } else {
+                                } else if (state is ShowSearchResultRouteState) {
                                   // get current location จะได้แสดง marker รูปรถบน maps ทันที ไม่ต้องรอ location update
                                   try {
                                     getCurrentLocation().then((Position position) {
@@ -1393,7 +1512,8 @@ class MyRouteState extends State<MyRoute> {
                                 }
                               },
                               child: Icon(
-                                state is ShowSearchLocationTrackingUpdated
+                                state is ShowSearchLocationTrackingUpdated ||
+                                        state is LocationTrackingUpdated
                                     ? Icons.stop
                                     : Icons.navigation,
                                 color: Colors.white,
@@ -1467,14 +1587,13 @@ class MyRouteState extends State<MyRoute> {
                                   text: entry.value == 0
                                       ? LocaleText.now().ofLanguage(language.lang)
                                       : sprintf(
-                                    LocaleText.minutesLater().ofLanguage(language.lang),
-                                    [entry.value],
-                                  ),
+                                          LocaleText.minutesLater().ofLanguage(language.lang),
+                                          [entry.value],
+                                        ),
                                   //searchServiceText.ofLanguage(language.lang),
-                                  onClick: () =>
-                                      _handleClickTimePeriodOption(entry.value),
+                                  onClick: () => _handleClickTimePeriodOption(entry.value),
                                   bulletColor:
-                                  Constants.BottomSheet.TAB_STRIP_COLOR_LIST[entry.key % 4],
+                                      Constants.BottomSheet.TAB_STRIP_COLOR_LIST[entry.key % 4],
                                 );
                               }).toList(),
                               itemPadding: EdgeInsets.symmetric(
@@ -1489,8 +1608,13 @@ class MyRouteState extends State<MyRoute> {
                   },
                 ),
 
-              if (_isLoading)
-                Center(child: MyProgressIndicator()),
+              BlocBuilder<RouteBloc, RouteState>(builder: (context, state) {
+                bool showProgress = _isLoading ||
+                    state is FetchGateInInitial ||
+                    state is FetchCostTollInitial ||
+                    state is FetchDirectionsInitial;
+                return showProgress ? Center(child: MyProgressIndicator()) : SizedBox.shrink();
+              }),
             ],
           ),
         ),

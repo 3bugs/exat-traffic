@@ -27,10 +27,14 @@ class CostTollSelected extends RouteEvent {
   CostTollSelected({@required this.selectedCostToll});
 }
 
-class UpdateCurrentLocation extends RouteEvent {
+class DoLocationTracking extends RouteEvent {
   final Position currentLocation;
 
-  UpdateCurrentLocation({@required this.currentLocation});
+  DoLocationTracking({@required this.currentLocation});
+}
+
+class StopLocationTracking extends RouteEvent {
+  StopLocationTracking();
 }
 
 class ShowSearchResultRoute extends RouteEvent {

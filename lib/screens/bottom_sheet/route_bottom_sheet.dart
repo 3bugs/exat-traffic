@@ -1,4 +1,6 @@
+import 'package:exattraffic/screens/route/bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //import 'package:http/http.dart';
@@ -297,286 +299,336 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
       collapsePosition: widget.collapsePosition,
       onChangeSize: _handleChangeSize,
       child: Expanded(
-        child: Container(
-          color: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
-          padding: EdgeInsets.only(
-            left: getPlatformSize(20.0),
-            right: getPlatformSize(4.0),
-            top: getPlatformSize(4.0),
-            bottom: getPlatformSize(0.0),
-          ),
-          child: Consumer<LanguageModel>(
-            builder: (context, language, child) {
-              return Column(
-                mainAxisSize: MainAxisSize.max,
-                //crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      // ข้อความบอกเวลา ระยะทาง
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: getPlatformSize(6.0),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                widget.googleRoute == null
-                                    ? ''
-                                    : (language.lang == LanguageName.thai
-                                        ? widget.googleRoute['legs'][0]['duration_in_traffic']
-                                            ['text']
-                                        /*.replaceAll('hours', 'ชม.')
-                                            .replaceAll('hour', 'ชม.')
-                                            .replaceAll('mins', 'นาที')
-                                            .replaceAll('min', 'นาที')*/
-                                        : widget.googleRoute['legs'][0]['duration_in_traffic']
-                                            ['text']),
-                                style: getTextStyle(
-                                  language.lang,
-                                  isBold: true,
-                                  color: Colors.white,
-                                  sizeTh: Constants.Font.BIGGEST_SIZE_TH,
-                                  sizeEn: Constants.Font.BIGGEST_SIZE_EN,
-                                ),
-                              ),
-                              SizedBox(
-                                width: getPlatformSize(15.0),
-                              ),
-                              Text(
-                                widget.googleRoute == null
-                                    ? ''
-                                    : '(${widget.googleRoute['legs'][0]['distance']['text']})',
-                                style: getTextStyle(
-                                  language.lang,
-                                  color: Colors.white,
-                                  sizeTh: Constants.Font.BIGGER_SIZE_TH,
-                                  sizeEn: Constants.Font.BIGGER_SIZE_EN,
-                                ),
-                              ),
-                            ],
+        child: InkWell(
+          onTap: _handleClickUpDownSheet,
+          child: Container(
+            color: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
+            padding: EdgeInsets.only(
+              left: getPlatformSize(20.0),
+              right: getPlatformSize(4.0),
+              top: getPlatformSize(4.0),
+              bottom: getPlatformSize(0.0),
+            ),
+            child: Consumer<LanguageModel>(
+              builder: (context, language, child) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  //crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        // ข้อความบอกเวลา ระยะทาง
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              top: getPlatformSize(6.0),
+                            ),
+                            child: BlocBuilder<RouteBloc, RouteState>(
+                              builder: (context, state) {
+                                return state is FetchDirectionsInitial
+                                    ? Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: getPlatformSize(6.0),
+                                              vertical: getPlatformSize(0.0),
+                                            ),
+                                            child: SizedBox(
+                                              width: getPlatformSize(20.0),
+                                              height: getPlatformSize(20.0),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: getPlatformSize(3.0),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: getPlatformSize(4.0),
+                                          ),
+                                          Text(
+                                            'กำลังค้นหาเส้นทาง...',
+                                            style: getTextStyle(
+                                              language.lang,
+                                              color: Colors.white.withOpacity(0.6),
+                                              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                                              sizeEn: Constants.Font.BIGGER_SIZE_EN,
+                                            ),
+                                          ),
+                                          Text(
+                                            '.',
+                                            style: getTextStyle(
+                                              language.lang,
+                                              color: Colors.transparent,
+                                              sizeTh: Constants.Font.BIGGEST_SIZE_TH,
+                                              sizeEn: Constants.Font.BIGGEST_SIZE_EN,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            widget.googleRoute == null
+                                                ? ''
+                                                : (language.lang == LanguageName.thai
+                                                    ? widget.googleRoute['legs'][0]
+                                                        ['duration_in_traffic']['text']
+                                                    /*.replaceAll('hours', 'ชม.')
+                                                .replaceAll('hour', 'ชม.')
+                                                .replaceAll('mins', 'นาที')
+                                                .replaceAll('min', 'นาที')*/
+                                                    : widget.googleRoute['legs'][0]
+                                                        ['duration_in_traffic']['text']),
+                                            style: getTextStyle(
+                                              language.lang,
+                                              isBold: true,
+                                              color: Colors.white,
+                                              sizeTh: Constants.Font.BIGGEST_SIZE_TH,
+                                              sizeEn: Constants.Font.BIGGEST_SIZE_EN,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: getPlatformSize(12.0),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: getPlatformSize(4.0)),
+                                            child: Text(
+                                              widget.googleRoute == null
+                                                  ? ''
+                                                  : '(${widget.googleRoute['legs'][0]['distance']['text']})',
+                                              style: getTextStyle(
+                                                language.lang,
+                                                color: Colors.white,
+                                                sizeTh: Constants.Font.BIGGER_SIZE_TH,
+                                                sizeEn: Constants.Font.BIGGER_SIZE_EN,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                              },
+                            ),
                           ),
                         ),
-                      ),
 
-                      // ปุ่ม favorite
-                      widget.destination != null
-                          ? Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: _handleClickFavorite,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(getPlatformSize(21.0)),
-                                ),
-                                child: Container(
-                                  width: getPlatformSize(42.0),
-                                  height: getPlatformSize(42.0),
-                                  //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                                  child: Center(
-                                    child: FutureBuilder(
-                                        future: _getFavoriteIcon(),
-                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                          return snapshot.hasData
-                                              ? snapshot.data
-                                              : SizedBox.shrink();
-                                        }),
+                        // ปุ่ม favorite
+                        widget.destination != null
+                            ? Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: _handleClickFavorite,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(getPlatformSize(21.0)),
+                                  ),
+                                  child: Container(
+                                    width: getPlatformSize(42.0),
+                                    height: getPlatformSize(42.0),
+                                    //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                    child: Center(
+                                      child: FutureBuilder(
+                                          future: _getFavoriteIcon(),
+                                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                            return snapshot.hasData
+                                                ? snapshot.data
+                                                : SizedBox.shrink();
+                                          }),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          : SizedBox.shrink(),
+                              )
+                            : SizedBox.shrink(),
 
-                      // ปุ่ม up/down
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _handleClickUpDownSheet();
-                          },
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(getPlatformSize(21.0)),
-                          ),
-                          child: Container(
-                            width: getPlatformSize(42.0),
-                            height: getPlatformSize(42.0),
-                            //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                            child: Center(
-                              child: Image(
-                                image: _bottomSheetExpanded
-                                    ? AssetImage('assets/images/route/ic_sheet_down_white.png')
-                                    : AssetImage('assets/images/route/ic_sheet_up_white.png'),
-                                width: getPlatformSize(12.0),
-                                height: getPlatformSize(9.73 * 12.0 / 5.88),
+                        // ปุ่ม up/down
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _handleClickUpDownSheet();
+                            },
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(getPlatformSize(21.0)),
+                            ),
+                            child: Container(
+                              width: getPlatformSize(42.0),
+                              height: getPlatformSize(42.0),
+                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                              child: Center(
+                                child: Image(
+                                  image: _bottomSheetExpanded
+                                      ? AssetImage('assets/images/route/ic_sheet_down_white.png')
+                                      : AssetImage('assets/images/route/ic_sheet_up_white.png'),
+                                  width: getPlatformSize(12.0),
+                                  height: getPlatformSize(9.73 * 12.0 / 5.88),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  // ถึงเวลา, ผ่านที่ด่าน
-                  Padding(
-                    padding: EdgeInsets.only(
-                      right: getPlatformSize(16.0),
+                      ],
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        widget.showArrivalTime
-                            ? Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    if (widget.onClickTimePeriodOption != null) {
-                                      widget.onClickTimePeriodOption();
-                                    }
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        width: 0.5,
-                                        color: Colors.white.withOpacity(0.8),
+
+                    // ถึงเวลา, ผ่านที่ด่าน
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: getPlatformSize(16.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          widget.showArrivalTime
+                              ? Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (widget.onClickTimePeriodOption != null) {
+                                        widget.onClickTimePeriodOption();
+                                      }
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          width: 0.5,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(getPlatformSize(4.0)),
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(getPlatformSize(4.0)),
+                                      padding: EdgeInsets.only(
+                                        top: getPlatformSize(2.0),
+                                        bottom: getPlatformSize(2.0),
+                                        left: getPlatformSize(8.0),
+                                        right: getPlatformSize(4.0),
                                       ),
-                                    ),
-                                    padding: EdgeInsets.only(
-                                      top: getPlatformSize(2.0),
-                                      bottom: getPlatformSize(2.0),
-                                      left: getPlatformSize(8.0),
-                                      right: getPlatformSize(4.0),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Text(
-                                          _getDepartArrivalText(language.lang),
-                                          style: getTextStyle(
-                                            language.lang,
-                                            color: Colors.white,
-                                            sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                            sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Text(
+                                            _getDepartArrivalText(language.lang),
+                                            style: getTextStyle(
+                                              language.lang,
+                                              color: Colors.white,
+                                              sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                              sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: getPlatformSize(6.0),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_drop_down,
-                                          color: Colors.white,
-                                          size: 20.0,
-                                        ),
-                                      ],
+                                          SizedBox(
+                                            width: getPlatformSize(6.0),
+                                          ),
+                                          Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.white,
+                                            size: 20.0,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
+                                )
+                              : Text(
+                                  sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
+                                      [_getNumTollPlaza()]),
+                                  style: getTextStyle(
+                                    language.lang,
+                                    color: Colors.white,
+                                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
-                                    [_getNumTollPlaza()]),
-                                style: getTextStyle(
-                                  language.lang,
-                                  color: Colors.white,
-                                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                ),
-                              ),
-                        widget.showArrivalTime
-                            ? Text(
-                                sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
-                                    [_getNumTollPlaza()]),
-                                style: getTextStyle(
-                                  language.lang,
-                                  color: Colors.white,
-                                  sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                  sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                      ],
+                          widget.showArrivalTime
+                              ? Text(
+                                  sprintf(LocaleText.totalTollPlaza().ofLanguage(language.lang),
+                                      [_getNumTollPlaza()]),
+                                  style: getTextStyle(
+                                    language.lang,
+                                    color: Colors.white,
+                                    sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                    sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                  ),
+                                )
+                              : SizedBox.shrink(),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // เส้นคั่น
-                  Container(
-                    height: 0.0,
-                    margin: EdgeInsets.only(
-                      top: getPlatformSize(16.0),
-                      bottom: getPlatformSize(16.0),
-                      right: getPlatformSize(16.0),
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.26),
-                          width: getPlatformSize(0.0),
+                    // เส้นคั่น
+                    Container(
+                      height: 0.0,
+                      margin: EdgeInsets.only(
+                        top: getPlatformSize(16.0),
+                        bottom: getPlatformSize(16.0),
+                        right: getPlatformSize(16.0),
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withOpacity(0.26),
+                            width: getPlatformSize(0.0),
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  // รูปรถ
-                  Padding(
-                    padding: EdgeInsets.only(
-                      right: getPlatformSize(16.0),
+                    // รูปรถ
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: getPlatformSize(16.0),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          _getCarItem(
+                            language.lang,
+                            8,
+                            fourWheelsText.ofLanguage(language.lang),
+                            'assets/images/route/ic_car_small.png',
+                            46.0,
+                            25.8,
+                            15,
+                          ),
+                          _getCarItem(
+                            language.lang,
+                            10,
+                            sixToTenWheelsText.ofLanguage(language.lang),
+                            'assets/images/route/ic_car_medium-new.png',
+                            84.65,
+                            38.66,
+                            3,
+                          ),
+                          _getCarItem(
+                            language.lang,
+                            11,
+                            overTenWheelsText.ofLanguage(language.lang),
+                            'assets/images/route/ic_car_large-new.png',
+                            118.25,
+                            42.01,
+                            0,
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: <Widget>[
-                        _getCarItem(
-                          language.lang,
-                          8,
-                          fourWheelsText.ofLanguage(language.lang),
-                          'assets/images/route/ic_car_small.png',
-                          46.0,
-                          25.8,
-                          15,
-                        ),
-                        _getCarItem(
-                          language.lang,
-                          10,
-                          sixToTenWheelsText.ofLanguage(language.lang),
-                          'assets/images/route/ic_car_medium-new.png',
-                          84.65,
-                          38.66,
-                          3,
-                        ),
-                        _getCarItem(
-                          language.lang,
-                          11,
-                          overTenWheelsText.ofLanguage(language.lang),
-                          'assets/images/route/ic_car_large-new.png',
-                          118.25,
-                          42.01,
-                          0,
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  // ค่าผ่านทาง
-                  Padding(
-                    padding: EdgeInsets.only(
-                      right: getPlatformSize(16.0),
+                    // ค่าผ่านทาง
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: getPlatformSize(16.0),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          _getFeeItem(language.lang, 6,
+                              widget.costToll == null ? 0 : widget.costToll.cost4Wheels),
+                          _getFeeItem(language.lang, 6,
+                              widget.costToll == null ? 0 : widget.costToll.cost6To10Wheels),
+                          _getFeeItem(language.lang, 6,
+                              widget.costToll == null ? 0 : widget.costToll.costOver10Wheels),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: <Widget>[
-                        _getFeeItem(language.lang, 6,
-                            widget.costToll == null ? 0 : widget.costToll.cost4Wheels),
-                        _getFeeItem(language.lang, 6,
-                            widget.costToll == null ? 0 : widget.costToll.cost6To10Wheels),
-                        _getFeeItem(language.lang, 6,
-                            widget.costToll == null ? 0 : widget.costToll.costOver10Wheels),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bloc/bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:sprintf/sprintf.dart';
 
 import 'package:exattraffic/screens/route/bloc/bloc.dart';
 import 'package:exattraffic/services/api.dart';
@@ -14,6 +15,9 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/alert_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/models/marker_categories/toll_plaza_model.dart';
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
   final BuildContext _context;
@@ -22,7 +26,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   List<GateInModel> _gateInList;
   RouteModel _bestRoute;
 
-  RouteBloc(this._context, {
+  RouteBloc(
+    this._context, {
     @required this.markerList,
     @required this.categoryList,
   }) : super(FetchGateInInitial());
@@ -88,6 +93,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     }
 
     if (event is ListGateIn) {
+      yield FetchGateInInitial();
+
       try {
         if (_gateInList == null) {
           _gateInList = await MyApi.fetchGateIn(this.markerList);
@@ -180,18 +187,18 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
             .map((markerModel) => LatLng(markerModel.latitude, markerModel.longitude))
             .toList();
 
-        final route = await googleMapsServices.getRoute(
-          LatLng(currentState.selectedGateIn.latitude, currentState.selectedGateIn.longitude),
-          LatLng(selectedCostToll.latitude, selectedCostToll.longitude),
-          partTollLatLngList,
-          0
-        );
+        var googleRoute = await googleMapsServices.getRoute(
+            LatLng(currentState.selectedGateIn.latitude, currentState.selectedGateIn.longitude),
+            LatLng(selectedCostToll.latitude, selectedCostToll.longitude),
+            partTollLatLngList,
+            0);
+
         yield FetchDirectionsSuccess(
           gateInList: currentState.gateInList,
           costTollList: currentState.costTollList,
           selectedGateIn: currentState.selectedGateIn,
           selectedCostToll: selectedCostToll,
-          googleRoute: route,
+          googleRoute: googleRoute,
         );
       } catch (_) {
         yield FetchDirectionsFailure(
@@ -200,10 +207,19 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           selectedGateIn: currentState.selectedGateIn,
         );
       }
-    } else if (event is UpdateCurrentLocation) {
+    } else if (event is StopLocationTracking) {
+      yield FetchDirectionsSuccess(
+        gateInList: currentState.gateInList,
+        costTollList: currentState.costTollList,
+        selectedGateIn: currentState.selectedGateIn,
+        selectedCostToll: currentState.selectedCostToll,
+        googleRoute: currentState.googleRoute,
+      );
+    } else if (event is DoLocationTracking) {
       print("***** UPDATE CURRENT LOCATION [GATEIN/COSTTOLL] *****");
 
-      try { // todo: (bug) selectedCostToll = null ?!?
+      try {
+        // todo: (bug) selectedCostToll = null ?!?
         GateInModel selectedGateIn = currentState.selectedGateIn;
         CostTollModel selectedCostToll = currentState.selectedCostToll;
         List<MarkerModel> partTollList = selectedCostToll.partTollMarkerList;
@@ -265,14 +281,25 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       currentLocation.longitude,
     );
     if (distanceInMeters < DISTANCE_THRESHOLD_METER) {
+      LanguageModel language = Provider.of<LanguageModel>(_context, listen: false);
+
       TollPlazaModel tollPlaza = TollPlazaModel.fromMarkerModel(marker);
 
-      String tollFee =
-          "▶ รถ 4 ล้อ:  ${tollPlaza.cost4Wheels} บาท\n▶ รถ 6-10 ล้อ:  ${tollPlaza.cost6To10Wheels} บาท\n▶ รถเกิน 10 ล้อ:  ${tollPlaza.costOver10Wheels} บาท";
+      String fourWheels = LocaleText.fourWheels().ofLanguage(language.lang);
+      String sixToTenWheels = LocaleText.sixToTenWheels().ofLanguage(language.lang);
+      String overTenWheels = LocaleText.overTenWheels().ofLanguage(language.lang);
+      String amountBaht = LocaleText.amountBaht().ofLanguage(language.lang);
+      String tollFee = sprintf(
+        "- $fourWheels:  $amountBaht\n- $sixToTenWheels:  $amountBaht\n- $overTenWheels:  $amountBaht",
+        [tollPlaza.cost4Wheels, tollPlaza.cost6To10Wheels, tollPlaza.costOver10Wheels],
+      );
       notification = AlertModel(
         title: "เตรียมจ่ายค่าผ่านทาง",
-        message:
-            "อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง${marker.name} กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
+        message: sprintf(
+          LocaleText.payTollAhead().ofLanguage(language.lang) + '\n\n$tollFee',
+          [(distanceInMeters / 1000).toStringAsFixed(1), marker.name],
+        ),
+        //"อีก ${(distanceInMeters / 1000).toStringAsFixed(1)} กม. ถึง${marker.name} กรุณาเตรียมเงินค่าผ่านทาง:\n\n$tollFee",
       );
     }
     return notification;

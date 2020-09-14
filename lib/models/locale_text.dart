@@ -520,6 +520,22 @@ class LocaleText {
     );
   }
 
+  factory LocaleText.amountBaht() {
+    return LocaleText(
+      thai: '%d บาท',
+      english: '%d Baht',
+      chinese: '%d泰铢',
+      japanese: '%dバーツ',
+      korean: '%d 바트',
+      lao: '%d ບາດ',
+      vietnamese: '%d Baht',
+      myanmar: '%d Baht',
+      khmer: '%d បាត',
+      malay: '%d Baht',
+      indonesian: '%d Baht',
+    );
+  }
+
   factory LocaleText.lane() {
     return LocaleText(
       thai: 'ช่อง',
@@ -855,6 +871,22 @@ class LocaleText {
       khmer: 'ទីតាំង​បច្ចុប្បន្ន',
       malay: 'lokasi sekarang',
       indonesian: 'lokasi saat ini',
+    );
+  }
+
+  factory LocaleText.payTollAhead() {
+    return LocaleText(
+      thai: 'อีก %s กม. ถึง%s โปรดเตรียมเงินค่าผ่านทาง',
+      english: 'Pay toll ahead %s km',
+      chinese: '提前付费%s公里',
+      japanese: '%s km先に通行料を支払う',
+      korean: '%skm 전방에 통행료 지불',
+      lao: 'ຈ່າຍຄ່າໂທລ່ວງ ໜ້າ %s ກິໂລແມັດ',
+      vietnamese: 'trả phí trước %s km',
+      myanmar: 'ရှေ့ဆက် %s ကီလိုမီတာသေဆုံးသူပေးဆောင်',
+      khmer: 'បង់ថ្លៃសេវាខាងមុខ %s គីឡូម៉ែត្រ',
+      malay: 'bayar tol lebih awal %s km',
+      indonesian: 'membayar tol ke depan %s km',
     );
   }
 }
