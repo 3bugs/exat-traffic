@@ -157,137 +157,140 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
       collapsePosition: widget.collapsePosition,
       onChangeSize: _handleChangeSize,
       child: Expanded(
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.only(
-            left: getPlatformSize(0.0),
-            right: getPlatformSize(0.0),
-            top: getPlatformSize(10.0),
-            bottom: getPlatformSize(0.0),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            //crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    width: getPlatformSize(8.0),
-                  ),
-                  _selectedExpressWay == null
-                      ? SizedBox(
-                          width: getPlatformSize(42.0),
-                        )
-                      : Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              _handleClickBack(context);
-                            },
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(getPlatformSize(21.0)),
-                            ),
-                            child: Container(
-                              width: getPlatformSize(42.0),
-                              height: getPlatformSize(42.0),
-                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                              child: Center(
-                                child: Image(
-                                  image: AssetImage('assets/images/home/ic_back.png'),
-                                  width: getPlatformSize(12.0),
-                                  height: getPlatformSize(12.0),
+        child: InkWell(
+          onTap: _handleClickUpDownSheet,
+          child: Container(
+            color: Colors.white,
+            padding: EdgeInsets.only(
+              left: getPlatformSize(0.0),
+              right: getPlatformSize(0.0),
+              top: getPlatformSize(10.0),
+              bottom: getPlatformSize(0.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              //crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      width: getPlatformSize(8.0),
+                    ),
+                    _selectedExpressWay == null
+                        ? SizedBox(
+                            width: getPlatformSize(42.0),
+                          )
+                        : Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                _handleClickBack(context);
+                              },
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(getPlatformSize(21.0)),
+                              ),
+                              child: Container(
+                                width: getPlatformSize(42.0),
+                                height: getPlatformSize(42.0),
+                                //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                                child: Center(
+                                  child: Image(
+                                    image: AssetImage('assets/images/home/ic_back.png'),
+                                    width: getPlatformSize(12.0),
+                                    height: getPlatformSize(12.0),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                  Expanded(
-                    child: Center(
-                      child: Consumer<LanguageModel>(
-                        builder: (context, language, child) {
-                          return Text(
-                            _selectedExpressWay == null
-                                ? headerText.ofLanguage(language.lang)
-                                : _selectedExpressWay.name,
-                            style: getTextStyle(language.lang, isBold: true),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        _handleClickUpDownSheet();
-                      },
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(getPlatformSize(21.0)),
-                      ),
-                      child: Container(
-                        width: getPlatformSize(42.0),
-                        height: getPlatformSize(42.0),
-                        //padding: EdgeInsets.all(getPlatformSize(15.0)),
-                        child: Center(
-                          child: Image(
-                            //image: AssetImage('assets/images/home/ic_sheet_down.png'),
-                            image: _bottomSheetExpanded
-                                ? AssetImage('assets/images/home/ic_sheet_down.png')
-                                : AssetImage('assets/images/home/ic_sheet_up.png'),
-                            width: getPlatformSize(12.0),
-                            height: getPlatformSize(6.7),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: getPlatformSize(14.0),
-                  ),
-                ],
-              ),
-              SizedBox(height: getPlatformSize(4.0)),
-              Expanded(
-                child: _error == null
-                    ? _futureExpressWayList != null
-                        ? LazyIndexedStack(
-                            reuse: false,
-                            itemBuilder: (context, index) {
-                              return index == 0
-                                  ? ExpressWayList(_futureExpressWayList, _handleClickExpressWay)
-                                  : ExpressWayDetails(
-                                      Key(_selectedExpressWay.name),
-                                      _selectedExpressWay,
-                                      _handleClickTrafficPoint,
-                                    );
-                            },
-                            itemCount: 2,
-                            index: _selectedExpressWay == null ? 0 : 1,
-                          )
-                        : Center(
-                            child: SizedBox(
-                              width: getPlatformSize(25.0),
-                              height: getPlatformSize(25.0),
-                              child: CircularProgressIndicator(
-                                strokeWidth: getPlatformSize(3.0),
-                              ),
-                            ),
-                          )
-                    : Center(
+                    Expanded(
+                      child: Center(
                         child: Consumer<LanguageModel>(
                           builder: (context, language, child) {
-                            return ErrorView(
-                              //text: "ขออภัย เกิดข้อผิดพลาดในการดึงข้อมูลทางพิเศษ",
-                              buttonText:
-                                  LocaleText.errorPleaseTryAgain().ofLanguage(language.lang),
-                              onClick: () => _fetchExpressWays(context),
+                            return Text(
+                              _selectedExpressWay == null
+                                  ? headerText.ofLanguage(language.lang)
+                                  : _selectedExpressWay.name,
+                              style: getTextStyle(language.lang, isBold: true),
                             );
                           },
                         ),
                       ),
-              ),
-            ],
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          _handleClickUpDownSheet();
+                        },
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(getPlatformSize(21.0)),
+                        ),
+                        child: Container(
+                          width: getPlatformSize(42.0),
+                          height: getPlatformSize(42.0),
+                          //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                          child: Center(
+                            child: Image(
+                              //image: AssetImage('assets/images/home/ic_sheet_down.png'),
+                              image: _bottomSheetExpanded
+                                  ? AssetImage('assets/images/home/ic_sheet_down.png')
+                                  : AssetImage('assets/images/home/ic_sheet_up.png'),
+                              width: getPlatformSize(12.0),
+                              height: getPlatformSize(6.7),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: getPlatformSize(14.0),
+                    ),
+                  ],
+                ),
+                SizedBox(height: getPlatformSize(4.0)),
+                Expanded(
+                  child: _error == null
+                      ? _futureExpressWayList != null
+                          ? LazyIndexedStack(
+                              reuse: false,
+                              itemBuilder: (context, index) {
+                                return index == 0
+                                    ? ExpressWayList(_futureExpressWayList, _handleClickExpressWay)
+                                    : ExpressWayDetails(
+                                        Key(_selectedExpressWay.name),
+                                        _selectedExpressWay,
+                                        _handleClickTrafficPoint,
+                                      );
+                              },
+                              itemCount: 2,
+                              index: _selectedExpressWay == null ? 0 : 1,
+                            )
+                          : Center(
+                              child: SizedBox(
+                                width: getPlatformSize(25.0),
+                                height: getPlatformSize(25.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: getPlatformSize(3.0),
+                                ),
+                              ),
+                            )
+                      : Center(
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return ErrorView(
+                                //text: "ขออภัย เกิดข้อผิดพลาดในการดึงข้อมูลทางพิเศษ",
+                                buttonText:
+                                    LocaleText.errorPleaseTryAgain().ofLanguage(language.lang),
+                                onClick: () => _fetchExpressWays(context),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

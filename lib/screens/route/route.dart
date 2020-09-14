@@ -32,6 +32,7 @@ import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/models/locale_text.dart';
 import 'package:exattraffic/components/options_dialog.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
+import 'package:exattraffic/components/error_view.dart';
 
 class MyRoute extends StatefulWidget {
   final Function showBestRouteAfterSearch;
@@ -648,6 +649,7 @@ class MyRouteState extends State<MyRoute> {
                 LocaleText.selectEntrance().ofLanguage(language.lang),
                 style: getTextStyle(language.lang, color: Colors.white),
               ),
+              backgroundColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
             );
             Scaffold.of(context).showSnackBar(snackBar);
 
@@ -670,6 +672,7 @@ class MyRouteState extends State<MyRoute> {
                 LocaleText.selectExit().ofLanguage(language.lang),
                 style: getTextStyle(language.lang, color: Colors.white),
               ),
+              backgroundColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
             );
             Scaffold.of(context).showSnackBar(snackBar);
 
@@ -1547,7 +1550,7 @@ class MyRouteState extends State<MyRoute> {
                     final GateInModel selectedGateIn = state.selectedGateIn;
                     final CostTollModel selectedCostToll = state.selectedCostToll;
 
-                    return selectedCostToll == null
+                    return selectedCostToll == null || state is FetchDirectionsFailure
                         ? SizedBox.shrink()
                         : RouteBottomSheet(
                             collapsePosition: _googleMapsHeight -
@@ -1600,6 +1603,9 @@ class MyRouteState extends State<MyRoute> {
                                 vertical: getPlatformSize(12.0),
                                 horizontal: getPlatformSize(20.0),
                               ),
+                              onClickClose: () => setState(() {
+                                _timePeriodDialogVisible = false;
+                              }),
                             ),
                           ],
                         ),
@@ -1608,13 +1614,49 @@ class MyRouteState extends State<MyRoute> {
                   },
                 ),
 
-              BlocBuilder<RouteBloc, RouteState>(builder: (context, state) {
-                bool showProgress = _isLoading ||
-                    state is FetchGateInInitial ||
-                    state is FetchCostTollInitial ||
-                    state is FetchDirectionsInitial;
-                return showProgress ? Center(child: MyProgressIndicator()) : SizedBox.shrink();
-              }),
+              BlocBuilder<RouteBloc, RouteState>(
+                builder: (context, state) {
+                  bool isFailed = state is FetchGateInFailure ||
+                      state is FetchCostTollFailure ||
+                      state is FetchDirectionsFailure;
+                  return isFailed
+                      ? Center(
+                          child: Consumer<LanguageModel>(
+                            builder: (context, language, child) {
+                              return ErrorView(
+                                //title: LocaleText.error().ofLanguage(language.lang),
+                                title: LocaleText.errorPleaseTryAgain().ofLanguage(language.lang),
+                                text: state.errorMessage,
+                                buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
+                                withBackground: true,
+                                onClick: () {
+                                  if (state is FetchGateInFailure) {
+                                    _routeBloc.add(ListGateIn());
+                                  } else if (state is FetchCostTollFailure) {
+                                    _routeBloc
+                                        .add(GateInSelected(selectedGateIn: state.selectedGateIn));
+                                  } else if (state is FetchDirectionsFailure) {
+                                    _routeBloc.add(
+                                        CostTollSelected(selectedCostToll: state.selectedCostToll));
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                        )
+                      : SizedBox.shrink();
+                },
+              ),
+
+              BlocBuilder<RouteBloc, RouteState>(
+                builder: (context, state) {
+                  bool showProgress = _isLoading ||
+                      state is FetchGateInInitial ||
+                      state is FetchCostTollInitial ||
+                      state is FetchDirectionsInitial;
+                  return showProgress ? Center(child: MyProgressIndicator()) : SizedBox.shrink();
+                },
+              ),
             ],
           ),
         ),

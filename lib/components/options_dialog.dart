@@ -9,8 +9,9 @@ class OptionsDialog extends StatelessWidget {
   final String title;
   final List<OptionModel> optionList;
   final EdgeInsets itemPadding;
+  final Function onClickClose;
 
-  OptionsDialog({this.title, @required this.optionList, this.itemPadding});
+  OptionsDialog({this.title, @required this.optionList, this.itemPadding, this.onClickClose});
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +47,43 @@ class OptionsDialog extends StatelessWidget {
                   //padding: this.itemPadding,
                   child: Padding(
                     padding: EdgeInsets.only(
-                      top: getPlatformSize(12.0),
-                      bottom: getPlatformSize(8.0),
+                      top: getPlatformSize(6.0),
+                      bottom: getPlatformSize(2.0),
                       left: getPlatformSize(0.0),
                       right: getPlatformSize(0.0),
                     ),
-                    child: Text(
-                      this.title,
-                      style: getTextStyle(language.lang, color: Color(0xFF454F63), isBold: true),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        SizedBox(
+                          width: getPlatformSize(42.0),
+                          height: getPlatformSize(42.0),
+                        ),
+                        Text(
+                          this.title,
+                          style:
+                              getTextStyle(language.lang, color: Color(0xFF454F63), isBold: true),
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: onClickClose,
+                            borderRadius: BorderRadius.all(Radius.circular(21.0)),
+                            child: Container(
+                              width: getPlatformSize(42.0),
+                              height: getPlatformSize(42.0),
+                              //padding: EdgeInsets.all(getPlatformSize(15.0)),
+                              child: Center(
+                                child: Image(
+                                  image: AssetImage('assets/images/home/ic_close_search.png'),
+                                  width: getPlatformSize(24.0),
+                                  height: getPlatformSize(24.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 );

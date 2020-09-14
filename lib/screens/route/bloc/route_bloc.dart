@@ -102,14 +102,15 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           _gateInList.forEach((gateIn) => gateIn.selected = false);
         }
         yield FetchGateInSuccess(gateInList: _gateInList);
-      } catch (_) {
-        yield FetchGateInFailure();
+      } catch (error) {
+        yield FetchGateInFailure(errorMessage: error.toString());
       }
     } else if (event is GateInSelected) {
       final GateInModel selectedGateIn = event.selectedGateIn;
 
       // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
-      if (currentState.selectedGateIn == selectedGateIn) return;
+      if (currentState.selectedGateIn == selectedGateIn && !(currentState is FetchCostTollFailure))
+        return;
 
       currentState.gateInList.forEach((gateIn) {
         gateIn.selected = selectedGateIn == gateIn;
@@ -161,13 +162,16 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
         yield FetchCostTollFailure(
           gateInList: currentState.gateInList,
+          selectedGateIn: selectedGateIn,
+          errorMessage: error.toString(),
         );
       }
     } else if (event is CostTollSelected) {
       final CostTollModel selectedCostToll = event.selectedCostToll;
 
       // ถ้าหมุดถูกเลือกอยู่แล้ว ไม่ต้องทำอะไร
-      if (currentState.selectedCostToll == selectedCostToll) return;
+      if (currentState.selectedCostToll == selectedCostToll &&
+          !(currentState is FetchDirectionsFailure)) return;
 
       currentState.costTollList.forEach((costToll) {
         costToll.selected = selectedCostToll == costToll;
@@ -200,11 +204,13 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
           selectedCostToll: selectedCostToll,
           googleRoute: googleRoute,
         );
-      } catch (_) {
+      } catch (error) {
         yield FetchDirectionsFailure(
           gateInList: currentState.gateInList,
           costTollList: currentState.costTollList,
           selectedGateIn: currentState.selectedGateIn,
+          selectedCostToll: selectedCostToll,
+          errorMessage: error.toString(),
         );
       }
     } else if (event is StopLocationTracking) {

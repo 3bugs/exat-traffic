@@ -1,5 +1,6 @@
 //import 'dart:async';
 //import 'package:cached_network_image/cached_network_image.dart';
+import 'package:exattraffic/components/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
@@ -12,7 +13,8 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/marker_categories/cctv_model.dart';
 import 'package:exattraffic/components/tool_item.dart';
 import 'package:exattraffic/components/my_progress_indicator.dart';
-import 'package:exattraffic/screens/login/login.dart';
+
+//import 'package:exattraffic/screens/login/login.dart';
 import 'package:exattraffic/components/my_cached_image.dart';
 
 //import 'package:exattraffic/app/app_bloc.dart';
@@ -44,6 +46,7 @@ class CctvDetailsMain extends StatefulWidget {
 class _CctvDetailsMainState extends State<CctvDetailsMain> {
   int _checkedToolItemIndex;
   VlcPlayerController _controller;
+  bool _isResumingVideo = false;
 
   void _handleClickTool(BuildContext context, int toolItemIndex) {
     if (toolItemIndex == 2) {
@@ -145,6 +148,16 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
         onInit: () {
           _controller.addListener(() {
             print("***** PLAYING STATE: ${_controller.playingState.toString()}");
+
+            if (_controller.playingState == PlayingState.STOPPED) {
+              _isResumingVideo = true;
+              Future.delayed(Duration(seconds: 1), () {
+                _controller.play();
+              });
+            } else if (_controller.playingState == PlayingState.PLAYING) {
+              _isResumingVideo = false;
+            }
+
             // rebuild ใหม่ทุกครั้งเมื่อสถานะของ video player เปลี่ยน
             try {
               // เกิด error ตรงนี้ หลังจากกด back ออกจากหน้า cctv details
@@ -295,18 +308,23 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                                   placeholder: Center(child: MyProgressIndicator()),
                                 ),
                                 Visibility(
-                                  visible:
-                                      !_controller.initialized || _controller.playingState == null,
-                                  child: Center(
-                                    child: MyProgressIndicator(),
-                                  ),
+                                  visible: !_controller.initialized ||
+                                      _controller.playingState == null ||
+                                      _isResumingVideo,
+                                  child: Center(child: MyProgressIndicator()),
                                 ),
                                 Visibility(
-                                  visible: _controller.playingState == PlayingState.STOPPED,
-                                  child: MyButton(
-                                    text: "TRY AGAIN",
-                                    onClickButton: () {
-                                      _controller.play();
+                                  visible:
+                                      false, //_controller.playingState == PlayingState.STOPPED,
+                                  child: Consumer<LanguageModel>(
+                                    builder: (context, language, child) {
+                                      return MyButton(
+                                        text: LocaleText.errorPleaseTryAgain()
+                                            .ofLanguage(language.lang),
+                                        onClick: () {
+                                          _controller.play();
+                                        },
+                                      );
                                     },
                                   ),
                                 ),

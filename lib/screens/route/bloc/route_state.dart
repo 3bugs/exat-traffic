@@ -15,6 +15,7 @@ abstract class RouteState extends Equatable {
   final Map<String, dynamic> googleRoute;
   final Position currentLocation;
   final AlertModel notification;
+  final String errorMessage;
 
   const RouteState({
     this.gateInList,
@@ -24,6 +25,7 @@ abstract class RouteState extends Equatable {
     this.googleRoute,
     this.currentLocation,
     this.notification,
+    this.errorMessage,
   });
 
   /*RouteState copyWith({
@@ -58,7 +60,13 @@ abstract class RouteState extends Equatable {
 
 class FetchGateInInitial extends RouteState {}
 
-class FetchGateInFailure extends RouteState {}
+class FetchGateInFailure extends RouteState {
+  const FetchGateInFailure({
+    @required errorMessage,
+  }) : super(
+    errorMessage: errorMessage,
+  );
+}
 
 class FetchGateInSuccess extends RouteState {
   const FetchGateInSuccess({
@@ -84,11 +92,14 @@ class FetchCostTollInitial extends RouteState {
 class FetchCostTollFailure extends RouteState {
   const FetchCostTollFailure({
     @required gateInList,
+    @required selectedGateIn,
+    @required errorMessage,
   }) : super(
           gateInList: gateInList,
           costTollList: null,
-          selectedGateIn: null,
+          selectedGateIn: selectedGateIn,
           selectedCostToll: null,
+          errorMessage: errorMessage,
         );
 }
 
@@ -125,12 +136,15 @@ class FetchDirectionsFailure extends RouteState {
     @required gateInList,
     @required costTollList,
     @required selectedGateIn,
+    @required selectedCostToll,
+    @required errorMessage,
   }) : super(
           gateInList: gateInList,
           costTollList: costTollList,
           selectedGateIn: selectedGateIn,
-          selectedCostToll: null,
+          selectedCostToll: selectedCostToll,
           googleRoute: null,
+          errorMessage: errorMessage,
         );
 }
 

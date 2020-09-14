@@ -141,8 +141,9 @@ class MarkerModel {
     }
 
     List group = json['group'] ?? List();
-    int groupId = group.isNotEmpty ? group[0]['parent'] : 0;
-    String groupName = group.isNotEmpty ? group[0]['group_name'] : '';
+    List filteredGroup = group.where((item) => item['type'].toString().toLowerCase() == 'cluster').toList();
+    int groupId = filteredGroup.isNotEmpty ? filteredGroup[0]['parent'] : 0;
+    String groupName = filteredGroup.isNotEmpty ? filteredGroup[0]['group_name'] : '';
 
     return MarkerModel(
       id: json['id'],

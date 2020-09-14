@@ -346,7 +346,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                                             width: getPlatformSize(4.0),
                                           ),
                                           Text(
-                                            'กำลังค้นหาเส้นทาง...',
+                                            LocaleText.findingRoute().ofLanguage(language.lang),
                                             style: getTextStyle(
                                               language.lang,
                                               color: Colors.white.withOpacity(0.6),

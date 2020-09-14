@@ -889,4 +889,36 @@ class LocaleText {
       indonesian: 'membayar tol ke depan %s km',
     );
   }
+
+  factory LocaleText.findingRoute() {
+    return LocaleText(
+      thai: 'กำลังค้นหาเส้นทาง...',
+      english: 'Finding route...',
+      chinese: '寻找路线...',
+      japanese: 'ルートを検索しています...',
+      korean: '경로 찾는 중 ...',
+      lao: 'ຊອກຫາເສັ້ນທາງ ...',
+      vietnamese: 'tìm đường ...',
+      myanmar: 'လမ်းကြောင်းရှာနေသည် ...',
+      khmer: 'ស្វែងរកផ្លូវ ...',
+      malay: 'mencari jalan ...',
+      indonesian: 'mencari rute ...',
+    );
+  }
+
+  /*factory LocaleText.xxx() {
+    return LocaleText(
+      thai: '',
+      english: '',
+      chinese: '',
+      japanese: '',
+      korean: '',
+      lao: '',
+      vietnamese: '',
+      myanmar: '',
+      khmer: '',
+      malay: '',
+      indonesian: '',
+    );
+  }*/
 }

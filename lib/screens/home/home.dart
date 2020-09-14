@@ -27,7 +27,7 @@ import 'package:exattraffic/models/favorite_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/widget_bottom_sheet.dart';
 import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
 import 'package:exattraffic/models/language_model.dart';
-import 'package:exattraffic/screens/search/search_place_presenter.dart';
+//import 'package:exattraffic/screens/search/search_place_presenter.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
 import 'package:exattraffic/storage/place_favorite_prefs.dart';
@@ -161,7 +161,7 @@ class MyHomeState extends State<Home> {
     } else {
       Map<int, ClusterModel> clusterMap = Map();
 
-      markerList.forEach((marker) async {
+      for (MarkerModel marker in markerList) {
         if (marker.groupId == 0) {
           Marker m = await _createMarker(context, marker);
           markerSet.add(m);
@@ -178,7 +178,7 @@ class MyHomeState extends State<Home> {
             clusterMap[marker.groupId] = cluster;
           }
         }
-      });
+      }
 
       List<ClusterModel> clusterList = clusterMap.entries.map((entry) => entry.value).toList();
       print("^^^^^^^^^^^^^^^^^^^^^^^^^ CLUSTER ^^^^^^^^^^^^^^^^^^^^^^^^^");
