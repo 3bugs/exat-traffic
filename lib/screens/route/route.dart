@@ -997,8 +997,8 @@ class MyRouteState extends State<MyRoute> {
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
-                                      sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
-                                      sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
+                                      sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                      sizeTh: Constants.Font.SMALLER_SIZE_TH,
                                     ),
                                   ),
                                 ),
@@ -1134,10 +1134,8 @@ class MyRouteState extends State<MyRoute> {
                                                             style: getTextStyle(
                                                               language.lang,
                                                               color: Color(0xFFB2B2B2),
-                                                              sizeTh: getPlatformSize(
-                                                                  Constants.Font.SMALLER_SIZE_TH),
-                                                              sizeEn: getPlatformSize(
-                                                                  Constants.Font.SMALLER_SIZE_EN),
+                                                              sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                                              sizeEn: Constants.Font.SMALLER_SIZE_EN,
                                                             ),
                                                           ),
                                                           Text(
@@ -1186,8 +1184,8 @@ class MyRouteState extends State<MyRoute> {
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
-                                      sizeEn: getPlatformSize(Constants.Font.SMALLER_SIZE_EN),
-                                      sizeTh: getPlatformSize(Constants.Font.SMALLER_SIZE_TH),
+                                      sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                      sizeTh: Constants.Font.SMALLER_SIZE_TH,
                                     ),
                                   ),
                                 ),

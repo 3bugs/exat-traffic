@@ -184,8 +184,8 @@ Future<DialogResult> showMyDialog(
             message,
             style: getTextStyle(
               lang,
-              sizeTh: getPlatformSize(Constants.Font.BIGGER_SIZE_TH),
-              sizeEn: getPlatformSize(Constants.Font.BIGGER_SIZE_EN),
+              sizeTh: Constants.Font.BIGGER_SIZE_TH,
+              sizeEn: Constants.Font.BIGGER_SIZE_EN,
             ),
           ),
           /*SizedBox(height: getPlatformSize(36.0)),
