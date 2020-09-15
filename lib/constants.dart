@@ -73,6 +73,8 @@ class Font {
   static const double DEFAULT_SIZE_EN = 16.0;
   static const double SMALLER_SIZE_TH = 21.0;
   static const double SMALLER_SIZE_EN = 14.0;
+  static const double SMALLEST_SIZE_TH = 17.0;
+  static const double SMALLEST_SIZE_EN = 11.0;
   static const double BIGGER_SIZE_TH = 26.0;
   static const double BIGGER_SIZE_EN = 18.0;
   static const double BIGGEST_SIZE_TH = 36.0;

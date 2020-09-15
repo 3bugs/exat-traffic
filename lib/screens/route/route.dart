@@ -997,8 +997,8 @@ class MyRouteState extends State<MyRoute> {
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
-                                      sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                      sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                      sizeEn: Constants.Font.SMALLEST_SIZE_EN,
+                                      sizeTh: Constants.Font.SMALLEST_SIZE_TH,
                                     ),
                                   ),
                                 ),
@@ -1184,8 +1184,8 @@ class MyRouteState extends State<MyRoute> {
                                     style: getTextStyle(
                                       LanguageName.english,
                                       color: Color(0xFFB2B2B2),
-                                      sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                                      sizeTh: Constants.Font.SMALLER_SIZE_TH,
+                                      sizeEn: Constants.Font.SMALLEST_SIZE_EN,
+                                      sizeTh: Constants.Font.SMALLEST_SIZE_TH,
                                     ),
                                   ),
                                 ),
