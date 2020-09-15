@@ -28,6 +28,10 @@ double getPlatformSize(double size) {
   return Platform.isAndroid ? 0.9 * size : size;
 }
 
+double getPlatformFontSize(double size) {
+  return 0.9 * size;
+}
+
 Future<Position> getCurrentLocation() async {
   Position position;
   try {
@@ -64,9 +68,11 @@ TextStyle getTextStyle(
   double heightEn = DEFAULT_LINE_HEIGHT,
 }) {
   String fontFamily = lang == LanguageName.thai ? (isBold ? 'DBHeavent-Med' : 'DBHeavent') : null;
-  FontWeight fontWeight =
-      lang == LanguageName.thai ? FontWeight.normal : (isBold ? FontWeight.bold : FontWeight.normal);
-  double fontSize = lang == LanguageName.thai ? getPlatformSize(sizeTh) : getPlatformSize(sizeEn);
+  FontWeight fontWeight = lang == LanguageName.thai
+      ? FontWeight.normal
+      : (isBold ? FontWeight.bold : FontWeight.normal);
+  double fontSize =
+      lang == LanguageName.thai ? getPlatformFontSize(sizeTh) : getPlatformFontSize(sizeEn);
   double height = lang == LanguageName.thai ? heightTh : heightEn;
 
   return height == DEFAULT_LINE_HEIGHT

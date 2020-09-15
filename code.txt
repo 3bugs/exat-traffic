@@ -1,0 +1,7 @@
+WidgetPrefs prefs = Provider.of<WidgetPrefs>(context, listen: false);
+
+Consumer<WidgetPrefs>(
+   builder: (context, prefs, child) {
+      return xxx;
+   }
+)
