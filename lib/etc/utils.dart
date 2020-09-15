@@ -29,7 +29,8 @@ double getPlatformSize(double size) {
 }
 
 double getPlatformFontSize(double size) {
-  return 0.9 * size;
+  //return Platform.isAndroid ? 0.9 * size : 0.95 * size;
+  return getPlatformSize(size);
 }
 
 Future<Position> getCurrentLocation() async {
@@ -95,10 +96,13 @@ TextStyle getHeadlineTextStyle(BuildContext context, {LanguageName lang = Langua
   final bool isBigScreen =
       screenWidth(context) > getPlatformSize(400) && screenHeight(context) > getPlatformSize(700);
 
+  double sizeTh = isBigScreen ? 55.0 : 44.0;
+  double sizeEn = isBigScreen ? 40.0 : 32.0;
+
   return getTextStyle(
     lang,
-    sizeTh: isBigScreen ? 55.0 : 44.0,
-    sizeEn: isBigScreen ? 40.0 : 32.0,
+    sizeTh: Platform.isAndroid ? sizeTh : 0.9 * sizeTh,
+    sizeEn: Platform.isAndroid ? sizeEn : 0.9 * sizeEn,
     color: Colors.white,
     heightTh: 1.1,
     heightEn: 1.4,
