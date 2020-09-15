@@ -71,7 +71,7 @@ class FavoriteView extends StatelessWidget {
                         language.lang,
                         color: Constants.App.ACCENT_COLOR,
                         isBold: true,
-                        heightEn: 1.6,
+                        heightEn: 1.6 / 0.9,
                       ),
                     );
                   },
@@ -85,7 +85,7 @@ class FavoriteView extends StatelessWidget {
                       style: getTextStyle(
                         language.lang,
                         color: Constants.Font.DIM_COLOR,
-                        heightEn: 1.6,
+                        heightEn: 1.6 / 0.9,
                       ),
                     );
                   },

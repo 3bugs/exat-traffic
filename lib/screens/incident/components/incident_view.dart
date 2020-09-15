@@ -83,7 +83,7 @@ class IncidentView extends StatelessWidget {
                         language.lang,
                         color: Constants.App.ACCENT_COLOR,
                         isBold: true,
-                        heightEn: 1.5,
+                        heightEn: 1.5 / 0.9,
                       ),
                     );
                   },
@@ -97,7 +97,7 @@ class IncidentView extends StatelessWidget {
                       style: getTextStyle(
                         language.lang,
                         color: Constants.Font.DIM_COLOR,
-                        heightEn: 1.6,
+                        heightEn: 1.6 / 0.9,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,
                       ),

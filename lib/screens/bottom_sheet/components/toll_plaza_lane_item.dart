@@ -118,7 +118,7 @@ class TollPlazaLaneItemView extends StatelessWidget {
                     isBold: true,
                     //sizeTh: Constants.Font.SMALLER_SIZE_TH,
                     sizeEn: 10.5,
-                    heightEn: 1.0,
+                    heightEn: 1.0 / 0.9,
                   ),
                 ),
                 SizedBox(

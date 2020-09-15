@@ -128,7 +128,7 @@ class TollPlazaBottomSheetState extends State<TollPlazaBottomSheet> {
                 color: TEXT_COLOR,
                 sizeTh: 50.0,
                 sizeEn: 35.0,
-                heightEn: 0.9,
+                heightEn: 0.9 / 0.9,
                 isBold: true,
               ),
             ),

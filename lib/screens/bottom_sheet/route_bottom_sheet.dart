@@ -148,7 +148,7 @@ class _RouteBottomSheetState extends State<RouteBottomSheet> {
                 color: Colors.white,
                 sizeTh: 50.0,
                 sizeEn: 35.0,
-                heightEn: 0.9,
+                heightEn: 0.9 / 0.9,
                 isBold: true,
               ),
             ),

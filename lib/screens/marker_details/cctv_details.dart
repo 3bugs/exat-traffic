@@ -283,7 +283,7 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
                           sizeEn: Constants.Font.BIGGER_SIZE_EN,
                           color: Colors.white,
                           isBold: true,
-                          //heightEn: 1.5,
+                          //heightEn: 1.5 / 0.9,
                         ),
                       );
                     },

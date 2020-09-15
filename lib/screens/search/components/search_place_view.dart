@@ -64,7 +64,7 @@ class SearchPlaceView extends StatelessWidget {
                               language.lang,
                               color: Constants.App.ACCENT_COLOR,
                               isBold: true,
-                              //heightEn: 1.6,
+                              //heightEn: 1.6 / 0.9,
                             ),
                           );
                         },
@@ -84,7 +84,7 @@ class SearchPlaceView extends StatelessWidget {
                         color: Constants.Font.DIM_COLOR,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                        //heightEn: 1.6,
+                        //heightEn: 1.6 / 0.9,
                       ),
                     );
                   },
