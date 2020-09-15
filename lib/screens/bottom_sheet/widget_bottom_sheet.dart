@@ -219,7 +219,7 @@ class ItemView extends StatelessWidget {
                         language.lang,
                         sizeTh: Constants.Font.SMALLER_SIZE_TH,
                         sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                        heightTh: 1.0,
+                        heightTh: 1.0 / 0.9,
                       ),
                     );
                   },

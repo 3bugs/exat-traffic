@@ -74,7 +74,8 @@ TextStyle getTextStyle(
       : (isBold ? FontWeight.bold : FontWeight.normal);
   double fontSize =
       lang == LanguageName.thai ? getPlatformFontSize(sizeTh) : getPlatformFontSize(sizeEn);
-  double height = lang == LanguageName.thai ? heightTh : heightEn;
+  double height =
+      lang == LanguageName.thai ? getPlatformFontSize(heightTh) : getPlatformFontSize(heightEn);
 
   return height == DEFAULT_LINE_HEIGHT
       ? TextStyle(
@@ -104,8 +105,8 @@ TextStyle getHeadlineTextStyle(BuildContext context, {LanguageName lang = Langua
     sizeTh: Platform.isAndroid ? sizeTh : 0.9 * sizeTh,
     sizeEn: Platform.isAndroid ? sizeEn : 0.9 * sizeEn,
     color: Colors.white,
-    heightTh: 1.1,
-    heightEn: 1.4,
+    heightTh: 1.1 / 0.9,
+    heightEn: 1.4 / 0.9,
   );
 }
 

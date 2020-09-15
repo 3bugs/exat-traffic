@@ -136,8 +136,8 @@ class _HeaderState extends State<Header> {
                         style: getTextStyle(
                           language.lang,
                           color: Colors.white,
-                          heightTh: 0.8,
-                          heightEn: 1.15,
+                          heightTh: 0.8 / 0.9,
+                          heightEn: 1.15 / 0.9,
                         ),
                       );
                     },

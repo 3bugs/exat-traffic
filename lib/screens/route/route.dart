@@ -1031,8 +1031,8 @@ class MyRouteState extends State<MyRoute> {
                                                     style: getTextStyle(
                                                       language.lang,
                                                       color: Colors.transparent,
-                                                      heightTh: 0.8,
-                                                      heightEn: 1.15,
+                                                      heightTh: 0.8 / 0.9,
+                                                      heightEn: 1.15 / 0.9,
                                                     ),
                                                   ),
                                                 ],
@@ -1061,8 +1061,8 @@ class MyRouteState extends State<MyRoute> {
                                                       language.lang,
                                                       color:
                                                           isSearchMode ? null : Color(0xFFB2B2B2),
-                                                      heightTh: 0.8,
-                                                      heightEn: 1.15,
+                                                      heightTh: 0.8 / 0.9,
+                                                      heightEn: 1.15 / 0.9,
                                                     ),
                                                   ),
                                                 );
@@ -1105,8 +1105,8 @@ class MyRouteState extends State<MyRoute> {
                                                         overflow: TextOverflow.ellipsis,
                                                         style: getTextStyle(
                                                           language.lang,
-                                                          heightTh: 0.8,
-                                                          heightEn: 1.15,
+                                                          heightTh: 0.8 / 0.9,
+                                                          heightEn: 1.15 / 0.9,
                                                         ),
                                                       ),
                                                     );
@@ -1142,8 +1142,8 @@ class MyRouteState extends State<MyRoute> {
                                                             gateIn.toString().trim(),
                                                             style: getTextStyle(
                                                               language.lang,
-                                                              heightTh: 0.8,
-                                                              heightEn: 1.15,
+                                                              heightTh: 0.8 / 0.9,
+                                                              heightEn: 1.15 / 0.9,
                                                             ),
                                                           ),
                                                         ],
@@ -1217,8 +1217,8 @@ class MyRouteState extends State<MyRoute> {
                                                   style: getTextStyle(
                                                     language.lang,
                                                     color: Colors.transparent,
-                                                    heightTh: 0.8,
-                                                    heightEn: 1.15,
+                                                    heightTh: 0.8 / 0.9,
+                                                    heightEn: 1.15 / 0.9,
                                                   ),
                                                 ),
                                               ],
@@ -1250,8 +1250,8 @@ class MyRouteState extends State<MyRoute> {
                                                   style: getTextStyle(
                                                     language.lang,
                                                     color: isSearchMode ? null : Color(0xFFB2B2B2),
-                                                    heightTh: 0.8,
-                                                    heightEn: 1.15,
+                                                    heightTh: 0.8 / 0.9,
+                                                    heightEn: 1.15 / 0.9,
                                                   ),
                                                 ),
                                               );
@@ -1295,8 +1295,8 @@ class MyRouteState extends State<MyRoute> {
                                                       overflow: TextOverflow.ellipsis,
                                                       style: getTextStyle(
                                                         language.lang,
-                                                        heightTh: 0.8,
-                                                        heightEn: 1.15,
+                                                        heightTh: 0.8 / 0.9,
+                                                        heightEn: 1.15 / 0.9,
                                                       ),
                                                     ),
                                                   );
@@ -1333,8 +1333,8 @@ class MyRouteState extends State<MyRoute> {
                                                           costToll.toString().trim(),
                                                           style: getTextStyle(
                                                             language.lang,
-                                                            heightTh: 0.8,
-                                                            heightEn: 1.15,
+                                                            heightTh: 0.8 / 0.9,
+                                                            heightEn: 1.15 / 0.9,
                                                           ),
                                                         ),
                                                       ],

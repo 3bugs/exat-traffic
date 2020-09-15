@@ -93,7 +93,7 @@ class LayerItemView extends StatelessWidget {
                       LanguageName.thai, //language.lang, // todo: *******************
                       sizeTh: Constants.Font.SMALLER_SIZE_TH,
                       sizeEn: Constants.Font.SMALLER_SIZE_EN,
-                      heightTh: 1.0,
+                      heightTh: 1.0 / 0.9,
                       color: selected ? Constants.App.PRIMARY_COLOR : Constants.Font.DEFAULT_COLOR,
                       //isBold: layerItem.isChecked,
                     ),
