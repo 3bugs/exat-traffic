@@ -57,7 +57,7 @@ Future<Position> getCurrentLocationNotNull() async {
   return position;
 }
 
-const double DEFAULT_LINE_HEIGHT = -1;
+const double DEFAULT_LINE_HEIGHT = 0;
 
 TextStyle getTextStyle(
   LanguageName lang, {
