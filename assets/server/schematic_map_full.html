@@ -32,11 +32,87 @@
           font-family: SukhumvitSet-Light;
           src: url('fonts/SukhumvitSet-Light.ttf');
       }
+
+      /* The Overlay (background) */
+      .overlay {
+          /* Height & width depends on how you want to reveal the overlay (see JS below) */
+          height: 100%;
+          width: 0;
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          left: 0;
+          top: 0;
+          background-color: rgb(0,0,0); /* Black fallback color */
+          background-color: rgba(0,0,0, 0.7); /* Black w/opacity */
+          overflow-x: hidden; /* Disable horizontal scroll */
+          transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+      }
+
+      /* Position the content inside the overlay */
+      .overlay-content {
+          position: relative;
+          top: 25%; /* 25% from the top */
+          width: 100%; /* 100% width */
+          text-align: center; /* Centered text/links */
+          margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+      }
+
+      /* The navigation links inside the overlay */
+      .overlay a {
+          padding: 8px;
+          text-decoration: none;
+          font-size: 36px;
+          color: #818181;
+          display: block; /* Display block instead of inline */
+          transition: 0.3s; /* Transition effects on hover (color) */
+      }
+
+      /* When you mouse over the navigation links, change their color */
+      .overlay a:hover, .overlay a:focus {
+          color: #f1f1f1;
+      }
+
+      /* Position the close button (top right corner) */
+      .overlay .closebtn {
+          position: absolute;
+          top: 20px;
+          right: 45px;
+          font-size: 60px;
+      }
   </style>
 </head>
 
 <body>
-<div style="position: absolute; left: 10px; top: 10px;">
+<!-- overlay menu -->
+<div id="myNav" class="overlay">
+  <!-- close button -->
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+  <!-- overlay content -->
+  <div class="overlay-content">
+    <div>
+      <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
+      <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
+      <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(1.3)">FIT</button>
+    </div>
+    <div style="margin-top: 10px">
+      <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(1)">1X</button>
+      <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(5)">5X</button>
+      <button style="padding: 10px 15px" onclick="schematicMap.setZoomLevel(10)">10X</button>
+    </div>
+    <div style="margin-top: 15px">
+      <input type="checkbox" id="cb-toggle-cctv-overlay">
+      <label for="cb-toggle-cctv-overlay" style="color: white"> CCTV</label>&nbsp;&nbsp;&nbsp;
+      <input type="checkbox" id="cb-toggle-night-mode-overlay">
+      <label for="cb-toggle-night-mode-overlay" style="color: white"> Night Mode</label>
+    </div>
+    <div style="margin-top: 50px">
+      <button style="padding: 10px 15px" onclick="closeNav()">CLOSE MENU</button>
+    </div>
+  </div>
+</div>
+
+<div style="position: absolute; left: 10px; top: 80px;">
   <div>
     <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(1)">ZOOM IN</button>
     <button style="padding: 10px 15px" onclick="schematicMap.changeZoom(-1)">ZOOM OUT</button>
@@ -2340,6 +2416,10 @@
   </div>
 </div>
 
+<div id="button-menu" style="display: none; position: absolute; left: 10px; top: 10px;">
+  <button style="padding: 10px 15px" onclick="openNav()">MENU</button>
+</div>
+
 <!--<script src="https://code.jquery.com/jquery-1.11.1.js"></script>-->
 <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
 <!--<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>-->
@@ -2528,6 +2608,10 @@
       self.canvas.addEventListener('mouseup', handleMouseUpCanvas);
     }
 
+    this.isObjectEmpty = function (obj) {
+      return Object.keys(obj).length === 0 && obj.constructor === Object;
+    }
+
     this.dayColors = {};
     this.setNightColor = function (selector, attr, value) {
       this.dayColors[`${selector}_${attr}`] = $(selector).css(attr);
@@ -2536,6 +2620,8 @@
 
     this.setNightMode = function (on) {
       if (!on) {
+        if (this.isObjectEmpty(this.dayColors)) return;
+
         const colors = this.dayColors;
         for (let selectorAttr in colors) {
           if (colors.hasOwnProperty(selectorAttr)) {
@@ -2546,7 +2632,10 @@
             $(selector).css(attr, value);
           }
         }
+        this.dayColors = {};
       } else {
+        if (!this.isObjectEmpty(this.dayColors)) return;
+
         //2A2E43 : dark color ในแอพ
         this.setNightColor('svg', 'background-color', '#080818');
 
@@ -2935,15 +3024,27 @@
 
     if (backendMode) {
       $('#logo').show();
+      $('#button-menu').show();
     }
 
-    $("#cb-toggle-cctv").change(function () {
+    $("#cb-toggle-cctv,#cb-toggle-cctv-overlay").change(function () {
+      $("#cb-toggle-cctv,#cb-toggle-cctv-overlay").prop('checked', this.checked);
       schematicMap.setCctvVisible(this.checked);
     });
-    $("#cb-toggle-night-mode").change(function () {
+    $("#cb-toggle-night-mode,#cb-toggle-night-mode-overlay").change(function () {
+      $("#cb-toggle-night-mode,#cb-toggle-night-mode-overlay").prop('checked', this.checked);
       schematicMap.setNightMode(this.checked);
     });
   });
+
+  function openNav() {
+    document.getElementById("myNav").style.width = "100%";
+  }
+
+  /* Close when someone clicks on the "x" symbol inside the overlay */
+  function closeNav() {
+    document.getElementById("myNav").style.width = "0%";
+  }
 </script>
 </body>
 </html>
