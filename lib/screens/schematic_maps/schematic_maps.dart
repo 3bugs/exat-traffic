@@ -36,7 +36,7 @@ class SchematicMapsMain extends StatefulWidget {
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller = Completer<WebViewController>();
   bool _showCctv = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   bool _nightMode;
   Light _light;
@@ -276,7 +276,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                           // ignore: prefer_collection_literals
                           javascriptChannels: <JavascriptChannel>[
                             _cctvJavascriptChannel(context),
-                            _loadedJavascriptChannel(context),
+                            //_loadedJavascriptChannel(context),
                           ].toSet(),
                           /*navigationDelegate: (NavigationRequest request) {
                           if (request.url.startsWith('https://www.youtube.com/')) {
