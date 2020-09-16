@@ -12,6 +12,7 @@ import 'package:exattraffic/models/cost_toll_model.dart';
 import 'package:exattraffic/models/error_model.dart';
 import 'package:exattraffic/models/category_model.dart';
 import 'package:exattraffic/models/marker_model.dart';
+
 //import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/FAQ_model.dart';
 import 'package:exattraffic/models/about_model.dart';
@@ -85,8 +86,9 @@ class MyApi {
 
   static Future<List<GateInModel>> fetchGateIn(
     List<MarkerModel> markerList,
+    String langCode,
   ) async {
-    ResponseResult responseResult = await _makeRequest(FETCH_GATE_IN_URL);
+    ResponseResult responseResult = await _makeRequest('$FETCH_GATE_IN_URL?language=$langCode');
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<GateInModel> gateInList =
@@ -102,9 +104,10 @@ class MyApi {
   static Future<List<CostTollModel>> fetchCostTollByGateIn(
     GateInModel gateIn,
     List<MarkerModel> markerList,
+    String langCode,
   ) async {
     ResponseResult responseResult = await _makeRequest(
-      '$FETCH_COST_TOLL_BY_GATE_IN_URL/${gateIn.id}',
+      '$FETCH_COST_TOLL_BY_GATE_IN_URL/${gateIn.id}?language=$langCode',
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
@@ -370,6 +373,7 @@ class ExatApi {
   }
 
   static List<int> _timePeriodList;
+
   static Future<List<int>> fetchTimePeriod(BuildContext context) async {
     final String url = "$EXAT_API_BASED_URL/coreconfigs/view";
 

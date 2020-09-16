@@ -173,7 +173,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Visibility(
-                                    visible: false,
+                                    visible: true,
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: Colors.transparent,
@@ -183,9 +183,9 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                         padding: EdgeInsets.all(getPlatformSize(0.0)),
                                         child: Image(
                                           image: AssetImage(
-                                              'assets/images/login/exat_logo_white_no_text-w200.png'),
-                                          width: getPlatformSize(24.0 * 20.0 / 17.6),
-                                          height: getPlatformSize(24.0),
+                                              'assets/images/splash/exat_logo_new_no_text.png'),
+                                          width: getPlatformSize(32.0 * 320 / 246),
+                                          height: getPlatformSize(32.0),
                                         ),
                                       ),
                                     ),
@@ -220,17 +220,18 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                         Navigator.pop(context);
                                       },
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(getPlatformSize(22.0)),
+                                        Radius.circular(getPlatformSize(27.0)),
                                       ),
                                       child: Container(
-                                        width: getPlatformSize(44.0),
-                                        height: getPlatformSize(44.0),
+                                        width: getPlatformSize(54.0),
+                                        height: getPlatformSize(54.0),
                                         child: Center(
                                           child: Image(
                                             image: AssetImage(
                                                 'assets/images/schematic_maps/ic_home.png'),
                                             width: getPlatformSize(20.69),
                                             height: getPlatformSize(17.19),
+                                            fit: BoxFit.contain,
                                           ),
                                         ),
                                       ),

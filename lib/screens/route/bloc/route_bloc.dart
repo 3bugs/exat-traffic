@@ -37,6 +37,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   @override
   Stream<RouteState> mapEventToState(RouteEvent event) async* {
     final currentState = state;
+    String langCode = Provider.of<LanguageModel>(_context, listen: false).langCode.toLowerCase();
 
     if (event is ShowSearchResultRoute) {
       // ให้ clear marker และ pause location tracking
@@ -97,7 +98,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
       try {
         if (_gateInList == null) {
-          _gateInList = await MyApi.fetchGateIn(this.markerList);
+          _gateInList = await MyApi.fetchGateIn(this.markerList, langCode);
         } else {
           _gateInList.forEach((gateIn) => gateIn.selected = false);
         }
@@ -122,7 +123,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
       );
 
       try {
-        final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn, this.markerList);
+        final costTollList = await MyApi.fetchCostTollByGateIn(selectedGateIn, this.markerList, langCode);
 
         // replace part toll marker ด้วย marker ที่โหลดมาตอนเข้าแอพ
         /*costTollList.forEach((CostTollModel costTollModel) {

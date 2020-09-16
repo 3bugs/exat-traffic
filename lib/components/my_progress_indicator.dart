@@ -37,7 +37,7 @@ class MyProgressIndicator extends StatelessWidget {
               child: Image(
                 width: getPlatformSize(50.0),
                 height: getPlatformSize(50.0),
-                image: AssetImage('assets/images/login/exat_logo_no_text.png'),
+                image: AssetImage('assets/images/splash/exat_logo_new_no_text.png'),
                 fit: BoxFit.contain,
               ),
             ),

@@ -77,8 +77,8 @@ class _HeaderState extends State<Header> {
                           ),
                         ),
                         Image(
-                          image: AssetImage('assets/images/login/exat_logo_no_text-w200.png'),
-                          width: getPlatformSize(24.0 * 20.0 / 17.6),
+                          image: AssetImage('assets/images/splash/exat_logo_new_no_text.png'),
+                          width: getPlatformSize(24.0 * 320 / 246),
                           height: getPlatformSize(24.0),
                           fit: BoxFit.contain,
                         ),

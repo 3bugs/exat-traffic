@@ -85,9 +85,9 @@ class _AboutPageState extends State<AboutPage> {
         ),
       ),
       child: AspectRatio(
-        aspectRatio: 1.6,
+        aspectRatio: 1.8,
         child: Image(
-          image: AssetImage('assets/images/login/exat_logo.png'),
+          image: AssetImage('assets/images/splash/exat_logo_new.png'),
           width: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
           height: getPlatformSize(Constants.LoginScreen.LOGO_SIZE),
         ),
