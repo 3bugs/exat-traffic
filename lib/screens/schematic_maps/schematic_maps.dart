@@ -85,6 +85,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
     controller.evaluateJavascript('schematicMap.setZoomLevel($scale);');
   }
 
+  void _setNightMode(bool on) async {
+    final WebViewController controller = await _controller.future;
+    controller.evaluateJavascript('schematicMap.setNightMode($on);');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
