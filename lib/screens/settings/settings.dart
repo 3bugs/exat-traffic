@@ -1,3 +1,4 @@
+import 'package:exattraffic/components/my_button.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/storage/util_prefs.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,10 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/locale_text.dart';
 
 class Settings extends StatefulWidget {
+  final bool isFirstRun;
+
+  Settings({this.isFirstRun = false});
+
   @override
   _SettingsState createState() => _SettingsState();
 }
@@ -57,7 +62,9 @@ class _SettingsState extends State<Settings> {
 
     languageModel.lang = lang;
     _selectedLang = lang;
-    _confirmRestart();
+    if (!widget.isFirstRun) {
+      _confirmRestart();
+    }
   }
 
   void _confirmRestart() {
@@ -103,99 +110,116 @@ class _SettingsState extends State<Settings> {
   Widget _content() {
     return Container(
       color: Constants.App.BACKGROUND_COLOR,
-      child: ListView(
-        physics: BouncingScrollPhysics(),
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-              vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
-            ),
-            child: Consumer<LanguageModel>(
-              builder: (context, language, child) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+      padding: EdgeInsets.symmetric(
+        horizontal: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+        vertical: getPlatformSize(Constants.App.HORIZONTAL_MARGIN),
+      ),
+      child: Consumer<LanguageModel>(
+        builder: (context, language, child) {
+          return Column(
+            children: <Widget>[
+              Expanded(
+                child: ListView(
+                  physics: BouncingScrollPhysics(),
                   children: <Widget>[
-                    SettingRow(
-                      text: languageText.ofLanguage(language.lang),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _languageOptionList
-                                .where((item) => (_languageOptionList.indexOf(item) <
-                                    _languageOptionList.length ~/ 2 +
-                                        (_languageOptionList.length % 2)))
-                                .map<Widget>(
-                                  (item) => OptionButton(
-                                    text: item.text,
-                                    value: item.value,
-                                    groupValue: language.lang,
-                                    isThaiText: item.isThaiText,
-                                    onClick: () => _handleClickLanguage(item.value),
-                                  ),
-                                )
-                                .toList(),
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          SettingRow(
+                            text: languageText.ofLanguage(language.lang),
                           ),
-                        ),
-                        SizedBox(
-                          width: getPlatformSize(0.0),
-                        ),
-                        Expanded(
-                          child: Column(
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _languageOptionList
-                                .where((item) => (_languageOptionList.indexOf(item) >=
-                                    _languageOptionList.length ~/ 2 +
-                                        (_languageOptionList.length % 2)))
-                                .map<Widget>(
-                                  (item) => OptionButton(
-                                    text: item.text,
-                                    value: item.value,
-                                    groupValue: language.lang,
-                                    isThaiText: item.isThaiText,
-                                    onClick: () => _handleClickLanguage(item.value),
-                                  ),
-                                )
-                                .toList(),
+                            children: <Widget>[
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: _languageOptionList
+                                      .where((item) => (_languageOptionList.indexOf(item) <
+                                          _languageOptionList.length ~/ 2 +
+                                              (_languageOptionList.length % 2)))
+                                      .map<Widget>(
+                                        (item) => OptionButton(
+                                          text: item.text,
+                                          value: item.value,
+                                          groupValue: language.lang,
+                                          isThaiText: item.isThaiText,
+                                          onClick: () => _handleClickLanguage(item.value),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(0.0),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: _languageOptionList
+                                      .where((item) => (_languageOptionList.indexOf(item) >=
+                                          _languageOptionList.length ~/ 2 +
+                                              (_languageOptionList.length % 2)))
+                                      .map<Widget>(
+                                        (item) => OptionButton(
+                                          text: item.text,
+                                          value: item.value,
+                                          groupValue: language.lang,
+                                          isThaiText: item.isThaiText,
+                                          onClick: () => _handleClickLanguage(item.value),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              )
+                            ],
                           ),
-                        )
-                      ],
+                          SizedBox(
+                            height: getPlatformSize(8.0),
+                          ),
+                          Consumer<UtilPrefs>(
+                            builder: (context, prefs, child) {
+                              return FutureBuilder(
+                                future: prefs.getNotification(),
+                                builder: (context, snapshot) {
+                                  return snapshot.hasData
+                                      ? SettingRow(
+                                          text: notificationText.ofLanguage(language.lang),
+                                          value: snapshot.data,
+                                          onChange: (bool value) =>
+                                              _handleSettingChange(SettingName.notification, value),
+                                        )
+                                      : SizedBox.shrink();
+                                },
+                              );
+                            },
+                          ),
+                          /*SettingRow(
+                            text: "โหมดกลางคืน (สำหรับ Schematic Map)",
+                            value: _nightModeValue,
+                            onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
+                          ),*/
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      height: getPlatformSize(8.0),
-                    ),
-                    Consumer<UtilPrefs>(
-                      builder: (context, prefs, child) {
-                        return FutureBuilder(
-                          future: prefs.getNotification(),
-                          builder: (context, snapshot) {
-                            return snapshot.hasData
-                                ? SettingRow(
-                                    text: notificationText.ofLanguage(language.lang),
-                                    value: snapshot.data,
-                                    onChange: (bool value) =>
-                                        _handleSettingChange(SettingName.notification, value),
-                                  )
-                                : SizedBox.shrink();
-                          },
-                        );
-                      },
-                    ),
-                    /*SettingRow(
-                    text: "โหมดกลางคืน (สำหรับ Schematic Map)",
-                    value: _nightModeValue,
-                    onChange: (bool value) => _handleSettingChange(SettingName.nightMode, value),
-                  ),*/
                   ],
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+              widget.isFirstRun
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        MyButton(
+                          text: LocaleText.next().ofLanguage(language.lang),
+                          onClick: () => Navigator.pop(context),
+                        ),
+                      ],
+                    )
+                  : SizedBox.shrink(),
+            ],
+          );
+        },
       ),
     );
   }
@@ -212,12 +236,15 @@ class _SettingsState extends State<Settings> {
       title: _title,
       child: _content(),
       onClickBack: () {
+        if (widget.isFirstRun) return;
+
         if (_selectedLang != null) {
           _confirmRestart();
         } else {
           Navigator.pop(context);
         }
       },
+      hideBackButton: widget.isFirstRun,
     );
   }
 }

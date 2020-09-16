@@ -3040,6 +3040,8 @@
       $("#cb-toggle-night-mode,#cb-toggle-night-mode-overlay").prop('checked', this.checked);
       schematicMap.setNightMode(this.checked);
     });
+
+    LOADED.postMessage();
   });
 
   function openNav() {

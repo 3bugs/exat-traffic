@@ -19,7 +19,7 @@ class QuestionnairePage extends StatefulWidget {
 class _QuestionnairePageState extends State<QuestionnairePage> {
   // กำหนด title ของแต่ละภาษา, ในช่วง dev ต้องกำหนดอย่างน้อย 3 ภาษา เพราะดัก assert ไว้ครับ
   LocaleText _title = LocaleText.questionnaire();
-  int group = 1;
+  int group;
   int myIndex = 0;
   bool showArrowLeft = false;
   bool showArrowRight = true;
@@ -91,7 +91,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                   Row(
                     children: <Widget>[
                       Radio(
-                        value: 1,
+                        value: 5,
                         groupValue: group,
                         onChanged: (T) {
                           setState(() {
@@ -101,43 +101,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                         },
                       ),
                       Text(
-                        "1 (ต่ำสุด)",
-                        style: getTextStyle(LanguageName.thai),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Radio(
-                        value: 2,
-                        groupValue: group,
-                        onChanged: (T) {
-                          setState(() {
-                            group = T;
-                            print(T);
-                          });
-                        },
-                      ),
-                      Text(
-                        "2",
-                        style: getTextStyle(LanguageName.thai),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Radio(
-                        value: 3,
-                        groupValue: group,
-                        onChanged: (T) {
-                          setState(() {
-                            group = T;
-                            print(T);
-                          });
-                        },
-                      ),
-                      Text(
-                        "3",
+                        "5 (สูงสุด)",
                         style: getTextStyle(LanguageName.thai),
                       ),
                     ],
@@ -163,7 +127,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                   Row(
                     children: <Widget>[
                       Radio(
-                        value: 5,
+                        value: 3,
                         groupValue: group,
                         onChanged: (T) {
                           setState(() {
@@ -173,7 +137,43 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
                         },
                       ),
                       Text(
-                        "5 (สูงสุด)",
+                        "3",
+                        style: getTextStyle(LanguageName.thai),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 2,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "2",
+                        style: getTextStyle(LanguageName.thai),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Radio(
+                        value: 1,
+                        groupValue: group,
+                        onChanged: (T) {
+                          setState(() {
+                            group = T;
+                            print(T);
+                          });
+                        },
+                      ),
+                      Text(
+                        "1 (ต่ำสุด)",
                         style: getTextStyle(LanguageName.thai),
                       ),
                     ],
@@ -195,6 +195,10 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
         text: "ส่งคำตอบ",
         onClick: () {
           print("send");
+          if (group == null) {
+            alert(context, '', 'กรุณาเลือกคำตอบ');
+            return;
+          }
           _presenter.addAnswers(_presenter.questionnaireModel.data[0].id, group);
         },
       ),

@@ -906,6 +906,22 @@ class LocaleText {
     );
   }
 
+  factory LocaleText.next() {
+    return LocaleText(
+      thai: 'ถัดไป',
+      english: 'Next',
+      chinese: '下一个',
+      japanese: '次',
+      korean: '다음',
+      lao: 'ຕໍ່ໄປ',
+      vietnamese: 'kế tiếp',
+      myanmar: 'နောက်တစ်ခု',
+      khmer: 'បន្ទាប់',
+      malay: 'seterusnya',
+      indonesian: 'lanjut',
+    );
+  }
+
   /*factory LocaleText.xxx() {
     return LocaleText(
       thai: '',

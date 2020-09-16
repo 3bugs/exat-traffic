@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -92,7 +93,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
         _errorView = ErrorView(
           title: "ไม่มีการเชื่อมต่อเครือข่าย!",
           text:
-          "${AppBloc.appName} ไม่สามารถทำงานได้ หากไม่มีการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่",
+              "${AppBloc.appName} ไม่สามารถทำงานได้ หากไม่มีการเชื่อมต่อเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่",
           buttonText: "ลองใหม่",
           onClick: () => _checkNetwork(),
         );
@@ -125,17 +126,31 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
         context,
         PageRouteBuilder(
           transitionDuration: Duration.zero,
-          pageBuilder: (context, anim1, anim2) => ConsentPage(),
+          pageBuilder: (context, anim1, anim2) => ConsentPage(isFirstRun: true),
         ),
       ).then((consent) {
         if (consent == true) {
           utilPrefs.setUserConsentAlready();
-          _fetchSplashData(context);
+
+          //todo: select language ******************************
+          _selectLanguage();
         } else {
           SystemChannels.platform.invokeMethod('SystemNavigator.pop');
         }
       });
     }
+  }
+
+  void _selectLanguage() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration.zero,
+        pageBuilder: (context, anim1, anim2) => Settings(isFirstRun: true),
+      ),
+    ).then((consent) {
+      _fetchSplashData(context);
+    });
   }
 
   void _fetchSplashData(BuildContext context) async {
@@ -206,7 +221,8 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
               builder: (context, language, child) {
                 return ErrorView(
                   title: LocaleText.error().ofLanguage(language.lang),
-                  text: LocaleText.cantFetchDataFromServer().ofLanguage(language.lang) + ' [${state.message}]',
+                  text: LocaleText.cantFetchDataFromServer().ofLanguage(language.lang) +
+                      ' [${state.message}]',
                   buttonText: LocaleText.tryAgain().ofLanguage(language.lang),
                   onClick: () => _loadMapsData(),
                 );
@@ -285,9 +301,7 @@ class _SplashMainState extends State<SplashMain> with TickerProviderStateMixin {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            _errorView
-                          ],
+                          children: <Widget>[_errorView],
                         ),
                       )
                     : SizedBox.shrink(),

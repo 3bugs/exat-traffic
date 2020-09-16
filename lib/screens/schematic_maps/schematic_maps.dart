@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -14,6 +13,7 @@ import 'package:exattraffic/components/my_progress_indicator.dart';
 import 'package:exattraffic/models/marker_model.dart';
 import 'package:exattraffic/app/bloc.dart';
 import 'package:exattraffic/models/category_model.dart';
+import 'package:exattraffic/models/language_model.dart';
 
 // iOS setup
 // Opt-in to the embedded views preview by adding a boolean property to
@@ -36,7 +36,7 @@ class SchematicMapsMain extends StatefulWidget {
 class _SchematicMapsMainState extends State<SchematicMapsMain> {
   final Completer<WebViewController> _controller = Completer<WebViewController>();
   bool _showCctv = false;
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   bool _nightMode;
   Light _light;
@@ -71,6 +71,17 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
         setState(() {
           _isLoading = false;
         });*/
+      },
+    );
+  }
+
+  JavascriptChannel _loadedJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+      name: 'LOADED',
+      onMessageReceived: (JavascriptMessage jsMessage) async {
+        setState(() {
+          _isLoading = false;
+        });
       },
     );
   }
@@ -265,6 +276,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                           // ignore: prefer_collection_literals
                           javascriptChannels: <JavascriptChannel>[
                             _cctvJavascriptChannel(context),
+                            _loadedJavascriptChannel(context),
                           ].toSet(),
                           /*navigationDelegate: (NavigationRequest request) {
                           if (request.url.startsWith('https://www.youtube.com/')) {
@@ -378,7 +390,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                 imageWidth: getPlatformSize(23.16),
                                 imageHeight: getPlatformSize(19.19),
                                 marginTop: getPlatformSize(0.0),
-                                isChecked: _showCctv,
+                                isChecked: false,
                                 showProgress: false,
                                 onClick: () async {
                                   _nightMode = !_nightMode;

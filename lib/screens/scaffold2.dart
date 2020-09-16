@@ -19,6 +19,7 @@ class YourScaffold extends StatefulWidget {
   final String searchBoxHint;
   final Function onSearchTextChanged;
   final Function onClickBack;
+  final bool hideBackButton;
 
   YourScaffold({
     Key key,
@@ -30,6 +31,7 @@ class YourScaffold extends StatefulWidget {
     this.searchBoxHint,
     this.onSearchTextChanged,
     this.onClickBack,
+    this.hideBackButton = false,
   }) : super(key: key);
 
   @override
@@ -116,16 +118,18 @@ class YourScaffoldState extends State<YourScaffold> {
                       return Header(
                         title: widget.title.ofLanguage(language.lang),
                         showDate: false,
-                        leftIcon: HeaderIcon(
-                          image: AssetImage('assets/images/home/ic_back_white.png'),
-                          onClick: () {
-                            if (widget.onClickBack != null) {
-                              widget.onClickBack();
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          },
-                        ),
+                        leftIcon: widget.hideBackButton
+                            ? null
+                            : HeaderIcon(
+                                image: AssetImage('assets/images/home/ic_back_white.png'),
+                                onClick: () {
+                                  if (widget.onClickBack != null) {
+                                    widget.onClickBack();
+                                  } else {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
                         rightIcon: null,
                       );
                     },

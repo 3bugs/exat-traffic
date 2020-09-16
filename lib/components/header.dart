@@ -54,28 +54,30 @@ class _HeaderState extends State<Header> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: widget.leftIcon.onClick,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(getPlatformSize(3.0)),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                left: getPlatformSize(3.0),
-                                right: getPlatformSize(12.0),
-                                top: getPlatformSize(6.0),
-                                bottom: getPlatformSize(8.0),
+                        widget.leftIcon == null
+                            ? SizedBox.shrink()
+                            : Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: widget.leftIcon.onClick,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(getPlatformSize(3.0)),
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      left: getPlatformSize(3.0),
+                                      right: getPlatformSize(12.0),
+                                      top: getPlatformSize(6.0),
+                                      bottom: getPlatformSize(8.0),
+                                    ),
+                                    child: Image(
+                                      image: widget.leftIcon.image,
+                                      width: getPlatformSize(22.0),
+                                      height: getPlatformSize(20.0),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              child: Image(
-                                image: widget.leftIcon.image,
-                                width: getPlatformSize(22.0),
-                                height: getPlatformSize(20.0),
-                              ),
-                            ),
-                          ),
-                        ),
                         Image(
                           image: AssetImage('assets/images/splash/exat_logo_new_no_text.png'),
                           width: getPlatformSize(24.0 * 320 / 246),

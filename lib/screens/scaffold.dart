@@ -1,4 +1,5 @@
 import 'package:exattraffic/components/options_dialog.dart';
+import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -127,6 +128,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
     new Future.delayed(Duration.zero, () {
       MyFcm(context).configFcm();
+      _showSchematicMaps();
     });
 
     _fragmentList = [
@@ -141,6 +143,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       int length = context.bloc<AppBloc>().markerList.length;
       alert(context, 'length', length.toString());
     });*/
+  }
+
+  void _showSchematicMaps() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SchematicMaps()),
+    );
   }
 
   void hideSearchOptions() {

@@ -70,7 +70,7 @@ class MyRouteState extends State<MyRoute> {
   bool _myLocationEnabled = false;
 
   //LatLng _mapTarget;
-  double _mapZoomLevel;
+  double _zoom;
   RouteBloc _routeBloc;
 
   TollPlazaModel _tollPlaza;
@@ -181,7 +181,13 @@ class MyRouteState extends State<MyRoute> {
 
   void _handleCameraMove(CameraPosition cameraPosition) {
     //_mapTarget = cameraPosition.target;
-    _mapZoomLevel = cameraPosition.zoom;
+    double oldZoom = _zoom;
+    double newZoom = cameraPosition.zoom;
+    _zoom = cameraPosition.zoom;
+    print("ZOOM LEVEL: $_zoom");
+    if ((oldZoom >= 12 && newZoom < 12) || (oldZoom < 12 && newZoom >= 12)) {
+      setState(() {});
+    }
   }
 
   Future<bool> _moveMapToCurrentPosition(BuildContext context) async {
@@ -190,7 +196,7 @@ class MyRouteState extends State<MyRoute> {
     if (position != null) {
       final CameraPosition currentPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude),
-        zoom: _mapZoomLevel ?? 15,
+        zoom: _zoom ?? 15,
       );
       _moveMapToPosition(context, currentPosition);
       return true;
@@ -213,7 +219,7 @@ class MyRouteState extends State<MyRoute> {
       position: LatLng(gateIn.latitude, gateIn.longitude),
       icon:
           BitmapDescriptor.fromBytes(gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon),
-      alpha: gateIn.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      alpha: (gateIn.selected || (_zoom != null && _zoom > 12)) ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
               title: gateIn.name + (kReleaseMode ? "" : " [${gateIn.categoryId}]"),
@@ -245,7 +251,7 @@ class MyRouteState extends State<MyRoute> {
       position: LatLng(costToll.latitude, costToll.longitude),
       icon: BitmapDescriptor.fromBytes(
           costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon),
-      alpha: costToll.selected ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      alpha: (costToll.selected || (_zoom != null && _zoom > 12)) ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
               title: costToll.name + (kReleaseMode ? "" : " [${costToll.categoryId}]"),
@@ -659,7 +665,7 @@ class MyRouteState extends State<MyRoute> {
                   gateInList.map((gateIn) => LatLng(gateIn.latitude, gateIn.longitude)).toList();
               LatLngBounds latLngBounds = boundsFromLatLngList(gateInLatLngList);
               final GoogleMapController controller = await _googleMapController.future;
-              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
             });
           }
 
@@ -684,7 +690,7 @@ class MyRouteState extends State<MyRoute> {
               costTollLatLngList.add(LatLng(selectedGateIn.latitude, selectedGateIn.longitude));
               LatLngBounds latLngBounds = boundsFromLatLngList(costTollLatLngList);
               final GoogleMapController controller = await _googleMapController.future;
-              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
             });
           }
 
@@ -695,7 +701,7 @@ class MyRouteState extends State<MyRoute> {
             new Future.delayed(Duration(milliseconds: 1000), () async {
               LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
               final GoogleMapController controller = await _googleMapController.future;
-              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
             });
           }
 
@@ -747,7 +753,7 @@ class MyRouteState extends State<MyRoute> {
                     state.bestRoute.gateInCostTollList[0].gateIn.longitude),
               );
               LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
-              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+              controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
 
               new Future.delayed(Duration(milliseconds: 1500), () async {
                 List<LatLng> latLngList = List();
@@ -760,11 +766,11 @@ class MyRouteState extends State<MyRoute> {
                       state.bestRoute.gateInCostTollList[0].costToll.longitude),
                 );
                 LatLngBounds latLngBounds = boundsFromLatLngList(latLngList);
-                controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
 
                 new Future.delayed(Duration(milliseconds: 1500), () async {
                   LatLngBounds latLngBounds = boundsFromLatLngList(polyline.points);
-                  controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 100));
+                  controller.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 110));
                 });
               });
             });
