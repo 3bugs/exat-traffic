@@ -5,6 +5,7 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:light/light.dart';
 
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/constants.dart' as Constants;
@@ -37,6 +38,10 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
   bool _showCctv = false;
   bool _isLoading = false;
 
+  bool _nightMode;
+  Light _light;
+  StreamSubscription _subscription;
+
   JavascriptChannel _cctvJavascriptChannel(BuildContext context) {
     return JavascriptChannel(
       name: 'CCTV',
@@ -45,7 +50,7 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
 
         int markerId = int.parse(jsMessage.message);
         List<MarkerModel> list =
-            _getCctvList(context).where((cctv) => cctv.id == markerId).toList();
+        _getCctvList(context).where((cctv) => cctv.id == markerId).toList();
         //alert(context, "CCTV", list[0].name);
 
         assert(list.isNotEmpty);
@@ -70,13 +75,47 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
     );
   }
 
+  void stopListening() {
+    _subscription.cancel();
+  }
+
+  void startListening() {
+    _light = new Light();
+    try {
+      _subscription = _light.lightSensorStream.listen((luxValue) {
+        print("Lux value: $luxValue");
+        /*setState(() {
+          _luxString = "$luxValue";
+        });*/
+      });
+    } on LightException catch (exception) {
+      print(exception);
+    }
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    startListening();
+  }
+
   @override
   void initState() {
     super.initState();
+    //initPlatformState();
+    DateTime now = DateTime.now();
+    _nightMode = !(now.hour >= 6 && now.hour < 18);
+  }
+
+  @override
+  void dispose() {
+    //stopListening();
+    super.dispose();
   }
 
   List<MarkerModel> _getCctvList(BuildContext context) {
-    List<MarkerModel> markerList = BlocProvider.of<AppBloc>(context).markerList;
+    List<MarkerModel> markerList = BlocProvider
+        .of<AppBloc>(context)
+        .markerList;
     return markerList.where((marker) => marker.category.code == CategoryType.CCTV).toList();
   }
 
@@ -215,10 +254,11 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                       child: AspectRatio(
                         aspectRatio: 4621.4 / 5134,
                         child: WebView(
-                          initialUrl: Constants.SchematicMapsScreen.SCHEMATIC_MAPS_URL,
+                          initialUrl: '${Constants.SchematicMapsScreen.SCHEMATIC_MAPS_URL}&night=${_nightMode ? 1 : 0}',
                           javascriptMode: JavascriptMode.unrestricted,
                           onWebViewCreated: (WebViewController webViewController) {
                             _controller.complete(webViewController);
+                            _setNightMode(_nightMode);
                           },
                           // TODO(iskakaushik): Remove this when collection literals makes it to stable.
                           // ignore: prefer_collection_literals
@@ -327,6 +367,21 @@ class _SchematicMapsMainState extends State<SchematicMapsMain> {
                                   }
                                   controller.evaluateJavascript(
                                       'schematicMap.setCctvVisible($showCctv);');
+                                },
+                              ),
+                              SizedBox(
+                                width: getPlatformSize(15.0),
+                              ),
+                              MapToolItem(
+                                icon: Icon(Icons.tonality, color: Color(0xFF454F63)),
+                                imageWidth: getPlatformSize(23.16),
+                                imageHeight: getPlatformSize(19.19),
+                                marginTop: getPlatformSize(0.0),
+                                isChecked: _showCctv,
+                                showProgress: false,
+                                onClick: () async {
+                                  _nightMode = !_nightMode;
+                                  _setNightMode(_nightMode);
                                 },
                               ),
                             ],

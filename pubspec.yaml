@@ -50,6 +50,7 @@ dependencies:
   enum_to_string: ^1.0.9
   google_maps_cluster_manager: ^0.1.0
   sprintf: "^4.0.0"
+  light: ^1.0.0
   #flutter_background_geolocation: '^1.9.0'
 
   # Map markers clustering
