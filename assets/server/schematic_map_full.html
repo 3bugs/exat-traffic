@@ -3033,7 +3033,7 @@
     const nightMode = parseInt(urlParams.get('night')) === 1;
 
     schematicMap = new SchematicMap({
-      initialScale: 1.3,
+      initialScale: backendMode ? 1.3 : 1,
       backendMode,
       editMode,
       nightMode,
