@@ -2694,14 +2694,16 @@
     };
 
     this.setZoomLevel = function (zoomLevel) {
-      if (zoomLevel < 1 || zoomLevel > 10) return;
+      if (zoomLevel > 9) zoomLevel = 9;
+      if (zoomLevel < 1 || zoomLevel > 9) return;
 
       this.scale = zoomLevel;
       this.resizeSvgContainer();
     };
 
     this.changeZoom = function (zoom) {
-      if ((zoom < 0 && this.scale <= 1) || (zoom > 0 && this.scale >= 10)) {
+      if (zoom > 9) zoom = 9;
+      if ((zoom < 0 && this.scale <= 1) || (zoom > 0 && this.scale >= 9)) {
         return;
       }
 
