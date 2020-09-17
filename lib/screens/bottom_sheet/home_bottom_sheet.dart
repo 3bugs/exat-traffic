@@ -157,8 +157,17 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
       collapsePosition: widget.collapsePosition,
       onChangeSize: _handleChangeSize,
       child: Expanded(
-        child: InkWell(
+        child: GestureDetector(
           onTap: _handleClickUpDownSheet,
+          onVerticalDragUpdate: (details) {
+            double sensitivity = 3.0;
+            if ((details.delta.dy < -sensitivity &&
+                    !_keyBottomSheetScaffold.currentState.bottomSheetExpanded) ||
+                (details.delta.dy > sensitivity &&
+                    _keyBottomSheetScaffold.currentState.bottomSheetExpanded)) {
+              _handleClickUpDownSheet();
+            }
+          },
           child: Container(
             color: Colors.white,
             padding: EdgeInsets.only(

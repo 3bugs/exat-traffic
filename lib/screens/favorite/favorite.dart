@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -9,9 +10,11 @@ import 'package:exattraffic/screens/favorite/favorite_presenter.dart';
 import 'package:exattraffic/components/data_loading.dart';
 import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/favorite_model.dart';
-import 'package:exattraffic/screens/search/search_place_presenter.dart';
+//import 'package:exattraffic/screens/search/search_place_presenter.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/services/google_maps_services.dart';
+import 'package:exattraffic/models/language_model.dart';
+import 'package:exattraffic/models/locale_text.dart';
 
 class Favorite extends StatefulWidget {
   final Function showBestRouteAfterSearch;
@@ -56,7 +59,13 @@ class FavoriteState extends State<Favorite> {
             // กลับไป _handleClickSearchOption ใน MyScaffold
             widget.showBestRouteAfterSearch(bestRoute);
           }
-        } catch (error) {}
+        } on RouteNotFoundException {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+          alert(context, '', LocaleText.routeNotFound().ofLanguage(language.lang));
+        } on Exception {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+          alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
+        }
         _presenter.loaded();
         break;
     }

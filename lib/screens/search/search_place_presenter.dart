@@ -101,7 +101,13 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
           // กลับไป _handleClickSearchOption ใน MyScaffold
           Navigator.pop(context, bestRoute);
         }
-      } catch (error) {}
+      } on RouteNotFoundException {
+        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+        alert(context, '', LocaleText.routeNotFound().ofLanguage(language.lang));
+      } on Exception {
+        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+        alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
+      }
       loaded();
 
       /*alert(context, "Place Details",
@@ -123,7 +129,13 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         // กลับไป _handleClickSearchOption ใน MyScaffold
         Navigator.pop(context, bestRoute);
       }
-    } catch (error) {}
+    } on RouteNotFoundException {
+      LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+      alert(context, '', LocaleText.routeNotFound().ofLanguage(language.lang));
+    } on Exception {
+      LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+      alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
+    }
     loaded();
   }
 }

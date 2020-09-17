@@ -52,6 +52,8 @@ class BottomSheetScaffoldState extends State<BottomSheetScaffold> with TickerPro
     super.initState();
   }
 
+  bool get bottomSheetExpanded => _bottomSheetExpanded;
+
   void toggleSheet() {
     if (_bottomSheetExpanded) {
       _controller.reverse();

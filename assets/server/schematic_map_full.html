@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <title>EXAT Traffic - Schematic Map</title>
   <!--<link rel="stylesheet"
@@ -2422,6 +2422,7 @@
 
 <!--<script src="https://code.jquery.com/jquery-1.11.1.js"></script>-->
 <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="js/hammer.min.js"></script>
 <!--<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>-->
 
 <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>-->
@@ -2587,6 +2588,7 @@
     this.showCctv = false;
 
     addTouchHandler();
+    //addTouchHandlerHammer();
     addCanvasHandler();
 
     $(window).resize(() => {
@@ -2602,6 +2604,13 @@
       self.svgWrapper.get(0).onmousedown = handleTouchStart;
       self.svgWrapper.get(0).onmousemove = handleTouchMove;
       document.onmouseup = handleTouchEnd;
+    }
+
+    function addTouchHandlerHammer() {
+      self.svgWrapper.get(0).addEventListener("touchstart", handleTouchStart, false);
+
+      const hammer = new Hammer(self.svgWrapper.get(0));
+      hammer.on('pan', handleTouchMoveHammer);
     }
 
     function addCanvasHandler() {
@@ -2900,6 +2909,37 @@
 
       /*const touches = evt.changedTouches;
       console.log(`pageX: ${touches[0].pageX}, pageY: ${touches[0].pageY}`);*/
+    }
+
+    function handleTouchMoveHammer(evt) {
+      console.log(`deltaX: ${evt.deltaX}, deltaY: ${evt.deltaY}`);
+
+      const containerWidth = self.svgContainer.width();
+      const containerHeight = self.svgContainer.height();
+      const wrapperWidth = self.svgWrapper.width();
+      const wrapperHeight = self.svgWrapper.height();
+      const diffX = evt.deltaX;
+      const diffY = evt.deltaY;
+
+      let newLeft, newTop;
+      if (self.svgWrapperLeft + diffX > 0) {
+        newLeft = 0;
+      } else if (self.svgWrapperLeft + diffX < containerWidth - wrapperWidth) {
+        newLeft = containerWidth - wrapperWidth;
+      } else {
+        newLeft = self.svgWrapperLeft + diffX;
+      }
+      if (self.svgWrapperTop + diffY > 0) {
+        newTop = 0;
+      } else if (self.svgWrapperTop + diffY < containerHeight - wrapperHeight) {
+        newTop = containerHeight - wrapperHeight;
+      } else {
+        newTop = self.svgWrapperTop + diffY;
+      }
+
+      self.svgWrapper.css('left', newLeft);
+      self.svgWrapper.css('top', newTop);
+      self.svgWrapper.hide().show(0); // refresh
     }
 
     function handleTouchMove(evt) {

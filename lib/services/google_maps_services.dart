@@ -260,6 +260,10 @@ class PlaceDetailsModel {
       BlocProvider.of<AppBloc>(context).markerList,
     );
 
+    if (gateInCostTollList == null || gateInCostTollList.isEmpty) {
+      throw RouteNotFoundException();
+    }
+
     gateInCostTollList = await Future.wait<GateInCostTollModel>(
       gateInCostTollList.map((gateInCostToll) async {
         return getGoogleRoute(context, origin, gateInCostToll, 0);
@@ -309,4 +313,7 @@ class PlaceDetailsModel {
       departureTime: departureTime,
     );
   }
+}
+
+class RouteNotFoundException implements Exception {
 }

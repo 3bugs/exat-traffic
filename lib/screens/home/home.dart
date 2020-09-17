@@ -429,7 +429,13 @@ class MyHomeState extends State<Home> {
             // กลับไป _handleClickSearchOption ใน MyScaffold
             widget.showBestRouteAfterSearch(bestRoute);
           }
-        } catch (error) {}
+        } on RouteNotFoundException {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+          alert(context, '', LocaleText.routeNotFound().ofLanguage(language.lang));
+        } on Exception {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+          alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
+        }
         setState(() {
           _isLoading = false;
         });

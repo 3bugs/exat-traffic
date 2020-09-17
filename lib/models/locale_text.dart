@@ -922,6 +922,22 @@ class LocaleText {
     );
   }
 
+  factory LocaleText.routeNotFound() {
+    return LocaleText(
+      thai: 'ขออภัย ไม่พบเส้นทางบนทางพิเศษสำหรับสถานที่นี้',
+      english: 'Expressway route not found for this place',
+      chinese: '找不到这个地方的高速公路路线',
+      japanese: 'この場所の高速道路ルートが見つかりません',
+      korean: '이 장소에 대한 고속도로 경로를 찾을 수 없습니다.',
+      lao: 'ບໍ່ພົບເຫັນເສັ້ນທາງດ່ວນ ສຳ ລັບສະຖານທີ່ນີ້',
+      vietnamese: 'Không tìm thấy tuyến đường cao tốc cho địa điểm này',
+      myanmar: 'ဒီနေရာအတွက်အမြန်လမ်းမကြီးလမ်းကြောင်းရှာမတွေ့ပါ',
+      khmer: 'រកមិនឃើញផ្លូវល្បឿនលឿនសម្រាប់កន្លែងនេះ',
+      malay: 'Laluan lebuh raya tidak dijumpai untuk tempat ini',
+      indonesian: 'Rute jalan tol tidak ditemukan untuk tempat ini',
+    );
+  }
+
   /*factory LocaleText.xxx() {
     return LocaleText(
       thai: '',
