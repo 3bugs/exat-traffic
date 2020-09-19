@@ -71,6 +71,7 @@ class MyRouteState extends State<MyRoute> {
 
   //LatLng _mapTarget;
   double _zoom;
+  bool _labelVisible = false;
   RouteBloc _routeBloc;
 
   TollPlazaModel _tollPlaza;
@@ -210,6 +211,115 @@ class MyRouteState extends State<MyRoute> {
     controller.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
+  Future<Set<Marker>> _createLabelMarkerSet(
+    BuildContext context,
+    List<GateInModel> gateInList,
+    List<CostTollModel> costTollList,
+    bool costTollSelected,
+  ) async {
+    Set<Marker> labelMarkerSet = Set();
+
+    if (_labelVisible) {
+      for (GateInModel gateIn in gateInList) {
+        Marker label = await _createLabel(
+          context,
+          'gate-in-${gateIn.id.toString()}',
+          gateIn.name,
+          LatLng(gateIn.latitude, gateIn.longitude),
+          Constants.App.PRIMARY_COLOR.withOpacity(0.7),
+        );
+        labelMarkerSet.add(label);
+      }
+      for (CostTollModel costToll in costTollList) {
+        Marker label = await _createLabel(
+          context,
+          'cost-toll-${costToll.id.toString()}',
+          costToll.name,
+          LatLng(costToll.latitude, costToll.longitude),
+          Colors.redAccent.withOpacity(0.6),
+        );
+        labelMarkerSet.add(label);
+      }
+    }
+
+    return labelMarkerSet;
+  }
+
+  Future<Marker> _createLabel(
+    BuildContext context,
+    String idText,
+    String name,
+    LatLng latLng,
+    Color bgColor,
+  ) async {
+    //String markerIdVal = uuid.v1();
+    final MarkerId markerId = MarkerId('label-$idText');
+
+    BitmapDescriptor bitmap =
+        BitmapDescriptor.fromBytes(await getBytesFromCanvas(name, bgColor));
+    TextPainter painter = getLabelTextPainter(name, Colors.black);
+    try {
+      print('+++++++++++++++++++++++++++++++++++++++++PAINTER WIDTH: ${painter.width}');
+    } catch (e) {
+      print('ERROR IN _createLabel(): ${e.toString()}');
+    }
+
+    return Marker(
+      markerId: markerId,
+      position: latLng,
+      icon: bitmap,
+      anchor: Offset(-0.08, 1),
+    );
+  }
+
+  TextPainter getLabelTextPainter(String text, Color bgColor) {
+    TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+    painter.text = TextSpan(
+      text: '  $text  ',
+      style: getTextStyle(
+        LanguageName.thai,
+        sizeTh: 60.0,
+        sizeEn: 60.0,
+        //isBold: true,
+        color: Colors.white,
+        //bgColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR.withOpacity(0.5),
+        bgColor: bgColor,
+      ),
+    );
+    return painter;
+  }
+
+  Future<Uint8List> getBytesFromCanvas(String label, Color bgColor) async {
+    final int height = 70;
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+
+    /*final Paint paint = Paint()..color = Constants.App.ACCENT_COLOR.withOpacity(0.6);
+    final Radius radius = Radius.circular(10.0);
+    canvas.drawRRect(
+      RRect.fromRectAndCorners(
+        Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+        topLeft: radius,
+        topRight: radius,
+        bottomLeft: radius,
+        bottomRight: radius,
+      ),
+      paint,
+    );*/
+
+    TextPainter painter = getLabelTextPainter(label, bgColor);
+    painter.layout();
+    painter.paint(
+      canvas,
+      //Offset((width * 0.5) - painter.width * 0.5, (height * 0.5) - painter.height * 0.5),
+      Offset(0.0, (height * 0.5) - painter.height * 0.5),
+    );
+    final img = await pictureRecorder.endRecording().toImage(painter.width.floor(), painter.height.floor());
+    final data = await img.toByteData(format: ui.ImageByteFormat.png);
+
+    return data.buffer.asUint8List();
+  }
+
   Marker _createGateInMarker(BuildContext context, GateInModel gateIn, bool costTollSelected) {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('gate-in-${gateIn.id.toString()}');
@@ -219,7 +329,9 @@ class MyRouteState extends State<MyRoute> {
       position: LatLng(gateIn.latitude, gateIn.longitude),
       icon:
           BitmapDescriptor.fromBytes(gateIn.selected ? _originMarkerIconLarge : _originMarkerIcon),
-      alpha: (gateIn.selected || (_zoom != null && _zoom > 12)) ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      alpha: (gateIn.selected || (_zoom != null && _zoom > 12))
+          ? 1.0
+          : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
               title: gateIn.name + (kReleaseMode ? "" : " [${gateIn.categoryId}]"),
@@ -251,7 +363,9 @@ class MyRouteState extends State<MyRoute> {
       position: LatLng(costToll.latitude, costToll.longitude),
       icon: BitmapDescriptor.fromBytes(
           costToll.selected ? _destinationMarkerIconLarge : _destinationMarkerIcon),
-      alpha: (costToll.selected || (_zoom != null && _zoom > 12)) ? 1.0 : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
+      alpha: (costToll.selected || (_zoom != null && _zoom > 12))
+          ? 1.0
+          : Constants.RouteScreen.INITIAL_MARKER_OPACITY,
       infoWindow: (true)
           ? InfoWindow(
               title: costToll.name + (kReleaseMode ? "" : " [${costToll.categoryId}]"),
@@ -821,6 +935,9 @@ class MyRouteState extends State<MyRoute> {
                     return _createCostTollMarker(context, costToll, selectedCostToll != null);
                   }).toSet();
 
+                  Future<Set<Marker>> futureLabelMarkerSet = _createLabelMarkerSet(
+                      context, filteredGateInList, filteredCostTollList, selectedCostToll != null);
+
                   /*Set<Marker> partTollSet = Set();
                   if (selectedCostToll != null) {
                     partTollSet = selectedCostToll.partTollMarkerList
@@ -858,28 +975,34 @@ class MyRouteState extends State<MyRoute> {
                             ? selectedCostToll.partTollMarkerList
                             : List())),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return GoogleMap(
-                        key: _keyGoogleMaps,
-                        padding: EdgeInsets.only(
-                          right: getPlatformSize(15.0),
-                        ),
-                        mapType: MapType.normal,
-                        initialCameraPosition: INITIAL_POSITION,
-                        myLocationEnabled: _myLocationEnabled,
-                        myLocationButtonEnabled: false,
-                        trafficEnabled: false,
-                        mapToolbarEnabled: false,
-                        onMapCreated: (GoogleMapController controller) {
-                          _googleMapController.complete(controller);
-                          //_moveMapToCurrentPosition(context);
+                      return FutureBuilder(
+                        future: futureLabelMarkerSet,
+                        builder: (BuildContext context, AsyncSnapshot labelSnapshot) {
+                          return GoogleMap(
+                            key: _keyGoogleMaps,
+                            padding: EdgeInsets.only(
+                              right: getPlatformSize(15.0),
+                            ),
+                            mapType: MapType.normal,
+                            initialCameraPosition: INITIAL_POSITION,
+                            myLocationEnabled: _myLocationEnabled,
+                            myLocationButtonEnabled: false,
+                            trafficEnabled: false,
+                            mapToolbarEnabled: false,
+                            onMapCreated: (GoogleMapController controller) {
+                              _googleMapController.complete(controller);
+                              //_moveMapToCurrentPosition(context);
+                            },
+                            onCameraMove: _handleCameraMove,
+                            markers: gateInMarkerSet
+                                .union(costTollMarkerSet)
+                                .union(snapshot.hasData ? snapshot.data : Set())
+                                .union(currentLocationSet)
+                                .union(searchRouteMarkerSet)
+                                .union(labelSnapshot.hasData ? labelSnapshot.data : Set()),
+                            polylines: polyLineSet,
+                          );
                         },
-                        onCameraMove: _handleCameraMove,
-                        markers: gateInMarkerSet
-                            .union(costTollMarkerSet)
-                            .union(snapshot.hasData ? snapshot.data : Set())
-                            .union(currentLocationSet)
-                            .union(searchRouteMarkerSet),
-                        polylines: polyLineSet,
                       );
                     },
                   );
@@ -1140,8 +1263,10 @@ class MyRouteState extends State<MyRoute> {
                                                             style: getTextStyle(
                                                               language.lang,
                                                               color: Color(0xFFB2B2B2),
-                                                              sizeTh: Constants.Font.SMALLER_SIZE_TH,
-                                                              sizeEn: Constants.Font.SMALLER_SIZE_EN,
+                                                              sizeTh:
+                                                                  Constants.Font.SMALLER_SIZE_TH,
+                                                              sizeEn:
+                                                                  Constants.Font.SMALLER_SIZE_EN,
                                                             ),
                                                           ),
                                                           Text(
@@ -1415,6 +1540,24 @@ class MyRouteState extends State<MyRoute> {
                         isChecked: false,
                         showProgress: false,
                         onClick: () => _handleClickSearch(context),
+                      ),
+
+                      // show/hide label
+                      MapToolItem(
+                        icon: Icon(
+                          Icons.label_outline,
+                          size: getPlatformSize(20.0),
+                        ),
+                        imageWidth: getPlatformSize(21.0),
+                        imageHeight: getPlatformSize(21.0),
+                        marginTop: getPlatformSize(10.0),
+                        isChecked: _labelVisible,
+                        showProgress: false,
+                        onClick: () {
+                          setState(() {
+                            _labelVisible = !_labelVisible;
+                          });
+                        },
                       ),
 
                       // current location

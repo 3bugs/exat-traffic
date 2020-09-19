@@ -64,6 +64,7 @@ TextStyle getTextStyle(
   double sizeTh = Constants.Font.DEFAULT_SIZE_TH,
   double sizeEn = Constants.Font.DEFAULT_SIZE_EN,
   Color color = Constants.Font.DEFAULT_COLOR,
+  Color bgColor = Colors.transparent,
   bool isBold = false,
   double heightTh = DEFAULT_LINE_HEIGHT,
   double heightEn = DEFAULT_LINE_HEIGHT,
@@ -83,12 +84,14 @@ TextStyle getTextStyle(
           fontWeight: fontWeight,
           fontSize: fontSize,
           color: color ?? Constants.Font.DEFAULT_COLOR,
+          backgroundColor: bgColor,
         )
       : TextStyle(
           fontFamily: fontFamily,
           fontWeight: fontWeight,
           fontSize: fontSize,
           color: color ?? Constants.Font.DEFAULT_COLOR,
+          backgroundColor: bgColor,
           height: height,
         );
 }
