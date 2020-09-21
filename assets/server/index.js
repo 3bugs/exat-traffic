@@ -158,7 +158,7 @@ app.get('/server_ip', (req, res) => {
     },
     data_list: [
       {
-        ip: 'http://etf.exat.co.th', // ไม่ต้องมี / ปิดท้าย
+        ip: 'http://202.94.76.77', // ไม่ต้องมี / ปิดท้าย
       }
     ],
   });
