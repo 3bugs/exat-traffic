@@ -225,6 +225,7 @@ class MyRouteState extends State<MyRoute> {
           context,
           'gate-in-${gateIn.id.toString()}',
           gateIn.name,
+          gateIn.routeName,
           LatLng(gateIn.latitude, gateIn.longitude),
           Constants.App.PRIMARY_COLOR.withOpacity(0.7),
         );
@@ -235,6 +236,7 @@ class MyRouteState extends State<MyRoute> {
           context,
           'cost-toll-${costToll.id.toString()}',
           costToll.name,
+          costToll.routeName,
           LatLng(costToll.latitude, costToll.longitude),
           Colors.redAccent.withOpacity(0.6),
         );
@@ -249,14 +251,17 @@ class MyRouteState extends State<MyRoute> {
     BuildContext context,
     String idText,
     String name,
+    String routeName,
     LatLng latLng,
     Color bgColor,
   ) async {
     //String markerIdVal = uuid.v1();
     final MarkerId markerId = MarkerId('label-$idText');
 
+    // values[0]: Uint8List, values[1]: double
+    List values = await getBytesFromCanvas(name, bgColor);
     BitmapDescriptor bitmap =
-        BitmapDescriptor.fromBytes(await getBytesFromCanvas(name, bgColor));
+        BitmapDescriptor.fromBytes(values[0]);
     TextPainter painter = getLabelTextPainter(name, Colors.black);
     try {
       print('+++++++++++++++++++++++++++++++++++++++++PAINTER WIDTH: ${painter.width}');
@@ -268,7 +273,22 @@ class MyRouteState extends State<MyRoute> {
       markerId: markerId,
       position: latLng,
       icon: bitmap,
-      anchor: Offset(-0.08, 1),
+      anchor: Offset(-30 / values[1], 1),
+      onTap: () {
+        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+        final snackBar = SnackBar(
+          content: Text(
+            LocaleText.tapMarkerToSelect().ofLanguage(language.lang),
+            style: getTextStyle(language.lang, color: Colors.white),
+          ),
+          backgroundColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+      /*infoWindow: InfoWindow(
+        title: name,
+        snippet: routeName,
+      )*/
     );
   }
 
@@ -289,7 +309,7 @@ class MyRouteState extends State<MyRoute> {
     return painter;
   }
 
-  Future<Uint8List> getBytesFromCanvas(String label, Color bgColor) async {
+  Future<List> getBytesFromCanvas(String label, Color bgColor) async {
     final int height = 70;
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
@@ -317,7 +337,7 @@ class MyRouteState extends State<MyRoute> {
     final img = await pictureRecorder.endRecording().toImage(painter.width.floor(), painter.height.floor());
     final data = await img.toByteData(format: ui.ImageByteFormat.png);
 
-    return data.buffer.asUint8List();
+    return [data.buffer.asUint8List(), painter.width];
   }
 
   Marker _createGateInMarker(BuildContext context, GateInModel gateIn, bool costTollSelected) {

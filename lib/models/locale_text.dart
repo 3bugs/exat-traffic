@@ -938,6 +938,22 @@ class LocaleText {
     );
   }
 
+  factory LocaleText.tapMarkerToSelect() {
+    return LocaleText(
+      thai: 'แตะที่หมุดเพื่อเลือก',
+      english: 'Tap the marker icon to select',
+      chinese: '点击标记图标以选择',
+      japanese: 'マーカーアイコンをタップして選択します',
+      korean: '선택하려면 마커 아이콘을 탭하세요.',
+      lao: 'ແຕະທີ່ໄອຄອນເຄື່ອງ ໝາຍ ເພື່ອເລືອກ',
+      vietnamese: 'chạm vào biểu tượng điểm đánh dấu để chọn',
+      myanmar: 'ရွေးရန်အမှတ်အသားအိုင်ကွန်ကိုအသာပုတ်ပါ',
+      khmer: 'ប៉ះរូបសញ្ញាសម្គាល់ដើម្បីជ្រើសរើស',
+      malay: 'ketik ikon penanda untuk memilih',
+      indonesian: 'ketuk ikon penanda untuk memilih',
+    );
+  }
+
   /*factory LocaleText.xxx() {
     return LocaleText(
       thai: '',
