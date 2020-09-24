@@ -1,5 +1,3 @@
-import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
-import 'package:exattraffic/storage/place_favorite_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -11,6 +9,9 @@ import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/screens/splash/splash.dart';
 import 'package:exattraffic/storage/util_prefs.dart';
 import 'package:exattraffic/storage/widget_prefs.dart';
+import 'package:exattraffic/storage/cctv_favorite_prefs.dart';
+import 'package:exattraffic/storage/place_favorite_prefs.dart';
+
 import 'constants.dart' as Constants;
 
 void main() {

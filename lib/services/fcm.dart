@@ -24,7 +24,17 @@ outside_route = นอกสายทาง
 {title_en: ., title_th: ., lat: 13.8469852, lng: 100.5802715, route_id: 0, id_en: 57, id_th: 56, cate_id: 193, markers_id: 0}
  */
 class MyFcm {
-  static const String TOPIC_ROUTE_NOT_SPECIFIED = "outside_route";
+  static const int ROUTE_NOT_SPECIFIED = 0;
+  static const int ROUTE_CHALERM = 1;
+  static const int ROUTE_CHALERM_S1 = 8;
+  static const int ROUTE_CHALONG = 9;
+  static const int ROUTE_BURAPA = 13;
+  static const int ROUTE_SRIRACH = 19;
+  static const int ROUTE_KANCHANA = 27;
+  static const int ROUTE_UDORN = 29;
+  static const int ROUTE_SRIRACH_OUTER_RING = 31;
+
+  /*static const String TOPIC_ROUTE_NOT_SPECIFIED = "outside_route";
   static const String TOPIC_ROUTE_CHALERM = "route_1";
   static const String TOPIC_ROUTE_CHALERM_S1 = "route_8";
   static const String TOPIC_ROUTE_CHALONG = "route_9";
@@ -32,44 +42,60 @@ class MyFcm {
   static const String TOPIC_ROUTE_SRIRACH = "route_19";
   static const String TOPIC_ROUTE_KANCHANA = "route_27";
   static const String TOPIC_ROUTE_UDORN = "route_29";
-  static const String TOPIC_ROUTE_SRIRACH_OUTER_RING = "route_31";
+  static const String TOPIC_ROUTE_SRIRACH_OUTER_RING = "route_31";*/
 
   final BuildContext _context;
   static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   MyFcm(this._context);
 
-  static void unsubscribeAll() {
-    _unsubscribeRoute(TOPIC_ROUTE_NOT_SPECIFIED);
-    _unsubscribeRoute(TOPIC_ROUTE_CHALERM);
-    _unsubscribeRoute(TOPIC_ROUTE_CHALERM_S1);
-    _unsubscribeRoute(TOPIC_ROUTE_CHALONG);
-    _unsubscribeRoute(TOPIC_ROUTE_BURAPA);
-    _unsubscribeRoute(TOPIC_ROUTE_SRIRACH);
-    _unsubscribeRoute(TOPIC_ROUTE_KANCHANA);
-    _unsubscribeRoute(TOPIC_ROUTE_UDORN);
-    _unsubscribeRoute(TOPIC_ROUTE_SRIRACH_OUTER_RING);
+  static String _getRouteTopic(int routeId) {
+    return routeId == 0 ? 'outside_route' : 'route_$routeId';
   }
 
-  static void _subscribeRoute(String routeTopic) {
+  // สำหรับเรียกมาจาก RouteTrackingManager
+  static void subscribeRoute(int routeId) {
+    _unsubscribeAll();
+    _subscribeRouteTopic(_getRouteTopic(ROUTE_NOT_SPECIFIED));
+    print('FCM SUBSCRIBE TOPIC ${_getRouteTopic(ROUTE_NOT_SPECIFIED)}');
+
+    if (routeId != 0) {
+      _subscribeRouteTopic(_getRouteTopic(routeId));
+      print('FCM SUBSCRIBE TOPIC ${_getRouteTopic(routeId)}');
+    }
+  }
+
+  static void _unsubscribeAll() {
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_NOT_SPECIFIED));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_CHALERM));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_CHALERM_S1));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_CHALONG));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_BURAPA));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_SRIRACH));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_KANCHANA));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_UDORN));
+    _unsubscribeRouteTopic(_getRouteTopic(ROUTE_SRIRACH_OUTER_RING));
+  }
+
+  static void _subscribeRouteTopic(String routeTopic) {
     _firebaseMessaging.subscribeToTopic(routeTopic);
   }
 
-  static void _unsubscribeRoute(String routeTopic) {
+  static void _unsubscribeRouteTopic(String routeTopic) {
     _firebaseMessaging.unsubscribeFromTopic(routeTopic);
   }
 
-  static void setNotification(bool isOn) {
+  static void setNotificationStatus(bool isOn) {
     if (isOn) {
-      _subscribeRoute(TOPIC_ROUTE_NOT_SPECIFIED);
+      _subscribeRouteTopic(_getRouteTopic(ROUTE_NOT_SPECIFIED));
     } else {
-      unsubscribeAll();
+      _unsubscribeAll();
     }
   }
 
   configFcm() async {
     UtilPrefs utilPrefs = Provider.of<UtilPrefs>(_context, listen: false);
-    setNotification(await utilPrefs.getNotification());
+    setNotificationStatus(await utilPrefs.getNotificationStatus());
 
     _firebaseMessaging.requestNotificationPermissions(); // จำเป็นสำหรับ ios
 

@@ -92,7 +92,7 @@ class _SettingsState extends State<Settings> {
     switch (settingName) {
       case SettingName.notification:
         UtilPrefs prefs = Provider.of<UtilPrefs>(context, listen: false);
-        prefs.setNotification(newValue);
+        prefs.setNotificationStatus(newValue);
         break;
       case SettingName.nightMode:
         setState(() {
@@ -181,7 +181,7 @@ class _SettingsState extends State<Settings> {
                           Consumer<UtilPrefs>(
                             builder: (context, prefs, child) {
                               return FutureBuilder(
-                                future: prefs.getNotification(),
+                                future: prefs.getNotificationStatus(),
                                 builder: (context, snapshot) {
                                   return snapshot.hasData
                                       ? SettingRow(

@@ -33,7 +33,7 @@ class UtilPrefs extends ChangeNotifier {
     prefs.setBool(KEY_PREF_USER_CONSENT, true);
   }
 
-  Future<bool> getNotification() async {
+  Future<bool> getNotificationStatus() async {
     SharedPreferences prefs = await getSharedPrefs();
     return prefs.getBool(KEY_PREF_NOTIFICATION) ?? true;
     /*if (prefs.containsKey(KEY_PREF_NOTIFICATION)) {
@@ -43,10 +43,10 @@ class UtilPrefs extends ChangeNotifier {
     }*/
   }
 
-  Future<void> setNotification(bool status) async {
+  Future<void> setNotificationStatus(bool status) async {
     SharedPreferences prefs = await getSharedPrefs();
     await prefs.setBool(KEY_PREF_NOTIFICATION, status);
     notifyListeners();
-    MyFcm.setNotification(status);
+    MyFcm.setNotificationStatus(status);
   }
 }

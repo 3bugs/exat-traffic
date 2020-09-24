@@ -1,4 +1,5 @@
 import 'package:exattraffic/components/options_dialog.dart';
+import 'package:exattraffic/route_tracking_manager.dart';
 import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -122,6 +123,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
   int _currentTabIndex = 0;
   ScreenProps _currentScreenProps = screenPropsList[0];
   bool _showSearchOptions = false;
+  RouteTrackingManager _routeTrackingManager;
 
   initState() {
     super.initState();
@@ -138,6 +140,10 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       Incident(),
       MyNotification(),
     ];
+
+    Future.delayed(Duration.zero, () {
+      _routeTrackingManager = RouteTrackingManager(context);
+    });
 
     /*Future.delayed(Duration.zero, () {
       int length = context.bloc<AppBloc>().markerList.length;
