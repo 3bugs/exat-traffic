@@ -294,8 +294,6 @@ class ExatApi {
       List<EmergencyNumberModel> emergencyNumberList =
           dataList.map((markerJson) => EmergencyNumberModel.fromJson(markerJson)).toList();
 
-      emergencyNumberList.sort((a, b) => a.routeId.compareTo(b.routeId));
-
       return emergencyNumberList;
     } else {
       throw Exception(responseResult.data);

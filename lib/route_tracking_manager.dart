@@ -10,6 +10,7 @@ import 'package:exattraffic/services/fcm.dart';
 import 'package:exattraffic/storage/util_prefs.dart';
 
 // todo: READ https://www.didierboelens.com/2019/01/futures-isolates-event-loop/
+// todo: READ https://medium.com/@pierre.sabot/how-to-fetch-user-location-in-background-with-flutter-e3494021bdf5
 
 class RouteTrackingManager {
   BuildContext _context;
@@ -22,8 +23,8 @@ class RouteTrackingManager {
   void _setupLocationUpdate() {
     const LocationOptions locationOptions = LocationOptions(
       accuracy: LocationAccuracy.medium,
-      //distanceFilter: 500,
-      timeInterval: 10000,
+      distanceFilter: 500,
+      //timeInterval: 10000,
     );
 
     Stream<Position> positionStream;
