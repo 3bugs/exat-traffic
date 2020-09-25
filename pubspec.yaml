@@ -51,10 +51,10 @@ dependencies:
   google_maps_cluster_manager: ^0.1.0
   sprintf: "^4.0.0"
   light: ^1.0.0
+  flutter_background_geolocation: '^1.9.0'
   #isolate_handler: ^0.3.1
   #workmanager: ^0.2.3
   #geodesy:
-  #flutter_background_geolocation: '^1.9.0'
 
   # Map markers clustering
   fluster: ^1.1.2
