@@ -53,6 +53,10 @@ class MyFcm {
     return routeId == 0 ? 'outside_route' : 'route_$routeId';
   }
 
+  static Future<String> getToken() async {
+    return await _firebaseMessaging.getToken();
+  }
+
   // สำหรับเรียกมาจาก RouteTrackingManager
   static void subscribeRoute(int routeId) {
     _unsubscribeAll();

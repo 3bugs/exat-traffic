@@ -53,6 +53,7 @@ class ResponseResult {
 class MyApi {
   static String MY_API_BASED_URL = "${Constants.Api.SERVER}/api";
   static String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
+  static String TRACK_USER = "$MY_API_BASED_URL/user_tracking";
   static String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
   static String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
   static String FIND_BEST_ROUTE_URL = "$MY_API_BASED_URL/best_route";
@@ -79,6 +80,19 @@ class MyApi {
       print('Number of Traffic Point Data : ${trafficPointList.length}');
 
       return trafficPointList;
+    } else {
+      throw Exception(responseResult.data);
+    }
+  }
+
+  static Future<bool> trackUser(
+      String token,
+      double latitude,
+      double longitude,
+      ) async {
+    ResponseResult responseResult = await _makeRequest('$TRACK_USER?token=$token&lat=$latitude&lng=$longitude');
+    if (responseResult.success) {
+      return true;
     } else {
       throw Exception(responseResult.data);
     }

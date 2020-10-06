@@ -2,27 +2,66 @@ import 'package:exattraffic/components/my_cached_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:exattraffic/constants.dart' as Constants;
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/express_way_model.dart';
 import 'package:exattraffic/screens/bottom_sheet/home_bottom_sheet.dart';
 
 class TrafficPointView extends StatelessWidget {
+  final TrafficPointModel trafficPoint;
+  final bool isFirstItem;
+  final bool isLastItem;
+  final Function onClick;
+  Color _statusColor;
+  String _statusText;
+
   TrafficPointView({
     @required this.trafficPoint,
     @required this.isFirstItem,
     @required this.isLastItem,
     @required this.onClick,
-  });
-
-  final TrafficPointModel trafficPoint;
-  final bool isFirstItem;
-  final bool isLastItem;
-  final Function onClick;
+  }) {
+    List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
+        .where((pointData) => pointData.pointId == trafficPoint.pointId)
+        .toList();
+    if (filteredTrafficPointData.isNotEmpty) {
+      final trafficPointData = filteredTrafficPointData[0];
+      switch (trafficPointData.status) {
+        case TrafficPointDataModel.STATUS_GREEN:
+          this._statusColor = Constants.BottomSheet.TRAFFIC_GREEN;
+          this._statusText = '> 70 km/h';
+          break;
+        case TrafficPointDataModel.STATUS_ORANGE:
+          this._statusColor = Constants.BottomSheet.TRAFFIC_ORANGE;
+          this._statusText = '40-70 km/h';
+          break;
+        case TrafficPointDataModel.STATUS_RED:
+          this._statusColor = Constants.BottomSheet.TRAFFIC_RED;
+          this._statusText = '15-40 km/h';
+          break;
+        case TrafficPointDataModel.STATUS_DARK_RED:
+          this._statusColor = Constants.BottomSheet.TRAFFIC_DARK_RED;
+          this._statusText = '0-15 km/h';
+          break;
+        case TrafficPointDataModel.STATUS_UNKNOWN:
+          this._statusColor = Color(0xFFAAAAAA);
+          this._statusText = 'N/A';
+          break;
+        default:
+          this._statusColor = Color(0xFFAAAAAA);
+          this._statusText = 'N/A';
+          break;
+      }
+    } else {
+      this._statusColor = Colors.black;
+      this._statusText = 'N/A';
+    }
+  }
 
   //final Random _rnd = Random();
 
-  Color _getTrafficStatus() {
+  /*Color _getTrafficStatusColor() {
     List<TrafficPointDataModel> filteredTrafficPointData = HomeBottomSheet.trafficPointDataList
         .where((pointData) => pointData.pointId == trafficPoint.pointId)
         .toList();
@@ -45,7 +84,7 @@ class TrafficPointView extends StatelessWidget {
     } else {
       return Colors.black;
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +106,7 @@ class TrafficPointView extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: _getTrafficStatus(),
+                      color: _statusColor,
                       //_rnd.nextInt(2) == 0 ? Color(0xFFEB222C) : Color(0xFF22B573),
                       width: getPlatformSize(11.0),
                     ),
@@ -94,15 +133,22 @@ class TrafficPointView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Expanded(
-                            child: Container(
-                              child: Consumer<LanguageModel>(
-                                builder: (context, language, child) {
-                                  return Text(
-                                    trafficPoint.cctvMarkerModel.name,
-                                    style: getTextStyle(language.lang),
-                                  );
-                                },
-                              ),
+                            child: Consumer<LanguageModel>(
+                              builder: (context, language, child) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      trafficPoint.cctvMarkerModel.name,
+                                      style: getTextStyle(language.lang),
+                                    ),
+                                    Text(
+                                      _statusText,
+                                      style: getTextStyle(language.lang, color: _statusColor),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                           (trafficPoint.cctvMarkerModel.streamMobile != null) ||
@@ -152,8 +198,9 @@ class TrafficPointView extends StatelessWidget {
           SizedBox(
             width: getPlatformSize(100.0),
             height: getPlatformSize(65.0),
-            child: false/*trafficPoint.cctvMarkerModel.godImageUrl != null*/
-                ? MyCachedImage(// ignore: dead_code
+            child: false /*trafficPoint.cctvMarkerModel.godImageUrl != null*/
+                ? MyCachedImage(
+                    // ignore: dead_code
                     imageUrl: trafficPoint.cctvMarkerModel.godImageUrl,
                     progressIndicatorSize: ProgressIndicatorSize.small,
                   )

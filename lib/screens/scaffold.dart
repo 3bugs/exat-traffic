@@ -1,10 +1,9 @@
-import 'package:exattraffic/components/options_dialog.dart';
-import 'package:exattraffic/route_tracking_manager.dart';
-import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 //import 'package:google_fonts/google_fonts.dart';
 
 import 'package:exattraffic/etc/utils.dart';
@@ -28,6 +27,10 @@ import 'package:exattraffic/screens/search/search_place.dart';
 import 'package:exattraffic/screens/emergency/emergency.dart';
 import 'package:exattraffic/services/api.dart';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/components/options_dialog.dart';
+import 'package:exattraffic/route_tracking_manager.dart';
+import 'package:exattraffic/screens/schematic_maps/schematic_maps.dart';
+import 'package:exattraffic/main.dart';
 
 //https://medium.com/flutter-community/implement-real-time-location-updates-on-google-maps-in-flutter-235c8a09173e
 //https://medium.com/@CORDEA/implement-backdrop-with-flutter-73b4c61b1357
@@ -141,14 +144,72 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       MyNotification(),
     ];
 
-    Future.delayed(Duration.zero, () {
+    /*Future.delayed(Duration.zero, () {
       _routeTrackingManager = RouteTrackingManager(context);
+    });*/
+
+    _setupBackgroundGeolocation();
+  }
+
+  // ย้ายไปไว้ใน main.dart
+  /*static DateTime lastTracking;
+
+  static void trackUser(bg.Location location) {
+    if (lastTracking == null || DateTime.now().difference(lastTracking).inSeconds > 300) {
+      MyFcm.getToken().then((token) {
+        try {
+          MyApi.trackUser(token, location.coords.latitude, location.coords.longitude);
+        } catch (e) {
+
+        }
+      });
+    }
+  }*/
+
+  void _setupBackgroundGeolocation() {
+    bg.BackgroundGeolocation.onLocation((bg.Location location) {
+      print('[🚘 location] - $location');
+
+      Position position = Position(
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      );
+      String msg = 'latitude: ${location.coords.latitude}, longitude: ${location.coords.longitude}';
+      //alert(context, '', msg,);
+
+      print('╔═════════════════════════════════════════════');
+      print('║ ⏰ lat: ${position.latitude}, lng: ${position.longitude}');
+      print('╠═════════════════════════════════════════════');
+
+      trackUser(location);
+
+      /*RoutePointModel.findCurrentRoute([
+        position,
+        (currentRoute) {
+          alert(
+            context,
+            '',
+            'latitude: ${location.coords.latitude}, longitude: ${location.coords.longitude}, route id: $currentRoute',
+          );
+        }
+      ]);*/
     });
 
-    /*Future.delayed(Duration.zero, () {
-      int length = context.bloc<AppBloc>().markerList.length;
-      alert(context, 'length', length.toString());
-    });*/
+    bg.BackgroundGeolocation.ready(bg.Config(
+      desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
+      distanceFilter: 0,
+      locationUpdateInterval: 300000, // 300 วินาที = 5 นาที
+      stopOnTerminate: false,
+      startOnBoot: true,
+      debug: true,
+      logLevel: bg.Config.LOG_LEVEL_VERBOSE,
+      enableHeadless: true,
+
+    )).then((bg.State state) {
+      if (!state.enabled) {
+        bg.BackgroundGeolocation.start();
+      }
+    });
   }
 
   void _showSchematicMaps() {

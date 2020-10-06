@@ -5,3 +5,10 @@ Consumer<WidgetPrefs>(
       return xxx;
    }
 )
+
+╔═════════════════════════════════════════════
+║ ⏰ OneShot event fired: TERMINATE_EVENT
+╠═════════════════════════════════════════════
+
+🔴
+🚘

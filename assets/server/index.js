@@ -189,14 +189,31 @@ app.get('/api/:item/:id?', (req, res) => {
 
     switch (req.params.item) {
       case 'user_tracking':
-        res.json({
-          error: {
-            code: CODE_SUCCESS,
-            message: 'บันทึกข้อมูลสำเร็จ',
-          },
-          data_list: null,
-        });
-        db.end();
+        const {token, lat, lng} = req.query;
+
+        db.query(
+          `INSERT INTO ulocations (device_token, ulat, ulng, ulocation, created_at) 
+                VALUES ('${token}', ${lat}, ${lng}, 0, NOW())`,
+          (error, results, fields) => {
+            if (error) {
+              res.json({
+                error: {
+                  code: CODE_FAILED,
+                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                },
+                data_list: null,
+              });
+            } else {
+              res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'บันทึกข้อมูลสำเร็จ',
+                },
+                data_list: [],
+              });
+            }
+            db.end();
+          });
         break;
 
       case 'best_route':

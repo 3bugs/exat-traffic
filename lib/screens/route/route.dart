@@ -260,8 +260,7 @@ class MyRouteState extends State<MyRoute> {
 
     // values[0]: Uint8List, values[1]: double
     List values = await getBytesFromCanvas(name, bgColor);
-    BitmapDescriptor bitmap =
-        BitmapDescriptor.fromBytes(values[0]);
+    BitmapDescriptor bitmap = BitmapDescriptor.fromBytes(values[0]);
     TextPainter painter = getLabelTextPainter(name, Colors.black);
     try {
       print('+++++++++++++++++++++++++++++++++++++++++PAINTER WIDTH: ${painter.width}');
@@ -270,26 +269,26 @@ class MyRouteState extends State<MyRoute> {
     }
 
     return Marker(
-      markerId: markerId,
-      position: latLng,
-      icon: bitmap,
-      anchor: Offset(-30 / values[1], 1),
-      onTap: () {
-        LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
-        final snackBar = SnackBar(
-          content: Text(
-            LocaleText.tapMarkerToSelect().ofLanguage(language.lang),
-            style: getTextStyle(language.lang, color: Colors.white),
-          ),
-          backgroundColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
-        );
-        Scaffold.of(context).showSnackBar(snackBar);
-      }
-      /*infoWindow: InfoWindow(
+        markerId: markerId,
+        position: latLng,
+        icon: bitmap,
+        anchor: Offset(-30 / values[1], 1),
+        onTap: () {
+          LanguageModel language = Provider.of<LanguageModel>(context, listen: false);
+          final snackBar = SnackBar(
+            content: Text(
+              LocaleText.tapMarkerToSelect().ofLanguage(language.lang),
+              style: getTextStyle(language.lang, color: Colors.white),
+            ),
+            backgroundColor: Constants.BottomSheet.DARK_BACKGROUND_COLOR,
+          );
+          Scaffold.of(context).showSnackBar(snackBar);
+        }
+        /*infoWindow: InfoWindow(
         title: name,
         snippet: routeName,
       )*/
-    );
+        );
   }
 
   TextPainter getLabelTextPainter(String text, Color bgColor) {
@@ -334,7 +333,8 @@ class MyRouteState extends State<MyRoute> {
       //Offset((width * 0.5) - painter.width * 0.5, (height * 0.5) - painter.height * 0.5),
       Offset(0.0, (height * 0.5) - painter.height * 0.5),
     );
-    final img = await pictureRecorder.endRecording().toImage(painter.width.floor(), painter.height.floor());
+    final img =
+        await pictureRecorder.endRecording().toImage(painter.width.floor(), painter.height.floor());
     final data = await img.toByteData(format: ui.ImageByteFormat.png);
 
     return [data.buffer.asUint8List(), painter.width];
@@ -644,15 +644,46 @@ class MyRouteState extends State<MyRoute> {
     context.bloc<RouteBloc>().add(CostTollSelected(selectedCostToll: selectedCostToll));
   }
 
-  Polyline createRoutePolyline(String encodedPoly) {
+  Polyline createRoutePolyline(String encodedPoly, String id, Color color) {
     final List<LatLng> latLngList = _convertToLatLngList(_decodePoly(encodedPoly));
 
     return Polyline(
-      polylineId: PolylineId('1'),
+      polylineId: PolylineId(id),
       width: 6,
       points: latLngList,
-      color: Color(0xFF747474).withOpacity(1.0),
+      color: color,
     );
+  }
+
+  List<Polyline> createRoutePolylineList(Map<String, dynamic> googleRoute) {
+    List<Polyline> polylineList = <Polyline>[];
+
+    //todo: ดักกรณี legs ไม่มีข้อมูล
+    List stepList = googleRoute['legs'][0]['steps'];
+    stepList.asMap().forEach((index, step) {
+      int distanceMeter = step['distance']['value'];
+      int durationSecond = step['duration']['value'];
+      double speedKmPerHour = (distanceMeter / 1000) / (durationSecond / 3600);
+
+      Color color;
+      if (speedKmPerHour > 70) {
+        color = Constants.BottomSheet.TRAFFIC_GREEN;
+      } else if (speedKmPerHour > 40) {
+        color = Constants.BottomSheet.TRAFFIC_ORANGE;
+      } else if (speedKmPerHour > 15) {
+        color = Constants.BottomSheet.TRAFFIC_RED;
+      } else {
+        color = Constants.BottomSheet.TRAFFIC_DARK_RED;
+      }
+
+      polylineList.add(createRoutePolyline(
+        step['polyline']['points'],
+        index.toString(),
+        color,
+      ));
+    });
+
+    return polylineList;
   }
 
   List<LatLng> _convertToLatLngList(List points) {
@@ -773,7 +804,11 @@ class MyRouteState extends State<MyRoute> {
           final Set<Polyline> polyLineSet = <Polyline>{};
           Polyline polyline;
           if (googleRoute != null) {
-            polyline = createRoutePolyline(googleRoute['overview_polyline']['points']);
+            polyline = createRoutePolyline(
+              googleRoute['overview_polyline']['points'],
+              '1',
+              Color(0xFF747474).withOpacity(1.0),
+            );
             polyLineSet.add(polyline);
           }
 
@@ -873,7 +908,10 @@ class MyRouteState extends State<MyRoute> {
             _stopLocationTracking(); // STOP NAVIGATION
 
             Polyline polyline = createRoutePolyline(
-                state.bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points']);
+              state.bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']['points'],
+              '1',
+              Color(0xFF747474).withOpacity(1.0),
+            );
 
             new Future.delayed(Duration(milliseconds: 1000), () async {
               final GoogleMapController controller = await _googleMapController.future;
@@ -966,10 +1004,14 @@ class MyRouteState extends State<MyRoute> {
                   }*/
 
                   final Set<Polyline> polyLineSet = <Polyline>{};
-                  Polyline polyline;
+                  //Polyline polyline;
                   if (googleRoute != null) {
-                    polyline = createRoutePolyline(googleRoute['overview_polyline']['points']);
-                    polyLineSet.add(polyline);
+                    /*polyline = createRoutePolyline(
+                      googleRoute['overview_polyline']['points'],
+                      Color(0xFF747474).withOpacity(1.0),
+                    );*/
+                    polyLineSet.addAll(createRoutePolylineList(googleRoute));
+                    //polyLineSet.add(polyline);
                   }
 
                   Set<Marker> currentLocationSet = Set();
@@ -983,9 +1025,14 @@ class MyRouteState extends State<MyRoute> {
                   Set<Marker> searchRouteMarkerSet = Set();
                   if (state is ShowSearchResultRouteState) {
                     searchRouteMarkerSet.addAll(_createSearchRouteMarkers(state.bestRoute));
-                    polyline = createRoutePolyline(state.bestRoute.gateInCostTollList[0]
-                        .googleRoute['overview_polyline']['points']);
-                    polyLineSet.add(polyline);
+                    /*polyline = createRoutePolyline(
+                      state.bestRoute.gateInCostTollList[0].googleRoute['overview_polyline']
+                          ['points'],
+                      Color(0xFF747474).withOpacity(1.0),
+                    );
+                    polyLineSet.add(polyline);*/
+                    polyLineSet.addAll(
+                        createRoutePolylineList(state.bestRoute.gateInCostTollList[0].googleRoute));
                   }
 
                   return FutureBuilder(

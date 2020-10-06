@@ -42,6 +42,10 @@ class BottomSheet {
     TAB_STRIP_COLOR_3,
     TAB_STRIP_COLOR_4,
   ];
+  static const Color TRAFFIC_GREEN = Color(0xFF22B573);
+  static const Color TRAFFIC_ORANGE = Color(0xFFF7882C);
+  static const Color TRAFFIC_RED = Color(0xFFEB222C);
+  static const Color TRAFFIC_DARK_RED = Color(0xFF790A11);
 }
 
 class HomeScreen {

@@ -10,16 +10,24 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
-        tools:replace="android:label"
         android:name=".Application"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="EXAT Traffic"
-        android:usesCleartextTraffic="true">
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:label">
 
-        <service android:name="com.transistorsoft.locationmanager.service.TrackingService" android:foregroundServiceType="location" />
-        <service android:name="com.transistorsoft.locationmanager.service.LocationRequestService" android:foregroundServiceType="location" />
+        <meta-data
+            android:name="com.transistorsoft.locationmanager.license"
+            android:value="db5fe94eba6ead43d85b958d0e9f37dd4de69ed70463243b30f3a708a9e7ad83" />
+        <service
+            android:name="com.transistorsoft.locationmanager.service.TrackingService"
+            android:foregroundServiceType="location" />
+        <service
+            android:name="com.transistorsoft.locationmanager.service.LocationRequestService"
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".MainActivity"
