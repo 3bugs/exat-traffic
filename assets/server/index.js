@@ -188,7 +188,7 @@ app.get('/api/:item/:id?', (req, res) => {
     });*/
 
     switch (req.params.item) {
-      case 'food':
+      case 'foods':
         res.json({
           error: {
             code: CODE_SUCCESS,
