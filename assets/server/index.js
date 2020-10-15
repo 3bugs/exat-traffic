@@ -188,6 +188,61 @@ app.get('/api/:item/:id?', (req, res) => {
     });*/
 
     switch (req.params.item) {
+      case 'food':
+        res.json({
+          error: {
+            code: CODE_SUCCESS,
+            message: 'ok',
+          },
+          data_list: [
+            {
+              name: 'ข้าวไข่เจียว',
+              price: 25,
+              image: 'http://163.47.9.26/food-images/kao_kai_jeaw.jpg',
+            },
+            {
+              name: 'ข้าวหมูแดง',
+              price: 30,
+              image: 'http://163.47.9.26/food-images/kao_moo_dang.jpg',
+            },
+            {
+              name: 'ข้าวมันไก่',
+              price: 30,
+              image: 'http://163.47.9.26/food-images/kao_mun_kai.jpg',
+            },
+            {
+              name: 'ข้าวหน้าเป็ด',
+              price: 40,
+              image: 'http://163.47.9.26/food-images/kao_na_ped.jpg',
+            },
+            {
+              name: 'ข้าวผัด',
+              price: 30,
+              image: 'http://163.47.9.26/food-images/kao_pad.jpg',
+            },
+            {
+              name: 'ผัดซีอิ๊ว',
+              price: 30,
+              image: 'http://163.47.9.26/food-images/pad_sie_eew.jpg',
+            },
+            {
+              name: 'ผัดไทย',
+              price: 35,
+              image: 'http://163.47.9.26/food-images/pad_thai.jpg',
+            },
+            {
+              name: 'ราดหน้า',
+              price: 30,
+              image: 'http://163.47.9.26/food-images/rad_na.jpg',
+            },
+            {
+              name: 'ส้มตำไก่ย่าง',
+              price: 50,
+              image: 'http://163.47.9.26/food-images/som_tum_kai_yang.jpg',
+            },
+          ],
+        });
+        break;
       case 'user_tracking':
         const {token, lat, lng} = req.query;
 
