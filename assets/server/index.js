@@ -237,7 +237,7 @@ app.get('/api/:item/:id?', (req, res) => {
             },
             {
               name: 'ส้มตำไก่ย่าง',
-              price: 50,
+              price: 80,
               image: 'http://163.47.9.26/food-images/som_tum_kai_yang.jpg',
             },
           ],
