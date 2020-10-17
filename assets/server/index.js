@@ -196,46 +196,55 @@ app.get('/api/:item/:id?', (req, res) => {
           },
           data_list: [
             {
+              id: 1,
               name: 'ข้าวไข่เจียว',
               price: 25,
               image: 'http://163.47.9.26/food-images/kao_kai_jeaw.jpg',
             },
             {
+              id: 2,
               name: 'ข้าวหมูแดง',
               price: 30,
               image: 'http://163.47.9.26/food-images/kao_moo_dang.jpg',
             },
             {
+              id: 3,
               name: 'ข้าวมันไก่',
               price: 30,
               image: 'http://163.47.9.26/food-images/kao_mun_kai.jpg',
             },
             {
+              id: 4,
               name: 'ข้าวหน้าเป็ด',
               price: 40,
               image: 'http://163.47.9.26/food-images/kao_na_ped.jpg',
             },
             {
+              id: 5,
               name: 'ข้าวผัด',
               price: 30,
               image: 'http://163.47.9.26/food-images/kao_pad.jpg',
             },
             {
+              id: 6,
               name: 'ผัดซีอิ๊ว',
               price: 30,
               image: 'http://163.47.9.26/food-images/pad_sie_eew.jpg',
             },
             {
+              id: 7,
               name: 'ผัดไทย',
               price: 35,
               image: 'http://163.47.9.26/food-images/pad_thai.jpg',
             },
             {
+              id: 8,
               name: 'ราดหน้า',
               price: 30,
               image: 'http://163.47.9.26/food-images/rad_na.jpg',
             },
             {
+              id: 9,
               name: 'ส้มตำไก่ย่าง',
               price: 80,
               image: 'http://163.47.9.26/food-images/som_tum_kai_yang.jpg',
