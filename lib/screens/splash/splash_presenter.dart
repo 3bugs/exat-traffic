@@ -68,7 +68,7 @@ class SplashPresenter extends BasePresenter<SplashMain> {
   }
 
   void fetchServerIp() async {
-    setState(() {
+    /*setState(() {
       errorView = null;
       loadingMessage = "Fetching server's IP address";
     });
@@ -77,7 +77,7 @@ class SplashPresenter extends BasePresenter<SplashMain> {
       Constants.Api.SERVER = await MyApi.fetchServerIp();
     } catch (_) {
       Constants.Api.SERVER = "http://202.94.76.78";
-    }
+    }*/
     checkUserConsent();
   }
 

@@ -91,7 +91,7 @@ class Font {
 
 class Api {
   //static const String SERVER = "http://163.47.9.26";
-  static String SERVER = "http://202.94.76.78";
+  static String SERVER = "https://etf.exat.co.th";
 }
 
 class SchematicMapsScreen {
