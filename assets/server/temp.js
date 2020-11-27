@@ -165,13 +165,13 @@ app.get('/server_ip', (req, res) => {
 });
 
 app.get('/api/:item/:id?', (req, res) => {
-    const db = mysql.createConnection({
+    /*const db = mysql.createConnection({
       host: 'localhost',
       user: 'root',
       password: 'Exf@2020ch5U$m#2kh&Mc[XY',
       database: 'itsexat2020'
     });
-    db.connect();
+    db.connect();*/
 
     switch (req.params.item) {
       case 'foods':
@@ -236,150 +236,6 @@ app.get('/api/:item/:id?', (req, res) => {
               image: 'http://165.227.94.69:8000/som_tum_kai_yang.jpg',
             },
           ],
-        });
-        break;
-      case 'user_tracking':
-        const {token, lat, lng} = req.query;
-
-        db.query(
-          `INSERT INTO ulocations (device_token, ulat, ulng, ulocation, created_at) 
-                VALUES ('${token}', ${lat}, ${lng}, 0, NOW())`,
-          (error, results, fields) => {
-            if (error) {
-              res.json({
-                error: {
-                  code: CODE_FAILED,
-                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                },
-                data_list: null,
-              });
-            } else {
-              res.json({
-                error: {
-                  code: CODE_SUCCESS,
-                  message: 'บันทึกข้อมูลสำเร็จ',
-                },
-                data_list: [],
-              });
-            }
-            db.end();
-          });
-        break;
-
-      case 'best_route':
-        const {origin, destination} = req.query;
-        const originPart = origin.split(',');
-        const originLatLng = {lat: originPart[0], lng: originPart[1]};
-        const destinationPart = destination.split(',');
-        const destinationLatLng = {lat: destinationPart[0], lng: destinationPart[1]};
-
-        const dataList = [];
-        getGateInList(db, req.params.id, (success, data) => {
-          if (!success) {
-            res.json({
-              error: {
-                code: CODE_FAILED,
-                message: data,
-              },
-              data_list: null,
-            });
-            db.end();
-          } else {
-            const gateInList = data;
-            gateInList.forEach(gateIn => {
-              gateIn.distanceMeters = getDistance(gateIn.lat, gateIn.lng, originLatLng.lat, originLatLng.lng);
-            });
-            const sortedGateInList = gateInList.sort((gateIn1, gateIn2) => {
-              return gateIn1.distanceMeters - gateIn2.distanceMeters;
-              /*return getDistance(gateIn1.lat, gateIn1.lng, originLatLng.lat, originLatLng.lng)
-                - getDistance(gateIn2.lat, gateIn2.lng, originLatLng.lat, originLatLng.lng);*/
-            });
-
-            const NUM_GATE_IN_TO_USE = 3;
-            let numGateIn = 0;
-            for (let i = 0; i < NUM_GATE_IN_TO_USE; i++) {
-              const gateIn = sortedGateInList[i];
-
-              getCostTollListByGateIn(db, gateIn.gate_in_id, (success, data) => {
-                if (success) {
-                  const costTollList = data;
-                  costTollList.forEach(costToll => {
-                    costToll.distanceMeters = getDistance(costToll.lat, costToll.lng, destinationLatLng.lat, destinationLatLng.lng);
-                  });
-                  const sortedCostTollList = costTollList.sort((costToll1, costToll2) => {
-                    return costToll1.distanceMeters - costToll2.distanceMeters;
-                    /*return getDistance(costToll1.lat, costToll1.lng, destinationLatLng.lat, destinationLatLng.lng)
-                      - getDistance(costToll2.lat, costToll2.lng, destinationLatLng.lat, destinationLatLng.lng);*/
-                  });
-
-                  const gateInDestinationDistance = getDistance(gateIn.lat, gateIn.lng, destinationLatLng.lat, destinationLatLng.lng);
-                  if ((sortedCostTollList[0].distanceMeters < gateInDestinationDistance)
-                    && (sortedCostTollList[1].distanceMeters < gateInDestinationDistance)) {
-                    dataList.push({gate_in: gateIn, cost_toll: sortedCostTollList[0]});
-                    dataList.push({gate_in: gateIn, cost_toll: sortedCostTollList[1]});
-                  }
-                }
-
-                numGateIn++;
-                if (numGateIn === NUM_GATE_IN_TO_USE) {
-                  res.json({
-                    error: {
-                      code: CODE_SUCCESS,
-                      message: 'ok',
-                    },
-                    data_list: dataList,
-                  });
-                  db.end();
-                }
-              });
-            }
-          }
-        });
-        break;
-
-      case 'gate_in':
-        getGateInList(db, req.params.id, (success, data) => {
-          if (success) {
-            res.json({
-              error: {
-                code: CODE_SUCCESS,
-                message: 'ok',
-              },
-              data_list: data,
-            });
-          } else {
-            res.json({
-              error: {
-                code: CODE_FAILED,
-                message: data,
-              },
-              data_list: null,
-            });
-          }
-          db.end();
-        });
-        break;
-
-      case 'cost_toll_by_gate_in':
-        getCostTollListByGateIn(db, req.params.id, (success, data) => {
-          if (success) {
-            res.json({
-              error: {
-                code: CODE_SUCCESS,
-                message: 'ok',
-              },
-              data_list: data,
-            });
-          } else {
-            res.json({
-              error: {
-                code: CODE_FAILED,
-                message: data,
-              },
-              data_list: null,
-            });
-          }
-          db.end();
         });
         break;
     }
