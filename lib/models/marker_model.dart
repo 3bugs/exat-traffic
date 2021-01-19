@@ -1,3 +1,4 @@
+import 'package:exattraffic/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -176,8 +177,12 @@ class MarkerModel {
     assert(this.category != null);
     if (this.category == null) return;
 
+    String categoryTypeText;
+
     switch (this.category.code) {
       case CategoryType.CCTV:
+        categoryTypeText = 'cctv';
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -195,6 +200,8 @@ class MarkerModel {
         });
         break;
       case CategoryType.REST_AREA:
+        categoryTypeText = 'rest_area';
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -231,6 +238,8 @@ class MarkerModel {
         );
         break;
       case CategoryType.POLICE_STATION:
+        categoryTypeText = 'police_station';
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -243,6 +252,8 @@ class MarkerModel {
         );
         break;
       case CategoryType.U_TURN:
+        categoryTypeText = 'u_turn';
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -254,10 +265,18 @@ class MarkerModel {
         );
         break;
       case CategoryType.TOLL_PLAZA:
+        categoryTypeText = 'toll_plaza';
+
         //context.bloc<HomeBloc>().add(ClickTollPlaza(marker: this));
         BlocProvider.of<MarkerBloc>(context).add(ClickTollPlaza(marker: this));
         break;
     }
+
+    print('╔═════════════════════════════════════════════');
+    print('║ Marker: $categoryTypeText - ${this.name}');
+    print('╠═════════════════════════════════════════════');
+
+    MyApi.usageLog(context, categoryTypeText, this.name);
   }
 
   @override

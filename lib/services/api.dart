@@ -54,6 +54,7 @@ class MyApi {
   static String MY_API_BASED_URL = "${Constants.Api.SERVER}/api";
   static String FETCH_TRAFFIC_DATA_URL = "$MY_API_BASED_URL/route_traffic";
   static String TRACK_USER = "$MY_API_BASED_URL/user_tracking";
+  static String USAGE_LOG = "$MY_API_BASED_URL/usage_log";
   static String FETCH_GATE_IN_URL = "$MY_API_BASED_URL/gate_in";
   static String FETCH_COST_TOLL_BY_GATE_IN_URL = "$MY_API_BASED_URL/cost_toll_by_gate_in";
   static String FIND_BEST_ROUTE_URL = "$MY_API_BASED_URL/best_route";
@@ -85,12 +86,11 @@ class MyApi {
     }
   }
 
-  static Future<bool> trackUser(
-      String token,
+  static Future<bool> trackUser(String token,
       double latitude,
-      double longitude,
-      ) async {
-    ResponseResult responseResult = await _makeRequest('$TRACK_USER?token=$token&lat=$latitude&lng=$longitude');
+      double longitude,) async {
+    ResponseResult responseResult = await _makeRequest(
+        '$TRACK_USER?token=$token&lat=$latitude&lng=$longitude');
     if (responseResult.success) {
       return true;
     } else {
@@ -98,15 +98,51 @@ class MyApi {
     }
   }
 
-  static Future<List<GateInModel>> fetchGateIn(
-    List<MarkerModel> markerList,
-    String langCode,
-  ) async {
+  static Future<bool> usageLog(BuildContext context, String pageName, String pageData) async {
+    Position currentLocation;
+    if (!_userDenyLocation) {
+      try {
+        currentLocation = await _getCurrentLocationForApi();
+      } catch (e) {
+        print(e);
+        // user ไม่อนุญาต location, จำค่าไว้ จะได้ไม่ต้องถาม user อีก
+        _userDenyLocation = true;
+      }
+    }
+
+    Map<String, dynamic> data = {
+      "deviceToken": await FirebaseMessaging().getToken(),
+      "deviceType": Platform.isAndroid ? "android" : "ios",
+      "screenWidth": MediaQuery
+          .of(context)
+          .size
+          .width,
+      "screenHeight": MediaQuery
+          .of(context)
+          .size
+          .height,
+      "lat": currentLocation != null ? currentLocation.latitude : null,
+      "lng": currentLocation != null ? currentLocation.longitude : null,
+      "page": pageName,
+      "data": pageData,
+    };
+
+    ResponseResult responseResult = await _makePostRequest(USAGE_LOG, data);
+    if (responseResult.success) {
+      return true;
+    } else {
+      //throw Exception(responseResult.data);
+      return false;
+    }
+  }
+
+  static Future<List<GateInModel>> fetchGateIn(List<MarkerModel> markerList,
+      String langCode,) async {
     ResponseResult responseResult = await _makeRequest('$FETCH_GATE_IN_URL?language=$langCode');
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<GateInModel> gateInList =
-          dataList.map((gateInJson) => GateInModel.fromJson(gateInJson, markerList)).toList();
+      dataList.map((gateInJson) => GateInModel.fromJson(gateInJson, markerList)).toList();
       print('Number of Gate In : ${gateInList.length}');
 
       return gateInList;
@@ -115,23 +151,22 @@ class MyApi {
     }
   }
 
-  static Future<List<CostTollModel>> fetchCostTollByGateIn(
-    GateInModel gateIn,
-    List<MarkerModel> markerList,
-    String langCode,
-  ) async {
+  static Future<List<CostTollModel>> fetchCostTollByGateIn(GateInModel gateIn,
+      List<MarkerModel> markerList,
+      String langCode,) async {
     ResponseResult responseResult = await _makeRequest(
       '$FETCH_COST_TOLL_BY_GATE_IN_URL/${gateIn.id}?language=$langCode',
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
       List<CostTollModel> costTollList =
-          dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson, markerList)).toList();
+      dataList.map((costTollJson) => CostTollModel.fromJson(costTollJson, markerList)).toList();
 
       print('Number of Cost Toll : ${costTollList.length}');
       costTollList.forEach((costToll) {
         print(
-            'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList.length}');
+            'Cost Toll name: ${costToll.name}, Part Toll count: ${costToll.partTollMarkerList
+                .length}');
         costToll.partTollMarkerList
             .map((partTollMarker) => print('--- ${partTollMarker.name}'))
             .toList();
@@ -143,13 +178,12 @@ class MyApi {
     }
   }
 
-  static Future<List<GateInCostTollModel>> findRoute(
-    Position origin,
-    Position destination,
-    List<MarkerModel> markerList,
-  ) async {
+  static Future<List<GateInCostTollModel>> findRoute(Position origin,
+      Position destination,
+      List<MarkerModel> markerList,) async {
     ResponseResult responseResult = await _makeRequest(
-      '$FIND_BEST_ROUTE_URL?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}',
+      '$FIND_BEST_ROUTE_URL?origin=${origin.latitude},${origin.longitude}&destination=${destination
+          .latitude},${destination.longitude}',
     );
     if (responseResult.success) {
       List dataList = responseResult.data;
@@ -167,7 +201,7 @@ class MyApi {
     }
   }
 
-  static Future<ResponseResult> _makeRequest(url) async {
+  static Future<ResponseResult> _makeRequest(String url) async {
     final response = await http.get(url);
 
     print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -193,7 +227,46 @@ class MyApi {
       return ResponseResult(success: false, data: msg);
     }
   }
+
+  static Future<ResponseResult> _makePostRequest(String url, Map<String, dynamic> paramMap,) async {
+    Map data = {};
+    data.addAll(paramMap);
+    final body = json.encode(data);
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    );
+
+    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    print("API: POST $url");
+    print("API Response Status Code: ${response.statusCode}");
+    print("API Response Body: ${response.body}");
+    print("-------------------------------------------------------");
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseBodyJson = json.decode(response.body);
+      ErrorModel error = ErrorModel.fromJson(responseBodyJson['error']);
+
+      if (error.code == 0) {
+        List dataList = responseBodyJson['data_list'];
+        return ResponseResult(success: true, data: dataList);
+      } else {
+        print(error.message);
+        return ResponseResult(success: false, data: error.message);
+      }
+    } else {
+      String msg = "เกิดข้อผิดพลาดในการเชื่อมต่อ Server";
+      print(msg);
+      return ResponseResult(success: false, data: msg);
+    }
+  }
 }
+
+bool _userDenyLocation = false;
 
 class GateInCostTollModel {
   final GateInModel gateIn;
@@ -214,7 +287,8 @@ class GateInCostTollModel {
     return "++++++++++++++++++++\n[Gate In] - " +
         "name: ${gateIn.name}, latitude: ${gateIn.latitude}, longitude: ${gateIn.longitude}\n" +
         "[Cost Toll] - " +
-        "name: ${costToll.name}, latitude: ${costToll.latitude}, longitude: ${costToll.longitude}\n" +
+        "name: ${costToll.name}, latitude: ${costToll.latitude}, longitude: ${costToll
+            .longitude}\n" +
         "[directions] - ${googleRoute.toString()}\n--------------------\n\n";
   }
 }
@@ -258,17 +332,17 @@ class ExatApi {
       if (responseResult.data is List) {
         return responseResult.data;
       } else {
-        return new List()..add(responseResult.data);
+        return new List()
+          ..add(responseResult.data);
       }
     } else {
       throw Exception(responseResult.data);
     }
   }
 
-  static Future<List<ExpressWayModel>> fetchExpressWays(
-    BuildContext context,
-    List<MarkerModel> markerList, // เอามา map point id กับ cctv
-  ) async {
+  static Future<List<ExpressWayModel>> fetchExpressWays(BuildContext context,
+      List<MarkerModel> markerList, // เอามา map point id กับ cctv
+      ) async {
     if (_expressWayList != null) {
       return Future.value(_expressWayList);
     }
@@ -306,7 +380,7 @@ class ExatApi {
     if (responseResult.success) {
       List dataList = responseResult.data ?? List();
       List<EmergencyNumberModel> emergencyNumberList =
-          dataList.map((markerJson) => EmergencyNumberModel.fromJson(markerJson)).toList();
+      dataList.map((markerJson) => EmergencyNumberModel.fromJson(markerJson)).toList();
 
       return emergencyNumberList;
     } else {
@@ -325,7 +399,7 @@ class ExatApi {
     if (responseResult.success) {
       List dataList = responseResult.data ?? List();
       List<MarkerModel> markerList =
-          dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
+      dataList.map((markerJson) => MarkerModel.fromJson(markerJson)).toList();
 
       print('***** MARKER COUNT: ${markerList.length}');
       /*markerList.forEach((marker) {
@@ -354,7 +428,7 @@ class ExatApi {
       //List filteredDataList = dataList.where((markerJson) => markerJson['status'] == 1).toList();
 
       List<CategoryModel> categoryList =
-          dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
+      dataList.map((markerJson) => CategoryModel.fromJson(markerJson)).toList();
 
       print('***** CATEGORY COUNT: ${categoryList.length}');
       /*categoryList.forEach((category) {
@@ -573,20 +647,20 @@ class ExatApi {
     }
   }
 
-  static bool _userDenyLocation = false;
+  //static bool _userDenyLocation = false;
 
-  static Future<ResponseResult> _makeRequest(
-    BuildContext context,
-    String url,
-    Map<String, dynamic> paramMap, {
-    bool sendLocation = true,
-  }) async {
+  static Future<ResponseResult> _makeRequest(BuildContext context,
+      String url,
+      Map<String, dynamic> paramMap, {
+        bool sendLocation = true,
+      }) async {
     Position currentLocation;
     if (!_userDenyLocation) {
       try {
         currentLocation = sendLocation ? await _getCurrentLocationForApi() : null;
       } catch (e) {
         print(e);
+        // user ไม่อนุญาต location, จำค่าไว้ จะได้ไม่ต้องถาม user อีก
         _userDenyLocation = true;
       }
     }
@@ -594,9 +668,17 @@ class ExatApi {
     Map data = {
       "deviceToken": await FirebaseMessaging().getToken(),
       "deviceType": Platform.isAndroid ? "android" : "ios",
-      "screenWidth": MediaQuery.of(context).size.width,
-      "screenHeight": MediaQuery.of(context).size.height,
-      "lang": Provider.of<LanguageModel>(context, listen: false).langCode,
+      "screenWidth": MediaQuery
+          .of(context)
+          .size
+          .width,
+      "screenHeight": MediaQuery
+          .of(context)
+          .size
+          .height,
+      "lang": Provider
+          .of<LanguageModel>(context, listen: false)
+          .langCode,
       "lat": currentLocation != null ? currentLocation.latitude : null,
       "lng": currentLocation != null ? currentLocation.longitude : null,
       "altitude": currentLocation != null ? currentLocation.altitude : null,
@@ -605,7 +687,9 @@ class ExatApi {
     data.addAll(paramMap);
     final body = json.encode(data);
 
-    int beginTime = DateTime.now().millisecondsSinceEpoch;
+    int beginTime = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     final response = await http.post(
       url,
       headers: {
@@ -614,7 +698,9 @@ class ExatApi {
       },
       body: body,
     );
-    int endTime = DateTime.now().millisecondsSinceEpoch;
+    int endTime = DateTime
+        .now()
+        .millisecondsSinceEpoch;
 
     print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     print("Duration: ${((endTime - beginTime) / 1000).toStringAsFixed(1)} วินาที");

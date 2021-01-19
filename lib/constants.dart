@@ -1,6 +1,7 @@
 library constants;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class App {
   static const String NAME = "EXAT Traffic";
@@ -91,7 +92,7 @@ class Font {
 
 class Api {
   //static const String SERVER = "http://163.47.9.26";
-  static String SERVER = "https://etf.exat.co.th";
+  static String SERVER = kReleaseMode ? "http://etf.exat.co.th" : "http://163.47.9.26";
 }
 
 class SchematicMapsScreen {

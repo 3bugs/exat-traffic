@@ -17,6 +17,8 @@ const CODE_SUCCESS = 0;
 const routeIdList = [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 app.use(express.static('./'));
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
 
 // Add headers
 app.use(function (req, res, next) {
@@ -252,6 +254,33 @@ app.get('/api/:item/:id?', (req, res) => {
           ],
         });
         break;
+
+      case 'usage_log':
+        db.query(
+          `INSERT INTO urequest (utoken, ulat, ulng, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
+                VALUES ('${token}', ${lat}, ${lng}, 0, NOW())`,
+          (error, results, fields) => {
+            if (error) {
+              res.json({
+                error: {
+                  code: CODE_FAILED,
+                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                },
+                data_list: null,
+              });
+            } else {
+              res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'บันทึกข้อมูลสำเร็จ',
+                },
+                data_list: [],
+              });
+            }
+            db.end();
+          });
+        break;
+
       case 'user_tracking':
         const {token, lat, lng} = req.query;
 
@@ -399,6 +428,46 @@ app.get('/api/:item/:id?', (req, res) => {
     }
   }
 );
+
+app.post('/api/:item/:id?', (req, res) => {
+  const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Exf@2020ch5U$m#2kh&Mc[XY',
+    database: 'itsexat2020'
+  });
+  db.connect();
+
+  switch (req.params.item) {
+    case 'usage_log':
+      const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
+
+      db.query(
+        `INSERT INTO urequest (utoken, ulat, ulng, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
+                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', 'name', '${data}', null, '${deviceType}', ${screenWidth}, ${screenHeight})`,
+        (error, results, fields) => {
+          if (error) {
+            res.json({
+              error: {
+                code: CODE_FAILED,
+                message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+              },
+              data_list: null,
+            });
+          } else {
+            res.json({
+              error: {
+                code: CODE_SUCCESS,
+                message: 'บันทึกข้อมูลสำเร็จ',
+              },
+              data_list: [],
+            });
+          }
+          db.end();
+        });
+      break;
+  }
+});
 
 new cronJob("*/5 * * * *", function () {
   console.log('CRON JOB RUN: ' + new Date());
