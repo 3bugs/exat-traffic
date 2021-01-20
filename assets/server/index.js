@@ -416,14 +416,14 @@ app.post('/api/:item/:id?', (req, res) => {
     case 'usage_log':
       const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
 
-      res.json({
+      /*res.json({
         error: {
           code: CODE_FAILED,
           message: `+++ TOKEN: ${deviceToken}, LAT: ${lat}, LNG: ${lng} +++`,
         },
         data_list: null,
       });
-      db.end();
+      db.end();*/
 
 
       db.query(
