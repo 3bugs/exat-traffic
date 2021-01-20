@@ -415,16 +415,7 @@ app.post('/api/:item/:id?', (req, res) => {
   switch (req.params.item) {
     case 'usage_log':
       const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
-
-      /*res.json({
-        error: {
-          code: CODE_FAILED,
-          message: `+++ TOKEN: ${deviceToken}, LAT: ${lat}, LNG: ${lng} +++`,
-        },
-        data_list: null,
-      });
-      db.end();*/
-
+      io.emit('location', {lat, lng, type: 'inuse'});
 
       db.query(
         `INSERT INTO urequest (utoken, ulat, ulong, udatetime, upagerequest, upostkey, userip, devicetype, screenWidth, screenHeight) 
