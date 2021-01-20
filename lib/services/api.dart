@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:io' show Platform;
 import 'dart:convert';
@@ -310,7 +311,7 @@ class RouteModel {
 }
 
 class ExatApi {
-  static String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:8089';
+  static String EXAT_API_BASED_URL = '${Constants.Api.SERVER}:${kReleaseMode ? "8089" : "8081"}';
 
   static List<ExpressWayModel> _expressWayList;
 

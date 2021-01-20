@@ -255,32 +255,6 @@ app.get('/api/:item/:id?', (req, res) => {
         });
         break;
 
-      case 'usage_log':
-        db.query(
-          `INSERT INTO urequest (utoken, ulat, ulng, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
-                VALUES ('${token}', ${lat}, ${lng}, 0, NOW())`,
-          (error, results, fields) => {
-            if (error) {
-              res.json({
-                error: {
-                  code: CODE_FAILED,
-                  message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
-                },
-                data_list: null,
-              });
-            } else {
-              res.json({
-                error: {
-                  code: CODE_SUCCESS,
-                  message: 'บันทึกข้อมูลสำเร็จ',
-                },
-                data_list: [],
-              });
-            }
-            db.end();
-          });
-        break;
-
       case 'user_tracking':
         const {token, lat, lng} = req.query;
 
@@ -442,6 +416,16 @@ app.post('/api/:item/:id?', (req, res) => {
     case 'usage_log':
       const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
 
+      res.json({
+        error: {
+          code: CODE_FAILED,
+          message: `+++ TOKEN: ${deviceToken}, LAT: ${lat}, LNG: ${lng} +++`,
+        },
+        data_list: null,
+      });
+      db.end();
+
+
       db.query(
         `INSERT INTO urequest (utoken, ulat, ulng, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
                 VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', 'name', '${data}', null, '${deviceType}', ${screenWidth}, ${screenHeight})`,
@@ -450,7 +434,7 @@ app.post('/api/:item/:id?', (req, res) => {
             res.json({
               error: {
                 code: CODE_FAILED,
-                message: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
               },
               data_list: null,
             });
