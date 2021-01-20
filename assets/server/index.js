@@ -434,7 +434,7 @@ app.post('/api/:item/:id?', (req, res) => {
             res.json({
               error: {
                 code: CODE_FAILED,
-                message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล',
+                message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error,
               },
               data_list: null,
             });
