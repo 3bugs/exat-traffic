@@ -417,14 +417,14 @@ app.post('/api/:item/:id?', (req, res) => {
       const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
       io.emit('location', {lat, lng, type: 'inuse'});
 
-      var ip = req.headers['x-forwarded-for'] ||
+      const ip = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         (req.connection.socket ? req.connection.socket.remoteAddress : null);
 
       db.query(
         `INSERT INTO urequest (utoken, ulat, ulong, udatetime, upagerequest, upostkey, userip, devicetype, screenWidth, screenHeight) 
-                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', '${data}', ${ip}, '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
+                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', '${data}', '${ip}', '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
         (error, results, fields) => {
           if (error) {
             res.json({
