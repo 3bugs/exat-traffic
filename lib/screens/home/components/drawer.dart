@@ -15,6 +15,7 @@ import 'package:exattraffic/screens/settings/settings.dart';
 import 'package:exattraffic/etc/utils.dart';
 import 'package:exattraffic/models/language_model.dart';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/services/api.dart';
 
 class MyDrawer extends StatelessWidget {
   // ignore: non_constant_identifier_names
@@ -22,11 +23,22 @@ class MyDrawer extends StatelessWidget {
 
   MyDrawer();
 
+  static void usageLog(BuildContext context, String menuName) {
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_drawer_menu',
+      pageKey: menuName,
+      pageData: null,
+    );
+  }
+
   final List<DrawerItemModel> _drawerItemList = [
     DrawerItemModel(
       text: LocaleText.aboutUs(),
       icon: AssetImage('assets/images/drawer/ic_about_us.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "about");
+
         // ปิด drawer
         Navigator.pop(context);
         // เปิดหน้า About Us
@@ -42,6 +54,8 @@ class MyDrawer extends StatelessWidget {
       text: LocaleText.questionnaire(),
       icon: AssetImage('assets/images/drawer/ic_questionnaire.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "questionnaire");
+
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -55,6 +69,8 @@ class MyDrawer extends StatelessWidget {
       text: LocaleText.help(),
       icon: AssetImage('assets/images/drawer/ic_help.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "help");
+
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -68,6 +84,8 @@ class MyDrawer extends StatelessWidget {
       text: LocaleText.faq(),
       icon: AssetImage('assets/images/drawer/ic_faq.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "faq");
+
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -81,6 +99,8 @@ class MyDrawer extends StatelessWidget {
       text: LocaleText.widget(),
       icon: AssetImage('assets/images/drawer/ic_widget.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "widget");
+
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -94,6 +114,8 @@ class MyDrawer extends StatelessWidget {
       text: LocaleText.settings(),
       icon: AssetImage('assets/images/drawer/ic_settings.png'),
       onClick: (BuildContext context) {
+        usageLog(context, "settings");
+
         Navigator.pop(context);
         Navigator.push(
           context,

@@ -86,6 +86,13 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         });
       } catch (error) {}
       loaded();
+
+      MyApi.usageLog(
+        context: context,
+        pageName: 'ui_search',
+        pageKey: 'keyword',
+        pageData: searchTerm,
+      );
     } else {
       // user เลือก prediction
       loading();
@@ -109,6 +116,13 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
         alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
       }
       loaded();
+
+      MyApi.usageLog(
+        context: context,
+        pageName: 'ui_search',
+        pageKey: 'click_prediction',
+        pageData: prediction.description,
+      );
 
       /*alert(context, "Place Details",
           "name: ${placeDetails.name}\nformatted address: ${placeDetails.formattedAddress}\nlatitude: ${placeDetails.latitude}\nlongitude: ${placeDetails.longitude}");*/
@@ -137,5 +151,12 @@ class SearchPlacePresenter extends BasePresenter<SearchPlace> {
       alert(context, '', LocaleText.errorPleaseTryAgain().ofLanguage(language.lang));
     }
     loaded();
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_search',
+      pageKey: 'click_search_result',
+      pageData: searchResult.placeDetails.name,
+    );
   }
 }

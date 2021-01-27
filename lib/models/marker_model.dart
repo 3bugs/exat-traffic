@@ -295,7 +295,7 @@ class MarkerModel {
 
     MyApi.usageLog(
       context: context,
-      pageName: 'map_marker',
+      pageName: 'ui_map_marker',
       pageKey: categoryTypeText,
       pageData: this.name,
     );

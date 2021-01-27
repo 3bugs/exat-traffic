@@ -248,7 +248,7 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     }
     MyApi.usageLog(
       context: context,
-      pageName: 'bottom_tab',
+      pageName: 'ui_bottom_tab',
       pageKey: tabName,
       pageData: null,
     );
@@ -289,14 +289,17 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
       _showSearchOptions = false;
     });
 
+    String searchType = '';
     switch (index) {
       case 0:
+        searchType = 'search_service';
         destination = SearchService(
           categoryList: context.bloc<AppBloc>().categoryList,
           markerList: context.bloc<AppBloc>().markerList,
         );
         break;
       case 1:
+        searchType = 'search_place';
         destination = SearchPlace();
         break;
     }
@@ -312,6 +315,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
         showBestRouteAfterSearch(bestRoute);
       }
     });
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_menu_search',
+      pageKey: searchType,
+      pageData: null,
+    );
   }
 
   void showBestRouteAfterSearch(RouteModel bestRoute) {
@@ -421,6 +431,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
                             image: AssetImage('assets/images/home/ic_phone_circle.png'),
                             onClick: () {
                               //Provider.of<LanguageModel>(context, listen: false).nextLang();
+
+                              MyApi.usageLog(
+                                context: context,
+                                pageName: 'ui_emergency_call',
+                                pageKey: null,
+                                pageData: null,
+                              );
 
                               Navigator.push(
                                 context,

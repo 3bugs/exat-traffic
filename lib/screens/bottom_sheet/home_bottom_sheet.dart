@@ -138,6 +138,13 @@ class _HomeBottomSheetState extends State<HomeBottomSheet> {
     setState(() {
       _selectedExpressWay = expressWayModel;
     });
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_route',
+      pageKey: expressWayModel.name,
+      pageData: null,
+    );
   }
 
   void _handleClickTrafficPoint(BuildContext context, TrafficPointModel trafficPoint) {

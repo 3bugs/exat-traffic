@@ -343,25 +343,37 @@ class MyHomeState extends State<Home> {
       widget.hideSearchOptions();
     }
 
+    String toolName = '';
     switch (mapTool) {
       case MapTool.schematicMaps:
+        toolName = 'schematic_maps';
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SchematicMaps()),
         );
         break;
       case MapTool.aroundMe:
+        toolName = 'around_me';
         context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.aroundMe));
         break;
       case MapTool.layer:
+        toolName = 'layer';
         context.bloc<HomeBloc>().add(ClickMapTool(mapTool: MapTool.layer));
         break;
       case MapTool.currentLocation:
+        toolName = 'current_location';
         _moveToCurrentPosition(context, showAlertIfLocationNotAvailable: true);
         break;
       case MapTool.none:
         break;
     }
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_map_tool',
+      pageKey: toolName,
+      pageData: null,
+    );
   }
 
   void _handleCameraMove(CameraPosition cameraPosition) {

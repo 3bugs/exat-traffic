@@ -425,7 +425,7 @@ app.post('/api/:item/:id?', (req, res) => {
       if (!onlyVisualization) {
         db.query(
           `INSERT INTO urequest (utoken, ulat, ulong, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
-                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', '${key}', ${data == null ? 'null' : "'" + data + "'"}, '${ip}', '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
+                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', ${key == null ? 'null' : "'" + key + "'"}, ${data == null ? 'null' : "'" + data + "'"}, '${ip}', '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
           (error, results, fields) => {
             if (error) {
               res.json({

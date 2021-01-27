@@ -142,6 +142,13 @@ class MyRouteState extends State<MyRoute> {
         );
       }
     });
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_map_tool',
+      pageKey: 'current_location',
+      pageData: null,
+    );
   }
 
   void _handleClickSearch(BuildContext context) {
@@ -156,6 +163,13 @@ class MyRouteState extends State<MyRoute> {
         widget.showBestRouteAfterSearch(bestRoute);
       }
     });
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_map_tool',
+      pageKey: 'search',
+      pageData: null,
+    );
   }
 
   Future<void> _handleClickTimePeriodOption(int time) async {
@@ -638,10 +652,24 @@ class MyRouteState extends State<MyRoute> {
 
   void _selectGateInMarker(BuildContext context, GateInModel selectedGateIn) {
     context.bloc<RouteBloc>().add(GateInSelected(selectedGateIn: selectedGateIn));
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_route_origin',
+      pageKey: selectedGateIn.name,
+      pageData: null,
+    );
   }
 
   void _selectCostTollMarker(BuildContext context, CostTollModel selectedCostToll) {
     context.bloc<RouteBloc>().add(CostTollSelected(selectedCostToll: selectedCostToll));
+
+    MyApi.usageLog(
+      context: context,
+      pageName: 'ui_route_destination',
+      pageKey: selectedCostToll.name,
+      pageData: null,
+    );
   }
 
   Polyline createRoutePolyline(String encodedPoly, String id, Color color) {
@@ -1624,6 +1652,13 @@ class MyRouteState extends State<MyRoute> {
                           setState(() {
                             _labelVisible = !_labelVisible;
                           });
+
+                          MyApi.usageLog(
+                            context: context,
+                            pageName: 'ui_map_tool',
+                            pageKey: 'label',
+                            pageData: null,
+                          );
                         },
                       ),
 

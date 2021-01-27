@@ -66,7 +66,7 @@ class _SearchServiceState extends State<SearchService> {
 
       MyApi.usageLog(
         context: context,
-        pageName: 'map_marker',
+        pageName: 'ui_map_marker',
         pageKey: 'toll_plaza',
         pageData: marker.name,
       );
