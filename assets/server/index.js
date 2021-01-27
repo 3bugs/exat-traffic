@@ -414,7 +414,7 @@ app.post('/api/:item/:id?', (req, res) => {
 
   switch (req.params.item) {
     case 'usage_log':
-      const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, data} = req.body;
+      const {deviceToken, deviceType, screenWidth, screenHeight, lat, lng, page, key, data, onlyVisualization} = req.body;
       io.emit('location', {lat, lng, type: 'inuse'});
 
       const ip = req.headers['x-forwarded-for'] ||
@@ -422,29 +422,33 @@ app.post('/api/:item/:id?', (req, res) => {
         req.socket.remoteAddress ||
         (req.connection.socket ? req.connection.socket.remoteAddress : null);
 
-      db.query(
-        `INSERT INTO urequest (utoken, ulat, ulong, udatetime, upagerequest, upostkey, userip, devicetype, screenWidth, screenHeight) 
-                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', '${data}', '${ip}', '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
-        (error, results, fields) => {
-          if (error) {
-            res.json({
-              error: {
-                code: CODE_FAILED,
-                message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error,
-              },
-              data_list: null,
-            });
-          } else {
-            res.json({
-              error: {
-                code: CODE_SUCCESS,
-                message: 'บันทึกข้อมูลสำเร็จ',
-              },
-              data_list: [],
-            });
-          }
-          db.end();
-        });
+      if (!onlyVisualization) {
+        db.query(
+          `INSERT INTO urequest (utoken, ulat, ulong, udatetime, upagerequest, upostkey, upostdata, userip, devicetype, screenWidth, screenHeight) 
+                VALUES ('${deviceToken}', ${lat}, ${lng}, NOW(), '${page}', '${key}', ${data == null ? 'null' : "'" + data + "'"}, '${ip}', '${deviceType === "android" ? "A" : "I"}', ${screenWidth}, ${screenHeight})`,
+          (error, results, fields) => {
+            if (error) {
+              res.json({
+                error: {
+                  code: CODE_FAILED,
+                  message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error,
+                },
+                data_list: null,
+              });
+            } else {
+              res.json({
+                error: {
+                  code: CODE_SUCCESS,
+                  message: 'บันทึกข้อมูลสำเร็จ',
+                },
+                data_list: [],
+              });
+            }
+            db.end();
+          });
+      } else {
+        db.end();
+      }
       break;
   }
 });

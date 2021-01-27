@@ -142,7 +142,8 @@ class MarkerModel {
     }
 
     List group = json['group'] ?? List();
-    List filteredGroup = group.where((item) => item['type'].toString().toLowerCase() == 'cluster').toList();
+    List filteredGroup =
+        group.where((item) => item['type'].toString().toLowerCase() == 'cluster').toList();
     int groupId = filteredGroup.isNotEmpty ? filteredGroup[0]['parent'] : 0;
     String groupName = filteredGroup.isNotEmpty ? filteredGroup[0]['group_name'] : '';
 
@@ -199,6 +200,7 @@ class MarkerModel {
           }
         });
         break;
+
       case CategoryType.REST_AREA:
         categoryTypeText = 'rest_area';
 
@@ -237,6 +239,7 @@ class MarkerModel {
           ),
         );
         break;
+
       case CategoryType.POLICE_STATION:
         categoryTypeText = 'police_station';
 
@@ -251,6 +254,7 @@ class MarkerModel {
           ),
         );
         break;
+
       case CategoryType.U_TURN:
         categoryTypeText = 'u_turn';
 
@@ -264,11 +268,24 @@ class MarkerModel {
           ),
         );
         break;
+
       case CategoryType.TOLL_PLAZA:
         categoryTypeText = 'toll_plaza';
 
         //context.bloc<HomeBloc>().add(ClickTollPlaza(marker: this));
         BlocProvider.of<MarkerBloc>(context).add(ClickTollPlaza(marker: this));
+        break;
+
+      case CategoryType.ENTRANCE:
+        categoryTypeText = 'entrance';
+        break;
+
+      case CategoryType.EXIT:
+        categoryTypeText = 'exit';
+        break;
+
+      case CategoryType.EAST_PASS:
+        categoryTypeText = 'easy_pass';
         break;
     }
 
@@ -276,7 +293,12 @@ class MarkerModel {
     print('║ Marker: $categoryTypeText - ${this.name}');
     print('╠═════════════════════════════════════════════');
 
-    MyApi.usageLog(context, categoryTypeText, this.name);
+    MyApi.usageLog(
+      context: context,
+      pageName: 'map_marker',
+      pageKey: categoryTypeText,
+      pageData: this.name,
+    );
   }
 
   @override

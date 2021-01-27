@@ -198,13 +198,13 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
     bg.BackgroundGeolocation.ready(bg.Config(
       desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
       distanceFilter: 0,
-      locationUpdateInterval: 300000, // 300 วินาที = 5 นาที
+      locationUpdateInterval: 300000,
+      // 300 วินาที = 5 นาที
       stopOnTerminate: false,
       startOnBoot: true,
       debug: true,
       logLevel: bg.Config.LOG_LEVEL_VERBOSE,
       enableHeadless: true,
-
     )).then((bg.State state) {
       if (!state.enabled) {
         bg.BackgroundGeolocation.start();
@@ -227,6 +227,31 @@ class _MyScaffoldMainState extends State<MyScaffoldMain> {
 
   void _handleClickTab(int index) {
     _showFragment(index);
+
+    String tabName = '';
+    switch (index) {
+      case 0: // home
+        tabName = 'home';
+        break;
+      case 1: // favorite
+        tabName = 'favorite';
+        break;
+      case 2: // route
+        tabName = 'route';
+        break;
+      case 3: // incident
+        tabName = 'incident';
+        break;
+      case 4: // notification
+        tabName = 'notification';
+        break;
+    }
+    MyApi.usageLog(
+      context: context,
+      pageName: 'bottom_tab',
+      pageKey: tabName,
+      pageData: null,
+    );
 
     /*if (index == 2) {
       if (_keyRoutePage.currentState != null) {

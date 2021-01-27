@@ -15,6 +15,7 @@ import 'package:exattraffic/screens/bottom_sheet/layer_bottom_sheet.dart';
 import 'package:exattraffic/screens/bottom_sheet/toll_plaza_bottom_sheet.dart';
 import 'package:exattraffic/components/no_data.dart';
 import 'package:exattraffic/models/locale_text.dart';
+import 'package:exattraffic/services/api.dart';
 
 import 'search_service_presenter.dart';
 
@@ -62,6 +63,13 @@ class _SearchServiceState extends State<SearchService> {
         _tollPlaza = TollPlazaModel.fromMarkerModel(marker);
         _keyTollPlazaBottomSheet.currentState.toggleSheet();
       });
+
+      MyApi.usageLog(
+        context: context,
+        pageName: 'map_marker',
+        pageKey: 'toll_plaza',
+        pageData: marker.name,
+      );
     } else {
       marker.showDetailsScreen(this.context);
     }
