@@ -257,6 +257,7 @@ app.get('/api/:item/:id?', (req, res) => {
 
       case 'user_tracking':
         const {token, lat, lng} = req.query;
+        io.emit('location', {lat, lng, type: 'bg'});
 
         db.query(
           `INSERT INTO ulocations (device_token, ulat, ulng, ulocation, created_at) 

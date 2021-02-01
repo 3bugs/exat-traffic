@@ -35,8 +35,9 @@ void main() {
       ),
     );
 
+    //https://pub.dev/documentation/flutter_background_geolocation/latest/flt_background_geolocation/BackgroundGeolocation/registerHeadlessTask.html
     // Register your headlessTask:
-    //bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
+    bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
   });
 }
 

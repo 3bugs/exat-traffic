@@ -174,8 +174,8 @@ class _CctvDetailsMainState extends State<CctvDetailsMain> {
 
   @override
   void dispose() {
+    if (_controller != null) _controller.dispose();
     super.dispose();
-    //_controller.dispose();
   }
 
   bool _isValidUrl(String url) {
